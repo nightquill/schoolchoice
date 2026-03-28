@@ -62,7 +62,11 @@
       "Bash(DATABASE_URL=\"postgresql+psycopg2://advisor:advisorsecret@localhost:5432/advisor_db\" SECRET_KEY=\"dev-secret-key\" ALGORITHM=\"HS256\" ACCESS_TOKEN_EXPIRE_MINUTES=\"30\" CORS_ORIGINS=\"http://localhost:5173\" UPLOAD_DIR=\"/tmp/advisor_uploads\" uvicorn app.main:app --host 0.0.0.0 --port 8000)",
       "Bash(open http://localhost:5173)",
       "Bash(git config:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(head -20 echo \"---\" grep -n \"generate_html_plan\\\\|plan_type\\\\|HIGH_SCHOOL\\\\|high_school\" /Users/bsg/Downloads/schoolchoice/backend/app/services/plan_generator.py)",
+      "Bash(head -20 echo \"---\" grep -n \"def.*plan\\\\|plan_type\\\\|HIGH_SCHOOL\" /Users/bsg/Downloads/schoolchoice/backend/app/api/v1/routes/plan.py)"
     ]
   }
 }

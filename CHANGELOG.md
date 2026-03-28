@@ -3,6 +3,17 @@
 
 ---
 
+## [2.2.1] — 2026-03-28
+
+### Added
+- **Plan type parameter**: `POST /students/{id}/plan` now accepts optional JSON body `{"plan_type": "UNIVERSITY"|"HIGH_SCHOOL"}` (default: `"UNIVERSITY"`). UNIVERSITY plan is unchanged. HIGH_SCHOOL plan omits IELTS/language section and major recommendations; instead shows a subject-by-subject strength/weakness analysis table (Strength ≥5, Needs Improvement <4, On Track 4–4) with recommended actions per subject and a grade improvement action plan. Title is "High School Academic Plan".
+- **SHAP score explanation in UNIVERSITY plan**: Each school card now includes a "What drives this score" section listing the top 4 SHAP features sorted by magnitude, showing direction (↑ boosts / ↓ reduces), percentage contribution, and explanation text. Section is omitted gracefully when `shap_explanation` is None.
+
+### Tests
+- 70/70 passed (+10: TestHighSchoolPlan ×6, TestShapExplanation ×4)
+
+---
+
 ## [2.2.0] — 2026-03-28
 
 ### Added

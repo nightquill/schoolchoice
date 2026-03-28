@@ -149,6 +149,55 @@ def _section_academic_profile(student: dict) -> str:
     </section>"""
 
 
+def _shap_section_html(result) -> str:
+    """
+    Build the 'What drives this score' SHAP breakdown HTML for a single school result.
+    Returns empty string if shap_explanation is None or has no features.
+    """
+    if isinstance(result, dict):
+        shap_explanation = result.get("shap_explanation")
+    else:
+        shap_explanation = getattr(result, "shap_explanation", None)
+
+    if not shap_explanation:
+        return ""
+
+    features = shap_explanation.get("features") if isinstance(shap_explanation, dict) else None
+    if not features:
+        return ""
+
+    # Sort by magnitude descending, take top 4
+    sorted_features = sorted(features, key=lambda f: f.get("magnitude", 0.0), reverse=True)[:4]
+
+    rows = ""
+    for feat in sorted_features:
+        feature_name = _esc(feat.get("feature", ""))
+        direction = feat.get("direction", "")
+        magnitude = feat.get("magnitude", 0.0)
+        explanation = _esc(feat.get("explanation", ""))
+        pct_str = f"{magnitude * 100:.1f}%"
+        if direction == "positive":
+            arrow = "&#8593;"  # ↑
+            dir_label = "boosts score"
+            dir_color = "#155724"
+            sign = "+"
+        else:
+            arrow = "&#8595;"  # ↓
+            dir_label = "reduces score"
+            dir_color = "#721c24"
+            sign = ""
+        rows += (
+            f'<li style="margin:6px 0; font-size:14px;">'
+            f'<span style="color:{dir_color}; font-weight:bold;">{arrow} {feature_name} ({sign}{pct_str})</span>'
+            f' &mdash; {explanation}'
+            f'</li>'
+        )
+
+    return f"""
+            <h4>What drives this score</h4>
+            <ul style="padding-left:20px;">{rows}</ul>"""
+
+
 def _section_recommended_schools(match_results: list, student: dict) -> str:
     content = '<section class="section"><h2>3. Recommended Schools</h2>'
 
@@ -232,12 +281,15 @@ def _section_recommended_schools(match_results: list, student: dict) -> str:
                 majors_display = _esc(str(intended_majors))
             majors_html = f'<p><strong>Intended Major(s):</strong> {majors_display}</p>'
 
+        shap_html = _shap_section_html(result)
+
         content += f"""
         <div class="school-card">
           <h3>{idx}. {school_name} {elig_badge}</h3>
           <p><strong>Fit Score:</strong> {_pct(fit_score)}</p>
           {majors_html}
           <p><strong>Why this school fits:</strong> {rationale}</p>
+          {shap_html}
           {gap_table}
           <h4>Recommended Actions</h4>
           <ul>{actions}</ul>
@@ -248,6 +300,279 @@ def _section_recommended_schools(match_results: list, student: dict) -> str:
 
     content += "</section>"
     return content
+
+
+# ---------------------------------------------------------------------------
+# HIGH_SCHOOL plan sections
+# ---------------------------------------------------------------------------
+
+def _section_hs_subject_analysis(student: dict) -> str:
+    """Section 3 for HIGH_SCHOOL plan: subject-by-subject strength/weakness analysis."""
+    from app.services.hkdse_service import grade_to_int
+
+    grades = student.get("subject_grades") or []
+    if not grades:
+        return '<section class="section"><h2>3. Subject Strength &amp; Weakness Analysis</h2><p>No grade records on file.</p></section>'
+
+    rows = ""
+    for g in grades:
+        subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
+        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
+        numeric = grade_to_int(raw)
+        raw_esc = _esc(raw)
+
+        if numeric >= 5:
+            status = "Strength"
+            status_style = "color:#155724; font-weight:bold;"
+            action = "Maintain performance; consider advanced extension work."
+        elif numeric < 4:
+            status = "Needs Improvement"
+            status_style = "color:#721c24; font-weight:bold;"
+            action = f"Focus on Grade 4+ target; seek teacher support and additional practice."
+        else:
+            status = "On Track"
+            status_style = "color:#856404; font-weight:bold;"
+            action = "Consolidate understanding; aim for Grade 5 in next sitting."
+
+        rows += (
+            f"<tr>"
+            f"<td>{subj}</td>"
+            f"<td>{raw_esc}</td>"
+            f"<td>{numeric}</td>"
+            f'<td><span style="{status_style}">{status}</span></td>'
+            f"<td>{action}</td>"
+            f"</tr>"
+        )
+
+    return f"""
+    <section class="section">
+      <h2>3. Subject Strength &amp; Weakness Analysis</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Subject</th><th>Grade</th><th>Numeric</th>
+            <th>Assessment</th><th>Recommended Action</th>
+          </tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </section>"""
+
+
+def _section_hs_action_plan(student: dict) -> str:
+    """Section 4 for HIGH_SCHOOL plan: grade improvement action items."""
+    from app.services.hkdse_service import grade_to_int
+
+    current_year = datetime.now(timezone.utc).year
+    grades = student.get("subject_grades") or []
+    items = []
+
+    for g in grades:
+        subj = _esc(g.get("subject_name") or g.get("subject_code") or "Subject")
+        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
+        numeric = grade_to_int(raw)
+        if numeric < 4:
+            items.append({
+                "task": f"Improve {subj} to Grade 4 or above",
+                "deadline": f"Next Mock Exam ({current_year})",
+                "priority": "High",
+            })
+        elif numeric < 5:
+            items.append({
+                "task": f"Aim for Grade 5 in {subj}",
+                "deadline": f"End of Term ({current_year})",
+                "priority": "Medium",
+            })
+
+    items.append({
+        "task": "Meet regularly with form teacher to review academic progress",
+        "deadline": f"Monthly ({current_year})",
+        "priority": "High",
+    })
+    items.append({
+        "task": "Identify and join relevant extra-curricular activities",
+        "deadline": f"Q3 {current_year}",
+        "priority": "Medium",
+    })
+
+    if not items:
+        return '<section class="section"><h2>4. Grade Improvement Action Plan</h2><p>No specific improvement actions needed. Keep up the excellent work!</p></section>'
+
+    rows = ""
+    for item in items:
+        task = _esc(item.get("task") or "")
+        deadline = _esc(item.get("deadline") or "")
+        priority = _esc(item.get("priority") or "Medium")
+        priority_class = f"priority-{priority.lower()}"
+        rows += (
+            f"<tr>"
+            f"<td>{deadline}</td>"
+            f"<td>{task}</td>"
+            f'<td><span class="{priority_class}">{priority}</span></td>'
+            f"</tr>"
+        )
+
+    return f"""
+    <section class="section">
+      <h2>4. Grade Improvement Action Plan</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Deadline</th><th>Task</th><th>Priority</th></tr>
+        </thead>
+        <tbody>{rows}</tbody>
+      </table>
+    </section>"""
+
+
+def _generate_high_school_plan(student: dict, match_results: list) -> str:
+    """
+    Generate a HIGH_SCHOOL academic plan HTML document.
+    Filters match results to HIGH_SCHOOL type schools only.
+    Shows subject strength/weakness analysis instead of university fit scores.
+    No IELTS section.
+    """
+    from app.services.hkdse_service import compute_best5_aggregate, grade_to_int
+
+    grades = student.get("subject_grades") or []
+    grade_dicts = []
+    for g in grades:
+        code = g.get("subject_code") or ""
+        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
+        category = g.get("category") or "ELECTIVE"
+        is_compulsory = g.get("is_compulsory") or False
+        grade_dicts.append({
+            "subject_code": code,
+            "numeric_value": grade_to_int(raw),
+            "is_compulsory": is_compulsory,
+            "category": category,
+        })
+    best5 = compute_best5_aggregate(grade_dicts)
+
+    student_name = student.get("name") or student.get("full_name") or "Student"
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    # Filter match_results to high schools only
+    hs_results = []
+    for r in match_results:
+        school_type = getattr(r, "school_type", None) if not isinstance(r, dict) else r.get("school_type")
+        if school_type == "HIGH_SCHOOL":
+            hs_results.append(r)
+
+    css = """
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #1a1a2e;
+      background: #f8f9fa;
+      line-height: 1.6;
+      padding: 24px;
+    }
+    .header {
+      background: linear-gradient(135deg, #145a32, #1e8449);
+      color: white;
+      padding: 32px 40px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+    .header h1 { font-size: 28px; margin-bottom: 4px; }
+    .header .subtitle { opacity: 0.8; font-size: 14px; }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .section h2 {
+      font-size: 18px;
+      color: #145a32;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section h3 { font-size: 15px; color: #333; margin: 16px 0 8px 0; }
+    .section h4 { font-size: 13px; color: #555; margin: 12px 0 6px 0; }
+    .summary-table, .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .summary-table th, .data-table th {
+      background: #145a32;
+      color: white;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .summary-table td, .data-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .summary-table tr:nth-child(even) td,
+    .data-table tr:nth-child(even) td { background: #f5f5f5; }
+    .school-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+    .badge-pass { background: #d4edda; color: #155724; }
+    .badge-fail { background: #f8d7da; color: #721c24; }
+    ul { padding-left: 20px; }
+    li { margin: 4px 0; font-size: 14px; }
+    .priority-high { color: #c0392b; font-weight: bold; }
+    .priority-medium { color: #e67e22; }
+    .priority-low { color: #27ae60; }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-top: 24px;
+      padding: 16px;
+    }
+    @media print {
+      body { background: white; padding: 0; font-size: 12px; }
+      .header { background: #145a32 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+      .school-card { page-break-inside: avoid; }
+      .badge { border: 1px solid currentColor; }
+    }
+    """
+
+    sections = "".join([
+        _section_student_summary(student, best5),
+        _section_academic_profile(student),
+        _section_hs_subject_analysis(student),
+        _section_hs_action_plan(student),
+        _section_appendix(student),
+    ])
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High School Academic Plan — {_esc(student_name)}</title>
+  <style>{css}</style>
+</head>
+<body>
+  <div class="header">
+    <h1>High School Academic Plan</h1>
+    <div class="subtitle">{_esc(student_name)} &mdash; Generated {_esc(generated_at)}</div>
+  </div>
+  {sections}
+  <div class="footer">
+    Generated by Intelligent Academic Advisor &bull; {_esc(generated_at)}
+  </div>
+</body>
+</html>"""
 
 
 def _section_action_plan(action_items: list) -> str:
@@ -392,11 +717,15 @@ def _section_appendix(student: dict) -> str:
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def generate_html_plan(student: dict, match_results: list, action_items: list) -> str:
+def generate_html_plan(student: dict, match_results: list, action_items: list, plan_type: str = "UNIVERSITY") -> str:
     """
     Returns complete HTML string with inline CSS and @media print.
+    plan_type: "UNIVERSITY" (default) or "HIGH_SCHOOL".
     REQ-077
     """
+    if plan_type == "HIGH_SCHOOL":
+        return _generate_high_school_plan(student, match_results)
+
     if not action_items:
         action_items = _build_action_items(student, match_results)
 
@@ -528,12 +857,12 @@ def generate_html_plan(student: dict, match_results: list, action_items: list) -
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Academic Plan — {_esc(student_name)}</title>
+  <title>University Academic Plan — {_esc(student_name)}</title>
   <style>{css}</style>
 </head>
 <body>
   <div class="header">
-    <h1>Academic Advising Plan</h1>
+    <h1>University Academic Plan</h1>
     <div class="subtitle">{_esc(student_name)} &mdash; Generated {_esc(generated_at)}</div>
   </div>
   {sections}

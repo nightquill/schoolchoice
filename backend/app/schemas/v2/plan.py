@@ -14,6 +14,10 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
+class PlanGenerateRequest(BaseModel):
+    plan_type: str = "UNIVERSITY"
+
+
 class PlanJobResponse(BaseModel):
     # ORM attribute is `id`; serialised as `job_id` in the response JSON.
     job_id: UUID = Field(validation_alias="id")

@@ -438,6 +438,174 @@ class TestGenerateHtmlPlan:
         assert "<link" not in html.lower()
 
 
+class TestHighSchoolPlan:
+    def _make_student(self):
+        return {
+            "name": "Lee Siu Ming",
+            "year_of_study": 2026,
+            "subject_grades": [
+                {
+                    "subject_code": "ENGL",
+                    "subject_name": "English Language",
+                    "sitting": "MOCK",
+                    "raw_grade": "5",
+                    "predicted_grade": "5",
+                    "year_of_exam": 2026,
+                    "is_compulsory": True,
+                    "category": "CORE",
+                },
+                {
+                    "subject_code": "MATH",
+                    "subject_name": "Mathematics",
+                    "sitting": "MOCK",
+                    "raw_grade": "2",
+                    "predicted_grade": "2",
+                    "year_of_exam": 2026,
+                    "is_compulsory": True,
+                    "category": "CORE",
+                },
+            ],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+
+    def test_high_school_plan_title(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "High School Academic Plan" in html
+
+    def test_high_school_plan_no_ielts_section(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "Language Readiness" not in html
+        assert "IELTS" not in html
+
+    def test_high_school_plan_subject_analysis_present(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "Subject Strength" in html
+        assert "Strength" in html
+        assert "Needs Improvement" in html
+
+    def test_high_school_plan_no_javascript(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "<script" not in html.lower()
+
+    def test_high_school_plan_media_print(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "@media print" in html
+
+    def test_university_plan_default(self):
+        # Default plan_type should produce University plan
+        student = self._make_student()
+        html = generate_html_plan(student, [], [])
+        assert "University Academic Plan" in html
+        assert "High School Academic Plan" not in html
+
+
+class TestShapExplanation:
+    def _make_result_with_shap(self) -> MatchResult:
+        return MatchResult(
+            school_id="school-shap",
+            school_name="SHAP University",
+            major_name=None,
+            major_jupas_code=None,
+            eligibility_pass=True,
+            failing_criteria=[],
+            fit_score=0.75,
+            component_scores={
+                "academic_fit": 0.8,
+                "subject_alignment": 0.7,
+                "language_fit": 0.9,
+                "interest_alignment": 0.6,
+                "weighted_score": 0.75,
+            },
+            ml_probability=None,
+            final_score=0.75,
+            shap_explanation={
+                "features": [
+                    {"feature": "Academic Fit", "direction": "positive", "magnitude": 0.182, "explanation": "Your grades align well."},
+                    {"feature": "Language", "direction": "negative", "magnitude": 0.05, "explanation": "IELTS slightly below target."},
+                    {"feature": "Interest", "direction": "positive", "magnitude": 0.12, "explanation": "Strong activity match."},
+                    {"feature": "Awards", "direction": "positive", "magnitude": 0.08, "explanation": "Awards add weight."},
+                    {"feature": "Extra", "direction": "negative", "magnitude": 0.01, "explanation": "Minor factor."},
+                ]
+            },
+            rationale="SHAP University is a good fit for testing.",
+        )
+
+    def test_shap_section_present_in_university_plan(self):
+        student = {
+            "name": "Test Student",
+            "year_of_study": 2026,
+            "subject_grades": [],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+        result = self._make_result_with_shap()
+        html = generate_html_plan(student, [result], [])
+        assert "What drives this score" in html
+        assert "Academic Fit" in html
+        assert "18.2%" in html
+
+    def test_shap_top_4_only(self):
+        student = {
+            "name": "Test Student",
+            "year_of_study": 2026,
+            "subject_grades": [],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+        result = self._make_result_with_shap()
+        html = generate_html_plan(student, [result], [])
+        # The 5th feature "Extra" has magnitude 0.01 and should be excluded
+        assert "Minor factor" not in html
+
+    def test_shap_none_gracefully_skipped(self):
+        student = {
+            "name": "Test Student",
+            "year_of_study": 2026,
+            "subject_grades": [],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+        result = MatchResult(
+            school_id="s1",
+            school_name="No SHAP School",
+            major_name=None,
+            major_jupas_code=None,
+            eligibility_pass=True,
+            failing_criteria=[],
+            fit_score=0.7,
+            component_scores={},
+            ml_probability=None,
+            final_score=0.7,
+            shap_explanation=None,
+            rationale="No SHAP here.",
+        )
+        html = generate_html_plan(student, [result], [])
+        assert "What drives this score" not in html
+
+    def test_shap_not_in_high_school_plan(self):
+        student = {
+            "name": "Test Student",
+            "year_of_study": 2026,
+            "subject_grades": [],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+        result = self._make_result_with_shap()
+        html = generate_html_plan(student, [result], [], plan_type="HIGH_SCHOOL")
+        assert "What drives this score" not in html
+
+
 class TestBuildActionItems:
     def test_generates_items(self):
         student = {

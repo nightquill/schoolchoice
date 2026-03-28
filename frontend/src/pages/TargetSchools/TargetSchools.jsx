@@ -150,6 +150,89 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
   );
 }
 
+// ---- By-Major view ----
+function MajorView({ targets }) {
+  const navigate = useNavigate();
+
+  // Build map: major -> [{target, matchScore, matchColor}]
+  const majorMap = {};
+  targets.forEach((target) => {
+    const majors = target.intended_majors?.length > 0 ? target.intended_majors : ['__none__'];
+    majors.forEach((major) => {
+      if (!majorMap[major]) majorMap[major] = [];
+      majorMap[major].push(target);
+    });
+  });
+
+  const sortedMajors = Object.keys(majorMap).filter((m) => m !== '__none__').sort();
+  const hasMajors = sortedMajors.length > 0;
+  const noMajorTargets = majorMap['__none__'] || [];
+
+  const schoolEntryStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-3)',
+    padding: 'var(--space-3) var(--space-4)',
+    borderBottom: 'var(--border-width) solid var(--color-border)',
+    flexWrap: 'wrap',
+  };
+
+  const majorHeadingStyle = {
+    fontSize: 'var(--font-size-sm)',
+    fontWeight: 'var(--font-weight-bold)',
+    color: 'var(--color-primary)',
+    background: 'rgba(37,99,235,0.06)',
+    padding: 'var(--space-2) var(--space-4)',
+    borderBottom: 'var(--border-width) solid var(--color-border)',
+  };
+
+  const renderTarget = (target) => {
+    const matchScore = target.match_score != null ? Math.round(target.match_score * 100) : null;
+    const matchColor = matchScore != null && matchScore >= 70 ? 'var(--color-success)' : matchScore != null && matchScore >= 40 ? 'var(--color-warning)' : 'var(--color-error)';
+    return (
+      <div key={target.id} style={schoolEntryStyle}>
+        <div style={{ flex: 1, minWidth: '120px' }}>
+          <span
+            style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline' }}
+            onClick={() => navigate(`/schools/${target.school_id}`)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(`/schools/${target.school_id}`)}
+          >
+            {target.school_name}
+          </span>
+        </div>
+        <EligibilityBadge pass={target.eligibility_pass} failingCriteria={target.failing_criteria} />
+        {matchScore != null && (
+          <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: matchColor, flexShrink: 0 }}>
+            {matchScore}%
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', boxShadow: 'var(--shadow-sm)', border: 'var(--border-width) solid var(--color-border)', overflow: 'hidden' }}>
+      {hasMajors && sortedMajors.map((major) => (
+        <div key={major}>
+          <div style={majorHeadingStyle}>{major}</div>
+          {majorMap[major].map(renderTarget)}
+        </div>
+      ))}
+      {noMajorTargets.length > 0 && (
+        <div>
+          <div style={{ ...majorHeadingStyle, color: 'var(--color-text-secondary)', background: 'var(--color-background)' }}>No Major Specified</div>
+          {noMajorTargets.map(renderTarget)}
+        </div>
+      )}
+      {!hasMajors && noMajorTargets.length === 0 && (
+        <div style={{ padding: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>No targets to display.</div>
+      )}
+    </div>
+  );
+}
+
 // ---- Main TargetSchools ----
 function TargetSchools() {
   const { id } = useParams();
@@ -157,6 +240,7 @@ function TargetSchools() {
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
   const [targets, setTargets] = useState([]);
+  const [viewMode, setViewMode] = useState('school'); // 'school' | 'major'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -388,8 +472,33 @@ function TargetSchools() {
           </div>
 
           <div style={listContainerStyle}>
+            {/* View mode toggle */}
+            <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+              {['school', 'major'].map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  style={{
+                    padding: 'var(--space-2) var(--space-4)',
+                    background: viewMode === mode ? 'var(--color-primary)' : 'none',
+                    color: viewMode === mode ? '#fff' : 'var(--color-text-secondary)',
+                    border: 'var(--border-width) solid var(--color-border)',
+                    borderRadius: 'var(--border-radius-sm)',
+                    cursor: 'pointer',
+                    fontSize: 'var(--font-size-sm)',
+                    fontFamily: 'var(--font-family-base)',
+                    fontWeight: viewMode === mode ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+                  }}
+                >
+                  {mode === 'school' ? 'By School' : 'By Major'}
+                </button>
+              ))}
+            </div>
+
             {targets.length === 0 ? (
               <EmptyState message="No target schools yet. Click 'Add School' to begin." />
+            ) : viewMode === 'major' ? (
+              <MajorView targets={targets} />
             ) : (
               <ul
                 style={targetListStyle}

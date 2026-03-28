@@ -97,18 +97,18 @@ function SchoolCard({ school }) {
           </div>
         </div>
       )}
-      {school.major_requirements && Object.keys(school.major_requirements).length > 0 && (
+      {Array.isArray(school.major_requirements) && school.major_requirements.length > 0 && (
         <div style={{ marginTop: 'var(--space-1)' }}>
           <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>Majors</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {Object.keys(school.major_requirements).slice(0, 3).map((major) => (
-              <span key={major} style={{ fontSize: '10px', background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
-                {major}
+            {school.major_requirements.slice(0, 3).map((req) => (
+              <span key={req.major} style={{ fontSize: '10px', background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
+                {req.major}
               </span>
             ))}
-            {Object.keys(school.major_requirements).length > 3 && (
+            {school.major_requirements.length > 3 && (
               <span style={{ fontSize: '10px', color: 'var(--color-text-secondary)', padding: '1px 6px' }}>
-                +{Object.keys(school.major_requirements).length - 3} more
+                +{school.major_requirements.length - 3} more
               </span>
             )}
           </div>

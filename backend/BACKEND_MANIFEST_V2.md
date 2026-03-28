@@ -61,6 +61,11 @@ Notes:
 | GET | /students/{id}/plan/status | return latest job status | REQ-078 | Protected | DONE |
 | GET | /students/{id}/plan | return HTML plan or 404 | REQ-078 | Protected | DONE |
 
+Notes:
+- `POST /students/{id}/plan` accepts an optional JSON body: `{"plan_type": "UNIVERSITY"}` (default) or `{"plan_type": "HIGH_SCHOOL"}`.
+- **UNIVERSITY plan** (default): 7-section plan with school fit scores, gap analysis, IELTS readiness, skill gaps, and action timeline. Each school card includes a "What drives this score" SHAP breakdown (top 4 features by magnitude, direction arrow, % contribution, explanation). SHAP section is skipped gracefully if `shap_explanation` is None.
+- **HIGH_SCHOOL plan**: 5-section plan (Student Summary, Academic Profile, Subject Strength & Weakness Analysis, Grade Improvement Action Plan, Appendix). Filters match_results to `school_type == "HIGH_SCHOOL"`. No IELTS section, no major recommendations. Subject analysis shows grade, numeric value, Strength (≥5) / On Track (4) / Needs Improvement (<4), and recommended actions per subject. Title: "High School Academic Plan".
+
 ---
 
 ## Account (REQ-079)

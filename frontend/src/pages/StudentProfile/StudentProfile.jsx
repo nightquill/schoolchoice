@@ -136,7 +136,58 @@ function PersonalTab({ studentId, student, onSaved, showToast }) {
         <TextInput label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} error={errors.full_name} />
         <TextInput label="Preferred Name" name="preferred_name" value={form.preferred_name} onChange={handleChange} />
         <div>
-          <TextInput label="Date of Birth" name="date_of_birth" type="date" value={form.date_of_birth} onChange={handleChange} />
+          <label style={labelStyle}>Date of Birth</label>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            {(() => {
+              const dobParts = form.date_of_birth ? form.date_of_birth.split('-') : ['', '', ''];
+              const dobYear = dobParts[0] || '';
+              const dobMonth = dobParts[1] || '';
+              const dobDay = dobParts[2] || '';
+              const currentYear = new Date().getFullYear();
+              const selectSt = { padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', background: 'var(--color-surface)', color: 'var(--color-text-primary)' };
+              const rebuildDob = (y, m, d) => {
+                if (!y || !m || !d) return '';
+                return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+              };
+              return (
+                <>
+                  <select
+                    aria-label="Day of birth"
+                    value={dobDay}
+                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(dobYear, dobMonth, e.target.value) } })}
+                    style={selectSt}
+                  >
+                    <option value="">Day</option>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                      <option key={d} value={String(d).padStart(2, '0')}>{d}</option>
+                    ))}
+                  </select>
+                  <select
+                    aria-label="Month of birth"
+                    value={dobMonth}
+                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(dobYear, e.target.value, dobDay) } })}
+                    style={selectSt}
+                  >
+                    <option value="">Month</option>
+                    {[['01','January'],['02','February'],['03','March'],['04','April'],['05','May'],['06','June'],['07','July'],['08','August'],['09','September'],['10','October'],['11','November'],['12','December']].map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                  <select
+                    aria-label="Year of birth"
+                    value={dobYear}
+                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(e.target.value, dobMonth, dobDay) } })}
+                    style={selectSt}
+                  >
+                    <option value="">Year</option>
+                    {Array.from({ length: 26 }, (_, i) => currentYear - i).map((y) => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
+                </>
+              );
+            })()}
+          </div>
           {age !== null && (
             <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '0' }}>Age: {age}</p>
           )}
@@ -743,6 +794,17 @@ function ActivitiesTab({ studentId, student, showToast }) {
   const [activities, setActivities] = useState(student?.extra_curricular || []);
   const [awards, setAwards] = useState(student?.awards || []);
   const [saving, setSaving] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(() =>
+    (student?.extra_curricular || []).map((a) => !a.activity)
+  );
+  const [awardOpen, setAwardOpen] = useState(() =>
+    (student?.awards || []).map((a) => !a.title)
+  );
+
+  const toggleActivity = (index) =>
+    setActivityOpen((prev) => prev.map((v, i) => (i === index ? !v : v)));
+  const toggleAward = (index) =>
+    setAwardOpen((prev) => prev.map((v, i) => (i === index ? !v : v)));
 
   const inputStyle = {
     padding: 'var(--space-2)',
@@ -794,34 +856,65 @@ function ActivitiesTab({ studentId, student, showToast }) {
     }
   };
 
+  const collapsibleHeaderStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    userSelect: 'none',
+  };
+
+  const toggleBtnStyle = {
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-text-secondary)',
+    fontFamily: 'var(--font-family-base)',
+    padding: '0 var(--space-1)',
+    flexShrink: 0,
+  };
+
   return (
     <div>
       <h3 style={sectionHeadingStyle}>Extracurricular Activities</h3>
       {activities.map((act, index) => (
         <div key={index} style={cardStyle}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Activity</label>
-              <input value={act.activity || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, activity: e.target.value } : a))} style={inputStyle} aria-label="Activity name" />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Role</label>
-              <input value={act.role || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, role: e.target.value } : a))} style={inputStyle} aria-label="Role" />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Years</label>
-              <input value={act.years || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, years: e.target.value } : a))} style={inputStyle} aria-label="Years participated" />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Achievement</label>
-              <input value={act.achievement || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, achievement: e.target.value } : a))} style={inputStyle} aria-label="Achievement" />
-            </div>
+          <div style={collapsibleHeaderStyle} onClick={() => toggleActivity(index)}>
+            <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
+              {act.activity || 'New Activity'}
+            </span>
+            <button style={toggleBtnStyle} aria-label={activityOpen[index] ? 'Collapse' : 'Expand'}>
+              {activityOpen[index] ? '▲' : '▼'}
+            </button>
           </div>
-          <button onClick={() => setActivities((prev) => prev.filter((_, i) => i !== index))} style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>Remove</button>
+          {activityOpen[index] && (
+            <div style={{ marginTop: 'var(--space-3)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Activity</label>
+                  <input value={act.activity || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, activity: e.target.value } : a))} style={inputStyle} aria-label="Activity name" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Role</label>
+                  <input value={act.role || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, role: e.target.value } : a))} style={inputStyle} aria-label="Role" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Years</label>
+                  <input value={act.years || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, years: e.target.value } : a))} style={inputStyle} aria-label="Years participated" />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Achievement</label>
+                  <input value={act.achievement || ''} onChange={(e) => setActivities((prev) => prev.map((a, i) => i === index ? { ...a, achievement: e.target.value } : a))} style={inputStyle} aria-label="Achievement" />
+                </div>
+              </div>
+              <button onClick={() => { setActivities((prev) => prev.filter((_, i) => i !== index)); setActivityOpen((prev) => prev.filter((_, i) => i !== index)); }} style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>Remove</button>
+            </div>
+          )}
         </div>
       ))}
       <div style={{ marginBottom: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
-        <Button label="Add Activity" variant="secondary" onClick={() => setActivities((prev) => [...prev, { activity: '', role: '', years: '', achievement: '' }])} />
+        <Button label="Add Activity" variant="secondary" onClick={() => { setActivities((prev) => [...prev, { activity: '', role: '', years: '', achievement: '' }]); setActivityOpen((prev) => [...prev, true]); }} />
         <Button label="Save Activities" onClick={handleSaveActivities} loading={saving} />
       </div>
 
@@ -829,34 +922,46 @@ function ActivitiesTab({ studentId, student, showToast }) {
         <h3 style={sectionHeadingStyle}>Awards</h3>
         {awards.map((aw, index) => (
           <div key={index} style={cardStyle}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Title</label>
-                <input value={aw.title || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, title: e.target.value } : a))} style={inputStyle} aria-label="Award title" />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Awarding Body</label>
-                <input value={aw.awarding_body || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, awarding_body: e.target.value } : a))} style={inputStyle} aria-label="Awarding body" />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Level</label>
-                <select value={aw.level || 'School'} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, level: e.target.value } : a))} style={inputStyle} aria-label="Award level">
-                  <option value="School">School</option>
-                  <option value="District">District</option>
-                  <option value="Regional">Regional</option>
-                  <option value="International">International</option>
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Year</label>
-                <input type="number" value={aw.year || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, year: e.target.value } : a))} style={inputStyle} aria-label="Year received" />
-              </div>
+            <div style={collapsibleHeaderStyle} onClick={() => toggleAward(index)}>
+              <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
+                {aw.title || 'New Award'}
+              </span>
+              <button style={toggleBtnStyle} aria-label={awardOpen[index] ? 'Collapse' : 'Expand'}>
+                {awardOpen[index] ? '▲' : '▼'}
+              </button>
             </div>
-            <button onClick={() => setAwards((prev) => prev.filter((_, i) => i !== index))} style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>Remove</button>
+            {awardOpen[index] && (
+              <div style={{ marginTop: 'var(--space-3)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Title</label>
+                    <input value={aw.title || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, title: e.target.value } : a))} style={inputStyle} aria-label="Award title" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Awarding Body</label>
+                    <input value={aw.awarding_body || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, awarding_body: e.target.value } : a))} style={inputStyle} aria-label="Awarding body" />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Level</label>
+                    <select value={aw.level || 'School'} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, level: e.target.value } : a))} style={inputStyle} aria-label="Award level">
+                      <option value="School">School</option>
+                      <option value="District">District</option>
+                      <option value="Regional">Regional</option>
+                      <option value="International">International</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Year</label>
+                    <input type="number" value={aw.year || ''} onChange={(e) => setAwards((prev) => prev.map((a, i) => i === index ? { ...a, year: e.target.value } : a))} style={inputStyle} aria-label="Year received" />
+                  </div>
+                </div>
+                <button onClick={() => { setAwards((prev) => prev.filter((_, i) => i !== index)); setAwardOpen((prev) => prev.filter((_, i) => i !== index)); }} style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>Remove</button>
+              </div>
+            )}
           </div>
         ))}
         <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-          <Button label="Add Award" variant="secondary" onClick={() => setAwards((prev) => [...prev, { title: '', awarding_body: '', level: 'School', year: '' }])} />
+          <Button label="Add Award" variant="secondary" onClick={() => { setAwards((prev) => [...prev, { title: '', awarding_body: '', level: 'School', year: '' }]); setAwardOpen((prev) => [...prev, true]); }} />
           <Button label="Save Awards" onClick={handleSaveAwards} loading={saving} />
         </div>
       </div>

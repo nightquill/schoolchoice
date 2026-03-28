@@ -18,7 +18,7 @@ from app.core.dependencies import get_current_user
 from app.db.models import School, User
 from app.db.models_v2 import AcademicPlan, PlanGenerationJob, PlanHistory, StudentSchoolTarget, Subject
 from app.db.session import SessionLocal, get_db
-from app.schemas.v2.plan import PlanHistoryItem, PlanHistoryResponse, PlanJobResponse, PlanResponse, PlanStatusResponse
+from app.schemas.v2.plan import PlanGenerateRequest, PlanHistoryItem, PlanHistoryResponse, PlanJobResponse, PlanResponse, PlanStatusResponse
 from app.services import student_service
 from app.services.hkdse_service import grade_to_int
 from app.services.matchmaker_v2 import run_matching
@@ -33,7 +33,7 @@ _TIMEOUT_SECONDS = int(os.environ.get("PLAN_GENERATION_TIMEOUT_SECONDS", "30"))
 # Background plan generation task
 # ---------------------------------------------------------------------------
 
-def _generate_plan_task(job_id: UUID, student_id: UUID) -> None:
+def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVERSITY") -> None:
     """
     Background task: build student data, run matching, generate HTML, save plan.
     Marks job DONE or FAILED.
@@ -167,7 +167,7 @@ def _generate_plan_task(job_id: UUID, student_id: UUID) -> None:
 
         # Generate HTML
         action_items = _build_action_items(student_dict, match_results)
-        html_content = generate_html_plan(student_dict, match_results, action_items)
+        html_content = generate_html_plan(student_dict, match_results, action_items, plan_type=plan_type)
 
         # Build recommended schools list (top 5 eligible)
         eligible = [r for r in match_results if r.eligibility_pass][:5]
@@ -268,11 +268,13 @@ def _generate_plan_task(job_id: UUID, student_id: UUID) -> None:
 def create_plan(
     student_id: UUID,
     background_tasks: BackgroundTasks,
+    body: PlanGenerateRequest = PlanGenerateRequest(),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """
     Enqueue plan generation as a background task.
+    Accepts optional JSON body with plan_type: "UNIVERSITY" (default) or "HIGH_SCHOOL".
     Returns {job_id, status: 'PENDING'}. REQ-078
     """
     student_service.get_student(db, student_id=student_id, user_id=current_user.id)
@@ -285,7 +287,7 @@ def create_plan(
     db.commit()
     db.refresh(job)
 
-    background_tasks.add_task(_generate_plan_task, job.id, student_id)
+    background_tasks.add_task(_generate_plan_task, job.id, student_id, body.plan_type)
 
     return PlanJobResponse(job_id=job.id, status=job.status, created_at=job.created_at)
 

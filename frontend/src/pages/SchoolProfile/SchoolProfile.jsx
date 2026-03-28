@@ -286,18 +286,41 @@ function SchoolProfile() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
                   <h2 style={{ ...sectionHeadingStyle, marginBottom: 0 }}>Requirements by Major</h2>
                 </div>
-                {school.major_requirements && Object.keys(school.major_requirements).length > 0 ? (
+                {Array.isArray(school.major_requirements) && school.major_requirements.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                    {Object.entries(school.major_requirements).map(([major, reqs]) => (
-                      <div key={major} style={{ background: 'var(--color-background)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-3)', border: 'var(--border-width) solid var(--color-border)' }}>
-                        <div style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)', color: 'var(--color-text-primary)' }}>{major}</div>
-                        {reqs.min_score && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Min. aggregate: {reqs.min_score}</div>}
-                        {reqs.required_subjects && reqs.required_subjects.length > 0 && (
-                          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)' }}>
-                            Required: {reqs.required_subjects.map((s) => `${s.subject_code} (${s.min_grade})`).join(', ')}
+                    {school.major_requirements.map((req) => (
+                      <div key={req.major} style={{ background: 'var(--color-background)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-3)', border: 'var(--border-width) solid var(--color-border)' }}>
+                        <div style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)', color: 'var(--color-text-primary)' }}>
+                          {req.major}
+                          {req.jupas_code && <span style={{ marginLeft: 'var(--space-2)', fontWeight: 'var(--font-weight-normal)', color: 'var(--color-text-secondary)' }}>{req.jupas_code}</span>}
+                        </div>
+                        {req.minimum_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Min. aggregate: {req.minimum_score}</div>}
+                        {req.average_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>Avg. admitted: {req.average_score}</div>}
+                        {req.required_subjects && req.required_subjects.length > 0 && (
+                          <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
+                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>Required:</span>
+                            <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {req.required_subjects.map((s, si) => (
+                                <span key={si} style={{ background: 'rgba(220,38,38,0.08)', border: 'var(--border-width) solid rgba(220,38,38,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-error)' }}>
+                                  {s.subject_code}{s.min_grade ? ` ≥${s.min_grade}` : ''}
+                                </span>
+                              ))}
+                            </span>
                           </div>
                         )}
-                        {reqs.notes && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)', fontStyle: 'italic' }}>{reqs.notes}</div>}
+                        {req.preferred_subjects && req.preferred_subjects.length > 0 && (
+                          <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
+                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>Preferred:</span>
+                            <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {req.preferred_subjects.map((s, si) => (
+                                <span key={si} style={{ background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
+                                  {typeof s === 'string' ? s : s.subject_code}
+                                </span>
+                              ))}
+                            </span>
+                          </div>
+                        )}
+                        {req.notes && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)', fontStyle: 'italic' }}>{req.notes}</div>}
                       </div>
                     ))}
                   </div>

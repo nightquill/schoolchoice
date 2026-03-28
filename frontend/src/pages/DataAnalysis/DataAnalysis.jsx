@@ -35,6 +35,42 @@ function GradeBar({ dist }) {
   );
 }
 
+// ---- Vertical Bar Chart ----
+function VerticalBarChart({ distribution, title }) {
+  if (!distribution) return null;
+  const MAX_HEIGHT = 120;
+  const barColors = {
+    '5**': 'var(--color-primary)',
+    '5*': 'var(--color-primary)',
+    '5': 'var(--color-success)',
+    '4': 'var(--color-success)',
+    '3': 'var(--color-warning)',
+    '2': 'var(--color-error)',
+    '1': 'var(--color-error)',
+    'U': 'var(--color-error)',
+  };
+  const values = GRADE_ORDER.map((g) => distribution[g] || 0);
+  const max = Math.max(...values, 1);
+  return (
+    <div style={{ marginTop: 'var(--space-2)' }}>
+      {title && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</div>}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: `${MAX_HEIGHT + 40}px` }} aria-label={title || 'Grade distribution chart'}>
+        {GRADE_ORDER.map((g) => {
+          const val = distribution[g] || 0;
+          const barH = val > 0 ? Math.max(4, Math.round((val / max) * MAX_HEIGHT)) : 0;
+          return (
+            <div key={g} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '20px', maxWidth: '48px' }}>
+              <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginBottom: '2px', height: '14px', textAlign: 'center' }}>{val > 0 ? val : ''}</div>
+              <div style={{ width: '100%', height: `${barH}px`, background: barColors[g] || 'var(--color-text-secondary)', borderRadius: '3px 3px 0 0', minHeight: val > 0 ? '4px' : '0' }} title={`${g}: ${val}`} />
+              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px', fontWeight: 'var(--font-weight-medium)' }}>{g}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // ---- Grade Rate Sparkline ----
 function GradeRates({ rates }) {
   if (!rates) return null;

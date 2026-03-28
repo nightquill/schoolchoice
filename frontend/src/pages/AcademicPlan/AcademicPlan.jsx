@@ -25,6 +25,7 @@ function AcademicPlan() {
   const [generating, setGenerating] = useState(false);
   const [polling, setPolling] = useState(false);
   const [error, setError] = useState(null);
+  const [planType, setPlanType] = useState('UNIVERSITY');
   const pollRef = useRef(null);
 
   const stopPolling = () => {
@@ -92,7 +93,7 @@ function AcademicPlan() {
     setGenerating(true);
     setError(null);
     try {
-      await generatePlan(id);
+      await generatePlan(id, planType);
       setPlanStatus('pending');
       setPlan(null);
       startPolling();
@@ -200,6 +201,28 @@ function AcademicPlan() {
           {plan?.version && (
             <p style={versionStyle}>Plan v{plan.version}</p>
           )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
+          {['UNIVERSITY', 'HIGH_SCHOOL'].map((type) => (
+            <button
+              key={type}
+              onClick={() => setPlanType(type)}
+              disabled={isGenerating}
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                background: planType === type ? 'var(--color-primary)' : 'none',
+                color: planType === type ? '#fff' : 'var(--color-text-secondary)',
+                border: 'var(--border-width) solid var(--color-border)',
+                borderRadius: 'var(--border-radius-sm)',
+                cursor: isGenerating ? 'not-allowed' : 'pointer',
+                fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-base)',
+                fontWeight: planType === type ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+              }}
+            >
+              {type === 'UNIVERSITY' ? 'University Plan' : 'High School Plan'}
+            </button>
+          ))}
         </div>
         <Button
           label="Generate Plan"
