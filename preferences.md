@@ -460,3 +460,80 @@ All agents writing React code MUST follow these rules without exception:
 - **API response unwrapping:** Always check the shape of API responses. FastAPI list endpoints return `{ items: [], total: 0 }` or `{ <resource>s: [], total: 0 }`. Never pass the whole object to `setState` when the component expects an array. Always unwrap: `.then((data) => setState(data.items || data.<resource>s || []))`.
 - **Invalid CSS in style props:** Never write `'-var(--token)'` — this is invalid. Use `'0'`, `calc()`, or a literal pixel value instead.
 - **Integration engineer must verify:** Before declaring any page done, test that switching to that page does not produce a blank screen.
+
+
+## 15. Academic Plan — Visualisation
+
+The academic plan document must include embedded charts rendered via Chart.js (loaded from CDN, version 4). Charts are rendered inline in the HTML document and must work when printed (static fallback values encoded in the chart config).
+
+Required charts:
+- Subject Grade Profile: horizontal bar chart showing each subject and its grade (numeric equivalent), with a reference line at the school's minimum required score. One chart per recommended school.
+- School Fit Radar: radar/spider chart with axes for Academic Fit, Subject Alignment, Language Fit, and Program Alignment scores (the four components of the matchmaking scoring model). One chart per recommended school.
+- Action Plan Timeline: a visual Gantt-style horizontal timeline grouping action items by quarter and priority (High = red, Medium = amber, Low = green). Rendered as SVG, not Chart.js.
+
+All chart data is embedded as JSON in a <script> tag within the HTML document. No external API calls from the document itself.
+
+---
+
+## 16. Counsellor AI Chat (Plan Editing)
+
+A chat panel is displayed alongside the Academic Plan view in the frontend.
+The counsellor can type natural language instructions to modify the plan.
+
+AI Provider: Google Gemini 2.5 Flash via the Google Generative AI Python SDK
+(pip install google-generativeai). API key stored as GEMINI_API_KEY environment
+variable in the backend. Never exposed to the frontend.
+Rationale: no credit card required, no expiry, 250 requests/day free tier sufficient
+for low-frequency counsellor usage, simple SDK, stable support.
+
+Architecture:
+- The chat panel sends: the counsellor's message + the current AcademicPlan's
+  structured data fields (recommended_schools list with scores and rationale,
+  action_items list) as JSON context. It does NOT send the full HTML.
+- The backend calls the Gemini API with a system prompt instructing the model
+  to return a JSON patch object specifying only the fields to change.
+  Example patch: { "recommended_schools[0].rationale": "new text",
+  "recommended_schools[0].fit_score": 0.82 }
+- The backend applies the patch to the AcademicPlan record, increments the
+  version number, regenerates the HTML, and returns the updated plan.
+- The frontend re-renders the plan view with the new HTML.
+
+Supported counsellor instructions the system prompt must handle:
+- Change the wording or tone of a school's rationale paragraph
+- Adjust a fit score for a school (override the algorithm's score)
+- Add, edit, or remove an action item
+- Change the priority of an action item
+- Reorder the recommended schools list
+- Change the student summary text
+
+Rate limiting: max 20 AI chat requests per plan per day per counsellor account,
+enforced in the backend. Return a clear error message when limit is reached.
+
+New backend endpoint: POST /api/v1/students/{id}/plan/chat
+- Request body: { "message": string }
+- Response: updated AcademicPlan object
+
+## 17. Plan Document — Editable Templates
+
+The plan document supports a small set of design templates selectable by the counsellor. This is not a free-form canvas — it is template switching with per-section rich text editing.
+
+Templates (3 total, backend stores template_id on AcademicPlan):
+- Professional: white background, dark navy headings, serif body font (Georgia), formal tone markers
+- Modern: light grey background, teal accent colour, sans-serif (Inter), generous whitespace
+- Minimal: pure white, black text only, no colour accents, maximum information density
+
+Template selection:
+- A toolbar above the plan view shows three template buttons with a thumbnail preview label.
+- Selecting a template saves template_id to the AcademicPlan record and re-renders the HTML with the new template's CSS.
+- New backend endpoint: PATCH /api/v1/students/{id}/plan/template — body: { "template_id": string }
+
+Per-section rich text editing:
+- Each named section of the plan (Student Summary, per-school rationale paragraphs, Action Plan notes) has an Edit button visible only to Counsellor and Admin roles.
+- Clicking Edit opens that section as a rich text editor (use TipTap). The counsellor can change wording, bold/italic text, and bullet points. No layout changes — text content only.
+- Saving a section sends a PATCH to /api/v1/students/{id}/plan/section — body: { "section_key": string, "html_content": string }
+- Edited sections are stored in AcademicPlan as an overrides JSONB field: { section_key: edited_html }. When regenerating the plan HTML, overrides take precedence over auto-generated content for that section.
+- A Reset Section button reverts a section to the algorithm-generated content by deleting its key from the overrides field.
+
+New AcademicPlan fields to add to schema:
+- template_id: string (default: "professional")
+- overrides: JSONB (default: {})

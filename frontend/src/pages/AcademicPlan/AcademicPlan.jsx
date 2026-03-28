@@ -1,5 +1,7 @@
 // REQ-096, REQ-099: Academic Plan Page — async plan generation with polling
-import { useState, useEffect, useRef } from 'react';
+// REQ-16: Counsellor AI Chat panel
+// REQ-17: Template selector + per-section TipTap editing
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
@@ -7,20 +9,53 @@ import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import Button from '../../components/Button/Button';
 import Toast from '../../components/Toast/Toast';
+import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
 import { useToast } from '../../hooks/useToast';
-import { generatePlan, getPlanStatus, getPlan } from '../../api/plan';
+import {
+  generatePlan,
+  getPlanStatus,
+  getPlan,
+  sendPlanChat,
+  setPlanTemplate,
+  editPlanSection,
+  resetPlanSection,
+} from '../../api/plan';
 import { getStudent } from '../../api/students';
 import { getAccount } from '../../api/account';
 
 const POLL_INTERVAL_MS = 2000;
 
+const TEMPLATES = [
+  { id: 'professional', label: 'Professional' },
+  { id: 'modern', label: 'Modern' },
+  { id: 'minimal', label: 'Minimal' },
+];
+
+function buildSectionList(plan) {
+  const sections = [
+    { key: 'student_summary', label: 'Student Summary' },
+  ];
+  const schools = plan?.recommended_schools || [];
+  const count = Math.min(schools.length || 0, 5);
+  for (let i = 0; i < count; i++) {
+    sections.push({
+      key: `school_${i}_rationale`,
+      label: `School ${i + 1} Rationale`,
+    });
+  }
+  sections.push({ key: 'action_plan_notes', label: 'Action Plan Notes' });
+  return sections;
+}
+
 function AcademicPlan() {
   const { id } = useParams();
   const { toasts, showToast, removeToast } = useToast();
+
+  // --- core state ---
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
   const [plan, setPlan] = useState(null);
-  const [planStatus, setPlanStatus] = useState(null); // null | 'pending' | 'running' | 'complete' | 'failed'
+  const [planStatus, setPlanStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [polling, setPolling] = useState(false);
@@ -28,6 +63,25 @@ function AcademicPlan() {
   const [planType, setPlanType] = useState('UNIVERSITY');
   const pollRef = useRef(null);
 
+  // --- template state ---
+  const [activeTemplate, setActiveTemplate] = useState('professional');
+  const [templateLoading, setTemplateLoading] = useState(false);
+
+  // --- edit sections state ---
+  const [editMode, setEditMode] = useState(false);
+  const [editingSection, setEditingSection] = useState(null); // { key, label }
+  const [sectionSaving, setSectionSaving] = useState(false);
+
+  // --- chat state ---
+  const [messages, setMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState(null);
+  const [chatDisabled, setChatDisabled] = useState(false); // true when no API key (503)
+  const messagesEndRef = useRef(null);
+  const chatTextareaRef = useRef(null);
+
+  // --- polling ---
   const stopPolling = () => {
     if (pollRef.current) {
       clearInterval(pollRef.current);
@@ -36,7 +90,19 @@ function AcademicPlan() {
     setPolling(false);
   };
 
-  const startPolling = () => {
+  const loadPlan = useCallback(async () => {
+    try {
+      const planData = await getPlan(id);
+      setPlan(planData);
+      if (planData?.template_id) {
+        setActiveTemplate(planData.template_id);
+      }
+    } catch {
+      // non-fatal: ignore
+    }
+  }, [id]);
+
+  const startPolling = useCallback(() => {
     setPolling(true);
     pollRef.current = setInterval(async () => {
       try {
@@ -47,6 +113,7 @@ function AcademicPlan() {
           stopPolling();
           const planData = await getPlan(id);
           setPlan(planData);
+          if (planData?.template_id) setActiveTemplate(planData.template_id);
           showToast('Plan ready \u2014 view it here.', 'success');
         } else if (statusValue === 'FAILED') {
           stopPolling();
@@ -58,7 +125,7 @@ function AcademicPlan() {
         setError('Failed to check plan status.');
       }
     }, POLL_INTERVAL_MS);
-  };
+  }, [id, showToast]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     Promise.all([
@@ -72,6 +139,7 @@ function AcademicPlan() {
         setAccount(accountData);
         if (planData?.html_content) {
           setPlan(planData);
+          if (planData?.template_id) setActiveTemplate(planData.template_id);
           setPlanStatus('DONE');
         } else if (statusData) {
           const sv = (statusData.status || statusData).toUpperCase();
@@ -88,6 +156,13 @@ function AcademicPlan() {
 
     return () => stopPolling();
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // auto-scroll chat to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleGeneratePlan = async () => {
     setGenerating(true);
@@ -109,8 +184,102 @@ function AcademicPlan() {
     setPlanStatus(null);
   };
 
-  const isGenerating = polling || planStatus === 'PENDING' || planStatus === 'RUNNING';
+  const handleSetTemplate = async (templateId) => {
+    if (templateId === activeTemplate || templateLoading) return;
+    setTemplateLoading(true);
+    try {
+      await setPlanTemplate(id, templateId);
+      setActiveTemplate(templateId);
+      await loadPlan();
+    } catch {
+      showToast('Failed to change template.', 'error');
+    } finally {
+      setTemplateLoading(false);
+    }
+  };
 
+  // --- chat ---
+  const handleSendChat = async () => {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
+    setChatInput('');
+    setChatError(null);
+    setMessages((prev) => [...prev, { role: 'user', text }]);
+    setChatLoading(true);
+    try {
+      const data = await sendPlanChat(id, text);
+      setMessages((prev) => [...prev, { role: 'assistant', text: data.message || 'Done.' }]);
+      // reload plan so charts/content reflect any changes
+      await loadPlan();
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 503) {
+        setChatDisabled(true);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'system',
+            text: 'AI chat is not available: Gemini API key not configured.',
+          },
+        ]);
+      } else if (status === 429) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'system',
+            text: 'Daily limit of 20 AI chat requests reached for this plan.',
+          },
+        ]);
+      } else {
+        setChatError('Failed to send message. Please try again.');
+      }
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleChatKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendChat();
+    }
+  };
+
+  // --- section editing ---
+  const handleSaveSection = async (htmlContent) => {
+    if (!editingSection) return;
+    setSectionSaving(true);
+    try {
+      await editPlanSection(id, editingSection.key, htmlContent);
+      setEditingSection(null);
+      await loadPlan();
+      showToast('Section saved.', 'success');
+    } catch {
+      showToast('Failed to save section.', 'error');
+    } finally {
+      setSectionSaving(false);
+    }
+  };
+
+  const handleResetSection = async () => {
+    if (!editingSection) return;
+    setSectionSaving(true);
+    try {
+      await resetPlanSection(id, editingSection.key);
+      setEditingSection(null);
+      await loadPlan();
+      showToast('Section reset to default.', 'success');
+    } catch {
+      showToast('Failed to reset section.', 'error');
+    } finally {
+      setSectionSaving(false);
+    }
+  };
+
+  const isGenerating = polling || planStatus === 'PENDING' || planStatus === 'RUNNING';
+  const hasPlan = !isGenerating && !error && plan?.html_content;
+
+  // --- styles ---
   const pageStyle = {
     background: 'var(--color-background)',
     minHeight: '100vh',
@@ -121,13 +290,14 @@ function AcademicPlan() {
 
   const toolbarStyle = {
     background: 'var(--color-surface)',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
+    borderBottom: '1px solid var(--color-border)',
     padding: 'var(--space-3) var(--space-6)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 'var(--space-4)',
     flexShrink: 0,
+    flexWrap: 'wrap',
   };
 
   const toolbarLeftStyle = {
@@ -169,32 +339,117 @@ function AcademicPlan() {
     justifyContent: 'center',
   };
 
-  const iframeStyle = {
-    width: '100%',
-    flex: 1,
-    border: 'none',
-    background: 'var(--color-background)',
-    display: 'block',
-    minHeight: 'calc(100vh - 120px)',
-  };
-
   const backLinkStyle = {
     fontSize: 'var(--font-size-sm)',
     color: 'var(--color-primary)',
     textDecoration: 'none',
     display: 'inline-block',
     padding: 'var(--space-2) var(--space-6)',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
+    borderBottom: '1px solid var(--color-border)',
     background: 'var(--color-surface)',
     width: '100%',
     boxSizing: 'border-box',
   };
+
+  // template button style factory
+  const templateBtnStyle = (isActive) => ({
+    padding: 'var(--space-2) var(--space-3)',
+    background: isActive ? 'var(--color-primary)' : '#fff',
+    color: isActive ? '#fff' : 'var(--color-primary)',
+    border: isActive ? 'none' : '1px solid var(--color-primary)',
+    borderRadius: 'var(--border-radius-sm)',
+    cursor: templateLoading ? 'not-allowed' : 'pointer',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+    opacity: templateLoading ? 0.6 : 1,
+  });
+
+  // plan type button style factory
+  const planTypeBtnStyle = (isActive) => ({
+    padding: 'var(--space-2) var(--space-3)',
+    background: isActive ? 'var(--color-primary)' : 'none',
+    color: isActive ? '#fff' : 'var(--color-text-secondary)',
+    border: '1px solid var(--color-border)',
+    borderRadius: 'var(--border-radius-sm)',
+    cursor: isGenerating ? 'not-allowed' : 'pointer',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+  });
+
+  // Two-column layout when plan is shown
+  const planAreaStyle = {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    minHeight: 0,
+  };
+
+  const iframeColStyle = {
+    flex: 1,
+    minWidth: 0,
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
+  const iframeStyle = {
+    width: '100%',
+    flex: 1,
+    border: 'none',
+    background: 'var(--color-background)',
+    display: 'block',
+    minHeight: 'calc(100vh - 160px)',
+  };
+
+  const chatColStyle = {
+    width: '360px',
+    flexShrink: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    borderLeft: '1px solid var(--color-border)',
+    background: 'var(--color-surface)',
+    minHeight: 0,
+  };
+
+  // Section list styles
+  const sectionListStyle = {
+    padding: 'var(--space-3) var(--space-6)',
+    borderTop: '1px solid var(--color-border)',
+    background: 'var(--color-surface)',
+  };
+
+  // Modal overlay for section editor
+  const modalBackdropStyle = {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.5)',
+    zIndex: 1000,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 'var(--space-4)',
+  };
+
+  const modalDialogStyle = {
+    background: 'var(--color-surface)',
+    borderRadius: 'var(--border-radius-lg)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+    padding: 'var(--space-6)',
+    width: '640px',
+    maxWidth: '95vw',
+    maxHeight: '90vh',
+    overflow: 'auto',
+  };
+
+  const sectionList = buildSectionList(plan);
 
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
       <Link to={`/students/${id}/profile`} style={backLinkStyle}>← Back to Profile</Link>
 
+      {/* Main toolbar */}
       <div style={toolbarStyle}>
         <div style={toolbarLeftStyle}>
           <p style={studentNameStyle}>{student?.full_name || 'Academic Plan'}</p>
@@ -202,28 +457,21 @@ function AcademicPlan() {
             <p style={versionStyle}>Plan v{plan.version}</p>
           )}
         </div>
+
+        {/* Plan type selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', flexShrink: 0 }}>
           {['UNIVERSITY', 'HIGH_SCHOOL'].map((type) => (
             <button
               key={type}
               onClick={() => setPlanType(type)}
               disabled={isGenerating}
-              style={{
-                padding: 'var(--space-2) var(--space-3)',
-                background: planType === type ? 'var(--color-primary)' : 'none',
-                color: planType === type ? '#fff' : 'var(--color-text-secondary)',
-                border: 'var(--border-width) solid var(--color-border)',
-                borderRadius: 'var(--border-radius-sm)',
-                cursor: isGenerating ? 'not-allowed' : 'pointer',
-                fontSize: 'var(--font-size-sm)',
-                fontFamily: 'var(--font-family-base)',
-                fontWeight: planType === type ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-              }}
+              style={planTypeBtnStyle(planType === type)}
             >
               {type === 'UNIVERSITY' ? 'University Plan' : 'High School Plan'}
             </button>
           ))}
         </div>
+
         <Button
           label="Generate Plan"
           variant="primary"
@@ -231,6 +479,7 @@ function AcademicPlan() {
           loading={generating || isGenerating}
           disabled={isGenerating}
         />
+
         <div style={toolbarRightStyle}>
           {plan?.html_content && (
             <Button label="Print" variant="secondary" onClick={() => window.print()} />
@@ -242,6 +491,80 @@ function AcademicPlan() {
           )}
         </div>
       </div>
+
+      {/* Template selector + Edit Sections toggle — only when plan exists */}
+      {hasPlan && (
+        <div style={{
+          background: 'var(--color-surface)',
+          borderBottom: '1px solid var(--color-border)',
+          padding: 'var(--space-2) var(--space-6)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-4)',
+          flexWrap: 'wrap',
+        }}>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
+            Template:
+          </span>
+          {TEMPLATES.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => handleSetTemplate(t.id)}
+              disabled={templateLoading}
+              style={templateBtnStyle(activeTemplate === t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+          <div style={{ marginLeft: 'auto' }}>
+            <button
+              onClick={() => setEditMode((v) => !v)}
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                background: editMode ? 'var(--color-primary)' : 'none',
+                color: editMode ? '#fff' : 'var(--color-primary)',
+                border: '1px solid var(--color-primary)',
+                borderRadius: 'var(--border-radius-sm)',
+                cursor: 'pointer',
+                fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-base)',
+                fontWeight: 'var(--font-weight-medium)',
+              }}
+            >
+              {editMode ? 'Done Editing' : 'Edit Sections'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Section list — visible when editMode is on */}
+      {hasPlan && editMode && (
+        <div style={sectionListStyle}>
+          <p style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
+            Select a section to edit:
+          </p>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+            {sectionList.map((sec) => (
+              <button
+                key={sec.key}
+                onClick={() => setEditingSection(sec)}
+                style={{
+                  padding: 'var(--space-2) var(--space-3)',
+                  background: 'none',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  cursor: 'pointer',
+                  fontSize: 'var(--font-size-sm)',
+                  fontFamily: 'var(--font-family-base)',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                ✏ {sec.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading && <div style={contentZoneStyle}><LoadingSpinner label="Loading plan..." /></div>}
 
@@ -269,14 +592,35 @@ function AcademicPlan() {
             </div>
           )}
 
-          {!isGenerating && !error && plan?.html_content && (
-            <iframe
-              style={iframeStyle}
-              srcDoc={plan.html_content}
-              title={`Academic Plan for ${student?.full_name || 'student'}`}
-              sandbox="allow-same-origin"
-              aria-label="Academic plan document"
-            />
+          {hasPlan && (
+            <div style={planAreaStyle}>
+              {/* Left: plan iframe */}
+              <div style={iframeColStyle}>
+                <iframe
+                  style={iframeStyle}
+                  srcDoc={plan.html_content}
+                  title={`Academic Plan for ${student?.full_name || 'student'}`}
+                  sandbox="allow-same-origin"
+                  aria-label="Academic plan document"
+                />
+              </div>
+
+              {/* Right: AI chat panel */}
+              <div style={chatColStyle}>
+                <ChatPanel
+                  messages={messages}
+                  chatInput={chatInput}
+                  setChatInput={setChatInput}
+                  chatLoading={chatLoading}
+                  chatError={chatError}
+                  chatDisabled={chatDisabled}
+                  messagesEndRef={messagesEndRef}
+                  chatTextareaRef={chatTextareaRef}
+                  onSend={handleSendChat}
+                  onKeyDown={handleChatKeyDown}
+                />
+              </div>
+            </div>
           )}
 
           {!isGenerating && !error && !plan?.html_content && (
@@ -288,7 +632,280 @@ function AcademicPlan() {
         </>
       )}
 
+      {/* Section editor modal */}
+      {editingSection && (
+        <div style={modalBackdropStyle} onClick={() => !sectionSaving && setEditingSection(null)}>
+          <div style={modalDialogStyle} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
+              <h2 style={{ margin: 0, fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-family-base)' }}>
+                Edit: {editingSection.label}
+              </h2>
+              {!sectionSaving && (
+                <button
+                  onClick={() => setEditingSection(null)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: 'var(--font-size-lg)',
+                    cursor: 'pointer',
+                    color: 'var(--color-text-secondary)',
+                    fontFamily: 'var(--font-family-base)',
+                    lineHeight: 1,
+                  }}
+                  aria-label="Close editor"
+                >
+                  &times;
+                </button>
+              )}
+            </div>
+            <PlanSectionEditor
+              sectionKey={editingSection.key}
+              initialHtml={''}
+              onSave={handleSaveSection}
+              onReset={handleResetSection}
+              onCancel={() => setEditingSection(null)}
+              saving={sectionSaving}
+            />
+          </div>
+        </div>
+      )}
+
       <Toast toasts={toasts} removeToast={removeToast} />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ChatPanel — extracted sub-component (same file, no separate file needed)
+// ---------------------------------------------------------------------------
+function ChatPanel({
+  messages,
+  chatInput,
+  setChatInput,
+  chatLoading,
+  chatError,
+  chatDisabled,
+  messagesEndRef,
+  chatTextareaRef,
+  onSend,
+  onKeyDown,
+}) {
+  const panelStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    fontFamily: 'var(--font-family-base)',
+  };
+
+  const headerStyle = {
+    padding: 'var(--space-3) var(--space-4)',
+    borderBottom: '1px solid var(--color-border)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-2)',
+    flexShrink: 0,
+  };
+
+  const headerTitleStyle = {
+    fontSize: 'var(--font-size-sm)',
+    fontWeight: 'var(--font-weight-medium)',
+    color: 'var(--color-text-primary)',
+    margin: 0,
+  };
+
+  const betaBadgeStyle = {
+    fontSize: '10px',
+    fontWeight: 'var(--font-weight-medium)',
+    color: '#fff',
+    background: 'var(--color-primary)',
+    borderRadius: '3px',
+    padding: '1px 5px',
+    lineHeight: '1.4',
+  };
+
+  const noKeyNoticeStyle = {
+    margin: 'var(--space-2) var(--space-4)',
+    padding: 'var(--space-3)',
+    background: '#fffbeb',
+    border: '1px solid #fbbf24',
+    borderRadius: 'var(--border-radius-sm)',
+    fontSize: 'var(--font-size-xs)',
+    color: '#92400e',
+    lineHeight: '1.5',
+  };
+
+  const messageListStyle = {
+    flex: 1,
+    overflowY: 'auto',
+    padding: 'var(--space-3) var(--space-4)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-2)',
+  };
+
+  const emptyHintStyle = {
+    fontSize: 'var(--font-size-xs)',
+    color: 'var(--color-text-secondary)',
+    textAlign: 'center',
+    lineHeight: '1.6',
+    padding: 'var(--space-4)',
+    fontStyle: 'italic',
+  };
+
+  const inputAreaStyle = {
+    padding: 'var(--space-3) var(--space-4)',
+    borderTop: '1px solid var(--color-border)',
+    display: 'flex',
+    gap: 'var(--space-2)',
+    alignItems: 'flex-end',
+    flexShrink: 0,
+  };
+
+  const textareaStyle = {
+    flex: 1,
+    resize: 'none',
+    border: '1px solid var(--color-border)',
+    borderRadius: 'var(--border-radius-sm)',
+    padding: 'var(--space-2)',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    color: 'var(--color-text-primary)',
+    background: '#fff',
+    minHeight: '60px',
+    maxHeight: '120px',
+    lineHeight: '1.5',
+    outline: 'none',
+  };
+
+  const sendBtnStyle = {
+    padding: 'var(--space-2) var(--space-3)',
+    background: chatLoading || !chatInput.trim() || chatDisabled
+      ? 'var(--color-border)'
+      : 'var(--color-primary)',
+    color: chatLoading || !chatInput.trim() || chatDisabled
+      ? 'var(--color-text-secondary)'
+      : '#fff',
+    border: 'none',
+    borderRadius: 'var(--border-radius-sm)',
+    cursor: chatLoading || !chatInput.trim() || chatDisabled ? 'not-allowed' : 'pointer',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    fontWeight: 'var(--font-weight-medium)',
+    whiteSpace: 'nowrap',
+    alignSelf: 'flex-end',
+    marginBottom: '1px',
+  };
+
+  return (
+    <div style={panelStyle}>
+      {/* Header */}
+      <div style={headerStyle}>
+        <p style={headerTitleStyle}>AI Assistant</p>
+        <span style={betaBadgeStyle}>beta</span>
+      </div>
+
+      {/* No API key persistent notice */}
+      {chatDisabled && (
+        <div style={noKeyNoticeStyle}>
+          AI chat requires a Gemini API key. Configure GEMINI_API_KEY in the backend to enable this feature.
+        </div>
+      )}
+
+      {/* Message list */}
+      <div style={messageListStyle}>
+        {messages.length === 0 && (
+          <p style={emptyHintStyle}>
+            Ask me to adjust a school&apos;s rationale, reorder schools, change action item priorities&hellip;
+          </p>
+        )}
+        {messages.map((msg, i) => (
+          <MessageBubble key={i} message={msg} />
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Error below textarea */}
+      {chatError && (
+        <div style={{
+          padding: '0 var(--space-4) var(--space-2)',
+          fontSize: 'var(--font-size-xs)',
+          color: 'var(--color-error)',
+          fontFamily: 'var(--font-family-base)',
+        }}>
+          {chatError}
+        </div>
+      )}
+
+      {/* Input area — hidden when chatDisabled */}
+      {!chatDisabled && (
+        <div style={inputAreaStyle}>
+          <textarea
+            ref={chatTextareaRef}
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="Type a message…"
+            rows={2}
+            style={textareaStyle}
+            disabled={chatLoading}
+            aria-label="Chat message input"
+          />
+          <button
+            onClick={onSend}
+            disabled={chatLoading || !chatInput.trim()}
+            style={sendBtnStyle}
+            aria-label="Send message"
+          >
+            {chatLoading ? '…' : 'Send'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MessageBubble({ message }) {
+  const isUser = message.role === 'user';
+  const isSystem = message.role === 'system';
+
+  const wrapStyle = {
+    display: 'flex',
+    justifyContent: isUser ? 'flex-end' : 'flex-start',
+  };
+
+  const bubbleStyle = {
+    maxWidth: '85%',
+    padding: 'var(--space-2) var(--space-3)',
+    borderRadius: '10px',
+    fontSize: 'var(--font-size-xs)',
+    lineHeight: '1.5',
+    fontFamily: 'var(--font-family-base)',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    ...(isUser
+      ? {
+          background: 'var(--color-primary)',
+          color: '#fff',
+          borderBottomRightRadius: '3px',
+        }
+      : isSystem
+      ? {
+          background: '#fef3c7',
+          color: '#78350f',
+          border: '1px solid #fbbf24',
+          borderRadius: '6px',
+          fontStyle: 'italic',
+        }
+      : {
+          background: '#f3f4f6',
+          color: 'var(--color-text-primary)',
+          borderBottomLeftRadius: '3px',
+        }),
+  };
+
+  return (
+    <div style={wrapStyle}>
+      <div style={bubbleStyle}>{message.text}</div>
     </div>
   );
 }

@@ -19,7 +19,9 @@ from app.db.models import School, User
 from app.db.models_v2 import AcademicPlan, PlanGenerationJob, PlanHistory, StudentSchoolTarget, Subject
 from app.db.session import SessionLocal, get_db
 from app.schemas.v2.plan import PlanGenerateRequest, PlanHistoryItem, PlanHistoryResponse, PlanJobResponse, PlanResponse, PlanStatusResponse
-from app.services import student_service
+from app.schemas.v2.plan_chat import PlanChatRequest, PlanChatResponse
+from app.schemas.v2.plan_edit import EditSectionRequest, SetTemplateRequest
+from app.services import student_service, plan_chat_service
 from app.services.hkdse_service import grade_to_int
 from app.services.matchmaker_v2 import run_matching
 from app.services.plan_generator import _build_action_items, generate_html_plan
@@ -407,3 +409,205 @@ def delete_plan_history(
         raise _HTTPException(status_code=404, detail="Plan not found")
     db.delete(entry)
     db.commit()
+
+
+# ---------------------------------------------------------------------------
+# POST /students/{student_id}/plan/chat  (Point 16)
+# ---------------------------------------------------------------------------
+
+@router.post("/{student_id}/plan/chat", response_model=PlanChatResponse)
+def plan_chat(
+    student_id: UUID,
+    body: PlanChatRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Counsellor AI chat: send a natural-language instruction to edit the plan.
+    Requires GEMINI_API_KEY env var; returns 503 if not configured.
+    Rate-limited to 20 requests per counsellor per plan per day.
+    """
+    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="No plan found for this student")
+    return plan_chat_service.handle_chat(db, plan, body.message, current_user.id)
+
+
+# ---------------------------------------------------------------------------
+# PATCH /students/{student_id}/plan/template  (Point 17)
+# ---------------------------------------------------------------------------
+
+@router.patch("/{student_id}/plan/template", response_model=PlanResponse)
+def set_plan_template(
+    student_id: UUID,
+    body: SetTemplateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Change the visual template for the plan and regenerate HTML.
+    template_id: 'professional' | 'modern' | 'minimal'
+    """
+    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="No plan found for this student")
+
+    plan.template_id = body.template_id
+
+    # Rebuild student dict for regeneration
+    student_for_regen, match_results_for_regen = _load_student_and_results(db, student_id, plan)
+
+    html_content = generate_html_plan(
+        student_for_regen,
+        match_results_for_regen,
+        plan.action_items or [],
+        plan_type="UNIVERSITY",
+        template_id=plan.template_id,
+        overrides=plan.overrides or {},
+    )
+    plan.html_content = html_content
+    plan.version = (plan.version or 1) + 1
+    plan.generated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(plan)
+    return PlanResponse.model_validate(plan)
+
+
+# ---------------------------------------------------------------------------
+# PATCH /students/{student_id}/plan/section  (Point 17)
+# ---------------------------------------------------------------------------
+
+@router.patch("/{student_id}/plan/section", response_model=PlanResponse)
+def edit_plan_section(
+    student_id: UUID,
+    body: EditSectionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Upsert a custom HTML override for a named section key, then regenerate.
+    section_key examples: 'student_summary', 'school_0_rationale', 'action_plan_notes'
+    """
+    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="No plan found for this student")
+
+    overrides: dict = dict(plan.overrides or {})
+    overrides[body.section_key] = body.html_content
+    plan.overrides = overrides
+
+    student_for_regen, match_results_for_regen = _load_student_and_results(db, student_id, plan)
+
+    html_content = generate_html_plan(
+        student_for_regen,
+        match_results_for_regen,
+        plan.action_items or [],
+        plan_type="UNIVERSITY",
+        template_id=plan.template_id or "professional",
+        overrides=plan.overrides,
+    )
+    plan.html_content = html_content
+    plan.version = (plan.version or 1) + 1
+    plan.generated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(plan)
+    return PlanResponse.model_validate(plan)
+
+
+# ---------------------------------------------------------------------------
+# DELETE /students/{student_id}/plan/section/{section_key}  (Point 17)
+# ---------------------------------------------------------------------------
+
+@router.delete("/{student_id}/plan/section/{section_key}", response_model=PlanResponse)
+def reset_plan_section(
+    student_id: UUID,
+    section_key: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Remove a section override, reverting that section to auto-generated content,
+    then regenerate the plan HTML.
+    """
+    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="No plan found for this student")
+
+    overrides: dict = dict(plan.overrides or {})
+    overrides.pop(section_key, None)
+    plan.overrides = overrides
+
+    student_for_regen, match_results_for_regen = _load_student_and_results(db, student_id, plan)
+
+    html_content = generate_html_plan(
+        student_for_regen,
+        match_results_for_regen,
+        plan.action_items or [],
+        plan_type="UNIVERSITY",
+        template_id=plan.template_id or "professional",
+        overrides=plan.overrides,
+    )
+    plan.html_content = html_content
+    plan.version = (plan.version or 1) + 1
+    plan.generated_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(plan)
+    return PlanResponse.model_validate(plan)
+
+
+# ---------------------------------------------------------------------------
+# Internal helper: load student data for HTML regeneration
+# ---------------------------------------------------------------------------
+
+def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan):
+    """
+    Build a student dict and match_results list for HTML regeneration.
+    Falls back to minimal data if student is missing.
+    """
+    from app.db.models import Student
+    from app.services.hkdse_service import grade_to_int
+
+    student_for_regen: dict = {
+        "name": "",
+        "subject_grades": [],
+        "ielts_score": None,
+        "extra_curricular": [],
+        "awards": [],
+    }
+    match_results_for_regen = plan.recommended_schools or []
+
+    try:
+        student_orm = db.query(Student).filter(Student.id == student_id).first()
+        if student_orm:
+            grade_records = getattr(student_orm, "subject_grades") or []
+            subject_grades_for_plan = []
+            for g in grade_records:
+                subj = db.query(Subject).filter(Subject.id == g.subject_id).first()
+                if not subj:
+                    continue
+                subject_grades_for_plan.append({
+                    "subject_code": subj.code,
+                    "subject_name": subj.name,
+                    "sitting": g.sitting,
+                    "raw_grade": g.raw_grade,
+                    "predicted_grade": g.predicted_grade,
+                    "year_of_exam": g.year_of_exam,
+                    "is_compulsory": subj.is_compulsory,
+                    "category": subj.category,
+                })
+            student_for_regen = {
+                "name": student_orm.name,
+                "year_of_study": getattr(student_orm, "year_of_study", None),
+                "subject_grades": subject_grades_for_plan,
+                "ielts_score": getattr(student_orm, "ielts_score", None),
+                "extra_curricular": getattr(student_orm, "extra_curricular", None) or [],
+                "awards": getattr(student_orm, "awards", None) or [],
+            }
+    except Exception:
+        pass
+
+    return student_for_regen, match_results_for_regen

@@ -642,6 +642,25 @@ class AcademicPlan(Base):
         nullable=True,
         comment="Full rendered HTML document; null until generation completes",
     )
+    template_id = Column(
+        String(50),
+        nullable=True,
+        default="professional",
+        server_default="professional",
+        comment="Template name used for the last render: professional | modern | minimal",
+    )
+    overrides = Column(
+        JSON,
+        nullable=True,
+        default=dict,
+        comment="Per-section HTML overrides keyed by section_key",
+    )
+    chat_request_counts = Column(
+        JSON,
+        nullable=True,
+        default=dict,
+        comment="Rate-limit counters: {date_counsellor_planid: count}",
+    )
     created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,

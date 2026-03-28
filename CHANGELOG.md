@@ -3,6 +3,42 @@
 
 ---
 
+## [2.3.0] — 2026-03-28
+
+### Added
+
+**Point 15 — Chart.js charts in UNIVERSITY plan HTML**
+- `plan_generator.py` now loads Chart.js v4 CDN (`chart.umd.min.js`) in `<head>` of every UNIVERSITY plan.
+- Each eligible school card gets two interactive charts: Subject Grade Profile (horizontal bar, 0–7 scale, red reference line at per-subject minimum) and School Fit Radar (4 axes: Academic Fit, Subject Alignment, Language Fit, Program Alignment).
+- An SVG Gantt timeline (width=700) is appended after all school cards, grouping action items by quarter (Q1–Q4 for current + next year), bars colour-coded by priority (High=#dc2626, Medium=#d97706, Low=#16a34a).
+- `@media print { canvas { max-width: 100% !important; } }` added to base CSS.
+- HIGH_SCHOOL plan is unchanged (no Chart.js, no canvas elements).
+
+**Point 16 — Counsellor AI Chat endpoint**
+- New `POST /api/v1/students/{id}/plan/chat` endpoint. Accepts `{"message": "..."}`.
+- Calls Gemini 2.5 Flash with a compact JSON plan context and a structured system prompt; Gemini returns a JSON patch specifying field-level changes.
+- Patch is applied to `recommended_schools`, `action_items`, and/or `overrides`; plan HTML is regenerated; `version` is incremented; updated plan is returned with `message` reply for chat UI.
+- Returns HTTP 503 if `GEMINI_API_KEY` is not set.
+- Rate-limited: 20 requests per counsellor per plan per calendar day (stored in `chat_request_counts` JSON column).
+- New `AcademicPlan` column: `chat_request_counts JSON DEFAULT '{}'`.
+- New runtime migration: `ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS chat_request_counts JSON DEFAULT '{}'`.
+
+**Point 17 — Plan templates + per-section overrides**
+- Three CSS variable templates: `professional` (navy/Georgia, default), `modern` (teal/Inter), `minimal` (black/Arial).
+- `generate_html_plan()` now accepts `template_id` and `overrides` kwargs; template CSS injected after base styles.
+- Section override keys: `student_summary`, `school_{N}_rationale`, `action_plan_notes`.
+- New endpoints: `PATCH /plan/template` (change template + regenerate), `PATCH /plan/section` (upsert section override), `DELETE /plan/section/{key}` (reset to auto-generated).
+- New `AcademicPlan` columns: `template_id VARCHAR(50) DEFAULT 'professional'`, `overrides JSON DEFAULT '{}'`.
+- New runtime migrations for both columns.
+- New schema files: `plan_chat.py`, `plan_edit.py`.
+- New service: `plan_chat_service.py`.
+
+### Tests
+- 92/92 passed (+22 new tests: TestChartsInUniversityPlan ×7, TestPlanTemplates ×7, TestPlanChatEndpoints ×2, TestPlanTemplateEndpoints ×6)
+- Updated: `test_no_javascript` → `test_university_plan_has_chartjs_cdn` (UNIVERSITY plan now intentionally contains Chart.js)
+
+---
+
 ## [2.2.1] — 2026-03-28
 
 ### Added

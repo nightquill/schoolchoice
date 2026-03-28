@@ -300,3 +300,218 @@ class TestPlanEndpoints:
         data = resp.json()
         assert "job_id" in data
         assert data["status"] == "PENDING"
+
+
+# ---------------------------------------------------------------------------
+# Plan chat endpoint tests (Point 16)
+# ---------------------------------------------------------------------------
+
+
+class TestPlanChatEndpoints:
+    def _create_student(self, client, auth_headers):
+        resp = client.post(
+            "/api/v1/students",
+            json={
+                "name": "Chat Student",
+                "grades": {},
+                "interests": [],
+                "strengths_weaknesses": "",
+                "target_region": "local",
+            },
+            headers=auth_headers,
+        )
+        assert resp.status_code == 201
+        return resp.json()["id"]
+
+    def _seed_plan(self, db, student_id: str):
+        """Directly insert an AcademicPlan row for the student."""
+        import uuid
+        from app.db.models_v2 import AcademicPlan
+        from datetime import datetime, timezone
+
+        plan = AcademicPlan(
+            id=uuid.uuid4(),
+            student_id=uuid.UUID(student_id),
+            version=1,
+            html_content="<html><body>Test Plan</body></html>",
+            recommended_schools=[{"school_name": "HKU", "rationale": "Good fit.", "fit_score": 0.8}],
+            action_items=[{"task": "Apply early", "deadline": "Q4 2026", "priority": "High"}],
+            generated_at=datetime.now(timezone.utc),
+            template_id="professional",
+            overrides={},
+            chat_request_counts={},
+        )
+        db.add(plan)
+        db.commit()
+        db.refresh(plan)
+        return plan
+
+    def test_plan_chat_no_api_key(self, client, auth_headers, db):
+        """POST /plan/chat returns 503 when GEMINI_API_KEY is not set."""
+        import os
+        # Ensure key is absent
+        os.environ.pop("GEMINI_API_KEY", None)
+
+        student_id = self._create_student(client, auth_headers)
+        self._seed_plan(db, student_id)
+
+        resp = client.post(
+            f"/api/v1/students/{student_id}/plan/chat",
+            json={"message": "Make the plan more concise."},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 503
+        assert "GEMINI_API_KEY" in resp.json()["detail"]
+
+    def test_plan_chat_no_plan_returns_404(self, client, auth_headers):
+        """POST /plan/chat returns 404 if no plan exists."""
+        import os
+        os.environ.pop("GEMINI_API_KEY", None)
+        student_id = self._create_student(client, auth_headers)
+        # No plan seeded
+        resp = client.post(
+            f"/api/v1/students/{student_id}/plan/chat",
+            json={"message": "Test message"},
+            headers=auth_headers,
+        )
+        # 404 (no plan) is raised before API key check
+        assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Plan template/section endpoints tests (Point 17)
+# ---------------------------------------------------------------------------
+
+
+class TestPlanTemplateEndpoints:
+    def _create_student(self, client, auth_headers):
+        resp = client.post(
+            "/api/v1/students",
+            json={
+                "name": "Template Student",
+                "grades": {},
+                "interests": [],
+                "strengths_weaknesses": "",
+                "target_region": "local",
+            },
+            headers=auth_headers,
+        )
+        assert resp.status_code == 201
+        return resp.json()["id"]
+
+    def _seed_plan(self, db, student_id: str):
+        import uuid
+        from app.db.models_v2 import AcademicPlan
+        from datetime import datetime, timezone
+
+        plan = AcademicPlan(
+            id=uuid.uuid4(),
+            student_id=uuid.UUID(student_id),
+            version=1,
+            html_content="<html><body>Test Plan</body></html>",
+            recommended_schools=[],
+            action_items=[],
+            generated_at=datetime.now(timezone.utc),
+            template_id="professional",
+            overrides={},
+            chat_request_counts={},
+        )
+        db.add(plan)
+        db.commit()
+        db.refresh(plan)
+        return plan
+
+    def test_set_plan_template_changes_template_id(self, client, auth_headers, db):
+        """PATCH /plan/template changes template_id and regenerates HTML."""
+        student_id = self._create_student(client, auth_headers)
+        self._seed_plan(db, student_id)
+
+        resp = client.patch(
+            f"/api/v1/students/{student_id}/plan/template",
+            json={"template_id": "modern"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        # version should be incremented
+        assert data["version"] >= 2
+        # HTML should be regenerated (contain something)
+        assert data["html_content"] is not None
+        assert "<!DOCTYPE html>" in data["html_content"]
+
+    def test_set_plan_template_invalid_returns_422(self, client, auth_headers, db):
+        """PATCH /plan/template with invalid template_id returns 422."""
+        student_id = self._create_student(client, auth_headers)
+        self._seed_plan(db, student_id)
+
+        resp = client.patch(
+            f"/api/v1/students/{student_id}/plan/template",
+            json={"template_id": "invalid_template"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 422
+
+    def test_set_plan_template_no_plan_returns_404(self, client, auth_headers):
+        """PATCH /plan/template returns 404 if no plan exists."""
+        student_id = self._create_student(client, auth_headers)
+        resp = client.patch(
+            f"/api/v1/students/{student_id}/plan/template",
+            json={"template_id": "modern"},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 404
+
+    def test_edit_plan_section(self, client, auth_headers, db):
+        """PATCH /plan/section upserts override and regenerates HTML."""
+        student_id = self._create_student(client, auth_headers)
+        self._seed_plan(db, student_id)
+
+        resp = client.patch(
+            f"/api/v1/students/{student_id}/plan/section",
+            json={
+                "section_key": "student_summary",
+                "html_content": "<p>Custom summary text</p>",
+            },
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["version"] >= 2
+        assert data["html_content"] is not None
+        assert "Custom summary text" in data["html_content"]
+
+    def test_reset_plan_section(self, client, auth_headers, db):
+        """DELETE /plan/section/{key} removes override and regenerates HTML."""
+        student_id = self._create_student(client, auth_headers)
+        plan = self._seed_plan(db, student_id)
+
+        # First set an override
+        resp = client.patch(
+            f"/api/v1/students/{student_id}/plan/section",
+            json={
+                "section_key": "student_summary",
+                "html_content": "<p>Override to remove</p>",
+            },
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200
+
+        # Now reset it
+        resp2 = client.delete(
+            f"/api/v1/students/{student_id}/plan/section/student_summary",
+            headers=auth_headers,
+        )
+        assert resp2.status_code == 200
+        data = resp2.json()
+        assert "Override to remove" not in (data["html_content"] or "")
+
+    def test_reset_nonexistent_section_is_noop(self, client, auth_headers, db):
+        """DELETE /plan/section/{key} for missing key is safe and returns 200."""
+        student_id = self._create_student(client, auth_headers)
+        self._seed_plan(db, student_id)
+
+        resp = client.delete(
+            f"/api/v1/students/{student_id}/plan/section/nonexistent_section",
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200

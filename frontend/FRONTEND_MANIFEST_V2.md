@@ -45,7 +45,7 @@
 | `src/api/targets.js` | getTargets, addTarget, updateTarget, deleteTarget, reorderTargets | GET/POST/PUT/DELETE `/students/{id}/targets` |
 | `src/api/schoolsV2.js` | searchSchools, getSchoolV2 | GET `/schools`, GET `/schools/{id}` |
 | `src/api/match.js` | runMatch, getMatch | POST/GET `/students/{id}/match` |
-| `src/api/plan.js` | generatePlan, getPlanStatus, getPlan | POST/GET `/students/{id}/plan` |
+| `src/api/plan.js` | generatePlan, getPlanStatus, getPlan, sendPlanChat, setPlanTemplate, editPlanSection, resetPlanSection | POST/GET `/students/{id}/plan`; POST `/plan/chat`; PATCH `/plan/template`; PATCH/DELETE `/plan/section` |
 | `src/api/account.js` | getAccount, updateAccount, changePassword, deleteAccount | GET/PUT/DELETE `/account` |
 | `src/api/transcripts.js` | uploadTranscript, getTranscript | POST/GET `/students/{id}/transcript` |
 
@@ -83,6 +83,16 @@
 - **SubjectDetail — VerticalBarChart (Change 5)**: Added same `VerticalBarChart` component in SubjectDetail.jsx. Renders below the existing `GradeBar` for both student sittings and HK population sittings grade distributions.
 - **plan.js — plan_type support (Change 6)**: `generatePlan(studentId, planType)` now accepts optional `planType` parameter (default `'UNIVERSITY'`), posted as `{ plan_type }` in request body.
 - **AcademicPlan — plan type selector (Change 6)**: Added two toggle buttons "University Plan" / "High School Plan" in the toolbar. Active button uses primary background. `planType` state passed to `generatePlan`.
+
+## Changelog — 2026-03-28 (fourth batch — Points 16 & 17)
+
+- **plan.js**: Added `sendPlanChat`, `setPlanTemplate`, `editPlanSection`, `resetPlanSection` API functions.
+- **PlanSectionEditor** (`src/components/PlanSectionEditor/PlanSectionEditor.jsx`): New TipTap-based rich text editor component. Props: `sectionKey`, `initialHtml`, `onSave`, `onReset`, `onCancel`, `saving`. Renders Bold / Italic / Bullet List mini toolbar, 400px editor area, and Save / Reset to Default / Cancel buttons.
+- **TipTap**: Installed `@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`.
+- **AcademicPlan — two-column layout (Point 16)**: When a plan is rendered, the page switches to a flex-row layout — left column (flex 1) holds the plan iframe; right column (360px, flex-shrink 0) holds the AI chat panel. On narrower screens the right column still renders below via flex-wrap behaviour.
+- **AcademicPlan — AI chat panel (Point 16)**: `ChatPanel` sub-component with header (title + beta badge), scrollable message list with auto-scroll via `useRef`/`useEffect`, user messages (right-aligned, primary background), assistant messages (left-aligned, grey), system messages (amber). Empty state hint text shown when no messages. Textarea with Enter-to-send (Shift+Enter for newline). 503 → persistent yellow notice + disables input. 429 → system message. Other errors → `chatError` shown below textarea.
+- **AcademicPlan — template selector (Point 17a)**: Secondary toolbar row (only when plan exists) with Professional / Modern / Minimal toggle buttons. Active = primary background/white text, no border. Inactive = white background, primary text, primary border. Calls `setPlanTemplate` then reloads plan. `activeTemplate` state seeded from `plan.template_id` on load.
+- **AcademicPlan — Edit Sections mode (Point 17b)**: "Edit Sections" toggle button in the template toolbar. When active, shows a row of section Edit buttons (Student Summary, School 1–N Rationale up to 5, Action Plan Notes). Clicking a section opens a full-screen modal with `PlanSectionEditor`. Save calls `editPlanSection` then reloads plan. Reset calls `resetPlanSection` then reloads plan. Cancel closes modal.
 
 ## v1 Compatibility
 

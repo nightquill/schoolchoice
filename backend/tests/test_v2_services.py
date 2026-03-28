@@ -427,10 +427,11 @@ class TestGenerateHtmlPlan:
         for section_num in range(1, 8):
             assert f"{section_num}." in html
 
-    def test_no_javascript(self):
+    def test_university_plan_has_chartjs_cdn(self):
+        """UNIVERSITY plan now embeds Chart.js CDN script tag in <head>."""
         student = {"name": "Test", "year_of_study": 2026, "subject_grades": [], "ielts_score": None, "extra_curricular": [], "awards": []}
         html = generate_html_plan(student, [], [])
-        assert "<script" not in html.lower()
+        assert "chart.js" in html.lower() or "cdn.jsdelivr.net" in html
 
     def test_inline_css_only(self):
         student = {"name": "Test", "year_of_study": 2026, "subject_grades": [], "ielts_score": None, "extra_curricular": [], "awards": []}
@@ -634,3 +635,172 @@ class TestBuildActionItems:
         items = _build_action_items(student, [])
         tasks = [i["task"] for i in items]
         assert any("personal statement" in t.lower() for t in tasks)
+
+
+# ---------------------------------------------------------------------------
+# Chart.js chart tests (Point 15)
+# ---------------------------------------------------------------------------
+
+
+class TestChartsInUniversityPlan:
+    def _make_result_eligible(self):
+        from app.services.matchmaker_v2 import MatchResult
+        return MatchResult(
+            school_id="school-chart",
+            school_name="Chart University",
+            major_name=None,
+            major_jupas_code=None,
+            eligibility_pass=True,
+            failing_criteria=[],
+            fit_score=0.8,
+            component_scores={
+                "academic_fit": 0.85,
+                "subject_alignment": 0.75,
+                "language_fit": 0.9,
+                "interest_alignment": 0.65,
+                "weighted_score": 0.8,
+            },
+            ml_probability=None,
+            final_score=0.8,
+            shap_explanation=None,
+            rationale="Good fit for testing charts.",
+        )
+
+    def _make_student_with_grades(self):
+        return {
+            "name": "Chart Student",
+            "year_of_study": 2026,
+            "subject_grades": [
+                {
+                    "subject_code": "ENGL",
+                    "subject_name": "English Language",
+                    "sitting": "MOCK",
+                    "raw_grade": "5",
+                    "predicted_grade": "5",
+                    "year_of_exam": 2026,
+                    "is_compulsory": True,
+                    "category": "CORE",
+                },
+                {
+                    "subject_code": "MATH",
+                    "subject_name": "Mathematics",
+                    "sitting": "MOCK",
+                    "raw_grade": "4",
+                    "predicted_grade": "4",
+                    "year_of_exam": 2026,
+                    "is_compulsory": True,
+                    "category": "CORE",
+                },
+            ],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+
+    def test_university_plan_contains_chartjs_cdn(self):
+        """UNIVERSITY plan <head> includes Chart.js CDN."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [self._make_result_eligible()], [])
+        assert "cdn.jsdelivr.net/npm/chart.js" in html
+
+    def test_university_plan_has_grade_chart_canvas(self):
+        """UNIVERSITY plan contains a grade chart canvas for eligible school."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [self._make_result_eligible()], [])
+        assert 'id="chart-grade-1"' in html
+
+    def test_university_plan_has_radar_chart_canvas(self):
+        """UNIVERSITY plan contains a radar chart canvas for eligible school."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [self._make_result_eligible()], [])
+        assert 'id="chart-radar-1"' in html
+
+    def test_university_plan_has_gantt_svg(self):
+        """UNIVERSITY plan contains the SVG Gantt timeline."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [self._make_result_eligible()], [])
+        assert "<svg" in html
+        assert "Timeline Overview" in html
+
+    def test_university_plan_has_print_canvas_rule(self):
+        """UNIVERSITY plan @media print includes canvas rule."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [self._make_result_eligible()], [])
+        assert "canvas" in html and "@media print" in html
+
+    def test_high_school_plan_has_no_chart(self):
+        """HIGH_SCHOOL plan must NOT contain Chart.js canvas elements."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [], [], plan_type="HIGH_SCHOOL")
+        assert "chart-grade" not in html
+        assert "chart-radar" not in html
+        assert "cdn.jsdelivr.net/npm/chart.js" not in html
+
+    def test_no_eligible_schools_produces_no_chart_canvas(self):
+        """With no eligible schools, no chart canvases are emitted."""
+        student = self._make_student_with_grades()
+        html = generate_html_plan(student, [], [])
+        # No eligible schools → no school chart canvases
+        assert "chart-grade-1" not in html
+        assert "chart-radar-1" not in html
+
+
+# ---------------------------------------------------------------------------
+# Template tests (Point 17)
+# ---------------------------------------------------------------------------
+
+
+class TestPlanTemplates:
+    def _make_student(self):
+        return {
+            "name": "Template Student",
+            "year_of_study": 2026,
+            "subject_grades": [],
+            "ielts_score": None,
+            "extra_curricular": [],
+            "awards": [],
+        }
+
+    def test_default_template_is_professional(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [])
+        # professional template uses Georgia serif
+        assert "Georgia" in html
+
+    def test_modern_template_uses_teal(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], template_id="modern")
+        assert "#0d9488" in html
+
+    def test_minimal_template_uses_black_heading(self):
+        student = self._make_student()
+        html = generate_html_plan(student, [], [], template_id="minimal")
+        assert "#000000" in html
+
+    def test_unknown_template_falls_back_to_professional(self):
+        student = self._make_student()
+        # Unknown template should not raise; defaults to professional
+        html = generate_html_plan(student, [], [], template_id="nonexistent")
+        assert "<!DOCTYPE html>" in html
+
+    def test_student_summary_override_applied(self):
+        student = self._make_student()
+        overrides = {"student_summary": "<p>Custom summary content</p>"}
+        html = generate_html_plan(student, [], [], overrides=overrides)
+        assert "Custom summary content" in html
+
+    def test_action_plan_notes_override_applied(self):
+        student = self._make_student()
+        overrides = {"action_plan_notes": "<p>Counsellor note here</p>"}
+        html = generate_html_plan(student, [], [], overrides=overrides)
+        assert "Counsellor note here" in html
+
+    def test_reset_override_removes_custom_content(self):
+        student = self._make_student()
+        # First confirm override works
+        overrides = {"student_summary": "<p>Override text</p>"}
+        html_with = generate_html_plan(student, [], [], overrides=overrides)
+        assert "Override text" in html_with
+        # Then reset (empty overrides)
+        html_without = generate_html_plan(student, [], [], overrides={})
+        assert "Override text" not in html_without
