@@ -1,0 +1,258 @@
+[
+  {
+    "name": "Chinese Language",
+    "code": "CHLA",
+    "category": "CORE",
+    "is_compulsory": true,
+    "hkdse_subject_code": "CHLA",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "English Language",
+    "code": "ENGL",
+    "category": "CORE",
+    "is_compulsory": true,
+    "hkdse_subject_code": "ENGL",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Mathematics (Compulsory Part)",
+    "code": "MATH",
+    "category": "CORE",
+    "is_compulsory": true,
+    "hkdse_subject_code": "MATH",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Citizenship and Social Development",
+    "code": "CSD",
+    "category": "CORE",
+    "is_compulsory": true,
+    "hkdse_subject_code": "CSD",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Chinese History",
+    "code": "CHIH",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "CHIH",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Chinese Literature",
+    "code": "CHIL",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "CHIL",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "History",
+    "code": "HIST",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "HIST",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Geography",
+    "code": "GEOG",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "GEOG",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Tourism and Hospitality Studies",
+    "code": "TOUR",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "TOUR",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Visual Arts",
+    "code": "VART",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "VART",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Music",
+    "code": "MUSC",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "MUSC",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Ethics and Religious Studies",
+    "code": "ERS",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "ERS",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Physical Education",
+    "code": "PE",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "PE",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Economics",
+    "code": "ECON",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "ECON",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Business, Accounting and Financial Studies",
+    "code": "BAFS",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "BAFS",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Biology",
+    "code": "BIOL",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "BIOL",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Chemistry",
+    "code": "CHEM",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "CHEM",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Physics",
+    "code": "PHYS",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "PHYS",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Combined Science",
+    "code": "CSCI",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "CSCI",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Integrated Science",
+    "code": "ISCI",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "ISCI",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Mathematics Extended Module 1 (Calculus and Statistics)",
+    "code": "M1",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "M1",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Mathematics Extended Module 2 (Algebra and Calculus)",
+    "code": "M2",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "M2",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Information and Communication Technology",
+    "code": "ICT",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "ICT",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Design and Applied Technology",
+    "code": "DAT",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "DAT",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Health Management and Social Care",
+    "code": "HMSC",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "HMSC",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Technology and Living",
+    "code": "TL",
+    "category": "ELECTIVE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "TL",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "French",
+    "code": "FREN",
+    "category": "OTHER_LANGUAGE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "FREN",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "German",
+    "code": "GERM",
+    "category": "OTHER_LANGUAGE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "GERM",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Japanese",
+    "code": "JAPA",
+    "category": "OTHER_LANGUAGE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "JAPA",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Spanish",
+    "code": "SPAN",
+    "category": "OTHER_LANGUAGE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "SPAN",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Putonghua",
+    "code": "PTH",
+    "category": "OTHER_LANGUAGE",
+    "is_compulsory": false,
+    "hkdse_subject_code": "PTH",
+    "grade_system": "HKDSE"
+  },
+  {
+    "name": "Applied Learning (Generic)",
+    "code": "APL_GENERIC",
+    "category": "APPLIED_LEARNING",
+    "is_compulsory": false,
+    "hkdse_subject_code": "APL_GENERIC",
+    "grade_system": "HKDSE"
+  }
+]

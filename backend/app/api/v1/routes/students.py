@@ -1,0 +1,298 @@
+"""
+app/api/v1/routes/students.py
+
+Student profile CRUD endpoints — all protected.
+"""
+from __future__ import annotations
+
+from typing import Any
+from uuid import UUID
+
+from fastapi import APIRouter, Body, Depends, status
+from sqlalchemy.orm import Session
+
+from app.core.dependencies import get_current_user
+from app.db.models import Student, User
+from app.db.session import get_db
+from app.schemas.student import (
+    StudentCreate,
+    StudentFullResponse,
+    StudentGraduateRequest,
+    StudentLanguageScoresUpdate,
+    StudentListItem,
+    StudentProfileUpdate,
+    StudentResponse,
+    StudentUpdate,
+)
+from app.services import student_service
+
+router = APIRouter(prefix="/students", tags=["students"])
+
+
+def _build_full_response(student: Student) -> dict:
+    """Build a StudentFullResponse-compatible dict from a Student ORM object."""
+    ielts = student.ielts_score or {}
+    if not isinstance(ielts, dict):
+        ielts = {}
+    return {
+        "id": student.id,
+        "user_id": student.user_id,
+        "name": student.name,
+        "grades": student.grades or {},
+        "interests": student.interests or [],
+        "strengths_weaknesses": student.strengths_weaknesses or "",
+        "target_region": student.target_region or "local",
+        "created_at": student.created_at,
+        "updated_at": student.updated_at,
+        # v2 identity
+        "full_name": student.name,  # name is the canonical full name
+        "preferred_name": student.preferred_name,
+        "date_of_birth": student.date_of_birth,
+        "gender": student.gender,
+        "address": student.address,
+        "phone": student.phone,
+        "email": student.email,
+        "class_name": student.class_name,
+        "year_of_study": student.year_of_study,
+        "candidate_number": student.candidate_number,
+        "financial_aid_flag": student.financial_aid_flag or False,
+        "preferred_language": student.preferred_language or "en",
+        "notes": student.notes,
+        "personal_statement": student.personal_statement,
+        "is_graduated": student.is_graduated or False,
+        "graduation_year": student.graduation_year,
+        "final_school_id": student.final_school_id,
+        "final_major": student.final_major,
+        # Flat IELTS fields
+        "ielts_score": ielts.get("overall"),
+        "ielts_listening": ielts.get("listening"),
+        "ielts_reading": ielts.get("reading"),
+        "ielts_writing": ielts.get("writing"),
+        "ielts_speaking": ielts.get("speaking"),
+        "ielts_date": ielts.get("test_date"),
+        "other_language_scores": student.other_language_scores or [],
+        # v2 JSONB arrays
+        "teacher_evaluation": student.teacher_evaluation or [],
+        "extra_curricular": student.extra_curricular or [],
+        "awards": student.awards or [],
+    }
+
+
+# REQ-015, REQ-032
+@router.get("", response_model=list[StudentListItem], status_code=status.HTTP_200_OK)
+def list_students(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """List all student profiles owned by the authenticated counselor. REQ-015, REQ-032"""
+    return student_service.get_students(db, user_id=current_user.id)
+
+
+# REQ-012, REQ-025, REQ-028, REQ-033
+@router.post("", response_model=StudentFullResponse, status_code=status.HTTP_201_CREATED)
+def create_student(
+    payload: StudentCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a new student profile. REQ-012, REQ-025, REQ-028, REQ-033"""
+    student = student_service.create_student(db, user_id=current_user.id, data=payload)
+    return _build_full_response(student)
+
+
+# REQ-014, REQ-033
+@router.get("/{student_id}", response_model=StudentFullResponse, status_code=status.HTTP_200_OK)
+def get_student(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Retrieve a full student profile by ID. REQ-014, REQ-033"""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    return _build_full_response(student)
+
+
+# Alias: GET /{student_id}/profile — same as GET /{student_id}
+@router.get("/{student_id}/profile", response_model=StudentFullResponse, status_code=status.HTTP_200_OK)
+def get_student_profile(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Retrieve a full student profile. REQ-014, REQ-033"""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    return _build_full_response(student)
+
+
+# REQ-013, REQ-033
+@router.put("/{student_id}", response_model=StudentResponse, status_code=status.HTTP_200_OK)
+def update_student(
+    student_id: UUID,
+    payload: StudentUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Full update of a student profile (v1 fields). REQ-013, REQ-033"""
+    return student_service.update_student(
+        db, student_id=student_id, user_id=current_user.id, data=payload
+    )
+
+
+# v2 full profile update
+@router.put("/{student_id}/profile", response_model=StudentFullResponse, status_code=status.HTTP_200_OK)
+def update_student_profile(
+    student_id: UUID,
+    payload: StudentProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update all v2 student profile fields. REQ-057"""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+
+    update_fields: dict[str, Any] = {
+        k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None
+    }
+
+    # `full_name` in request → `name` in model
+    if "full_name" in update_fields:
+        student.name = update_fields.pop("full_name")
+
+    for field, value in update_fields.items():
+        if hasattr(student, field):
+            setattr(student, field, value)
+
+    db.commit()
+    db.refresh(student)
+    return _build_full_response(student)
+
+
+# Language scores
+@router.post("/{student_id}/language-scores", response_model=StudentFullResponse, status_code=status.HTTP_200_OK)
+def update_language_scores(
+    student_id: UUID,
+    payload: StudentLanguageScoresUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Save IELTS and other language scores for a student."""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+
+    # Pack flat IELTS fields into the JSONB structure
+    existing_ielts = student.ielts_score or {}
+    if not isinstance(existing_ielts, dict):
+        existing_ielts = {}
+    new_ielts = dict(existing_ielts)
+
+    mapping = {
+        "ielts_score": "overall",
+        "ielts_listening": "listening",
+        "ielts_reading": "reading",
+        "ielts_writing": "writing",
+        "ielts_speaking": "speaking",
+        "ielts_date": "test_date",
+    }
+    data = payload.model_dump(exclude_unset=True)
+    for flat_key, jsonb_key in mapping.items():
+        if flat_key in data and data[flat_key] is not None:
+            new_ielts[jsonb_key] = data[flat_key]
+
+    student.ielts_score = new_ielts or None
+
+    if payload.other_language_scores is not None:
+        student.other_language_scores = payload.other_language_scores
+
+    db.commit()
+    db.refresh(student)
+    return _build_full_response(student)
+
+
+# Teacher evaluations
+@router.get("/{student_id}/teacher-evaluations", status_code=status.HTTP_200_OK)
+def get_teacher_evaluations(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return teacher evaluation array for a student."""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    return student.teacher_evaluation or []
+
+
+@router.put("/{student_id}/teacher-evaluations", status_code=status.HTTP_200_OK)
+def update_teacher_evaluations(
+    student_id: UUID,
+    payload: list = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Replace the teacher evaluation array for a student."""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student.teacher_evaluation = payload
+    db.commit()
+    db.refresh(student)
+    return student.teacher_evaluation or []
+
+
+# Extracurricular activities
+@router.post("/{student_id}/extracurricular", status_code=status.HTTP_200_OK)
+def update_extracurricular(
+    student_id: UUID,
+    payload: list = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Replace the extracurricular activities array for a student."""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student.extra_curricular = payload
+    db.commit()
+    db.refresh(student)
+    return student.extra_curricular or []
+
+
+# Awards
+@router.post("/{student_id}/awards", status_code=status.HTTP_200_OK)
+def update_awards(
+    student_id: UUID,
+    payload: list = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Replace the awards array for a student."""
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student.awards = payload
+    db.commit()
+    db.refresh(student)
+    return student.awards or []
+
+
+# Graduate a student — marks is_graduated=True and records final destination
+@router.post("/{student_id}/graduate", response_model=StudentFullResponse, status_code=status.HTTP_200_OK)
+def graduate_student(
+    student_id: UUID,
+    payload: StudentGraduateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Mark a student as graduated with their final school and major. Feeds the analytics data store."""
+    from datetime import date as _date
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student.is_graduated = True
+    if payload.final_school_id is not None:
+        student.final_school_id = payload.final_school_id
+    if payload.final_major is not None:
+        student.final_major = payload.final_major
+    student.graduation_year = payload.graduation_year or _date.today().year
+    db.commit()
+    db.refresh(student)
+    return _build_full_response(student)
+
+
+# REQ-025, REQ-028
+@router.delete("/{student_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_student(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Permanently delete a student profile and all associated data. REQ-025, REQ-028"""
+    student_service.delete_student(db, student_id=student_id, user_id=current_user.id)

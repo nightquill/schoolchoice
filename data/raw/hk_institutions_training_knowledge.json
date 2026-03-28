@@ -1,0 +1,187 @@
+[
+  {
+    "name": "The University of Hong Kong",
+    "name_zh": "香港大學",
+    "type": "UNIVERSITY",
+    "location": "Pokfulam, Hong Kong Island",
+    "website": "https://www.hku.hk",
+    "minimum_entry_score": 20,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "3"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "notable_programs": ["Medicine", "Law", "Business Administration", "Engineering", "Architecture", "Social Sciences"],
+    "faculties": ["Faculty of Arts", "Faculty of Business and Economics", "Faculty of Dentistry", "Faculty of Education", "Faculty of Engineering", "Faculty of Law", "Faculty of Medicine", "Faculty of Science", "Faculty of Social Sciences"],
+    "acceptance_rate": 0.18,
+    "average_admitted_score": 26.0,
+    "scholarship_available": true
+  },
+  {
+    "name": "The Chinese University of Hong Kong",
+    "name_zh": "香港中文大學",
+    "type": "UNIVERSITY",
+    "location": "Sha Tin, New Territories",
+    "website": "https://www.cuhk.edu.hk",
+    "minimum_entry_score": 18,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "notable_programs": ["Medicine", "Business Administration", "Law", "Engineering", "Arts", "Social Science"],
+    "faculties": ["Faculty of Arts", "Faculty of Business Administration", "Faculty of Education", "Faculty of Engineering", "Faculty of Law", "Faculty of Medicine", "Faculty of Science", "Faculty of Social Science"],
+    "acceptance_rate": 0.20,
+    "average_admitted_score": 25.0,
+    "scholarship_available": true
+  },
+  {
+    "name": "The Hong Kong University of Science and Technology",
+    "name_zh": "香港科技大學",
+    "type": "UNIVERSITY",
+    "location": "Clear Water Bay, Kowloon",
+    "website": "https://www.ust.hk",
+    "minimum_entry_score": 18,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "3"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "notable_programs": ["Engineering", "Business Management", "Science", "Computer Science", "Data Science"],
+    "faculties": ["School of Engineering", "School of Science", "School of Business and Management", "School of Humanities and Social Science"],
+    "acceptance_rate": 0.22,
+    "average_admitted_score": 25.5,
+    "scholarship_available": true
+  },
+  {
+    "name": "The Hong Kong Polytechnic University",
+    "name_zh": "香港理工大學",
+    "type": "POLYTECHNIC",
+    "location": "Hung Hom, Kowloon",
+    "website": "https://www.polyu.edu.hk",
+    "minimum_entry_score": 14,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Nursing", "Hotel and Tourism Management", "Engineering", "Design", "Business Administration", "Optometry"],
+    "faculties": ["Faculty of Applied Science and Textiles", "Faculty of Business", "Faculty of Construction and Environment", "Faculty of Engineering", "Faculty of Health and Social Sciences", "Faculty of Humanities", "School of Design", "School of Hotel and Tourism Management"],
+    "acceptance_rate": 0.30,
+    "average_admitted_score": 20.0,
+    "scholarship_available": true
+  },
+  {
+    "name": "City University of Hong Kong",
+    "name_zh": "香港城市大學",
+    "type": "UNIVERSITY",
+    "location": "Kowloon Tong, Kowloon",
+    "website": "https://www.cityu.edu.hk",
+    "minimum_entry_score": 14,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Computer Science", "Law", "Business Administration", "Engineering", "Creative Media", "Data Science"],
+    "faculties": ["College of Business", "College of Computing", "School of Creative Media", "School of Data Science", "School of Energy and Environment", "School of Law", "College of Engineering", "College of Liberal Arts and Social Sciences"],
+    "acceptance_rate": 0.32,
+    "average_admitted_score": 19.5,
+    "scholarship_available": true
+  },
+  {
+    "name": "The Hong Kong Baptist University",
+    "name_zh": "香港浸會大學",
+    "type": "UNIVERSITY",
+    "location": "Kowloon Tong, Kowloon",
+    "website": "https://www.hkbu.edu.hk",
+    "minimum_entry_score": 13,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Communication Studies", "Business Administration", "Social Work", "Chinese Medicine", "Film"],
+    "faculties": ["Faculty of Arts", "Faculty of Business", "Faculty of Communication", "Faculty of Science", "Faculty of Social Sciences", "School of Chinese Medicine"],
+    "acceptance_rate": 0.40,
+    "average_admitted_score": 17.5,
+    "scholarship_available": true
+  },
+  {
+    "name": "Lingnan University",
+    "name_zh": "嶺南大學",
+    "type": "UNIVERSITY",
+    "location": "Tuen Mun, New Territories",
+    "website": "https://www.ln.edu.hk",
+    "minimum_entry_score": 12,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Liberal Arts", "Business Administration", "Social Sciences", "Cultural Studies"],
+    "faculties": ["Faculty of Arts", "Faculty of Business", "Faculty of Social Sciences"],
+    "acceptance_rate": 0.45,
+    "average_admitted_score": 15.5,
+    "scholarship_available": true
+  },
+  {
+    "name": "The Education University of Hong Kong",
+    "name_zh": "香港教育大學",
+    "type": "UNIVERSITY",
+    "location": "Tai Po, New Territories",
+    "website": "https://www.eduhk.hk",
+    "minimum_entry_score": 12,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Primary Education", "Early Childhood Education", "Special Education", "Counselling", "Sports Science"],
+    "faculties": ["Faculty of Education and Human Development", "Faculty of Humanities", "Faculty of Liberal Arts and Social Sciences", "Faculty of Science and Technology"],
+    "acceptance_rate": 0.50,
+    "average_admitted_score": 15.0,
+    "scholarship_available": true
+  },
+  {
+    "name": "Hong Kong Community College",
+    "name_zh": "香港專上學院",
+    "type": "COMMUNITY_COLLEGE",
+    "location": "Multiple campuses, Hong Kong",
+    "website": "https://www.hkcc.polyu.edu.hk",
+    "minimum_entry_score": 8,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "1"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "notable_programs": ["Business Management", "Computing Studies", "Hotel Operations Management", "Nursing Studies", "Social Work"],
+    "faculties": ["School of Business", "School of Computing and Information Sciences", "School of Creative Industries", "School of Health Sciences", "School of Social Sciences"],
+    "acceptance_rate": 0.70,
+    "average_admitted_score": 10.0,
+    "scholarship_available": false
+  },
+  {
+    "name": "Vocational Training Council",
+    "name_zh": "職業訓練局",
+    "type": "VOCATIONAL",
+    "location": "Multiple campuses across Hong Kong",
+    "website": "https://www.vtc.edu.hk",
+    "minimum_entry_score": null,
+    "required_subjects": [],
+    "notable_programs": ["Engineering", "Information Technology", "Hospitality", "Hair and Beauty", "Multimedia", "Business"],
+    "faculties": ["Institute of Vocational Education (IVE)", "Hong Kong Institute of Vocational Education (HKIVE)", "Design Institute", "Technological and Higher Education Institute of Hong Kong (THEi)"],
+    "acceptance_rate": 0.85,
+    "average_admitted_score": null,
+    "scholarship_available": false
+  }
+]

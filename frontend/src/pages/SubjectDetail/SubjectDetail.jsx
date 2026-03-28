@@ -1,0 +1,258 @@
+// Subject Detail page — full analysis for a single HKDSE subject
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
+import { getAccount } from '../../api/account';
+import { getHkdseTrends, getHkdsePopulationStats } from '../../api/analytics';
+import { getCohorts } from '../../api/cohorts';
+
+const GRADE_ORDER = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
+const CATEGORY_LABELS = { CORE: 'Core', ELECTIVE: 'Elective', OTHER_LANGUAGE: 'Other Language', APPLIED_LEARNING: 'Applied Learning' };
+const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
+
+function numericToGrade(n) {
+  return GRADE_LABELS[Math.max(0, Math.min(7, Math.round(n)))] || 'U';
+}
+
+// ---- Grade distribution bar ----
+function GradeBar({ dist }) {
+  const barStyle = { display: 'flex', gap: '4px', alignItems: 'flex-end', height: '80px', marginTop: '4px' };
+  const colors = { '5**': '#1a7c3e', '5*': '#22c55e', '5': '#4ade80', '4': '#86efac', '3': '#fbbf24', '2': '#f97316', '1': '#ef4444', 'U': '#94a3b8' };
+  const max = Math.max(...GRADE_ORDER.map((g) => dist[g] || 0), 1);
+  return (
+    <div style={barStyle} aria-label="Grade distribution">
+      {GRADE_ORDER.map((g) => {
+        const n = dist[g] || 0;
+        const pct = (n / max) * 100;
+        return (
+          <div key={g} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', maxWidth: '50px' }} title={`${g}: ${n}`}>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>{n > 0 ? n : ''}</div>
+            <div style={{ width: '100%', height: `${pct}%`, background: colors[g] || '#94a3b8', borderRadius: '2px 2px 0 0', minHeight: n > 0 ? '4px' : 0 }} />
+            <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px', fontWeight: 'bold' }}>{g}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---- Grade Rate Cards ----
+function GradeRates({ rates }) {
+  if (!rates) return null;
+  const colors = { '5**': '#1a7c3e', '5*': '#22c55e', '5': '#4ade80', '4': '#86efac', '3': '#fbbf24', '2': '#f97316' };
+  return (
+    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-2)' }}>
+      {['5**', '5*', '5', '4', '3', '2'].map((g) => {
+        const r = rates[g];
+        if (r == null) return null;
+        return (
+          <div key={g} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-2) var(--space-3)', minWidth: '60px' }}>
+            <div style={{ width: '100%', height: '4px', background: colors[g] || '#94a3b8', borderRadius: '2px', marginBottom: 'var(--space-1)' }} />
+            <div style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{r}%</div>
+            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)' }}>&ge; {g}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SubjectDetail() {
+  const { subjectCode } = useParams();
+  const navigate = useNavigate();
+  const [account, setAccount] = useState(null);
+  const [cohorts, setCohorts] = useState([]);
+  const [sittings, setSittings] = useState([]);
+  const [subjectName, setSubjectName] = useState('');
+  const [subjectCategory, setSubjectCategory] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cohortFilter, setCohortFilter] = useState('');
+  const [sittingFilter, setSittingFilter] = useState('');
+  const [populationData, setPopulationData] = useState(null);
+
+  const loadData = (cohort, sitting) => {
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      getHkdseTrends(sitting || undefined, cohort || undefined),
+      getCohorts(),
+      getAccount(),
+      getHkdsePopulationStats(subjectCode),
+    ])
+      .then(([trendsData, cohortsData, accountData, populationStatsData]) => {
+        setAccount(accountData);
+        setCohorts(Array.isArray(cohortsData) ? cohortsData : (cohortsData.cohorts ?? []));
+        const allTrends = trendsData?.trends ?? [];
+        const matching = allTrends.filter((r) => r.subject_code === subjectCode);
+        if (matching.length > 0) {
+          setSubjectName(matching[0].subject_name || subjectCode);
+          setSubjectCategory(matching[0].category || '');
+        }
+        setSittings(matching);
+        const popSubject = populationStatsData?.subjects?.find((s) => s.code === subjectCode);
+        setPopulationData(popSubject || null);
+        if (matching.length === 0 && popSubject) {
+          setSubjectName(popSubject.name || subjectCode);
+          setSubjectCategory(popSubject.category || '');
+        }
+      })
+      .catch((err) => setError(err?.response?.data?.detail || 'Failed to load subject data.'))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadData('', '');
+  }, [subjectCode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!loading) loadData(cohortFilter, sittingFilter);
+  }, [cohortFilter, sittingFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const catColors = { CORE: '#2563eb', ELECTIVE: '#7c3aed', OTHER_LANGUAGE: '#0891b2', APPLIED_LEARNING: '#d97706' };
+
+  const inputStyle = {
+    padding: 'var(--space-2)',
+    border: 'var(--border-width) solid var(--color-border)',
+    borderRadius: 'var(--border-radius-sm)',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+  };
+
+  const filteredSittings = sittingFilter ? sittings.filter((r) => r.sitting === sittingFilter) : sittings;
+
+  return (
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
+      <NavBarV2 account={account} />
+
+      <div style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4) var(--space-8)' }}>
+        <button
+          onClick={() => navigate('/data-analysis')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-base)', padding: 0, marginBottom: 'var(--space-3)', display: 'block' }}
+        >
+          &larr; Back to Data Analysis
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-1) 0' }}>
+              {subjectCode}
+            </h1>
+            {subjectName && subjectName !== subjectCode && (
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>{subjectName}</p>
+            )}
+          </div>
+          {subjectCategory && (
+            <span style={{ fontSize: '12px', background: catColors[subjectCategory] || '#64748b', color: '#fff', padding: '3px 10px', borderRadius: '10px' }}>
+              {CATEGORY_LABELS[subjectCategory] || subjectCategory}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: 'var(--space-6) var(--space-8)' }}>
+
+        {/* Filters */}
+        <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-6)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Cohort:</label>
+            <select value={cohortFilter} onChange={(e) => setCohortFilter(e.target.value)} style={inputStyle}>
+              <option value="">All Students</option>
+              {cohorts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Sitting:</label>
+            <select value={sittingFilter} onChange={(e) => setSittingFilter(e.target.value)} style={inputStyle}>
+              <option value="">All</option>
+              <option value="MOCK">MOCK</option>
+              <option value="TRIAL">TRIAL</option>
+              <option value="OFFICIAL">OFFICIAL</option>
+            </select>
+          </div>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+            {filteredSittings.length} sitting{filteredSittings.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+
+        {loading && <LoadingSpinner label="Loading subject data…" />}
+        {error && <ErrorMessage message={error} />}
+
+        {!loading && !error && filteredSittings.length === 0 && (
+          <div style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+            No data available for this subject with the selected filters.
+          </div>
+        )}
+
+        {!loading && !error && filteredSittings.map((row) => (
+          <div key={row.sitting} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                {row.sitting} Sitting
+              </h2>
+              <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                {row.count} student{row.count !== 1 ? 's' : ''}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: 'var(--space-6)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+              <span>Mean: <strong style={{ color: 'var(--color-text-primary)' }}>{numericToGrade(row.mean)} ({row.mean.toFixed(2)})</strong></span>
+              <span>Variance: <strong style={{ color: 'var(--color-text-primary)' }}>{row.variance.toFixed(2)}</strong></span>
+            </div>
+
+            <div style={{ marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Grade Distribution
+            </div>
+            <GradeBar dist={row.grade_distribution || {}} />
+
+            <div style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Grade Rates (% achieving grade or above)
+            </div>
+            <GradeRates rates={row.grade_rates} />
+          </div>
+        ))}
+
+        {!loading && !error && populationData && (
+          <div style={{ marginTop: 'var(--space-6)' }}>
+            <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
+              HK Population Data (HKDSE)
+            </h2>
+            {(populationData.sittings ?? []).map((sitting) => (
+              <div key={`${sitting.year}-${sitting.sitting_type}`} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                  <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                    {sitting.year} {sitting.sitting_type}
+                  </h3>
+                  <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                    {sitting.total_candidates != null ? `${sitting.total_candidates.toLocaleString()} candidates` : ''}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: 'var(--space-6)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+                  {sitting.mean_numeric != null && (
+                    <span>Mean: <strong style={{ color: 'var(--color-text-primary)' }}>{numericToGrade(sitting.mean_numeric)} ({sitting.mean_numeric.toFixed(2)})</strong></span>
+                  )}
+                  {sitting.variance != null && (
+                    <span>Variance: <strong style={{ color: 'var(--color-text-primary)' }}>{sitting.variance.toFixed(2)}</strong></span>
+                  )}
+                </div>
+
+                {sitting.grade_distribution && (
+                  <>
+                    <div style={{ marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Grade Distribution (%)
+                    </div>
+                    <GradeBar dist={sitting.grade_distribution} />
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default SubjectDetail;

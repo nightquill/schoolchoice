@@ -1,0 +1,53 @@
+:root {
+  /* Colors */
+  --color-primary:        #2563EB;
+  --color-secondary:      #64748B;
+  --color-background:     #F8FAFC;
+  --color-surface:        #FFFFFF;
+  --color-text-primary:   #0F172A;
+  --color-text-secondary: #475569;
+  --color-error:          #DC2626;
+  --color-success:        #16A34A;
+  --color-warning:        #D97706;
+  --color-border:         #CBD5E1;
+
+  /* Typography */
+  --font-family-base:     system-ui, -apple-system, sans-serif;
+  --font-size-xs:         0.75rem;
+  --font-size-sm:         0.875rem;
+  --font-size-md:         1rem;
+  --font-size-lg:         1.125rem;
+  --font-size-xl:         1.25rem;
+  --font-size-2xl:        1.5rem;
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-bold:     700;
+  --line-height-tight:    1.25;
+  --line-height-normal:   1.5;
+
+  /* Spacing */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Borders */
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-width:     1px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.10);
+
+  /* Breakpoints */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+}

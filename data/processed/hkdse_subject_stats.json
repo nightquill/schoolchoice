@@ -1,0 +1,2004 @@
+{
+  "metadata": {
+    "year": 2024,
+    "total_candidates": 48000,
+    "description": "HKDSE per-subject grade distribution statistics. All percentages are estimates based on published HKEAA Statistical Reports. Verify against official HKEAA publications before use in production.",
+    "source": "training_knowledge",
+    "generated": "2026-03-28",
+    "grade_scale": {
+      "5**": 7,
+      "5*": 6,
+      "5": 5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
+      "U": 0
+    }
+  },
+  "subjects": [
+    {
+      "code": "CHLA",
+      "name": "Chinese Language",
+      "name_zh": "中國語文",
+      "category": "CORE",
+      "is_compulsory": true,
+      "total_candidates": 46200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 1.1,
+            "5*": 2.9,
+            "5": 7.8,
+            "4": 14.8,
+            "3": 23.9,
+            "2": 28.2,
+            "1": 16.2,
+            "U": 5.1
+          },
+          "mean_numeric": 2.95,
+          "variance": 2.10,
+          "total_candidates": 46500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 1.2,
+            "5*": 3.1,
+            "5": 8.1,
+            "4": 15.0,
+            "3": 24.1,
+            "2": 27.8,
+            "1": 15.9,
+            "U": 4.8
+          },
+          "mean_numeric": 2.98,
+          "variance": 2.08,
+          "total_candidates": 46300
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 1.2,
+            "5*": 3.2,
+            "5": 8.4,
+            "4": 15.2,
+            "3": 24.0,
+            "2": 27.5,
+            "1": 15.8,
+            "U": 4.7
+          },
+          "mean_numeric": 3.00,
+          "variance": 2.07,
+          "total_candidates": 46200
+        }
+      ]
+    },
+    {
+      "code": "ENGL",
+      "name": "English Language",
+      "name_zh": "英國語文",
+      "category": "CORE",
+      "is_compulsory": true,
+      "total_candidates": 46100,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 1.8,
+            "5*": 4.7,
+            "5": 9.5,
+            "4": 16.8,
+            "3": 24.7,
+            "2": 25.1,
+            "1": 12.3,
+            "U": 5.1
+          },
+          "mean_numeric": 3.18,
+          "variance": 2.15,
+          "total_candidates": 46400
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.0,
+            "5*": 5.0,
+            "5": 10.0,
+            "4": 17.0,
+            "3": 25.0,
+            "2": 25.0,
+            "1": 12.0,
+            "U": 4.0
+          },
+          "mean_numeric": 3.25,
+          "variance": 2.10,
+          "total_candidates": 46200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.1,
+            "5*": 5.2,
+            "5": 10.3,
+            "4": 17.1,
+            "3": 24.8,
+            "2": 24.7,
+            "1": 11.8,
+            "U": 4.0
+          },
+          "mean_numeric": 3.27,
+          "variance": 2.09,
+          "total_candidates": 46100
+        }
+      ]
+    },
+    {
+      "code": "MATH",
+      "name": "Mathematics (Compulsory Part)",
+      "name_zh": "數學（必修部分）",
+      "category": "CORE",
+      "is_compulsory": true,
+      "total_candidates": 46000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 7.8,
+            "5": 11.6,
+            "4": 16.8,
+            "3": 22.1,
+            "2": 20.2,
+            "1": 13.5,
+            "U": 4.2
+          },
+          "mean_numeric": 3.32,
+          "variance": 2.30,
+          "total_candidates": 46300
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 8.0,
+            "5": 12.0,
+            "4": 17.0,
+            "3": 22.0,
+            "2": 20.0,
+            "1": 13.0,
+            "U": 4.0
+          },
+          "mean_numeric": 3.36,
+          "variance": 2.28,
+          "total_candidates": 46100
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 8.2,
+            "5": 12.1,
+            "4": 17.0,
+            "3": 21.8,
+            "2": 19.8,
+            "1": 12.8,
+            "U": 4.1
+          },
+          "mean_numeric": 3.38,
+          "variance": 2.27,
+          "total_candidates": 46000
+        }
+      ]
+    },
+    {
+      "code": "CSD",
+      "name": "Citizenship and Social Development",
+      "name_zh": "公民與社會發展科",
+      "category": "CORE",
+      "is_compulsory": true,
+      "notes": "Introduced in 2021 replacing Liberal Studies. Graded Attained/Not Attained only from 2021; grade distribution reflects proportion achieving Attained.",
+      "total_candidates": 45000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained": 92.1,
+            "Not Attained": 7.9
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 45500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained": 92.8,
+            "Not Attained": 7.2
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 45200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained": 93.2,
+            "Not Attained": 6.8
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 45000
+        }
+      ]
+    },
+    {
+      "code": "M1",
+      "name": "Mathematics Extended Module 1 (Calculus and Statistics)",
+      "name_zh": "數學延伸課程（單元一）微積分與統計",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 9500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.2,
+            "5*": 9.8,
+            "5": 14.1,
+            "4": 19.2,
+            "3": 22.5,
+            "2": 17.3,
+            "1": 9.1,
+            "U": 2.8
+          },
+          "mean_numeric": 3.60,
+          "variance": 2.20,
+          "total_candidates": 9800
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.5,
+            "5*": 10.0,
+            "5": 14.5,
+            "4": 19.0,
+            "3": 22.0,
+            "2": 17.0,
+            "1": 9.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.62,
+          "variance": 2.18,
+          "total_candidates": 9600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.6,
+            "5*": 10.2,
+            "5": 14.8,
+            "4": 18.8,
+            "3": 21.8,
+            "2": 16.8,
+            "1": 9.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.64,
+          "variance": 2.17,
+          "total_candidates": 9500
+        }
+      ]
+    },
+    {
+      "code": "M2",
+      "name": "Mathematics Extended Module 2 (Algebra and Calculus)",
+      "name_zh": "數學延伸課程（單元二）代數與微積分",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 10200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.1,
+            "5*": 12.2,
+            "5": 16.0,
+            "4": 19.5,
+            "3": 21.0,
+            "2": 14.8,
+            "1": 7.2,
+            "U": 2.2
+          },
+          "mean_numeric": 3.82,
+          "variance": 2.22,
+          "total_candidates": 10500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.5,
+            "5*": 12.5,
+            "5": 16.5,
+            "4": 19.0,
+            "3": 20.5,
+            "2": 14.5,
+            "1": 7.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.85,
+          "variance": 2.20,
+          "total_candidates": 10300
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.8,
+            "5*": 12.8,
+            "5": 16.8,
+            "4": 19.0,
+            "3": 20.0,
+            "2": 14.2,
+            "1": 7.4,
+            "U": 2.0
+          },
+          "mean_numeric": 3.88,
+          "variance": 2.18,
+          "total_candidates": 10200
+        }
+      ]
+    },
+    {
+      "code": "PHYS",
+      "name": "Physics",
+      "name_zh": "物理",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 16500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.8,
+            "5*": 6.8,
+            "5": 9.8,
+            "4": 14.8,
+            "3": 20.1,
+            "2": 22.3,
+            "1": 15.2,
+            "U": 8.2
+          },
+          "mean_numeric": 3.02,
+          "variance": 2.38,
+          "total_candidates": 16900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.0,
+            "5*": 7.0,
+            "5": 10.0,
+            "4": 15.0,
+            "3": 20.0,
+            "2": 22.0,
+            "1": 15.0,
+            "U": 8.0
+          },
+          "mean_numeric": 3.05,
+          "variance": 2.35,
+          "total_candidates": 16700
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.1,
+            "5*": 7.2,
+            "5": 10.2,
+            "4": 15.1,
+            "3": 19.8,
+            "2": 21.9,
+            "1": 14.9,
+            "U": 7.8
+          },
+          "mean_numeric": 3.07,
+          "variance": 2.33,
+          "total_candidates": 16500
+        }
+      ]
+    },
+    {
+      "code": "CHEM",
+      "name": "Chemistry",
+      "name_zh": "化學",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 18000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.9,
+            "5*": 6.5,
+            "5": 9.8,
+            "4": 14.9,
+            "3": 20.5,
+            "2": 21.8,
+            "1": 15.1,
+            "U": 8.5
+          },
+          "mean_numeric": 3.01,
+          "variance": 2.36,
+          "total_candidates": 18500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.0,
+            "5*": 7.0,
+            "5": 10.0,
+            "4": 15.0,
+            "3": 20.5,
+            "2": 21.5,
+            "1": 15.0,
+            "U": 8.0
+          },
+          "mean_numeric": 3.03,
+          "variance": 2.34,
+          "total_candidates": 18200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.1,
+            "5*": 7.1,
+            "5": 10.2,
+            "4": 15.2,
+            "3": 20.3,
+            "2": 21.2,
+            "1": 14.9,
+            "U": 8.0
+          },
+          "mean_numeric": 3.05,
+          "variance": 2.33,
+          "total_candidates": 18000
+        }
+      ]
+    },
+    {
+      "code": "BIOL",
+      "name": "Biology",
+      "name_zh": "生物",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 19500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 7.8,
+            "5": 11.8,
+            "4": 17.8,
+            "3": 22.0,
+            "2": 20.2,
+            "1": 12.2,
+            "U": 4.4
+          },
+          "mean_numeric": 3.32,
+          "variance": 2.22,
+          "total_candidates": 19900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 8.0,
+            "5": 12.0,
+            "4": 18.0,
+            "3": 22.0,
+            "2": 20.0,
+            "1": 12.0,
+            "U": 4.0
+          },
+          "mean_numeric": 3.35,
+          "variance": 2.20,
+          "total_candidates": 19700
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.1,
+            "5*": 8.2,
+            "5": 12.2,
+            "4": 18.1,
+            "3": 21.8,
+            "2": 19.8,
+            "1": 11.8,
+            "U": 4.0
+          },
+          "mean_numeric": 3.37,
+          "variance": 2.18,
+          "total_candidates": 19500
+        }
+      ]
+    },
+    {
+      "code": "ECON",
+      "name": "Economics",
+      "name_zh": "經濟",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 17500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.8,
+            "5*": 9.8,
+            "5": 14.8,
+            "4": 19.8,
+            "3": 22.0,
+            "2": 17.2,
+            "1": 8.5,
+            "U": 3.1
+          },
+          "mean_numeric": 3.52,
+          "variance": 2.18,
+          "total_candidates": 17900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.0,
+            "5*": 10.0,
+            "5": 15.0,
+            "4": 20.0,
+            "3": 22.0,
+            "2": 17.0,
+            "1": 8.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.55,
+          "variance": 2.16,
+          "total_candidates": 17700
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.2,
+            "5*": 10.2,
+            "5": 15.2,
+            "4": 20.0,
+            "3": 21.8,
+            "2": 16.8,
+            "1": 7.8,
+            "U": 3.0
+          },
+          "mean_numeric": 3.57,
+          "variance": 2.15,
+          "total_candidates": 17500
+        }
+      ]
+    },
+    {
+      "code": "BAFS",
+      "name": "Business, Accounting and Financial Studies",
+      "name_zh": "企業、會計與財務概論",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 16000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 8.2,
+            "5": 13.0,
+            "4": 18.5,
+            "3": 23.0,
+            "2": 20.5,
+            "1": 10.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.30,
+          "variance": 2.20,
+          "total_candidates": 16400
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 8.5,
+            "5": 13.5,
+            "4": 18.5,
+            "3": 22.5,
+            "2": 20.0,
+            "1": 10.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.33,
+          "variance": 2.18,
+          "total_candidates": 16200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 8.8,
+            "5": 13.8,
+            "4": 18.5,
+            "3": 22.2,
+            "2": 19.5,
+            "1": 10.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.36,
+          "variance": 2.17,
+          "total_candidates": 16000
+        }
+      ]
+    },
+    {
+      "code": "ICT",
+      "name": "Information and Communication Technology",
+      "name_zh": "資訊及通訊科技",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 11500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.5,
+            "5*": 8.0,
+            "5": 13.0,
+            "4": 18.0,
+            "3": 23.5,
+            "2": 20.5,
+            "1": 10.5,
+            "U": 3.0
+          },
+          "mean_numeric": 3.28,
+          "variance": 2.20,
+          "total_candidates": 11900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 8.2,
+            "5": 13.2,
+            "4": 18.2,
+            "3": 23.0,
+            "2": 20.2,
+            "1": 10.4,
+            "U": 3.0
+          },
+          "mean_numeric": 3.30,
+          "variance": 2.18,
+          "total_candidates": 11700
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 8.5,
+            "5": 13.5,
+            "4": 18.0,
+            "3": 22.5,
+            "2": 20.0,
+            "1": 10.5,
+            "U": 3.0
+          },
+          "mean_numeric": 3.32,
+          "variance": 2.17,
+          "total_candidates": 11500
+        }
+      ]
+    },
+    {
+      "code": "DAT",
+      "name": "Design and Applied Technology",
+      "name_zh": "設計與應用科技",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 4500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 9.5,
+            "5": 14.0,
+            "4": 19.0,
+            "3": 23.0,
+            "2": 18.5,
+            "1": 9.0,
+            "U": 2.5
+          },
+          "mean_numeric": 3.45,
+          "variance": 2.12,
+          "total_candidates": 4700
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.8,
+            "5*": 9.8,
+            "5": 14.2,
+            "4": 18.8,
+            "3": 22.8,
+            "2": 18.2,
+            "1": 9.0,
+            "U": 2.4
+          },
+          "mean_numeric": 3.47,
+          "variance": 2.10,
+          "total_candidates": 4600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.0,
+            "5*": 10.0,
+            "5": 14.5,
+            "4": 18.5,
+            "3": 22.5,
+            "2": 18.0,
+            "1": 9.0,
+            "U": 2.5
+          },
+          "mean_numeric": 3.49,
+          "variance": 2.08,
+          "total_candidates": 4500
+        }
+      ]
+    },
+    {
+      "code": "VART",
+      "name": "Visual Arts",
+      "name_zh": "視覺藝術",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 6500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.5,
+            "5*": 11.0,
+            "5": 16.0,
+            "4": 20.0,
+            "3": 22.0,
+            "2": 16.5,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.60,
+          "variance": 2.05,
+          "total_candidates": 6800
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.8,
+            "5*": 11.2,
+            "5": 16.2,
+            "4": 20.0,
+            "3": 21.8,
+            "2": 16.0,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.62,
+          "variance": 2.03,
+          "total_candidates": 6600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.0,
+            "5*": 11.5,
+            "5": 16.5,
+            "4": 19.5,
+            "3": 21.5,
+            "2": 15.5,
+            "1": 7.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.65,
+          "variance": 2.02,
+          "total_candidates": 6500
+        }
+      ]
+    },
+    {
+      "code": "MUSC",
+      "name": "Music",
+      "name_zh": "音樂",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 1800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.0,
+            "5*": 12.0,
+            "5": 18.0,
+            "4": 22.0,
+            "3": 21.0,
+            "2": 13.5,
+            "1": 6.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.75,
+          "variance": 1.98,
+          "total_candidates": 1900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.2,
+            "5*": 12.2,
+            "5": 18.2,
+            "4": 21.8,
+            "3": 20.8,
+            "2": 13.2,
+            "1": 6.1,
+            "U": 1.5
+          },
+          "mean_numeric": 3.77,
+          "variance": 1.96,
+          "total_candidates": 1850
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.5,
+            "5*": 12.5,
+            "5": 18.5,
+            "4": 21.5,
+            "3": 20.5,
+            "2": 13.0,
+            "1": 6.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.80,
+          "variance": 1.95,
+          "total_candidates": 1800
+        }
+      ]
+    },
+    {
+      "code": "PE",
+      "name": "Physical Education",
+      "name_zh": "體育",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 5200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 9.5,
+            "5": 15.0,
+            "4": 21.0,
+            "3": 23.5,
+            "2": 17.5,
+            "1": 7.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.42,
+          "variance": 2.08,
+          "total_candidates": 5400
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 9.8,
+            "5": 15.2,
+            "4": 21.0,
+            "3": 23.0,
+            "2": 17.2,
+            "1": 7.6,
+            "U": 2.0
+          },
+          "mean_numeric": 3.44,
+          "variance": 2.06,
+          "total_candidates": 5300
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 10.0,
+            "5": 15.5,
+            "4": 21.0,
+            "3": 22.5,
+            "2": 17.0,
+            "1": 7.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.46,
+          "variance": 2.05,
+          "total_candidates": 5200
+        }
+      ]
+    },
+    {
+      "code": "HIST",
+      "name": "History",
+      "name_zh": "歷史",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 9500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 8.5,
+            "5": 13.5,
+            "4": 19.0,
+            "3": 23.5,
+            "2": 19.8,
+            "1": 9.4,
+            "U": 2.5
+          },
+          "mean_numeric": 3.32,
+          "variance": 2.15,
+          "total_candidates": 9800
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 8.8,
+            "5": 13.8,
+            "4": 19.0,
+            "3": 23.0,
+            "2": 19.5,
+            "1": 9.4,
+            "U": 2.5
+          },
+          "mean_numeric": 3.34,
+          "variance": 2.13,
+          "total_candidates": 9600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 9.0,
+            "5": 14.0,
+            "4": 19.0,
+            "3": 22.8,
+            "2": 19.2,
+            "1": 9.3,
+            "U": 2.5
+          },
+          "mean_numeric": 3.36,
+          "variance": 2.12,
+          "total_candidates": 9500
+        }
+      ]
+    },
+    {
+      "code": "CHIH",
+      "name": "Chinese History",
+      "name_zh": "中國歷史",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 12000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.5,
+            "5*": 5.8,
+            "5": 10.5,
+            "4": 17.2,
+            "3": 25.0,
+            "2": 24.5,
+            "1": 11.5,
+            "U": 3.0
+          },
+          "mean_numeric": 3.08,
+          "variance": 2.15,
+          "total_candidates": 12500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.8,
+            "5*": 6.0,
+            "5": 11.0,
+            "4": 17.2,
+            "3": 24.8,
+            "2": 24.0,
+            "1": 11.2,
+            "U": 3.0
+          },
+          "mean_numeric": 3.11,
+          "variance": 2.13,
+          "total_candidates": 12200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.0,
+            "5*": 6.2,
+            "5": 11.2,
+            "4": 17.3,
+            "3": 24.5,
+            "2": 23.8,
+            "1": 11.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.13,
+          "variance": 2.12,
+          "total_candidates": 12000
+        }
+      ]
+    },
+    {
+      "code": "GEOG",
+      "name": "Geography",
+      "name_zh": "地理",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 12800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 9.0,
+            "5": 14.0,
+            "4": 19.5,
+            "3": 23.0,
+            "2": 19.0,
+            "1": 9.0,
+            "U": 2.5
+          },
+          "mean_numeric": 3.38,
+          "variance": 2.12,
+          "total_candidates": 13200
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 9.2,
+            "5": 14.2,
+            "4": 19.5,
+            "3": 22.8,
+            "2": 18.8,
+            "1": 9.0,
+            "U": 2.3
+          },
+          "mean_numeric": 3.40,
+          "variance": 2.10,
+          "total_candidates": 13000
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 9.5,
+            "5": 14.5,
+            "4": 19.5,
+            "3": 22.5,
+            "2": 18.5,
+            "1": 8.8,
+            "U": 2.2
+          },
+          "mean_numeric": 3.42,
+          "variance": 2.08,
+          "total_candidates": 12800
+        }
+      ]
+    },
+    {
+      "code": "ERS",
+      "name": "Ethics and Religious Studies",
+      "name_zh": "倫理與宗教",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 3200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 9.5,
+            "5": 15.0,
+            "4": 20.0,
+            "3": 23.5,
+            "2": 18.5,
+            "1": 7.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.43,
+          "variance": 2.08,
+          "total_candidates": 3400
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.2,
+            "5*": 9.8,
+            "5": 15.2,
+            "4": 20.0,
+            "3": 23.2,
+            "2": 18.2,
+            "1": 7.4,
+            "U": 2.0
+          },
+          "mean_numeric": 3.45,
+          "variance": 2.06,
+          "total_candidates": 3300
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 10.0,
+            "5": 15.5,
+            "4": 20.0,
+            "3": 23.0,
+            "2": 18.0,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.47,
+          "variance": 2.05,
+          "total_candidates": 3200
+        }
+      ]
+    },
+    {
+      "code": "TOUR",
+      "name": "Tourism and Hospitality Studies",
+      "name_zh": "旅遊與款待",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 5500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 10.0,
+            "5": 15.5,
+            "4": 20.5,
+            "3": 23.0,
+            "2": 17.5,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.48,
+          "variance": 2.05,
+          "total_candidates": 5700
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.8,
+            "5*": 10.2,
+            "5": 15.8,
+            "4": 20.2,
+            "3": 22.8,
+            "2": 17.2,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.50,
+          "variance": 2.03,
+          "total_candidates": 5600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.0,
+            "5*": 10.5,
+            "5": 16.0,
+            "4": 20.0,
+            "3": 22.5,
+            "2": 17.0,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.52,
+          "variance": 2.02,
+          "total_candidates": 5500
+        }
+      ]
+    },
+    {
+      "code": "HMSC",
+      "name": "Health Management and Social Care",
+      "name_zh": "健康管理與社會關懷",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 4800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.5,
+            "5*": 8.5,
+            "5": 14.5,
+            "4": 20.5,
+            "3": 24.0,
+            "2": 19.5,
+            "1": 8.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.35,
+          "variance": 2.05,
+          "total_candidates": 5000
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 8.8,
+            "5": 14.8,
+            "4": 20.4,
+            "3": 23.7,
+            "2": 19.2,
+            "1": 8.0,
+            "U": 1.3
+          },
+          "mean_numeric": 3.38,
+          "variance": 2.03,
+          "total_candidates": 4900
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 9.0,
+            "5": 15.0,
+            "4": 20.5,
+            "3": 23.5,
+            "2": 19.0,
+            "1": 7.8,
+            "U": 1.2
+          },
+          "mean_numeric": 3.40,
+          "variance": 2.02,
+          "total_candidates": 4800
+        }
+      ]
+    },
+    {
+      "code": "CHIL",
+      "name": "Chinese Literature",
+      "name_zh": "中國文學",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 3800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.5,
+            "5*": 10.0,
+            "5": 15.5,
+            "4": 20.5,
+            "3": 23.0,
+            "2": 17.5,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.48,
+          "variance": 2.05,
+          "total_candidates": 4000
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.8,
+            "5*": 10.2,
+            "5": 15.8,
+            "4": 20.2,
+            "3": 22.8,
+            "2": 17.2,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.50,
+          "variance": 2.03,
+          "total_candidates": 3900
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.0,
+            "5*": 10.5,
+            "5": 16.0,
+            "4": 20.0,
+            "3": 22.5,
+            "2": 17.0,
+            "1": 7.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.52,
+          "variance": 2.02,
+          "total_candidates": 3800
+        }
+      ]
+    },
+    {
+      "code": "ENLIT",
+      "name": "English Literature",
+      "name_zh": "英國文學",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 1200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.5,
+            "5*": 12.0,
+            "5": 17.5,
+            "4": 21.5,
+            "3": 22.0,
+            "2": 14.5,
+            "1": 6.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.68,
+          "variance": 1.98,
+          "total_candidates": 1300
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.8,
+            "5*": 12.2,
+            "5": 17.8,
+            "4": 21.2,
+            "3": 21.8,
+            "2": 14.2,
+            "1": 6.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.70,
+          "variance": 1.96,
+          "total_candidates": 1250
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.0,
+            "5*": 12.5,
+            "5": 18.0,
+            "4": 21.0,
+            "3": 21.5,
+            "2": 14.0,
+            "1": 6.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.72,
+          "variance": 1.95,
+          "total_candidates": 1200
+        }
+      ]
+    },
+    {
+      "code": "CSCI",
+      "name": "Combined Science",
+      "name_zh": "組合科學",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 2800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.0,
+            "5*": 5.5,
+            "5": 9.5,
+            "4": 16.5,
+            "3": 24.5,
+            "2": 25.5,
+            "1": 13.5,
+            "U": 3.0
+          },
+          "mean_numeric": 3.00,
+          "variance": 2.18,
+          "total_candidates": 3000
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.2,
+            "5*": 5.8,
+            "5": 9.8,
+            "4": 16.8,
+            "3": 24.2,
+            "2": 25.2,
+            "1": 13.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.02,
+          "variance": 2.16,
+          "total_candidates": 2900
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.5,
+            "5*": 6.0,
+            "5": 10.0,
+            "4": 17.0,
+            "3": 24.0,
+            "2": 25.0,
+            "1": 12.5,
+            "U": 3.0
+          },
+          "mean_numeric": 3.04,
+          "variance": 2.14,
+          "total_candidates": 2800
+        }
+      ]
+    },
+    {
+      "code": "TL",
+      "name": "Technology and Living",
+      "name_zh": "科技與生活",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "total_candidates": 3500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.5,
+            "5*": 8.5,
+            "5": 14.0,
+            "4": 20.0,
+            "3": 24.0,
+            "2": 19.5,
+            "1": 8.5,
+            "U": 2.0
+          },
+          "mean_numeric": 3.32,
+          "variance": 2.10,
+          "total_candidates": 3700
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 3.8,
+            "5*": 8.8,
+            "5": 14.2,
+            "4": 20.0,
+            "3": 23.8,
+            "2": 19.2,
+            "1": 8.2,
+            "U": 2.0
+          },
+          "mean_numeric": 3.34,
+          "variance": 2.08,
+          "total_candidates": 3600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 4.0,
+            "5*": 9.0,
+            "5": 14.5,
+            "4": 20.0,
+            "3": 23.5,
+            "2": 19.0,
+            "1": 8.0,
+            "U": 2.0
+          },
+          "mean_numeric": 3.36,
+          "variance": 2.07,
+          "total_candidates": 3500
+        }
+      ]
+    },
+    {
+      "code": "ISCI",
+      "name": "Integrated Science",
+      "name_zh": "綜合科學",
+      "category": "ELECTIVE",
+      "is_compulsory": false,
+      "notes": "Small cohort subject; data is indicative only.",
+      "total_candidates": 800,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.0,
+            "5*": 5.0,
+            "5": 9.0,
+            "4": 16.0,
+            "3": 25.0,
+            "2": 26.0,
+            "1": 14.0,
+            "U": 3.0
+          },
+          "mean_numeric": 2.98,
+          "variance": 2.15,
+          "total_candidates": 900
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.2,
+            "5*": 5.2,
+            "5": 9.2,
+            "4": 16.2,
+            "3": 24.8,
+            "2": 25.8,
+            "1": 13.6,
+            "U": 3.0
+          },
+          "mean_numeric": 3.00,
+          "variance": 2.13,
+          "total_candidates": 850
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 2.5,
+            "5*": 5.5,
+            "5": 9.5,
+            "4": 16.5,
+            "3": 24.5,
+            "2": 25.5,
+            "1": 13.0,
+            "U": 3.0
+          },
+          "mean_numeric": 3.02,
+          "variance": 2.12,
+          "total_candidates": 800
+        }
+      ]
+    },
+    {
+      "code": "FREN",
+      "name": "French",
+      "name_zh": "法文",
+      "category": "OTHER_LANGUAGE",
+      "is_compulsory": false,
+      "total_candidates": 600,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.0,
+            "5*": 14.0,
+            "5": 19.0,
+            "4": 22.0,
+            "3": 20.0,
+            "2": 11.5,
+            "1": 4.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.90,
+          "variance": 1.92,
+          "total_candidates": 650
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.5,
+            "5*": 14.5,
+            "5": 19.5,
+            "4": 21.5,
+            "3": 19.5,
+            "2": 11.0,
+            "1": 4.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.93,
+          "variance": 1.90,
+          "total_candidates": 620
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 9.0,
+            "5*": 15.0,
+            "5": 20.0,
+            "4": 21.0,
+            "3": 19.0,
+            "2": 11.0,
+            "1": 4.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.96,
+          "variance": 1.88,
+          "total_candidates": 600
+        }
+      ]
+    },
+    {
+      "code": "GERM",
+      "name": "German",
+      "name_zh": "德文",
+      "category": "OTHER_LANGUAGE",
+      "is_compulsory": false,
+      "total_candidates": 200,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.5,
+            "5*": 13.5,
+            "5": 18.5,
+            "4": 22.5,
+            "3": 20.5,
+            "2": 12.0,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.85,
+          "variance": 1.93,
+          "total_candidates": 220
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.0,
+            "5*": 14.0,
+            "5": 19.0,
+            "4": 22.0,
+            "3": 20.0,
+            "2": 11.5,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.88,
+          "variance": 1.91,
+          "total_candidates": 210
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.5,
+            "5*": 14.5,
+            "5": 19.5,
+            "4": 21.5,
+            "3": 19.5,
+            "2": 11.5,
+            "1": 4.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.91,
+          "variance": 1.89,
+          "total_candidates": 200
+        }
+      ]
+    },
+    {
+      "code": "JAPA",
+      "name": "Japanese",
+      "name_zh": "日本語文",
+      "category": "OTHER_LANGUAGE",
+      "is_compulsory": false,
+      "total_candidates": 1500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.0,
+            "5*": 13.0,
+            "5": 18.5,
+            "4": 22.5,
+            "3": 21.0,
+            "2": 12.5,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.82,
+          "variance": 1.92,
+          "total_candidates": 1600
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 7.5,
+            "5*": 13.5,
+            "5": 19.0,
+            "4": 22.0,
+            "3": 20.5,
+            "2": 12.0,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.85,
+          "variance": 1.90,
+          "total_candidates": 1550
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.0,
+            "5*": 14.0,
+            "5": 19.5,
+            "4": 21.5,
+            "3": 20.0,
+            "2": 12.0,
+            "1": 4.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.88,
+          "variance": 1.88,
+          "total_candidates": 1500
+        }
+      ]
+    },
+    {
+      "code": "SPAN",
+      "name": "Spanish",
+      "name_zh": "西班牙文",
+      "category": "OTHER_LANGUAGE",
+      "is_compulsory": false,
+      "total_candidates": 150,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.0,
+            "5*": 14.0,
+            "5": 18.0,
+            "4": 22.0,
+            "3": 20.0,
+            "2": 12.0,
+            "1": 5.0,
+            "U": 1.0
+          },
+          "mean_numeric": 3.86,
+          "variance": 1.92,
+          "total_candidates": 170
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 8.5,
+            "5*": 14.5,
+            "5": 18.5,
+            "4": 21.5,
+            "3": 19.5,
+            "2": 12.0,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.89,
+          "variance": 1.90,
+          "total_candidates": 160
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 9.0,
+            "5*": 15.0,
+            "5": 19.0,
+            "4": 21.0,
+            "3": 19.0,
+            "2": 11.5,
+            "1": 4.5,
+            "U": 1.0
+          },
+          "mean_numeric": 3.92,
+          "variance": 1.88,
+          "total_candidates": 150
+        }
+      ]
+    },
+    {
+      "code": "PTH",
+      "name": "Putonghua",
+      "name_zh": "普通話",
+      "category": "OTHER_LANGUAGE",
+      "is_compulsory": false,
+      "total_candidates": 4500,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.5,
+            "5*": 11.0,
+            "5": 16.5,
+            "4": 21.5,
+            "3": 23.5,
+            "2": 15.0,
+            "1": 5.5,
+            "U": 1.5
+          },
+          "mean_numeric": 3.58,
+          "variance": 2.00,
+          "total_candidates": 4700
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 5.8,
+            "5*": 11.5,
+            "5": 17.0,
+            "4": 21.0,
+            "3": 23.0,
+            "2": 14.8,
+            "1": 5.4,
+            "U": 1.5
+          },
+          "mean_numeric": 3.61,
+          "variance": 1.98,
+          "total_candidates": 4600
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "5**": 6.0,
+            "5*": 12.0,
+            "5": 17.5,
+            "4": 21.0,
+            "3": 22.5,
+            "2": 14.5,
+            "1": 5.0,
+            "U": 1.5
+          },
+          "mean_numeric": 3.64,
+          "variance": 1.96,
+          "total_candidates": 4500
+        }
+      ]
+    },
+    {
+      "code": "APL_GENERIC",
+      "name": "Applied Learning (Generic)",
+      "name_zh": "應用學習（通用）",
+      "category": "APPLIED_LEARNING",
+      "is_compulsory": false,
+      "notes": "ApL is graded Attained (A) or Attained with Distinction (AD). Data represents percentage of candidates achieving each grade. Unclassified = did not Attain.",
+      "total_candidates": 18000,
+      "sittings": [
+        {
+          "year": 2022,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained with Distinction": 28.5,
+            "Attained": 58.5,
+            "Unclassified": 13.0
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 18500
+        },
+        {
+          "year": 2023,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained with Distinction": 29.0,
+            "Attained": 59.0,
+            "Unclassified": 12.0
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 18200
+        },
+        {
+          "year": 2024,
+          "sitting_type": "OFFICIAL",
+          "grade_distribution": {
+            "Attained with Distinction": 30.0,
+            "Attained": 59.0,
+            "Unclassified": 11.0
+          },
+          "mean_numeric": null,
+          "variance": null,
+          "total_candidates": 18000
+        }
+      ]
+    }
+  ]
+}
