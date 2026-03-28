@@ -27,6 +27,10 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "--plan-accent": "#1e3a5f",
         "--plan-font-body": "Georgia, serif",
         "--plan-font-heading": "Georgia, serif",
+        "--plan-section-padding": "28px 32px",
+        "--plan-section-gap": "32px",
+        "--plan-line-height": "1.8",
+        "--plan-letter-spacing": "0.01em",
     },
     "modern": {
         "--plan-bg": "#f5f5f5",
@@ -34,6 +38,10 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "--plan-accent": "#0d9488",
         "--plan-font-body": "Inter, sans-serif",
         "--plan-font-heading": "Inter, sans-serif",
+        "--plan-section-padding": "36px 40px",
+        "--plan-section-gap": "40px",
+        "--plan-line-height": "1.7",
+        "--plan-letter-spacing": "0em",
     },
     "minimal": {
         "--plan-bg": "#ffffff",
@@ -41,6 +49,10 @@ TEMPLATES: dict[str, dict[str, str]] = {
         "--plan-accent": "#000000",
         "--plan-font-body": "Arial, sans-serif",
         "--plan-font-heading": "Arial, sans-serif",
+        "--plan-section-padding": "12px 16px",
+        "--plan-section-gap": "16px",
+        "--plan-line-height": "1.5",
+        "--plan-letter-spacing": "0em",
     },
 }
 
@@ -49,13 +61,27 @@ def _get_template_css(template_id: str) -> str:
     """Return a <style> block with CSS variable overrides for the given template."""
     tpl = TEMPLATES.get(template_id) or TEMPLATES["professional"]
     vars_css = "\n    ".join(f"{k}: {v};" for k, v in tpl.items())
+    minimal_extra = ""
+    if template_id == "minimal":
+        minimal_extra = """
+  .section { box-shadow: none !important; border: 1px solid #e5e7eb !important; border-radius: 0 !important; }
+  .header { background: #000 !important; }"""
     return f"""<style>
   :root {{
     {vars_css}
   }}
   body {{
     background: var(--plan-bg);
-    font-family: var(--plan-font-body);
+    font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
+    line-height: var(--plan-line-height, 1.6);
+    letter-spacing: var(--plan-letter-spacing, 0);
+  }}
+  h1, h2, h3, h4, h5, h6 {{
+    font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
+  }}
+  .section {{
+    padding: var(--plan-section-padding, 24px);
+    margin-bottom: var(--plan-section-gap, 24px);
   }}
   .section h2 {{
     color: var(--plan-heading-color);
@@ -71,7 +97,7 @@ def _get_template_css(template_id: str) -> str:
   }}
   .header {{
     background: var(--plan-heading-color) !important;
-  }}
+  }}{minimal_extra}
 </style>"""
 
 
@@ -933,8 +959,8 @@ def _generate_high_school_plan(student: dict, match_results: list, template_id: 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>High School Academic Plan — {_esc(student_name)}</title>
-  <style>{css}</style>
   {template_css}
+  <style>{css}</style>
 </head>
 <body>
   <div class="header">
@@ -1150,11 +1176,14 @@ def generate_html_plan(
     css = """
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
       color: #1a1a2e;
       background: #f8f9fa;
       line-height: 1.6;
       padding: 24px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
     }
     .header {
       background: linear-gradient(135deg, #0f3460, #16213e);
@@ -1272,8 +1301,8 @@ def generate_html_plan(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>University Academic Plan — {_esc(student_name)}</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>{css}</style>
   {template_css}
+  <style>{css}</style>
 </head>
 <body>
   <div class="header">

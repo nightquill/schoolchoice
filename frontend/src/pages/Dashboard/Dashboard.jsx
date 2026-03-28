@@ -35,7 +35,7 @@ function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const plansGenerated = students.filter((s) => s.plan_generated_at || s.has_plan).length;
+  const plansGenerated = students.filter((s) => s.has_plan).length;
 
   const filteredStudents = students.filter((s) => {
     const name = (s.full_name || s.name || '').toLowerCase();

@@ -35,38 +35,125 @@ function GradeBar({ dist }) {
   );
 }
 
-// ---- Vertical Bar Chart ----
-function VerticalBarChart({ distribution, title }) {
+// ---- Vertical Bar Chart (polished) ----
+const BAR_COLORS = {
+  '5**': '#7c3aed',
+  '5*': '#2563eb',
+  '5': '#0891b2',
+  '4': '#16a34a',
+  '3': '#ca8a04',
+  '2': '#ea580c',
+  '1': '#dc2626',
+  'U': '#9ca3af',
+};
+
+function deriveChartStats(distribution) {
+  const NUMERIC = { '5**': 7, '5*': 6, '5': 5, '4': 4, '3': 3, '2': 2, '1': 1, 'U': 0 };
+  const entries = GRADE_ORDER.map((g) => ({ g, v: distribution[g] || 0 })).filter((e) => e.v > 0);
+  const totalN = entries.reduce((s, e) => s + e.v, 0);
+  if (totalN === 0) return { mean: null, mode: null, totalN: 0 };
+  const sumWeighted = entries.reduce((s, e) => s + NUMERIC[e.g] * e.v, 0);
+  const meanNum = sumWeighted / totalN;
+  const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
+  const meanGrade = GRADE_LABELS[Math.round(meanNum)] || 'U';
+  const modeEntry = entries.reduce((best, e) => (e.v > best.v ? e : best), entries[0]);
+  return { mean: meanGrade, meanNum: meanNum.toFixed(1), mode: modeEntry.g, totalN };
+}
+
+function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
+  const [hoveredGrade, setHoveredGrade] = useState(null);
   if (!distribution) return null;
-  const MAX_HEIGHT = 120;
-  const barColors = {
-    '5**': 'var(--color-primary)',
-    '5*': 'var(--color-primary)',
-    '5': 'var(--color-success)',
-    '4': 'var(--color-success)',
-    '3': 'var(--color-warning)',
-    '2': 'var(--color-error)',
-    '1': 'var(--color-error)',
-    'U': 'var(--color-error)',
-  };
+
+  const MAX_HEIGHT = 160;
   const values = GRADE_ORDER.map((g) => distribution[g] || 0);
   const max = Math.max(...values, 1);
+  const isPercent = values.reduce((s, v) => s + v, 0) > 90;
+
+  // derive stats if not passed in
+  const stats = (mean == null) ? deriveChartStats(distribution) : { mean, mode, totalN };
+
+  const gridLines = [0.25, 0.5, 0.75, 1.0];
+
   return (
-    <div style={{ marginTop: 'var(--space-2)' }}>
-      {title && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</div>}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: `${MAX_HEIGHT + 40}px` }} aria-label={title || 'Grade distribution chart'}>
-        {GRADE_ORDER.map((g) => {
-          const val = distribution[g] || 0;
-          const barH = val > 0 ? Math.max(4, Math.round((val / max) * MAX_HEIGHT)) : 0;
-          return (
-            <div key={g} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '20px', maxWidth: '48px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginBottom: '2px', height: '14px', textAlign: 'center' }}>{val > 0 ? val : ''}</div>
-              <div style={{ width: '100%', height: `${barH}px`, background: barColors[g] || 'var(--color-text-secondary)', borderRadius: '3px 3px 0 0', minHeight: val > 0 ? '4px' : '0' }} title={`${g}: ${val}`} />
-              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px', fontWeight: 'var(--font-weight-medium)' }}>{g}</div>
-            </div>
-          );
-        })}
+    <div style={{ background: '#fff', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '20px', marginTop: 'var(--space-2)' }}>
+      {title && (
+        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{title}</div>
+      )}
+      <div style={{ position: 'relative' }}>
+        {/* Horizontal gridlines */}
+        <div style={{ position: 'absolute', inset: `0 0 20px 0`, pointerEvents: 'none' }}>
+          {gridLines.map((frac) => (
+            <div key={frac} style={{
+              position: 'absolute',
+              bottom: `${frac * MAX_HEIGHT}px`,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: 'rgba(0,0,0,0.06)',
+            }} />
+          ))}
+        </div>
+        {/* Bar area */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: `${MAX_HEIGHT + 20}px`, paddingBottom: '0' }} aria-label={title || 'Grade distribution chart'}>
+          {GRADE_ORDER.map((g) => {
+            const val = distribution[g] || 0;
+            const barH = val > 0 ? Math.max(4, Math.round((val / max) * MAX_HEIGHT)) : 0;
+            const color = BAR_COLORS[g] || '#9ca3af';
+            const isHovered = hoveredGrade === g;
+            const suffix = isPercent ? '%' : '';
+            return (
+              <div
+                key={g}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '28px', position: 'relative' }}
+                onMouseEnter={() => setHoveredGrade(g)}
+                onMouseLeave={() => setHoveredGrade(null)}
+              >
+                {/* Always-visible value label above bar */}
+                <div style={{ fontSize: '11px', color, fontWeight: 'bold', marginBottom: '2px', height: '14px', textAlign: 'center' }}>
+                  {val > 0 ? `${val}${suffix}` : ''}
+                </div>
+                {/* Hover tooltip */}
+                {isHovered && val > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: `${barH + 20}px`,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#1f2937',
+                    color: '#fff',
+                    fontSize: '11px',
+                    padding: '3px 7px',
+                    borderRadius: '4px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                  }}>
+                    {g}: {val}{suffix}
+                  </div>
+                )}
+                {/* Bar */}
+                <div style={{
+                  width: '100%',
+                  height: `${barH}px`,
+                  background: color,
+                  borderRadius: '4px 4px 0 0',
+                  minHeight: val > 0 ? '4px' : '0',
+                  opacity: isHovered ? 0.85 : 1,
+                  transition: 'opacity 0.1s',
+                }} />
+                {/* X-axis label */}
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', textAlign: 'center' }}>{g}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+      {/* Summary line */}
+      {stats.totalN > 0 && (
+        <div style={{ marginTop: '12px', fontSize: '12px', color: '#9ca3af' }}>
+          Mean: {stats.mean}{stats.meanNum ? ` (${stats.meanNum})` : ''} | Mode: {stats.mode} | n={stats.totalN}
+        </div>
+      )}
     </div>
   );
 }
@@ -299,7 +386,11 @@ function DataAnalysis() {
                   {groupedSubjects.length > 0 ? groupedSubjects.map((subj) => {
                     const totalStudents = subj.sittings.reduce((s, r) => s + (r.count || 0), 0);
                     const avgMean = subj.sittings.length ? subj.sittings.reduce((s, r) => s + r.mean, 0) / subj.sittings.length : 0;
-                    const catColors = { CORE: '#2563eb', ELECTIVE: '#7c3aed', OTHER_LANGUAGE: '#0891b2', APPLIED_LEARNING: '#d97706' };
+                    const catColors = { CORE: '#2563eb', ELECTIVE: '#16a34a', OTHER_LANGUAGE: '#7c3aed', APPLIED_LEARNING: '#d97706' };
+                    // Use the best-populated sitting for the chart
+                    const bestSitting = subj.sittings.reduce((best, r) => (!best || (r.count || 0) > (best.count || 0)) ? r : best, null);
+                    const chartDist = bestSitting?.grade_distribution || null;
+                    const chartStats = chartDist ? deriveChartStats(chartDist) : null;
                     return (
                       <div
                         key={subj.subject_code}
@@ -307,33 +398,46 @@ function DataAnalysis() {
                         style={{
                           background: 'var(--color-surface)',
                           border: 'var(--border-width) solid var(--color-border)',
-                          borderRadius: 'var(--border-radius-sm)',
-                          padding: 'var(--space-3)',
+                          borderRadius: 'var(--border-radius-md)',
+                          padding: 'var(--space-4)',
                           cursor: 'pointer',
                           transition: 'box-shadow 0.15s',
                         }}
                         onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
                         onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
                       >
+                        {/* Header row */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
                           <div>
-                            <div style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{subj.subject_code}</div>
+                            <div style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{subj.subject_code}</div>
                             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{subj.subject_name}</div>
                           </div>
-                          <span style={{ fontSize: '10px', background: catColors[subj.category] || '#64748b', color: '#fff', padding: '2px 7px', borderRadius: '8px', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
+                          <span style={{ fontSize: '10px', background: catColors[subj.category] || '#64748b', color: '#fff', padding: '3px 8px', borderRadius: '12px', flexShrink: 0, marginLeft: 'var(--space-2)', fontWeight: 'bold', letterSpacing: '0.02em' }}>
                             {CATEGORY_LABELS[subj.category] || subj.category || '—'}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', gap: 'var(--space-4)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                          <span>{totalStudents} students</span>
-                          <span>Avg {numericToGrade(avgMean)}</span>
-                          <span>{subj.sittings.length} sitting{subj.sittings.length !== 1 ? 's' : ''}</span>
-                        </div>
+                        {/* Chart */}
+                        {chartDist && <VerticalBarChart distribution={chartDist} />}
+                        {/* Stats summary pills */}
+                        {chartStats && chartStats.totalN > 0 && (
+                          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                            {[
+                              { label: 'Mean', value: chartStats.mean },
+                              { label: 'Variance', value: bestSitting?.variance != null ? bestSitting.variance.toFixed(2) : '—' },
+                              { label: 'n=', value: String(totalStudents) },
+                            ].map(({ label, value }) => (
+                              <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', color: '#6b7280', display: 'flex', gap: '3px', alignItems: 'center' }}>
+                                <span>{label}</span>
+                                <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                         <div style={{ fontSize: '10px', color: 'var(--color-primary)', marginTop: 'var(--space-2)' }}>Click for HKDSE population data →</div>
                       </div>
                     );
                   }) : (populationStats?.subjects ?? []).map((subj) => {
-                    const catColors = { CORE: '#2563eb', ELECTIVE: '#7c3aed', OTHER_LANGUAGE: '#0891b2', APPLIED_LEARNING: '#d97706' };
+                    const catColors = { CORE: '#2563eb', ELECTIVE: '#16a34a', OTHER_LANGUAGE: '#7c3aed', APPLIED_LEARNING: '#d97706' };
                     return (
                       <div
                         key={subj.code}
@@ -341,8 +445,8 @@ function DataAnalysis() {
                         style={{
                           background: 'var(--color-surface)',
                           border: 'var(--border-width) solid var(--color-border)',
-                          borderRadius: 'var(--border-radius-sm)',
-                          padding: 'var(--space-3)',
+                          borderRadius: 'var(--border-radius-md)',
+                          padding: 'var(--space-4)',
                           cursor: 'pointer',
                           transition: 'box-shadow 0.15s',
                         }}
@@ -351,10 +455,10 @@ function DataAnalysis() {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
                           <div>
-                            <div style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{subj.code}</div>
+                            <div style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{subj.code}</div>
                             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{subj.name}</div>
                           </div>
-                          <span style={{ fontSize: '10px', background: catColors[subj.category] || '#64748b', color: '#fff', padding: '2px 7px', borderRadius: '8px', flexShrink: 0, marginLeft: 'var(--space-2)' }}>
+                          <span style={{ fontSize: '10px', background: catColors[subj.category] || '#64748b', color: '#fff', padding: '3px 8px', borderRadius: '12px', flexShrink: 0, marginLeft: 'var(--space-2)', fontWeight: 'bold', letterSpacing: '0.02em' }}>
                             {CATEGORY_LABELS[subj.category] || subj.category || '—'}
                           </span>
                         </div>

@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import Student, User
+from app.db.models_v2 import AcademicPlan
 from app.db.session import get_db
 from app.schemas.student import (
     StudentCreate,
@@ -85,7 +86,29 @@ def list_students(
     current_user: User = Depends(get_current_user),
 ):
     """List all student profiles owned by the authenticated counselor. REQ-015, REQ-032"""
-    return student_service.get_students(db, user_id=current_user.id)
+    from sqlalchemy import exists, select
+
+    students = student_service.get_students(db, user_id=current_user.id)
+
+    # Build a set of student_ids that have a generated plan — single query, no N+1
+    student_ids = [s.id for s in students]
+    if student_ids:
+        rows = db.execute(
+            select(AcademicPlan.student_id).where(
+                AcademicPlan.student_id.in_(student_ids),
+                AcademicPlan.generated_at.isnot(None),
+            )
+        ).fetchall()
+        has_plan_ids = {row[0] for row in rows}
+    else:
+        has_plan_ids = set()
+
+    result = []
+    for s in students:
+        item = StudentListItem.model_validate(s)
+        item.has_plan = s.id in has_plan_ids
+        result.append(item)
+    return result
 
 
 # REQ-012, REQ-025, REQ-028, REQ-033

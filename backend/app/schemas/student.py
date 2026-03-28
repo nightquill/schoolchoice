@@ -56,6 +56,7 @@ class StudentListItem(BaseModel):
     target_region: str
     created_at: datetime
     updated_at: datetime
+    has_plan: bool = False
 
     model_config = {"from_attributes": True}
 

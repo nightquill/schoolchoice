@@ -190,6 +190,11 @@ def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVER
                 "final_score": r.final_score,
                 "intended_majors": target_major_map.get(r.school_id),
                 "component_scores": r.component_scores,
+                "eligibility_pass": True,
+                "failing_criteria": [],
+                "shap_explanation": r.shap_explanation,
+                "major_name": getattr(r, "major_name", None),
+                "major_jupas_code": getattr(r, "major_jupas_code", None),
             }
             for r in eligible
         ]

@@ -38,38 +38,123 @@ function GradeBar({ dist }) {
   );
 }
 
-// ---- Vertical Bar Chart ----
-function VerticalBarChart({ distribution, title }) {
+// ---- Vertical Bar Chart (polished) ----
+const BAR_COLORS = {
+  '5**': '#7c3aed',
+  '5*': '#2563eb',
+  '5': '#0891b2',
+  '4': '#16a34a',
+  '3': '#ca8a04',
+  '2': '#ea580c',
+  '1': '#dc2626',
+  'U': '#9ca3af',
+};
+
+function deriveChartStats(distribution) {
+  const NUMERIC = { '5**': 7, '5*': 6, '5': 5, '4': 4, '3': 3, '2': 2, '1': 1, 'U': 0 };
+  const entries = GRADE_ORDER.map((g) => ({ g, v: distribution[g] || 0 })).filter((e) => e.v > 0);
+  const totalN = entries.reduce((s, e) => s + e.v, 0);
+  if (totalN === 0) return { mean: null, mode: null, totalN: 0 };
+  const sumWeighted = entries.reduce((s, e) => s + NUMERIC[e.g] * e.v, 0);
+  const meanNum = sumWeighted / totalN;
+  const GRADE_LABELS_MAP = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
+  const meanGrade = GRADE_LABELS_MAP[Math.round(meanNum)] || 'U';
+  const modeEntry = entries.reduce((best, e) => (e.v > best.v ? e : best), entries[0]);
+  return { mean: meanGrade, meanNum: meanNum.toFixed(1), mode: modeEntry.g, totalN };
+}
+
+function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
+  const [hoveredGrade, setHoveredGrade] = useState(null);
   if (!distribution) return null;
-  const MAX_HEIGHT = 120;
-  const barColors = {
-    '5**': 'var(--color-primary)',
-    '5*': 'var(--color-primary)',
-    '5': 'var(--color-success)',
-    '4': 'var(--color-success)',
-    '3': 'var(--color-warning)',
-    '2': 'var(--color-error)',
-    '1': 'var(--color-error)',
-    'U': 'var(--color-error)',
-  };
+
+  const MAX_HEIGHT = 160;
   const values = GRADE_ORDER.map((g) => distribution[g] || 0);
   const max = Math.max(...values, 1);
+  const isPercent = values.reduce((s, v) => s + v, 0) > 90;
+
+  const stats = (mean == null) ? deriveChartStats(distribution) : { mean, mode, totalN };
+  const gridLines = [0.25, 0.5, 0.75, 1.0];
+
   return (
-    <div style={{ marginTop: 'var(--space-2)' }}>
-      {title && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</div>}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: `${MAX_HEIGHT + 40}px` }} aria-label={title || 'Grade distribution chart'}>
-        {GRADE_ORDER.map((g) => {
-          const val = distribution[g] || 0;
-          const barH = val > 0 ? Math.max(4, Math.round((val / max) * MAX_HEIGHT)) : 0;
-          return (
-            <div key={g} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '20px', maxWidth: '48px' }}>
-              <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', marginBottom: '2px', height: '14px', textAlign: 'center' }}>{val > 0 ? val : ''}</div>
-              <div style={{ width: '100%', height: `${barH}px`, background: barColors[g] || 'var(--color-text-secondary)', borderRadius: '3px 3px 0 0', minHeight: val > 0 ? '4px' : '0' }} title={`${g}: ${val}`} />
-              <div style={{ fontSize: '11px', color: 'var(--color-text-secondary)', marginTop: '4px', fontWeight: 'var(--font-weight-medium)' }}>{g}</div>
-            </div>
-          );
-        })}
+    <div style={{ background: '#fff', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', padding: '20px', marginTop: 'var(--space-2)' }}>
+      {title && (
+        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#111827', marginBottom: '16px' }}>{title}</div>
+      )}
+      <div style={{ position: 'relative' }}>
+        {/* Horizontal gridlines */}
+        <div style={{ position: 'absolute', inset: `0 0 20px 0`, pointerEvents: 'none' }}>
+          {gridLines.map((frac) => (
+            <div key={frac} style={{
+              position: 'absolute',
+              bottom: `${frac * MAX_HEIGHT}px`,
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: 'rgba(0,0,0,0.06)',
+            }} />
+          ))}
+        </div>
+        {/* Bar area */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: `${MAX_HEIGHT + 20}px` }} aria-label={title || 'Grade distribution chart'}>
+          {GRADE_ORDER.map((g) => {
+            const val = distribution[g] || 0;
+            const barH = val > 0 ? Math.max(4, Math.round((val / max) * MAX_HEIGHT)) : 0;
+            const color = BAR_COLORS[g] || '#9ca3af';
+            const isHovered = hoveredGrade === g;
+            const suffix = isPercent ? '%' : '';
+            return (
+              <div
+                key={g}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1', minWidth: '28px', position: 'relative' }}
+                onMouseEnter={() => setHoveredGrade(g)}
+                onMouseLeave={() => setHoveredGrade(null)}
+              >
+                {/* Always-visible value label */}
+                <div style={{ fontSize: '11px', color, fontWeight: 'bold', marginBottom: '2px', height: '14px', textAlign: 'center' }}>
+                  {val > 0 ? `${val}${suffix}` : ''}
+                </div>
+                {/* Hover tooltip */}
+                {isHovered && val > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: `${barH + 20}px`,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#1f2937',
+                    color: '#fff',
+                    fontSize: '11px',
+                    padding: '3px 7px',
+                    borderRadius: '4px',
+                    whiteSpace: 'nowrap',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                  }}>
+                    {g}: {val}{suffix}
+                  </div>
+                )}
+                {/* Bar */}
+                <div style={{
+                  width: '100%',
+                  height: `${barH}px`,
+                  background: color,
+                  borderRadius: '4px 4px 0 0',
+                  minHeight: val > 0 ? '4px' : '0',
+                  opacity: isHovered ? 0.85 : 1,
+                  transition: 'opacity 0.1s',
+                }} />
+                {/* X-axis label */}
+                <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px', textAlign: 'center' }}>{g}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+      {/* Summary line */}
+      {stats.totalN > 0 && (
+        <div style={{ marginTop: '12px', fontSize: '12px', color: '#9ca3af' }}>
+          Mean: {stats.mean}{stats.meanNum ? ` (${stats.meanNum})` : ''} | Mode: {stats.mode} | n={stats.totalN}
+        </div>
+      )}
     </div>
   );
 }
@@ -147,7 +232,7 @@ function SubjectDetail() {
     if (!loading) loadData(cohortFilter, sittingFilter);
   }, [cohortFilter, sittingFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const catColors = { CORE: '#2563eb', ELECTIVE: '#7c3aed', OTHER_LANGUAGE: '#0891b2', APPLIED_LEARNING: '#d97706' };
+  const catColors = { CORE: '#2563eb', ELECTIVE: '#16a34a', OTHER_LANGUAGE: '#7c3aed', APPLIED_LEARNING: '#d97706' };
 
   const inputStyle = {
     padding: 'var(--space-2)',
@@ -180,7 +265,7 @@ function SubjectDetail() {
             )}
           </div>
           {subjectCategory && (
-            <span style={{ fontSize: '12px', background: catColors[subjectCategory] || '#64748b', color: '#fff', padding: '3px 10px', borderRadius: '10px' }}>
+            <span style={{ fontSize: '11px', background: catColors[subjectCategory] || '#64748b', color: '#fff', padding: '3px 10px', borderRadius: '12px', fontWeight: 'bold', letterSpacing: '0.02em' }}>
               {CATEGORY_LABELS[subjectCategory] || subjectCategory}
             </span>
           )}
@@ -221,71 +306,97 @@ function SubjectDetail() {
           </div>
         )}
 
-        {!loading && !error && filteredSittings.map((row) => (
-          <div key={row.sitting} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-              <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                {row.sitting} Sitting
-              </h2>
-              <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                {row.count} student{row.count !== 1 ? 's' : ''}
-              </span>
-            </div>
+        {!loading && !error && filteredSittings.map((row) => {
+          const chartStats = row.grade_distribution ? deriveChartStats(row.grade_distribution) : null;
+          return (
+            <div key={row.sitting} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                  {row.sitting} Sitting
+                </h2>
+                <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  {row.count} student{row.count !== 1 ? 's' : ''}
+                </span>
+              </div>
 
-            <div style={{ display: 'flex', gap: 'var(--space-6)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-              <span>Mean: <strong style={{ color: 'var(--color-text-primary)' }}>{numericToGrade(row.mean)} ({row.mean.toFixed(2)})</strong></span>
-              <span>Variance: <strong style={{ color: 'var(--color-text-primary)' }}>{row.variance.toFixed(2)}</strong></span>
-            </div>
+              {/* Stats summary pills */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+                {[
+                  { label: 'Mean', value: `${numericToGrade(row.mean)} (${row.mean.toFixed(2)})` },
+                  { label: 'Variance', value: row.variance.toFixed(2) },
+                  { label: 'n=', value: String(row.count) },
+                  ...(row.grade_rates?.['5'] != null ? [{ label: 'Grade 5+', value: `${row.grade_rates['5']}%` }] : []),
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '4px 12px', fontSize: '12px', color: '#6b7280', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    <span>{label}</span>
+                    <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{value}</span>
+                  </div>
+                ))}
+              </div>
 
-            <div style={{ marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Grade Distribution
-            </div>
-            <GradeBar dist={row.grade_distribution || {}} />
-            <VerticalBarChart distribution={row.grade_distribution || {}} title="Grade Distribution — Bar Chart" />
+              {/* Chart — full width, prominent */}
+              {row.grade_distribution && (
+                <VerticalBarChart
+                  distribution={row.grade_distribution}
+                  title="Grade Distribution"
+                  mean={chartStats?.mean}
+                  mode={chartStats?.mode}
+                  totalN={chartStats?.totalN}
+                />
+              )}
 
-            <div style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Grade Rates (% achieving grade or above)
+              <div style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Grade Rates (% achieving grade or above)
+              </div>
+              <GradeRates rates={row.grade_rates} />
             </div>
-            <GradeRates rates={row.grade_rates} />
-          </div>
-        ))}
+          );
+        })}
 
         {!loading && !error && populationData && (
           <div style={{ marginTop: 'var(--space-6)' }}>
             <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
               HK Population Data (HKDSE)
             </h2>
-            {(populationData.sittings ?? []).map((sitting) => (
-              <div key={`${sitting.year}-${sitting.sitting_type}`} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                  <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                    {sitting.year} {sitting.sitting_type}
-                  </h3>
-                  <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                    {sitting.total_candidates != null ? `${sitting.total_candidates.toLocaleString()} candidates` : ''}
-                  </span>
-                </div>
+            {(populationData.sittings ?? []).map((sitting) => {
+              const popChartStats = sitting.grade_distribution ? deriveChartStats(sitting.grade_distribution) : null;
+              return (
+                <div key={`${sitting.year}-${sitting.sitting_type}`} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                      {sitting.year} {sitting.sitting_type}
+                    </h3>
+                    <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                      {sitting.total_candidates != null ? `${sitting.total_candidates.toLocaleString()} candidates` : ''}
+                    </span>
+                  </div>
 
-                <div style={{ display: 'flex', gap: 'var(--space-6)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-                  {sitting.mean_numeric != null && (
-                    <span>Mean: <strong style={{ color: 'var(--color-text-primary)' }}>{numericToGrade(sitting.mean_numeric)} ({sitting.mean_numeric.toFixed(2)})</strong></span>
-                  )}
-                  {sitting.variance != null && (
-                    <span>Variance: <strong style={{ color: 'var(--color-text-primary)' }}>{sitting.variance.toFixed(2)}</strong></span>
+                  {/* Stats summary pills */}
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
+                    {[
+                      ...(sitting.mean_numeric != null ? [{ label: 'Mean', value: `${numericToGrade(sitting.mean_numeric)} (${sitting.mean_numeric.toFixed(2)})` }] : []),
+                      ...(sitting.variance != null ? [{ label: 'Variance', value: sitting.variance.toFixed(2) }] : []),
+                      ...(sitting.total_candidates != null ? [{ label: 'n=', value: sitting.total_candidates.toLocaleString() }] : []),
+                    ].map(({ label, value }) => (
+                      <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '4px 12px', fontSize: '12px', color: '#6b7280', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        <span>{label}</span>
+                        <span style={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {sitting.grade_distribution && (
+                    <VerticalBarChart
+                      distribution={sitting.grade_distribution}
+                      title="Grade Distribution (%)"
+                      mean={popChartStats?.mean}
+                      mode={popChartStats?.mode}
+                      totalN={popChartStats?.totalN}
+                    />
                   )}
                 </div>
-
-                {sitting.grade_distribution && (
-                  <>
-                    <div style={{ marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Grade Distribution (%)
-                    </div>
-                    <GradeBar dist={sitting.grade_distribution} />
-                    <VerticalBarChart distribution={sitting.grade_distribution} title="Grade Distribution — Bar Chart" />
-                  </>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

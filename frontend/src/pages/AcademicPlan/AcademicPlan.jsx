@@ -26,9 +26,9 @@ import { getAccount } from '../../api/account';
 const POLL_INTERVAL_MS = 2000;
 
 const TEMPLATES = [
-  { id: 'professional', label: 'Professional' },
-  { id: 'modern', label: 'Modern' },
-  { id: 'minimal', label: 'Minimal' },
+  { id: 'professional', label: 'Professional', headerColor: '#1e3a5f' },
+  { id: 'modern', label: 'Modern', headerColor: '#0d9488' },
+  { id: 'minimal', label: 'Minimal', headerColor: '#111827' },
 ];
 
 function buildSectionList(plan) {
@@ -204,11 +204,11 @@ function AcademicPlan() {
     if (!text || chatLoading) return;
     setChatInput('');
     setChatError(null);
-    setMessages((prev) => [...prev, { role: 'user', text }]);
+    setMessages((prev) => [...prev, { role: 'user', text, id: crypto.randomUUID() }]);
     setChatLoading(true);
     try {
       const data = await sendPlanChat(id, text);
-      setMessages((prev) => [...prev, { role: 'assistant', text: data.message || 'Done.' }]);
+      setMessages((prev) => [...prev, { role: 'assistant', text: data.message || 'Done.', id: crypto.randomUUID() }]);
       // reload plan so charts/content reflect any changes
       await loadPlan();
     } catch (err) {
@@ -220,6 +220,7 @@ function AcademicPlan() {
           {
             role: 'system',
             text: 'AI chat is not available: Gemini API key not configured.',
+            id: crypto.randomUUID(),
           },
         ]);
       } else if (status === 429) {
@@ -228,6 +229,7 @@ function AcademicPlan() {
           {
             role: 'system',
             text: 'Daily limit of 20 AI chat requests reached for this plan.',
+            id: crypto.randomUUID(),
           },
         ]);
       } else {
@@ -351,18 +353,28 @@ function AcademicPlan() {
     boxSizing: 'border-box',
   };
 
-  // template button style factory
+  // template button style factory (card-style with mini-preview)
   const templateBtnStyle = (isActive) => ({
-    padding: 'var(--space-2) var(--space-3)',
-    background: isActive ? 'var(--color-primary)' : '#fff',
-    color: isActive ? '#fff' : 'var(--color-primary)',
-    border: isActive ? 'none' : '1px solid var(--color-primary)',
-    borderRadius: 'var(--border-radius-sm)',
+    width: '110px',
+    height: '72px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '6px',
+    background: '#fff',
+    border: isActive ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+    borderRadius: '8px',
     cursor: templateLoading ? 'not-allowed' : 'pointer',
-    fontSize: 'var(--font-size-sm)',
+    fontSize: '12px',
     fontFamily: 'var(--font-family-base)',
     fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+    color: isActive ? 'var(--color-primary)' : 'var(--color-text-primary)',
     opacity: templateLoading ? 0.6 : 1,
+    transform: isActive ? 'scale(1.02)' : 'scale(1)',
+    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
+    transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.15s',
+    padding: '6px',
   });
 
   // plan type button style factory
@@ -512,7 +524,17 @@ function AcademicPlan() {
               onClick={() => handleSetTemplate(t.id)}
               disabled={templateLoading}
               style={templateBtnStyle(activeTemplate === t.id)}
+              onMouseEnter={(e) => { if (activeTemplate !== t.id && !templateLoading) e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
+              onMouseLeave={(e) => { if (activeTemplate !== t.id) e.currentTarget.style.borderColor = 'var(--color-border)'; }}
             >
+              {/* Mini preview swatch */}
+              <div style={{ width: '72px', borderRadius: '3px', overflow: 'hidden', border: '1px solid #e5e7eb', flexShrink: 0 }}>
+                <div style={{ height: '8px', background: t.headerColor }} />
+                <div style={{ padding: '3px 4px', background: '#f9fafb' }}>
+                  <div style={{ height: '3px', background: '#d1d5db', borderRadius: '1px', marginBottom: '2px' }} />
+                  <div style={{ height: '3px', background: '#e5e7eb', borderRadius: '1px', width: '70%' }} />
+                </div>
+              </div>
               {t.label}
             </button>
           ))}
@@ -600,7 +622,7 @@ function AcademicPlan() {
                   style={iframeStyle}
                   srcDoc={plan.html_content}
                   title={`Academic Plan for ${student?.full_name || 'student'}`}
-                  sandbox="allow-same-origin"
+                  sandbox="allow-same-origin allow-scripts"
                   aria-label="Academic plan document"
                 />
               </div>
@@ -818,8 +840,8 @@ function ChatPanel({
             Ask me to adjust a school&apos;s rationale, reorder schools, change action item priorities&hellip;
           </p>
         )}
-        {messages.map((msg, i) => (
-          <MessageBubble key={i} message={msg} />
+        {messages.map((msg) => (
+          <MessageBubble key={msg.id} message={msg} />
         ))}
         <div ref={messagesEndRef} />
       </div>

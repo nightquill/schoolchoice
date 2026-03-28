@@ -94,6 +94,15 @@
 - **AcademicPlan — template selector (Point 17a)**: Secondary toolbar row (only when plan exists) with Professional / Modern / Minimal toggle buttons. Active = primary background/white text, no border. Inactive = white background, primary text, primary border. Calls `setPlanTemplate` then reloads plan. `activeTemplate` state seeded from `plan.template_id` on load.
 - **AcademicPlan — Edit Sections mode (Point 17b)**: "Edit Sections" toggle button in the template toolbar. When active, shows a row of section Edit buttons (Student Summary, School 1–N Rationale up to 5, Action Plan Notes). Clicking a section opens a full-screen modal with `PlanSectionEditor`. Save calls `editPlanSection` then reloads plan. Reset calls `resetPlanSection` then reloads plan. Cancel closes modal.
 
+## Changelog — 2026-03-28 (fifth batch — bugs + redesigns)
+
+- **BUG 1 — AcademicPlan iframe sandbox**: Changed `sandbox="allow-same-origin"` to `sandbox="allow-same-origin allow-scripts"` so Chart.js scripts embedded in the plan HTML document execute correctly.
+- **BUG 2 — Dashboard plan count**: Changed `plansGenerated` filter from `s.plan_generated_at || s.has_plan` to `s.has_plan` only, consistent with the backend `has_plan: boolean` field.
+- **BUG 3 — Chat message keys**: Messages now carry a stable `id: crypto.randomUUID()` field added at push time (user, assistant, system messages). ChatPanel `.map()` uses `key={msg.id}` instead of `key={i}` (array-index anti-pattern).
+- **REDESIGN 1 — VerticalBarChart (DataAnalysis + SubjectDetail)**: Replaced plain bar chart with a polished visualization: white card with `border-radius: 8px` and `box-shadow`, `160px` bar area, per-grade color scheme (5**=purple, 5*=blue, 5=cyan, 4=green, 3=amber, 2=orange, 1=red, U=grey), rounded top corners, hover opacity effect + floating tooltip, always-visible value label above each bar in bar color, faint horizontal gridlines at 25%/50%/75%/100%, `%` suffix detection for population data, summary line showing Mean / Mode / n= derived via `deriveChartStats()`.
+- **REDESIGN 2 — DataAnalysis subject card layout**: Subject cards now show `VerticalBarChart` (best-populated sitting) full-width at top of card, followed by horizontal stats pills (Mean, Variance, n= with primary-color bold values on grey pill backgrounds). Category badge redesigned as rounded pill (12px radius, bold text). Category colors corrected: CORE=blue, ELECTIVE=green, OTHER_LANGUAGE=purple, APPLIED_LEARNING=amber. SubjectDetail sitting cards and population cards updated with same pill-style stats row, chart made full-width and prominent (GradeBar kept for visual reference).
+- **REDESIGN 3 — Template toolbar (AcademicPlan)**: Template buttons redesigned as 110x72px card-like buttons with mini-preview swatch (colored header bar + two grey content lines). Active template: 2px primary border, `scale(1.02)`, shadow. Inactive: light border, hover darkens border to primary color. `TEMPLATES` array extended with `headerColor` (Professional=#1e3a5f, Modern=#0d9488, Minimal=#111827).
+
 ## v1 Compatibility
 
 All v1 routes, components, and API files are untouched:
