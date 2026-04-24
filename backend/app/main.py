@@ -134,30 +134,32 @@ def _seed_database():
 _seed_database()
 
 # ---------------------------------------------------------------------------
-# Runtime column migrations (add columns that don't exist yet)
+# Runtime column migrations (PostgreSQL only — SQLite does not support
+# IF NOT EXISTS in ALTER TABLE; guard prevents test suite collection errors)
 # ---------------------------------------------------------------------------
-from sqlalchemy import text as _sql_text
-with engine.connect() as _conn:
-    _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS personal_statement TEXT"))
-    _conn.execute(_sql_text("ALTER TABLE student_school_targets ADD COLUMN IF NOT EXISTS intended_majors JSON"))
-    _conn.execute(_sql_text("ALTER TABLE student_school_targets ADD COLUMN IF NOT EXISTS year_of_entry INTEGER"))
-    _conn.execute(_sql_text("ALTER TABLE schools ADD COLUMN IF NOT EXISTS is_custom BOOLEAN DEFAULT FALSE"))
-    _conn.execute(_sql_text("ALTER TABLE schools ADD COLUMN IF NOT EXISTS major_requirements JSON"))
-    _conn.execute(_sql_text("ALTER TABLE schools DROP CONSTRAINT IF EXISTS ck_schools_type"))
-    _conn.execute(_sql_text(
-        "ALTER TABLE schools ADD CONSTRAINT ck_schools_type CHECK "
-        "(type IN ('UNIVERSITY', 'POLYTECHNIC', 'COMMUNITY_COLLEGE', 'VOCATIONAL', 'HIGH_SCHOOL') OR type IS NULL)"
-    ))
-    # Graduation columns on students
-    _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS is_graduated BOOLEAN DEFAULT FALSE"))
-    _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS graduation_year INTEGER"))
-    _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS final_school_id UUID REFERENCES schools(id) ON DELETE SET NULL"))
-    _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS final_major VARCHAR(255)"))
-    # AcademicPlan — template, overrides, and chat rate-limit columns (Point 16/17)
-    _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS template_id VARCHAR(50) DEFAULT 'professional'"))
-    _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS overrides JSON DEFAULT '{}'"))
-    _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS chat_request_counts JSON DEFAULT '{}'"))
-    _conn.commit()
+if engine.dialect.name == "postgresql":
+    from sqlalchemy import text as _sql_text
+    with engine.connect() as _conn:
+        _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS personal_statement TEXT"))
+        _conn.execute(_sql_text("ALTER TABLE student_school_targets ADD COLUMN IF NOT EXISTS intended_majors JSON"))
+        _conn.execute(_sql_text("ALTER TABLE student_school_targets ADD COLUMN IF NOT EXISTS year_of_entry INTEGER"))
+        _conn.execute(_sql_text("ALTER TABLE schools ADD COLUMN IF NOT EXISTS is_custom BOOLEAN DEFAULT FALSE"))
+        _conn.execute(_sql_text("ALTER TABLE schools ADD COLUMN IF NOT EXISTS major_requirements JSON"))
+        _conn.execute(_sql_text("ALTER TABLE schools DROP CONSTRAINT IF EXISTS ck_schools_type"))
+        _conn.execute(_sql_text(
+            "ALTER TABLE schools ADD CONSTRAINT ck_schools_type CHECK "
+            "(type IN ('UNIVERSITY', 'POLYTECHNIC', 'COMMUNITY_COLLEGE', 'VOCATIONAL', 'HIGH_SCHOOL') OR type IS NULL)"
+        ))
+        # Graduation columns on students
+        _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS is_graduated BOOLEAN DEFAULT FALSE"))
+        _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS graduation_year INTEGER"))
+        _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS final_school_id UUID REFERENCES schools(id) ON DELETE SET NULL"))
+        _conn.execute(_sql_text("ALTER TABLE students ADD COLUMN IF NOT EXISTS final_major VARCHAR(255)"))
+        # AcademicPlan — template, overrides, and chat rate-limit columns (Point 16/17)
+        _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS template_id VARCHAR(50) DEFAULT 'professional'"))
+        _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS overrides JSON DEFAULT '{}'"))
+        _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS chat_request_counts JSON DEFAULT '{}'"))
+        _conn.commit()
 
 # ---------------------------------------------------------------------------
 # Ensure UPLOAD_DIR exists on startup
