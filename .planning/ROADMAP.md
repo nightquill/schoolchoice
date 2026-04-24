@@ -31,7 +31,15 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. HKDSE-specific logic is fully contained inside a `modules/school_choice/` folder — a project-wide grep finds no school-choice domain references in `core/`
   4. A single API version handles all requests — no v1/v2 duplication in routes
   5. Startup logs report ORM-schema parity check result, XGBoost model status, and CORS origin in use; health endpoint returns all three
-**Plans**: TBD
+**Plans:** 6 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Bug fixes (BUG-01 through BUG-04), HTML escaping (SEC-05), SQLite test fix, PyYAML dependency
+- [ ] 01-02-PLAN.md — Platform entity layer: YAML parser, entity registry, CRUD generator (PLAT-01, PLAT-02)
+- [ ] 01-03-PLAN.md — Module loader, health infrastructure, ORM parity check (PLAT-04, PLAT-05, PLAT-08, SEC-03, SEC-04, BUG-05)
+- [ ] 01-04-PLAN.md — Domain model extraction to modules/school_choice/models/ with re-export stubs (PLAT-06)
+- [ ] 01-05-PLAN.md — Service extraction to modules/school_choice/services/ via strangler fig (PLAT-06)
+- [ ] 01-06-PLAN.md — Wire module loader + health into main.py, API consolidation, integration tests (PLAT-07)
 
 ### Phase 2: AI Provider Abstraction
 **Goal**: All AI calls route through a single LiteLLM-backed interface; school choice plan chat and AI features work with any configured provider; BYOK API key config is fully environment-variable-driven
@@ -103,7 +111,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation | 0/TBD | Not started | - |
+| 1. Platform Foundation | 0/6 | Planning complete | - |
 | 2. AI Provider Abstraction | 0/TBD | Not started | - |
 | 3. Frontend Stabilization | 0/TBD | Not started | - |
 | 4. Import and Export | 0/TBD | Not started | - |
