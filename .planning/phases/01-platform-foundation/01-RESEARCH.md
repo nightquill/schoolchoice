@@ -698,22 +698,25 @@ def health_check():
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`ALTER TABLE IF NOT EXISTS` in main.py — fix approach**
    - What we know: Currently breaks SQLite test collection (confirmed); PostgreSQL production unaffected.
    - What's unclear: Whether to (a) add `if engine.dialect.name == 'postgresql':` guard, or (b) move to Alembic migrations.
    - Recommendation: Option (a) is the minimum fix for Phase 1 (one-line guard per ALTER TABLE block). Option (b) is technically correct but adds Alembic workflow overhead that the planner should evaluate against phase scope. If Alembic is not in scope, use option (a).
+   - RESOLVED: Option (a) implemented in Plan 01-01 Task 2 — dialect guard `if engine.dialect.name == 'postgresql':` wrapping each ALTER TABLE block in main.py.
 
 2. **Auto-generated CRUD vs existing custom routes — namespace conflict**
    - What we know: Auto-generated CRUD would produce `GET /api/v1/students/` and `GET /api/v1/students/{id}` — same paths as existing `students.py` routes.
    - What's unclear: D-06 says "Modules can override with custom endpoints when needed." The planner needs to decide whether auto-generated routes are additive (new path prefix like `/api/v1/entities/`) or replace the custom routes for the `student` entity.
    - Recommendation: For Phase 1 with the school_choice module, the custom routes already exist and are well-tested. Auto-generated CRUD should use a distinct path or be explicitly skipped for entities that have custom routes declared in config.yaml. Add an `"auto_crud": false` flag in entity YAML for entities with full custom route coverage.
+   - RESOLVED: `auto_crud: false` flag in entity YAML for entities with full custom routes (Plan 01-02). Auto-generated CRUD only applies to entities without custom route coverage.
 
 3. **BUG-03 school name — scope of fix**
    - What we know: `Recommendation.school_name` is a denormalized copy stored at generation time (by design, for historical accuracy). The `targets.py` route correctly JOINs `school.name` for the current name. The `recommendations.py` route returns the stored `school_name` from the `recommendations` table.
    - What's unclear: Requirements say "single source of truth." This could mean (a) always JOIN to `schools.name` in API responses, discarding the denormalized copy, or (b) keep denormalized copy but ensure it's refreshed on update.
    - Recommendation: For targets and match API responses, always use `school.name` from the JOIN (already done in `targets.py`). For historical `recommendations`, return the stored name as-is (it represents the name at generation time). The bug is in match responses that duplicate `school_name` at both `school_name` field level and inside `MatchResult` — ensure single field in response.
+   - RESOLVED: Match/target responses use JOIN to schools.name; historical recommendation.school_name left as-is for historical accuracy (Plan 01-01 Task 1).
 
 ---
 
