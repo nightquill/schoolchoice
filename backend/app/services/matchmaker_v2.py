@@ -30,6 +30,28 @@ class MatchResult:
     final_score: float           # combined score
     shap_explanation: Optional[dict]   # top 3 features
     rationale: str               # one sentence plain English
+    data_completeness: float = 0.0    # BUG-02: 0.0–1.0 fraction of expected grade fields present
+
+
+# ---------------------------------------------------------------------------
+# BUG-02: Data completeness indicator
+# ---------------------------------------------------------------------------
+
+def compute_data_completeness(student_data: dict) -> float:
+    """
+    Compute fraction of expected grade fields present for this student.
+    Weights compulsory subjects (CHLA, ENGL, MATH, CSD) at 70% and
+    elective subjects at 30%. Returns a float in [0.0, 1.0].
+    """
+    grades = student_data.get("grades_by_code", {})
+    compulsory_present = sum(
+        1 for c in ["CHLA", "ENGL", "MATH", "CSD"]
+        if c in grades and grades[c]
+    )
+    compulsory_score = compulsory_present / 4
+    elective_grades = [v for k, v in grades.items() if k not in {"CHLA", "ENGL", "MATH", "CSD"}]
+    elective_score = min(len([g for g in elective_grades if g]) / 2, 1.0) if elective_grades else 0.0
+    return round((compulsory_score * 0.7 + elective_score * 0.3), 2)
 
 
 # ---------------------------------------------------------------------------
@@ -458,6 +480,8 @@ def run_matching(
     eligible_results: list[MatchResult] = []
     ineligible_results: list[MatchResult] = []
 
+    data_completeness = compute_data_completeness(student_data)
+
     for school in schools:
         school_id = str(school.get("id", ""))
         school_name = school.get("name", "Unknown")
@@ -479,6 +503,7 @@ def run_matching(
                     final_score=0.0,
                     shap_explanation=None,
                     rationale=f"Not eligible: {'; '.join(failing)}",
+                    data_completeness=data_completeness,
                 )
             )
             continue
@@ -572,6 +597,7 @@ def run_matching(
                     final_score=major_final,
                     shap_explanation=shap_out,
                     rationale="",
+                    data_completeness=data_completeness,
                 )
                 result.rationale = generate_rationale(result)
                 eligible_results.append(result)
@@ -590,6 +616,7 @@ def run_matching(
                 final_score=round(final_score, 4),
                 shap_explanation=shap_out,
                 rationale="",
+                data_completeness=data_completeness,
             )
             result.rationale = generate_rationale(result)
             eligible_results.append(result)

@@ -610,10 +610,10 @@ def _section_recommended_schools(match_results: list, student: dict, overrides: 
             failing = getattr(result, "failing_criteria") or []
             intended_majors = []
 
-        # Check for rationale override
+        # Check for rationale override (escape user-provided override text)
         rationale_override_key = f"school_{idx - 1}_rationale"
         if overrides and overrides.get(rationale_override_key):
-            rationale = overrides[rationale_override_key]
+            rationale = _esc(overrides[rationale_override_key])
 
         elig_badge = (
             '<span class="badge badge-pass">ELIGIBLE</span>'

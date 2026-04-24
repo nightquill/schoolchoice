@@ -196,6 +196,7 @@ def run_match(
             "final_score": r.final_score,
             "shap_explanation": r.shap_explanation,
             "rationale": r.rationale,
+            "data_completeness": r.data_completeness,
         }
         for r in results
     ]

@@ -4,7 +4,7 @@ app/services/plan_chat_service.py
 Counsellor AI chat service — applies natural-language edits to an academic plan
 via Gemini 2.5 Flash, returning an updated plan and a summary reply.
 
-Rate limit: 20 requests per counsellor per plan per calendar day.
+Rate limit: 20 requests per counsellor per plan per rolling 24-hour window.
 Requires GEMINI_API_KEY environment variable.
 """
 
@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import os
 import re
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -47,26 +47,35 @@ Respond with ONLY the JSON object. No explanation, no markdown, no code fences."
 # Rate limiting helper
 # ---------------------------------------------------------------------------
 
-def _rate_limit_key(counsellor_id: Any, plan_id: Any) -> str:
-    return f"{date.today().isoformat()}:{counsellor_id}:{plan_id}"
-
-
 def _check_and_increment_rate_limit(db: Session, plan: AcademicPlan, counsellor_id: Any) -> None:
     """
-    Check daily rate limit (20 requests per counsellor per plan).
-    Raises HTTP 429 if exceeded; otherwise increments counter in DB.
+    Check rolling 24-hour rate limit (20 requests per counsellor per plan).
+    Uses a window_start timestamp to implement a true rolling window rather than
+    a calendar-day reset. Raises HTTP 429 if exceeded; otherwise increments counter in DB.
     """
-    key = _rate_limit_key(counsellor_id, plan.id)
+    key = f"{counsellor_id}:{plan.id}"
     counts: dict = dict(plan.chat_request_counts or {})
-    current_count = counts.get(key, 0)
+    entry = counts.get(key, {"count": 0, "window_start": None})
 
-    if current_count >= 20:
+    now = datetime.now(timezone.utc)
+    window_start_str = entry.get("window_start")
+
+    if window_start_str:
+        window_start = datetime.fromisoformat(window_start_str)
+        if now - window_start > timedelta(hours=24):
+            # Reset window — more than 24 hours have passed
+            entry = {"count": 0, "window_start": now.isoformat()}
+    else:
+        entry["window_start"] = now.isoformat()
+
+    if entry["count"] >= 20:
         raise HTTPException(
             status_code=429,
             detail="Daily AI chat limit (20 requests) reached for this plan.",
         )
 
-    counts[key] = current_count + 1
+    entry["count"] += 1
+    counts[key] = entry
     plan.chat_request_counts = counts
 
 
