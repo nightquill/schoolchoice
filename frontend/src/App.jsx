@@ -21,6 +21,7 @@ import DataAnalysis from './pages/DataAnalysis/DataAnalysis';
 import SubjectDetail from './pages/SubjectDetail/SubjectDetail';
 import EntityListPage from './pages/EntityListPage/EntityListPage';
 import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
+import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,7 @@ export default function App() {
 
         {/* Entity routes (PLAT-03) */}
         <Route path="/entities/:name" element={<ProtectedRoute><EntityListPage /></ProtectedRoute>} />
+        <Route path="/entities/:name/import" element={<ProtectedRoute><ImportWizardPage /></ProtectedRoute>} />
         <Route path="/entities/:name/:id" element={<ProtectedRoute><EntityDetailPage /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
