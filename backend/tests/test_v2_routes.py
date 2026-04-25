@@ -39,6 +39,16 @@ def test_health_check(client):
     assert "modules" in data
 
 
+def test_health_reports_ai_provider(client):
+    """GET /health includes AI provider status in module health."""
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    data = resp.json()
+    sc = data["modules"]["school_choice"]
+    assert "ai_provider" in sc
+    assert sc["ai_status"] in ("configured", "unconfigured")
+
+
 # ---------------------------------------------------------------------------
 # Account endpoints
 # ---------------------------------------------------------------------------
@@ -353,10 +363,10 @@ class TestPlanChatEndpoints:
         return plan
 
     def test_plan_chat_no_api_key(self, client, auth_headers, db):
-        """POST /plan/chat returns 503 when GEMINI_API_KEY is not set."""
+        """POST /plan/chat returns 503 when AI_API_KEY is not set."""
         import os
         # Ensure key is absent
-        os.environ.pop("GEMINI_API_KEY", None)
+        os.environ["AI_API_KEY"] = ""
 
         student_id = self._create_student(client, auth_headers)
         self._seed_plan(db, student_id)
@@ -367,12 +377,10 @@ class TestPlanChatEndpoints:
             headers=auth_headers,
         )
         assert resp.status_code == 503
-        assert "GEMINI_API_KEY" in resp.json()["detail"]
+        assert "AI_API_KEY" in resp.json()["detail"]
 
     def test_plan_chat_no_plan_returns_404(self, client, auth_headers):
         """POST /plan/chat returns 404 if no plan exists."""
-        import os
-        os.environ.pop("GEMINI_API_KEY", None)
         student_id = self._create_student(client, auth_headers)
         # No plan seeded
         resp = client.post(

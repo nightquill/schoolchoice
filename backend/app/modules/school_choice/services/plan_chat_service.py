@@ -2,16 +2,15 @@
 app/services/plan_chat_service.py
 
 Counsellor AI chat service — applies natural-language edits to an academic plan
-via Gemini 2.5 Flash, returning an updated plan and a summary reply.
+via AI provider (via LiteLLM), returning an updated plan and a summary reply.
 
 Rate limit: 20 requests per counsellor per plan per rolling 24-hour window.
-Requires GEMINI_API_KEY environment variable.
+Requires AI_API_KEY environment variable (configured in core/config.py).
 """
 
 from __future__ import annotations
 
 import json
-import os
 import re
 from datetime import datetime, timezone, timedelta
 from typing import Any
@@ -23,6 +22,7 @@ from sqlalchemy.orm import Session
 from app.db.models_v2 import AcademicPlan
 from app.schemas.v2.plan_chat import PlanChatResponse
 from app.modules.school_choice.services.plan_generator import generate_html_plan
+from app.core.ai_service import call_ai
 
 # ---------------------------------------------------------------------------
 # System prompt
@@ -141,21 +141,14 @@ def handle_chat(
 ) -> PlanChatResponse:
     """
     Process one counsellor chat message:
-    1. Check GEMINI_API_KEY
+    1. Call AI provider (raises 503 if unconfigured)
     2. Enforce rate limit
-    3. Call Gemini with plan context + instruction
+    3. Call AI provider via call_ai()
     4. Apply returned patch to plan
     5. Regenerate HTML
     6. Persist to DB
     7. Return PlanChatResponse
     """
-    api_key = os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=503,
-            detail="AI chat is not available: GEMINI_API_KEY is not configured.",
-        )
-
     # Rate limit check (mutates plan.chat_request_counts but does not commit yet)
     _check_and_increment_rate_limit(db, plan, counsellor_id)
 
@@ -166,15 +159,12 @@ def handle_chat(
     }
     context_json = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
 
-    # Call Gemini
-    import google.generativeai as genai  # type: ignore[import]
-
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(
-        f"{SYSTEM_PROMPT}\n\nCurrent plan data:\n{context_json}\n\nCounsellor instruction: {message}"
-    )
-    raw_text: str = response.text.strip()
+    # Call AI provider via LiteLLM abstraction (D-10: messages array format)
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"Current plan data:\n{context_json}\n\nCounsellor instruction: {message}"},
+    ]
+    raw_text = call_ai(messages)
 
     # Strip markdown code fences if Gemini wraps in them despite instructions
     if raw_text.startswith("```"):
