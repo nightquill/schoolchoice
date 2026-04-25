@@ -359,6 +359,77 @@ class TestSchoolChoiceHealth:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# TestHealthEndpoint — integration tests for extended /health
+# ---------------------------------------------------------------------------
+
+
+class TestHealthEndpoint:
+    def test_health_returns_required_fields(self, client):
+        """SEC-03: /health returns db, cors_origin, schema_parity, modules."""
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert "db" in data
+        assert "cors_origin" in data
+        assert "schema_parity" in data
+        assert "modules" in data
+        assert data["status"] in ("ok", "degraded")
+
+    def test_health_db_status_ok(self, client):
+        """Health endpoint reports db as ok when database is reachable."""
+        response = client.get("/health")
+        data = response.json()
+        assert data["db"] == "ok"
+
+    def test_health_cors_from_env(self, client):
+        """SEC-04: CORS origin in health response matches env var."""
+        response = client.get("/health")
+        data = response.json()
+        assert data["cors_origin"] == os.environ.get("CORS_ORIGINS", "http://localhost:5173")
+
+    def test_health_schema_parity_present(self, client):
+        """Schema parity result is included in health response."""
+        response = client.get("/health")
+        data = response.json()
+        parity = data["schema_parity"]
+        assert "status" in parity
+        # In SQLite test env, parity check is skipped
+        assert parity["status"] in ("ok", "skipped", "drift_detected", "not_checked")
+
+    def test_health_modules_includes_school_choice(self, client):
+        """Module loader registers school_choice and its health appears in /health."""
+        response = client.get("/health")
+        data = response.json()
+        modules = data["modules"]
+        assert "school_choice" in modules
+        assert "xgboost_model" in modules["school_choice"]
+
+
+# ---------------------------------------------------------------------------
+# TestDomainIsolation
+# ---------------------------------------------------------------------------
+
+
+class TestDomainIsolation:
+    def test_no_school_choice_refs_in_core(self):
+        """PLAT-06 success criterion 3: no school-choice domain references in core/."""
+        import subprocess
+        result = subprocess.run(
+            ["grep", "-rn", "-i",
+             "hkdse\\|school_choice\\|jupas\\|matchmaker\\|plan_generator\\|plan_chat",
+             "app/core/"],
+            capture_output=True, text=True,
+            cwd=str(Path(__file__).parent.parent)
+        )
+        # Filter out __pycache__ hits
+        lines = [line for line in result.stdout.strip().split("\n")
+                 if line and "__pycache__" not in line]
+        assert lines == [] or lines == [""], (
+            f"School-choice domain references found in core/: {lines}"
+        )
+
+
 class TestCorsFromEnv:
     def test_cors_origins_from_settings(self):
         """SEC-04: CORS origins come from environment variable via settings."""
