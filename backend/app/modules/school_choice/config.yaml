@@ -1,0 +1,21 @@
+name: school_choice
+version: "1.0"
+
+# Model import path — module_loader imports this before registering routes
+# to ensure all ORM classes are in Base.metadata
+models_import: app.modules.school_choice.models.models
+
+# Entity YAML definitions (relative to module directory)
+entities:
+  - entities/student.yaml
+  - entities/school.yaml
+
+# Router references — format: "filename.router_attribute"
+# These are imported from app.modules.school_choice.routes.{filename}
+# NOTE: Routes still live in app.api.v1.routes/ during Phase 1.
+# They will move here during Plan 05 (service extraction).
+# For now, routes are registered directly in main.py (unchanged).
+routes: []
+
+# Health callback — module:function format
+health_callback: "app.modules.school_choice.health:check_health"
