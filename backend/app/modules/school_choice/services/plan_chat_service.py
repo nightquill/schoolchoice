@@ -11,6 +11,7 @@ Requires AI_API_KEY environment variable (configured in core/config.py).
 from __future__ import annotations
 
 import json
+import logging
 import re
 from datetime import datetime, timezone, timedelta
 from typing import Any
@@ -23,6 +24,8 @@ from app.db.models_v2 import AcademicPlan
 from app.schemas.v2.plan_chat import PlanChatResponse
 from app.modules.school_choice.services.plan_generator import generate_html_plan
 from app.core.ai_service import call_ai
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # System prompt
@@ -224,8 +227,8 @@ def handle_chat(
                 "extra_curricular": getattr(student_orm, "extra_curricular", None) or [],
                 "awards": getattr(student_orm, "awards", None) or [],
             }
-    except Exception:
-        pass  # Fall back to minimal dict
+    except Exception as exc:
+        logger.warning("Failed to load student data for plan regeneration: %s", exc)
 
     html_content = generate_html_plan(
         student_for_regen,
