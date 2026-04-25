@@ -34,5 +34,12 @@ class Settings(BaseSettings):
         """Split CORS_ORIGINS on commas and strip whitespace from each entry."""
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
+    # AI provider configuration (Phase 2: AI-01, AI-02, AI-03)
+    AI_PROVIDER: str = "gemini"
+    AI_API_KEY: str = ""
+    AI_MODEL: str = ""
+    AI_BASE_URL: str = ""
+    AI_TIMEOUT: int = 30
+
 
 settings = Settings()
