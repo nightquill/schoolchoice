@@ -13,6 +13,8 @@ import yaml
 from pathlib import Path
 from fastapi import FastAPI
 from app.platform.health import register_health_callback
+from app.platform.yaml_loader import load_entity_yaml
+from app.platform.entity_registry import registry
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +35,19 @@ def discover_and_register_modules(app: FastAPI, modules_dir: Path) -> list[dict]
             models_module = config.get("models_import")
             if models_module:
                 importlib.import_module(models_module)
+
+            # Register entity YAML configs into the entity registry (D-06, D-08)
+            entities_dir = module_dir / "entities"
+            if entities_dir.exists():
+                for entity_yaml in sorted(entities_dir.glob("*.yaml")):
+                    try:
+                        entity_config = load_entity_yaml(entity_yaml)
+                        if entity_config.auto_crud:
+                            registry.register(entity_config)
+                        else:
+                            registry.register_config(entity_config)
+                    except Exception as e:
+                        logger.warning(f"Entity load skipped: {entity_yaml.name} — {e}")
 
             # Register routers
             for router_ref in config.get("routes", []):

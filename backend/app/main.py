@@ -19,6 +19,7 @@ from app.api.v1.routes import (
     admin,
     analytics,
     cohorts,
+    entities,
     grades,
     match,
     plan,
@@ -236,6 +237,7 @@ app.include_router(transcripts.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(cohorts.router, prefix="/api/v1")
+app.include_router(entities.router, prefix="/api/v1")
 
 
 # ---------------------------------------------------------------------------

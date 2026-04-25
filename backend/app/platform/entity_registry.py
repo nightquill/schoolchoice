@@ -32,6 +32,16 @@ class EntityRegistry:
         self._models: dict[str, type] = {}
         self._configs: dict[str, EntityConfig] = {}
 
+    def register_config(self, config: EntityConfig) -> None:
+        """Register entity config metadata only (no dynamic model creation).
+
+        Use for entities with auto_crud=False that have hand-written models.
+        The config is still available via get_config() and all_configs() for
+        schema-driven UI rendering.
+        """
+        self._configs[config.name] = config
+        logger.info(f"Entity config registered (metadata only): {config.name}")
+
     def register(self, config: EntityConfig) -> type:
         """Build and register a SQLAlchemy model class for the entity config."""
         attrs = {
