@@ -2,9 +2,11 @@
 app/main.py
 
 FastAPI application entrypoint.
-Configures CORS middleware and includes all API routers under /api/v1.
+Configures CORS middleware, discovers platform modules, runs startup
+diagnostics (ORM-schema parity), and includes all API routers under /api/v1.
 """
 
+import logging as _logging
 import os
 from pathlib import Path
 
@@ -28,9 +30,14 @@ from app.api.v1.routes import (
 from app.core.config import settings
 from app.db.models import Base
 from app.db.session import engine
+from app.platform.module_loader import discover_and_register_modules
+from app.platform.health import check_orm_schema_parity, run_health_check
 
 # Import models_v2 to register all v2 ORM classes with Base.metadata
+# (safety net — module loader also imports models, but create_all runs before discovery)
 import app.db.models_v2  # noqa: F401
+
+_startup_logger = _logging.getLogger("app.startup")
 
 app = FastAPI(
     title="Intelligent Academic Advisor API",
@@ -162,6 +169,32 @@ if engine.dialect.name == "postgresql":
         _conn.commit()
 
 # ---------------------------------------------------------------------------
+# Module discovery and registration
+# ---------------------------------------------------------------------------
+_modules_dir = Path(__file__).parent / "modules"
+if _modules_dir.exists():
+    _registered_modules = discover_and_register_modules(app, _modules_dir)
+    _startup_logger.info(f"Modules loaded: {[m['name'] for m in _registered_modules if m['status'] == 'ok']}")
+else:
+    _registered_modules = []
+    _startup_logger.info("No modules directory found — skipping module discovery")
+
+# ---------------------------------------------------------------------------
+# ORM-schema parity check (runs once at startup, logs warnings)
+# ---------------------------------------------------------------------------
+_check_models = []
+_queue = list(Base.__subclasses__())
+while _queue:
+    _cls = _queue.pop(0)
+    if hasattr(_cls, '__tablename__'):
+        _check_models.append(_cls)
+    _queue.extend(_cls.__subclasses__())
+_parity_result = check_orm_schema_parity(engine, _check_models)
+_startup_logger.info(f"Schema parity: {_parity_result['status']}")
+
+_startup_logger.info(f"CORS origin: {settings.CORS_ORIGINS}")
+
+# ---------------------------------------------------------------------------
 # Ensure UPLOAD_DIR exists on startup
 # ---------------------------------------------------------------------------
 _upload_dir = os.environ.get("UPLOAD_DIR", "/tmp/advisor_uploads")
@@ -204,9 +237,9 @@ app.include_router(cohorts.router, prefix="/api/v1")
 
 
 # ---------------------------------------------------------------------------
-# Health check
+# Health check — extended with DB, CORS, schema parity, module health
 # ---------------------------------------------------------------------------
 @app.get("/health", tags=["health"])
 def health_check():
-    """Health check endpoint."""
-    return {"status": "ok"}
+    """Extended health check: DB, CORS, schema parity, module health."""
+    return run_health_check(engine, settings.CORS_ORIGINS)

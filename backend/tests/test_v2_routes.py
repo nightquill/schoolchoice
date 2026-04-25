@@ -30,7 +30,13 @@ def test_health_check(client):
     """Smoke test — verify app boots with v2 routes."""
     resp = client.get("/health")
     assert resp.status_code == 200
-    assert resp.json() == {"status": "ok"}
+    data = resp.json()
+    assert data["status"] in ("ok", "degraded")
+    # Extended health check includes these fields
+    assert "db" in data
+    assert "cors_origin" in data
+    assert "schema_parity" in data
+    assert "modules" in data
 
 
 # ---------------------------------------------------------------------------
