@@ -19,6 +19,8 @@ import CohortList from './pages/CohortList/CohortList';
 import CohortDetail from './pages/CohortDetail/CohortDetail';
 import DataAnalysis from './pages/DataAnalysis/DataAnalysis';
 import SubjectDetail from './pages/SubjectDetail/SubjectDetail';
+import EntityListPage from './pages/EntityListPage/EntityListPage';
+import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +63,10 @@ export default function App() {
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
+
+        {/* Entity routes (PLAT-03) */}
+        <Route path="/entities/:name" element={<ProtectedRoute><EntityListPage /></ProtectedRoute>} />
+        <Route path="/entities/:name/:id" element={<ProtectedRoute><EntityDetailPage /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

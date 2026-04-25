@@ -1,5 +1,7 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
+import { getEntities } from '../../api/entities';
 
 // NavBarV2 — extended navigation bar for v2 pages
 // Adds Dashboard, School Directory, Account Settings links; Data Refresh for admin
@@ -12,6 +14,12 @@ function NavBarV2({ account }) {
     logout();
     navigate('/login');
   };
+
+  const entitiesQuery = useQuery({
+    queryKey: ['entities'],
+    queryFn: getEntities,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const isAdmin = account?.role === 'admin';
   const displayName = account?.display_name || account?.email || '';
@@ -106,6 +114,13 @@ function NavBarV2({ account }) {
             Data Refresh
           </Link>
         )}
+        {entitiesQuery.data
+          ?.filter((e) => e.auto_crud)
+          .map((entity) => (
+            <Link key={entity.name} to={`/entities/${entity.name}`} style={getLinkStyle(`/entities/${entity.name}`)}>
+              {entity.name}
+            </Link>
+          ))}
       </div>
 
       <div style={rightStyle}>
