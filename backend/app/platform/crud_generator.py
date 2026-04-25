@@ -4,10 +4,11 @@ app/platform/crud_generator.py
 Auto-generate FastAPI CRUD routers and Pydantic schemas from EntityConfig.
 All generated endpoints require authentication via get_current_user dependency.
 """
+import json
 from typing import Any, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query as QueryParam, status
 from pydantic import BaseModel, create_model
 from sqlalchemy.orm import Session
 
@@ -61,10 +62,47 @@ def build_crud_router(entity_config: EntityConfig, model_cls: type) -> APIRouter
 
     @router.get("", status_code=status.HTTP_200_OK)
     def list_entities(
+        q: Optional[str] = QueryParam(None, description="Text search across string/text/enum fields"),
+        filters: Optional[str] = QueryParam(None, description="JSON-encoded field filter dict, e.g. {\"status\": \"active\", \"age__gte\": 18}"),
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
     ):
-        return db.query(model_cls).all()
+        from sqlalchemy import or_
+        query = db.query(model_cls)
+
+        # Text search: ILIKE across all string/text/enum fields (per D-09, DATA-07)
+        if q:
+            ilike_clauses = []
+            for f in entity_config.fields:
+                if f.type in ("string", "text", "enum") and hasattr(model_cls, f.name):
+                    ilike_clauses.append(
+                        getattr(model_cls, f.name).ilike(f"%{q}%")
+                    )
+            if ilike_clauses:
+                query = query.filter(or_(*ilike_clauses))
+
+        # Field filters: JSON dict of field_name -> value or field_name__op -> value (per D-10, DATA-08)
+        if filters:
+            try:
+                filter_dict = json.loads(filters)
+            except (ValueError, TypeError):
+                filter_dict = {}
+            for key, value in filter_dict.items():
+                if value in (None, "", {}):
+                    continue
+                # Support range operators: field__gte, field__lte
+                if "__gte" in key:
+                    field_name = key.replace("__gte", "")
+                    if hasattr(model_cls, field_name):
+                        query = query.filter(getattr(model_cls, field_name) >= value)
+                elif "__lte" in key:
+                    field_name = key.replace("__lte", "")
+                    if hasattr(model_cls, field_name):
+                        query = query.filter(getattr(model_cls, field_name) <= value)
+                elif hasattr(model_cls, key):
+                    query = query.filter(getattr(model_cls, key) == value)
+
+        return query.all()
 
     @router.post("", status_code=status.HTTP_201_CREATED)
     def create_entity(
