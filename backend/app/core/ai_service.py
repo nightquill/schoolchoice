@@ -62,7 +62,13 @@ def call_ai(messages: list[dict[str, str]], **kwargs: Any) -> str:
             timeout=settings.AI_TIMEOUT,
             **kwargs,
         )
-        return response.choices[0].message.content.strip()
+        content = response.choices[0].message.content
+        if content is None:
+            raise HTTPException(
+                status_code=502,
+                detail="AI provider returned an empty response.",
+            )
+        return content.strip()
     except litellm.AuthenticationError as exc:
         logger.error("AI provider authentication failed: %s", exc)
         raise HTTPException(status_code=503, detail=f"AI provider authentication failed: {exc}")
