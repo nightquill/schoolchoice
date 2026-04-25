@@ -618,7 +618,7 @@ def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan)
                 "extra_curricular": getattr(student_orm, "extra_curricular", None) or [],
                 "awards": getattr(student_orm, "awards", None) or [],
             }
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to load student data for regeneration: %s", exc)
 
     return student_for_regen, match_results_for_regen
