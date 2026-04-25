@@ -45,7 +45,7 @@ Declared values (multiples of 4 only). Source: existing `tokens.css` — carried
 
 Exceptions:
 - Touch targets on mobile (375px viewport): minimum 44px height for all interactive controls (tab buttons, primary CTA, nav links in collapsed hamburger menu). This overrides the 32px/40px defaults where necessary.
-- StudentProfile tab bar: tab buttons use 12px vertical padding (space-3) and 20px horizontal padding (space-5) to match the existing `Tabs.jsx` contract; do not increase on desktop.
+- StudentProfile tab bar: tab buttons use 8px (sm) vertical padding and 16px (md) horizontal padding. All spacing values, including exceptions, must come from the standard scale above.
 
 ---
 
@@ -56,12 +56,12 @@ All sizes in px (rem equivalents in parentheses). Source: existing `tokens.css` 
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 16px (1rem) | 400 (normal) | 1.5 | Default paragraph text, form field values, tab panel content |
-| Label | 14px (0.875rem) | 500 (medium) | 1.25 | Form labels, table headers, nav links, chip text |
+| Label | 14px (0.875rem) | 500 (medium) | 1.25 | Form labels, table headers, nav links, chip text, badges, timestamps |
 | Heading | 20px (1.25rem) | 500 (medium) | 1.25 | Page section headings, card titles, modal titles |
 | Display | 24px (1.5rem) | 500 (medium) | 1.2 | Page-level headings (StudentProfile name, Dashboard section titles) |
 
 Notes:
-- 12px (xs) is permitted only for badges, chips, and timestamps — never for body copy or labels.
+- There are exactly 4 declared type scale roles. Any sub-role sizing (e.g. a badge rendered smaller than 14px) is a component-internal implementation detail and does not constitute a new scale role.
 - Weights are strictly 400 and 500 only. Do not introduce 600 or 700 in Phase 3. (Source: D-12, "clean and minimal".)
 - Font family: `system-ui, -apple-system, sans-serif` for all roles. No web font imports.
 
