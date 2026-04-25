@@ -88,8 +88,15 @@ Plans:
   3. User can export any entity list to CSV — the downloaded file contains all visible fields for all filtered rows
   4. User can export any generated report or plan as an HTML file that renders correctly when opened in a browser
   5. User can search any entity list by typing text and can filter by field values using dropdowns, date ranges, or numeric range inputs
-**Plans**: TBD
+**Plans:** 5 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 04-01-PLAN.md — Backend import service: CSV/Excel parsing, auto-mapping, validation, duplicate detection (DATA-01, DATA-02, DATA-03)
+- [ ] 04-02-PLAN.md — Backend endpoints: import parse/validate/commit, CSV export, HTML export, search/filter on auto-CRUD (DATA-04, DATA-06, DATA-07, DATA-08)
+- [ ] 04-03-PLAN.md — Frontend import wizard: ImportWizardPage, ImportWizard, ColumnMapper, ValidationSummary, shadcn components, API layer (DATA-01, DATA-02, DATA-03)
+- [ ] 04-04-PLAN.md — Frontend search/filter/export: SearchFilterBar, FilterControl, ActionBar, EntityListPage extension (DATA-04, DATA-05, DATA-06, DATA-07, DATA-08)
+- [ ] 04-05-PLAN.md — Human verification: full import/export flow, search/filter, regression check (all DATA requirements)
 
 ### Phase 5: Consultant Engine
 **Goal**: Users can ask freeform AI questions about their entity data and run structured guided workflows; school choice plan generation is migrated to the workflow engine; recommendation engine is generalized across domains
@@ -126,6 +133,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Platform Foundation | 0/6 | Planning complete | - |
 | 2. AI Provider Abstraction | 0/3 | Planning complete | - |
 | 3. Frontend Stabilization | 6/6 | Complete | 2026-04-25 |
-| 4. Import and Export | 0/TBD | Not started | - |
+| 4. Import and Export | 0/5 | Planning complete | - |
 | 5. Consultant Engine | 0/TBD | Not started | - |
 | 6. Deployment and Production Readiness | 0/TBD | Not started | - |
