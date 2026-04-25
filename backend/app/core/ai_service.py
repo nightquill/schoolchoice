@@ -71,10 +71,10 @@ def call_ai(messages: list[dict[str, str]], **kwargs: Any) -> str:
         return content.strip()
     except litellm.AuthenticationError as exc:
         logger.error("AI provider authentication failed: %s", exc)
-        raise HTTPException(status_code=503, detail=f"AI provider authentication failed: {exc}")
+        raise HTTPException(status_code=503, detail="AI provider authentication failed.")
     except litellm.ServiceUnavailableError as exc:
         logger.error("AI provider unreachable: %s", exc)
-        raise HTTPException(status_code=503, detail=f"AI provider unreachable: {exc}")
+        raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
     except Exception as exc:
         logger.error("AI provider error: %s", exc)
-        raise HTTPException(status_code=502, detail=f"AI provider error: {exc}")
+        raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
