@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
 import EntityForm from '../../components/EntityForm/EntityForm';
+import { toast } from 'sonner';
 import { getEntitySchema, getEntityDetail, updateEntity } from '../../api/entities';
 
 const pageStyle = { background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' };
@@ -28,6 +29,9 @@ export default function EntityDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['entity', name, id] });
       navigate(`/entities/${name}`);
     },
+    onError: () => {
+      toast.error(`Failed to update ${name}.`);
+    },
   });
 
   return (
@@ -43,6 +47,7 @@ export default function EntityDetailPage() {
           resourceName={name}
         >
           <EntityForm
+            key={detailQuery.data?.id || 'new'}
             schema={schemaQuery.data}
             initialValues={detailQuery.data || {}}
             onSubmit={(payload) => mutation.mutate(payload)}
