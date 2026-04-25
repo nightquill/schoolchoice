@@ -429,7 +429,7 @@ def plan_chat(
 ):
     """
     Counsellor AI chat: send a natural-language instruction to edit the plan.
-    Requires GEMINI_API_KEY env var; returns 503 if not configured.
+    Requires AI_API_KEY env var; returns 503 if not configured.
     Rate-limited to 20 requests per counsellor per plan per day.
     """
     student_service.get_student(db, student_id=student_id, user_id=current_user.id)
