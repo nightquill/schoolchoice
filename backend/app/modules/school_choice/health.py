@@ -16,7 +16,7 @@ def check_health() -> dict:
     Imports _get_model lazily to avoid circular imports.
     """
     try:
-        from app.services.matchmaker_v2 import _get_model
+        from app.modules.school_choice.services.matchmaker_v2 import _get_model
         model = _get_model()
         if model is None:
             logger.warning(
