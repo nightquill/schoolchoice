@@ -31,6 +31,7 @@ class EntityConfig:
     table: str
     fields: list[FieldConfig] = field(default_factory=list)
     auto_crud: bool = True
+    key_fields: list[str] = field(default_factory=list)
 
 
 def load_entity_yaml(path: Path) -> EntityConfig:
@@ -66,4 +67,5 @@ def load_entity_yaml(path: Path) -> EntityConfig:
         table=raw.get("table", raw["name"] + "s"),
         fields=fields,
         auto_crud=raw.get("auto_crud", True),
+        key_fields=raw.get("key_fields", []),
     )
