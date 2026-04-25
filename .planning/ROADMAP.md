@@ -50,8 +50,12 @@ Plans:
   2. School choice plan chat works end-to-end (returns a modified plan) with at least two different configured providers verified in sequence
   3. AI provider API keys exist only in environment variables — no key material appears in the database, logs, or any API response
   4. Health endpoint reports which AI provider is configured and whether it is reachable
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — AI config settings, LiteLLM ai_service.py wrapper, dependency updates, unit tests (AI-01, AI-02, AI-03)
+- [ ] 02-02-PLAN.md — Migrate plan_chat_service from Gemini SDK to call_ai(), extend health with AI status, update tests (AI-10)
+- [ ] 02-03-PLAN.md — Manual verification script and human checkpoint with real AI provider (AI-01, AI-02, AI-10)
 
 ### Phase 3: Frontend Stabilization
 **Goal**: The frontend has a working test baseline, StudentProfile is decomposed into independent tab components, TanStack Query manages server state, and the UI is polished and professional
@@ -112,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 0/6 | Planning complete | - |
-| 2. AI Provider Abstraction | 0/TBD | Not started | - |
+| 2. AI Provider Abstraction | 0/3 | Planning complete | - |
 | 3. Frontend Stabilization | 0/TBD | Not started | - |
 | 4. Import and Export | 0/TBD | Not started | - |
 | 5. Consultant Engine | 0/TBD | Not started | - |
