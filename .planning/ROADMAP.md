@@ -53,9 +53,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — AI config settings, LiteLLM ai_service.py wrapper, dependency updates, unit tests (AI-01, AI-02, AI-03)
-- [ ] 02-02-PLAN.md — Migrate plan_chat_service from Gemini SDK to call_ai(), extend health with AI status, update tests (AI-10)
-- [ ] 02-03-PLAN.md — Manual verification script and human checkpoint with real AI provider (AI-01, AI-02, AI-10)
+- [x] 02-01-PLAN.md — AI config settings, LiteLLM ai_service.py wrapper, dependency updates, unit tests (AI-01, AI-02, AI-03)
+- [x] 02-02-PLAN.md — Migrate plan_chat_service from Gemini SDK to call_ai(), extend health with AI status, update tests (AI-10)
+- [x] 02-03-PLAN.md — Manual verification script and human checkpoint with real AI provider (AI-01, AI-02, AI-10)
 
 ### Phase 3: Frontend Stabilization
 **Goal**: The frontend has a working test baseline, StudentProfile is decomposed into independent tab components, TanStack Query manages server state, and the UI is polished and professional
