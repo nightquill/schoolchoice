@@ -25,7 +25,7 @@
 **Search & Filter Controls**
 - D-08: Persistent search bar + filter controls always visible above entity list table.
 - D-09: As-you-type search with 300ms debounce.
-- D-10: Filter types auto-determined from entity YAML field types: enum → dropdown, date → date range picker, numeric → range inputs.
+- D-10: Filter types auto-determined from entity YAML field types: enum -> dropdown, date -> date range picker, numeric -> range inputs.
 
 **Export**
 - D-11: CSV export respects current search/filter; "Export all" option also available.
@@ -68,13 +68,13 @@
 
 ## Summary
 
-Phase 4 adds file import/export and search/filter to the generic entity system built in Phase 3. All work is an extension of existing infrastructure — the entity registry, CRUD generator, EntityListView, and FileUpload component are all in place. The central challenge is the multi-step import wizard: file parse → sheet select (Excel) → column mapping → validation preview → confirm commit. This requires a two-call backend API (parse/preview endpoint, then commit endpoint) so the user can review before data is written.
+Phase 4 adds file import/export and search/filter to the generic entity system built in Phase 3. All work is an extension of existing infrastructure — the entity registry, CRUD generator, EntityListView, and FileUpload component are all in place. The central challenge is the multi-step import wizard: file parse -> sheet select (Excel) -> column mapping -> validation preview -> confirm commit. This requires a two-call backend API (parse/preview endpoint, then commit endpoint) so the user can review before data is written.
 
 The existing stack already has all required libraries. `openpyxl` (version 3.0.9) is installed in the environment but is NOT listed in `backend/requirements.txt` — it must be added. The Python `csv` module (stdlib) handles CSV reading and writing with no extra dependency. The frontend already has TanStack Query v5, shadcn/ui initialized, `lucide-react`, and `sonner` (toasts). The new shadcn components required (Select, Table, Badge, Progress, Separator, DropdownMenu, Popover) must be added via `npx shadcn@latest add` commands — they are not yet installed.
 
 The `auto_crud` entity system routes all generic entity list queries through `build_crud_router` at `/api/v1/{table}`. Search and filter must be added as optional query parameters to the generated list endpoint, OR as a separate search endpoint on `entities.py`. Because `auto_crud=false` entities (student, school) use hand-written routes, the search/filter parameters must be applied uniformly — the cleanest approach is to add `q`, `field`, and filter params directly to the auto-crud list route, and separately to hand-written routes only as needed.
 
-**Primary recommendation:** Implement the import wizard as a dedicated page route with a two-phase API (parse → commit). Add search/filter as query params to the auto-CRUD list endpoint. Export CSV via a streaming FastAPI response. HTML report export extends the existing `plan_generator.py` pattern.
+**Primary recommendation:** Implement the import wizard as a dedicated page route with a two-phase API (parse -> commit). Add search/filter as query params to the auto-CRUD list endpoint. Export CSV via a streaming FastAPI response. HTML report export extends the existing `plan_generator.py` pattern.
 
 ---
 
@@ -105,7 +105,7 @@ The `auto_crud` entity system routes all generic entity list queries through `bu
 |---------|---------|---------|--------------|
 | `openpyxl` | 3.0.9 (env) | Excel .xlsx read/write | Only .xlsx-capable Python library without pandas overhead; already installed |
 | `csv` (stdlib) | n/a | CSV read/write | Zero dependency; handles all CSV dialect edge cases; FastAPI streams via `io.StringIO` |
-| `difflib` (stdlib) | n/a | Column name similarity scoring for auto-map | `SequenceMatcher.ratio()` gives 0–1 score; no install needed |
+| `difflib` (stdlib) | n/a | Column name similarity scoring for auto-map | `SequenceMatcher.ratio()` gives 0-1 score; no install needed |
 | `@tanstack/react-query` | ^5.100.2 | TanStack Query for import mutations and filtered queries | Already in use (Phase 3); `useMutation` for import steps |
 | `lucide-react` | ^1.11.0 | Icons: Upload, Download, Search, FileDown, Check | Already installed; confirmed: upload.mjs, download.mjs, search.mjs, file-down.mjs, check.mjs |
 | `sonner` | ^2.0.7 | Import/export success and error toasts | Already in use; `ui/sonner.jsx` exists |
@@ -166,54 +166,54 @@ npx shadcn@latest add select table badge progress separator dropdown-menu popove
 
 ```
 User browser
-    │
-    │  1. Upload file (multipart)
-    ▼
+    |
+    |  1. Upload file (multipart)
+    v
 POST /api/v1/entities/{name}/import/parse
-    │  - openpyxl or csv.reader parses bytes
-    │  - returns: {sheets: [...], columns: [...], preview_rows: [...], mapping: {...}}
-    │
-    │  2. User reviews column mapping in ImportWizard (React)
-    │     - ColumnMapper renders mapping dropdowns
-    │     - auto_mapping pre-fills dropdowns
-    │
-    │  3. User clicks "Next" → Validate
-    ▼
+    |  - openpyxl or csv.reader parses bytes
+    |  - returns: {sheets: [...], columns: [...], preview_rows: [...], mapping: {...}}
+    |
+    |  2. User reviews column mapping in ImportWizard (React)
+    |     - ColumnMapper renders mapping dropdowns
+    |     - auto_mapping pre-fills dropdowns
+    |
+    |  3. User clicks "Next" -> Validate
+    v
 POST /api/v1/entities/{name}/import/validate
-    │  - applies column mapping to all rows
-    │  - Pydantic validation per field type/required
-    │  - duplicate detection via SQL
-    │  - returns: {valid_count, error_count, warning_count, error_rows: [...]}
-    │
-    │  4. User reviews ValidationSummary → clicks "Import N Valid Rows"
-    ▼
+    |  - applies column mapping to all rows
+    |  - Pydantic validation per field type/required
+    |  - duplicate detection via SQL
+    |  - returns: {valid_count, error_count, warning_count, error_rows: [...]}
+    |
+    |  4. User reviews ValidationSummary -> clicks "Import N Valid Rows"
+    v
 POST /api/v1/entities/{name}/import/commit
-    │  - re-applies mapping + skips error rows
-    │  - writes valid rows via ORM bulk_insert_mappings
-    │  - applies duplicate decisions (skip/overwrite/new)
-    │  - returns: {imported_count, skipped_count}
-    │
-    │  5. Redirect to entity list page
-    ▼
+    |  - re-applies mapping + skips error rows
+    |  - writes valid rows via ORM bulk_insert_mappings
+    |  - applies duplicate decisions (skip/overwrite/new)
+    |  - returns: {imported_count, skipped_count}
+    |
+    |  5. Redirect to entity list page
+    v
 GET /api/v1/{table}?q=...&field=value&date_from=...&date_to=...
-    │  - SQL ILIKE for text search
-    │  - WHERE clauses for enum/date/numeric filters
-    │  - returns filtered rows as JSON
-    │
-    │  6a. User clicks "Export CSV"
-    ▼
+    |  - SQL ILIKE for text search
+    |  - WHERE clauses for enum/date/numeric filters
+    |  - returns filtered rows as JSON
+    |
+    |  6a. User clicks "Export CSV"
+    v
 GET /api/v1/entities/{name}/export?q=...&(same filters)
-    │  - StreamingResponse with CSV content-type
-    │  - filename: entity-name-export-YYYY-MM-DD.csv
-    ▼
+    |  - StreamingResponse with CSV content-type
+    |  - filename: entity-name-export-YYYY-MM-DD.csv
+    v
 User downloads file
 
-    │  6b. User clicks "Export HTML" (report/plan pages only)
-    ▼
-GET /api/v1/plan/{id}/export-html
-    │  - Jinja2 renders self-contained HTML (existing pattern)
-    │  - Returns HTML string as download
-    ▼
+    |  6b. User clicks "Export HTML" (report/plan pages only)
+    v
+GET /api/v1/entities/plan-export/{plan_id}
+    |  - Returns stored html_content as download
+    |  - Self-contained HTML file
+    v
 User downloads file
 ```
 
@@ -235,7 +235,7 @@ frontend/src/
 │       └── ImportWizardPage.jsx  # route: /entities/:name/import
 ├── components/
 │   ├── ImportWizard/
-│   │   └── ImportWizard.jsx      # step controller (Upload→Sheet→Map→Validate→Done)
+│   │   └── ImportWizard.jsx      # step controller (Upload->Sheet->Map->Validate->Done)
 │   ├── ColumnMapper/
 │   │   └── ColumnMapper.jsx      # two-column mapping UI with preview rows
 │   ├── ValidationSummary/
@@ -252,7 +252,7 @@ frontend/src/
 
 ### Pattern 1: Two-Phase Import API
 
-**What:** Import splits into parse → validate → commit. Never write to DB without user confirmation.
+**What:** Import splits into parse -> validate -> commit. Never write to DB without user confirmation.
 
 **When to use:** Any multi-step data operation requiring user review before commit.
 
@@ -444,7 +444,7 @@ function useEntitySearch(entityName, tableName) {
 
 **What:** Single React component managing step progression with state per step.
 
-**Steps:** upload (0) → sheetSelect (1, Excel only) → columnMapping (2) → validationPreview (3) → done (4)
+**Steps:** upload (0) -> sheetSelect (1, Excel only) -> columnMapping (2) -> validationPreview (3) -> done (4)
 
 ```javascript
 // Pattern: local useState step machine — no router navigation between steps
@@ -507,6 +507,7 @@ def parse_excel_sheet(content: bytes, sheet_name: str, config: EntityConfig) -> 
 
 - **Committing on parse:** Never write to the DB in the parse or validate endpoint. Only `/import/commit` touches the database.
 - **Client-side CSV parsing:** Do not parse files in JavaScript. Large Excel files (5MB+) will exceed React memory limits and browser I/O. Always send file to backend.
+- **Client-side error CSV generation:** Do not build error CSVs client-side via `URL.createObjectURL` on manually constructed strings. Use the backend `GET /{name}/export/errors` endpoint which uses `generate_error_csv()` for correct CSV formatting (handles commas in error messages, encoding, etc.).
 - **Blocking import for all-or-nothing:** D-06 requires partial import support. Do not abort on first validation error.
 - **Regex-only column matching:** Header "Student Name" vs "student_name" vs "StudentName" all need to match. Always normalize before comparing.
 - **Dynamic query params with FastAPI's `**kwargs`:** FastAPI cannot introspect dynamically-added query params for docs or validation. Use explicit Query() parameters or a Depends helper that reads request.query_params directly.
@@ -770,22 +771,25 @@ export default function FilterControl({ field, value, onChange }) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Where should search/filter params live in auto-CRUD route generation?**
+1. **Where should search/filter params live in auto-CRUD route generation?** (RESOLVED)
    - What we know: `crud_generator.py` uses `build_crud_router()` to generate all list endpoints; FastAPI requires explicit `Query()` params in function signatures.
    - What's unclear: Whether to generate per-field Query params dynamically (complex, brittle) or use a single `filters=` JSON blob (simpler but less RESTful).
    - Recommendation: Use a `filters` query param that accepts a JSON-encoded dict, plus a standalone `q=` text search param. Simple, avoids code-generation complexity.
+   - **RESOLVED:** Adopted single `filters: str = Query(None)` JSON blob + `q: str = Query(None)` text search. Implemented in Plan 02 Task 1 (crud_generator.py) and Plan 04 Task 2 (EntityListPage.jsx builds JSON filter params).
 
-2. **Key field for duplicate detection when EntityConfig has no `key_fields` attribute**
+2. **Key field for duplicate detection when EntityConfig has no `key_fields` attribute** (RESOLVED)
    - What we know: `EntityConfig` dataclass (yaml_loader.py) has no `key_fields` or `unique_fields` attribute — only `name`, `table`, `fields`, `auto_crud`.
    - What's unclear: Whether to add `key_fields` to EntityConfig/YAML format, or infer from required fields.
    - Recommendation: Add an optional `key_fields: list[str]` to `EntityConfig` and the YAML format (e.g., `key_fields: [email]`). Fall back to first required field if absent. This is a YAML loader extension, not a DB schema change.
+   - **RESOLVED:** Adopted recommendation. Plan 01 Task 1 adds `key_fields: list[str] = field(default_factory=list)` to EntityConfig and extends yaml_loader.py to parse it. Fallback to first required string field when key_fields is empty.
 
-3. **HTML export: entity list vs. report/plan pages**
+3. **HTML export: entity list vs. report/plan pages** (RESOLVED)
    - What we know: D-14 specifies HTML report export for reports/plans. DATA-06 covers this. The UI-SPEC places "Export HTML" on report/plan detail views, not entity list pages.
    - What's unclear: Whether any entity list can be exported as HTML, or only plan/report artifacts.
    - Recommendation: Phase 4 scope is plan/report HTML export only (follows existing `plan_generator.py` pattern). Entity list exports are CSV only (DATA-04, D-11). This is consistent with CONTEXT.md and UI-SPEC.
+   - **RESOLVED:** Plan/report HTML export only. Plan 02 Task 2 adds `GET /plan-export/{plan_id}` endpoint returning stored `html_content`. Plan 04 Task 3 adds "Export HTML" button to AcademicPlan page calling `exportPlanHTML(planId)`. Entity lists export CSV only.
 
 ---
 
@@ -793,19 +797,19 @@ export default function FilterControl({ field, value, onChange }) {
 
 | Dependency | Required By | Available | Version | Fallback |
 |------------|------------|-----------|---------|----------|
-| openpyxl | DATA-02 Excel parsing | ✓ (env) / ✗ (requirements.txt) | 3.0.9 | Must add to requirements.txt |
-| csv (stdlib) | DATA-01 CSV parsing, DATA-04 export | ✓ | stdlib | — |
-| difflib (stdlib) | Column auto-mapping | ✓ | stdlib | — |
-| FastAPI StreamingResponse | DATA-04 CSV export | ✓ | FastAPI 0.111.0 | — |
-| shadcn Select | Column mapping dropdowns, filters | ✗ (not yet added) | — | Must run `npx shadcn@latest add select` |
-| shadcn Table | Data preview, validation table | ✗ (not yet added) | — | Must run `npx shadcn@latest add table` |
-| shadcn Badge | Summary banner counts | ✗ (not yet added) | — | Must run `npx shadcn@latest add badge` |
-| shadcn Progress | Import progress bar | ✗ (not yet added) | — | Must run `npx shadcn@latest add progress` |
-| shadcn Separator | Wizard step dividers | ✗ (not yet added) | — | Must run `npx shadcn@latest add separator` |
-| shadcn DropdownMenu | Export options menu | ✗ (not yet added) | — | Must run `npx shadcn@latest add dropdown-menu` |
-| shadcn Popover | Date range filter | ✗ (not yet added) | — | Must run `npx shadcn@latest add popover` |
-| PostgreSQL 15 | All data operations | ✓ | 15+ (Homebrew) | — |
-| lucide-react | Icons | ✓ | ^1.11.0 | — |
+| openpyxl | DATA-02 Excel parsing | Yes (env) / No (requirements.txt) | 3.0.9 | Must add to requirements.txt |
+| csv (stdlib) | DATA-01 CSV parsing, DATA-04 export | Yes | stdlib | -- |
+| difflib (stdlib) | Column auto-mapping | Yes | stdlib | -- |
+| FastAPI StreamingResponse | DATA-04 CSV export | Yes | FastAPI 0.111.0 | -- |
+| shadcn Select | Column mapping dropdowns, filters | No (not yet added) | -- | Must run `npx shadcn@latest add select` |
+| shadcn Table | Data preview, validation table | No (not yet added) | -- | Must run `npx shadcn@latest add table` |
+| shadcn Badge | Summary banner counts | No (not yet added) | -- | Must run `npx shadcn@latest add badge` |
+| shadcn Progress | Import progress bar | No (not yet added) | -- | Must run `npx shadcn@latest add progress` |
+| shadcn Separator | Wizard step dividers | No (not yet added) | -- | Must run `npx shadcn@latest add separator` |
+| shadcn DropdownMenu | Export options menu | No (not yet added) | -- | Must run `npx shadcn@latest add dropdown-menu` |
+| shadcn Popover | Date range filter | No (not yet added) | -- | Must run `npx shadcn@latest add popover` |
+| PostgreSQL 15 | All data operations | Yes | 15+ (Homebrew) | -- |
+| lucide-react | Icons | Yes | ^1.11.0 | -- |
 
 **Missing dependencies with no fallback:**
 - `openpyxl` in `requirements.txt` — blocks Excel import (Wave 0 task: add to requirements.txt)
@@ -826,20 +830,20 @@ export default function FilterControl({ field, value, onChange }) {
 | Quick run command | `cd backend && pytest tests/test_import_export.py -x` |
 | Full suite command | `cd backend && pytest && cd ../frontend && npm test` |
 
-### Phase Requirements → Test Map
+### Phase Requirements -> Test Map
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| DATA-01 | Parse CSV file, return columns + preview + auto_mapping | unit | `pytest tests/test_import_export.py::test_parse_csv -x` | ❌ Wave 0 |
-| DATA-02 | Parse Excel .xlsx, return sheet list; parse selected sheet | unit | `pytest tests/test_import_export.py::test_parse_excel -x` | ❌ Wave 0 |
-| DATA-03 | Validate rows: valid count, error count, error_reason per row | unit | `pytest tests/test_import_export.py::test_validate_rows -x` | ❌ Wave 0 |
-| DATA-03 | Commit: only valid rows written; duplicates handled per decision | integration | `pytest tests/test_import_export.py::test_import_commit -x` | ❌ Wave 0 |
-| DATA-04 | Export CSV returns correct rows with auth | integration | `pytest tests/test_import_export.py::test_export_csv -x` | ❌ Wave 0 |
-| DATA-04 | Export CSV respects q= search param | integration | `pytest tests/test_import_export.py::test_export_csv_filtered -x` | ❌ Wave 0 |
-| DATA-06 | HTML export returns self-contained HTML file | integration | `pytest tests/test_import_export.py::test_export_html -x` | ❌ Wave 0 |
-| DATA-07 | Entity list q= param returns text-matching rows | integration | `pytest tests/test_entities.py::test_entity_list_search -x` | ❌ Wave 0 |
-| DATA-08 | Entity list filter params return field-matching rows | integration | `pytest tests/test_entities.py::test_entity_list_filter -x` | ❌ Wave 0 |
-| DATA-01-E2E | Upload CSV → column map → validate → confirm → rows appear | manual | Navigate to /entities/:name/import | — |
+| DATA-01 | Parse CSV file, return columns + preview + auto_mapping | unit | `pytest tests/test_import_export.py::test_parse_csv -x` | No Wave 0 |
+| DATA-02 | Parse Excel .xlsx, return sheet list; parse selected sheet | unit | `pytest tests/test_import_export.py::test_parse_excel -x` | No Wave 0 |
+| DATA-03 | Validate rows: valid count, error count, error_reason per row | unit | `pytest tests/test_import_export.py::test_validate_rows -x` | No Wave 0 |
+| DATA-03 | Commit: only valid rows written; duplicates handled per decision | integration | `pytest tests/test_import_export.py::test_import_commit -x` | No Wave 0 |
+| DATA-04 | Export CSV returns correct rows with auth | integration | `pytest tests/test_import_export.py::test_export_csv -x` | No Wave 0 |
+| DATA-04 | Export CSV respects q= search param | integration | `pytest tests/test_import_export.py::test_export_csv_filtered -x` | No Wave 0 |
+| DATA-06 | HTML export returns self-contained HTML file | integration | `pytest tests/test_import_export.py::test_export_html -x` | No Wave 0 |
+| DATA-07 | Entity list q= param returns text-matching rows | integration | `pytest tests/test_entities.py::test_entity_list_search -x` | No Wave 0 |
+| DATA-08 | Entity list filter params return field-matching rows | integration | `pytest tests/test_entities.py::test_entity_list_filter -x` | No Wave 0 |
+| DATA-01-E2E | Upload CSV -> column map -> validate -> confirm -> rows appear | manual | Navigate to /entities/:name/import | -- |
 
 ### Sampling Rate
 
