@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Tabs from '../../components/Tabs/Tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import { Button } from '@/components/ui/button';
@@ -165,35 +165,39 @@ function StudentProfile() {
             </div>
           </div>
 
-          <div style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
-            <Tabs tabs={TABS} activeTab={activeTab} onChange={handleTabChange}>
-              <div />
-            </Tabs>
-          </div>
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <div style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
+              <TabsList variant="line" className="w-full justify-start" aria-label="Student profile sections">
+                {TABS.map((tab) => (
+                  <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
 
-          <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-8)' }}>
-            {activeTab === 'personal' && (
-              <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-            )}
-            {activeTab === 'grades' && (
-              <GradesTab studentId={id} showToast={showToast} subjects={subjects} />
-            )}
-            {activeTab === 'language' && (
-              <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-            )}
-            {activeTab === 'evaluations' && (
-              <EvaluationsTab studentId={id} showToast={showToast} />
-            )}
-            {activeTab === 'activities' && (
-              <ActivitiesTab studentId={id} student={student} showToast={showToast} />
-            )}
-            {activeTab === 'notes' && (
-              <NotesTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-            )}
-            {activeTab === 'plans' && (
-              <PlansTab studentId={id} showToast={showToast} />
-            )}
-          </div>
+            <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-8)' }}>
+              <TabsContent value="personal">
+                <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
+              </TabsContent>
+              <TabsContent value="grades">
+                <GradesTab studentId={id} showToast={showToast} subjects={subjects} />
+              </TabsContent>
+              <TabsContent value="language">
+                <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
+              </TabsContent>
+              <TabsContent value="evaluations">
+                <EvaluationsTab studentId={id} showToast={showToast} />
+              </TabsContent>
+              <TabsContent value="activities">
+                <ActivitiesTab studentId={id} student={student} showToast={showToast} />
+              </TabsContent>
+              <TabsContent value="notes">
+                <NotesTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
+              </TabsContent>
+              <TabsContent value="plans">
+                <PlansTab studentId={id} showToast={showToast} />
+              </TabsContent>
+            </div>
+          </Tabs>
         </>
       )}
 
