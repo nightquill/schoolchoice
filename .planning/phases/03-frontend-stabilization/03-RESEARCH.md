@@ -766,22 +766,22 @@ import './index.css'  // index.css must contain @tailwind directives
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **shadcn/ui React 19 peer dep warning**
    - What we know: React 19.2.4 is installed; shadcn/ui components depend on Radix primitives which declare peer deps for React 16–18
    - What's unclear: Whether `npm install` will fail with peer dep conflicts or proceed with a warning
-   - Recommendation: Run `npm install --legacy-peer-deps` if peer dep conflict occurs; all Radix primitives are known to work at runtime with React 19
+   - RESOLVED: Use `--legacy-peer-deps` if peer dep conflict occurs during `npm install`. All Radix primitives are known to work at runtime with React 19.
 
 2. **`auto_crud: false` on student.yaml**
    - What we know: `student.yaml` has `auto_crud: false`, meaning the auto-generated CRUD router is NOT mounted for students — the existing hand-written students route handles student CRUD
    - What's unclear: Whether the entity schema endpoint should still serve student.yaml (it should, for completeness of the entity registry API)
-   - Recommendation: The schema endpoint should return all registered entities regardless of `auto_crud` flag; the nav should only show entities with `auto_crud: true` to avoid duplicating the existing students nav link
+   - RESOLVED: Schema endpoint returns all entities regardless of `auto_crud`; nav shows only `auto_crud: true` entities to avoid duplicating the existing students nav link (see 03-04 T3).
 
 3. **TipTap v3 (3.21.0) + React 19 compatibility**
    - What we know: TipTap @tiptap/react 3.21.0 is already installed and presumably working
    - What's unclear: Whether adding Tailwind and shadcn/ui affects TipTap's CSS
-   - Recommendation: Test PlanSectionEditor.jsx renders correctly after shadcn init; TipTap uses its own CSS scoping and should not conflict
+   - RESOLVED: Test PlanSectionEditor after shadcn init; add ProseMirror CSS overrides in index.css if needed. RTL test added in 03-06 T2 to catch rendering breakage.
 
 ---
 
