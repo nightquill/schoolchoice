@@ -32,7 +32,6 @@ from app.db.models import User
 from app.db.session import get_db
 from app.platform.entity_registry import registry
 from app.services.import_service import (
-    auto_map_columns,
     find_duplicates,
     generate_error_csv,
     parse_csv,
@@ -159,14 +158,12 @@ async def import_parse(
     if result.get("sheets"):
         return {"sheets": result["sheets"]}
 
-    entity_field_names = [f.name for f in config.fields]
-    auto_mapping = auto_map_columns(result["columns"] or [], entity_field_names)
-
+    all_rows = result.get("all_rows", [])
     return {
         "columns": result["columns"],
         "preview_rows": result["preview_rows"],
-        "total_rows": result["total_rows"],
-        "auto_mapping": auto_mapping,
+        "total_rows": len(all_rows),
+        "auto_mapping": result.get("auto_mapping", {}),
     }
 
 
@@ -194,14 +191,12 @@ async def import_parse_sheet(
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
 
-    entity_field_names = [f.name for f in config.fields]
-    auto_mapping = auto_map_columns(result["columns"] or [], entity_field_names)
-
+    all_rows = result.get("all_rows", [])
     return {
         "columns": result["columns"],
         "preview_rows": result["preview_rows"],
-        "total_rows": result["total_rows"],
-        "auto_mapping": auto_mapping,
+        "total_rows": len(all_rows),
+        "auto_mapping": result.get("auto_mapping", {}),
     }
 
 
@@ -220,7 +215,7 @@ def import_validate(
     if not config:
         raise HTTPException(status_code=404, detail=f"Entity '{name}' not found")
 
-    valid_rows, error_rows = validate_rows(body.rows, body.mapping, config.fields)
+    valid_rows, error_rows = validate_rows(body.rows, body.mapping, config)
     duplicate_rows = find_duplicates(valid_rows, config)
 
     # Count warnings (duplicates that are still valid, just flagged)
@@ -259,7 +254,7 @@ def import_commit(
         )
 
     # Re-validate before committing (T-04-10 mitigation: never trust client "valid" claim)
-    valid_rows, error_rows = validate_rows(body.valid_rows, body.mapping, config.fields)
+    valid_rows, error_rows = validate_rows(body.valid_rows, body.mapping, config)
     if error_rows:
         raise HTTPException(
             status_code=422,
