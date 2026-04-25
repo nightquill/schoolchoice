@@ -1,6 +1,6 @@
 import { usePersonalTab } from '../../hooks/usePersonalTab';
-import Button from '../../components/Button/Button';
-import TextInput from '../../components/TextInput/TextInput';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function PersonalTab({ studentId, student, onSaved, showToast }) {
   const { form, saving, errors, handleChange, handleSave, calcAge } = usePersonalTab(student, studentId, showToast, onSaved);
@@ -31,8 +31,34 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
   return (
     <div>
       <div style={gridStyle}>
-        <TextInput label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} error={errors.full_name} />
-        <TextInput label="Preferred Name" name="preferred_name" value={form.preferred_name} onChange={handleChange} />
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-full_name" style={labelStyle}>
+            Full Name
+          </label>
+          <Input
+            id="input-full_name"
+            name="full_name"
+            value={form.full_name}
+            onChange={handleChange}
+            aria-invalid={!!errors.full_name}
+          />
+          {errors.full_name && (
+            <span style={{ display: 'block', fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', marginTop: 'var(--space-1)' }} role="alert">
+              {errors.full_name}
+            </span>
+          )}
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-preferred_name" style={labelStyle}>
+            Preferred Name
+          </label>
+          <Input
+            id="input-preferred_name"
+            name="preferred_name"
+            value={form.preferred_name}
+            onChange={handleChange}
+          />
+        </div>
         <div>
           <label style={labelStyle}>Date of Birth</label>
           <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
@@ -90,15 +116,91 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
             <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '0' }}>Age: {age}</p>
           )}
         </div>
-        <TextInput label="Gender" name="gender" value={form.gender} onChange={handleChange} />
-        <div style={{ gridColumn: '1 / -1' }}>
-          <TextInput label="Address" name="address" value={form.address} onChange={handleChange} />
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-gender" style={labelStyle}>
+            Gender
+          </label>
+          <Input
+            id="input-gender"
+            name="gender"
+            value={form.gender}
+            onChange={handleChange}
+          />
         </div>
-        <TextInput label="Phone" name="phone" value={form.phone} onChange={handleChange} />
-        <TextInput label="Email" name="email" type="email" value={form.email} onChange={handleChange} error={errors.email} />
-        <TextInput label="Class" name="class_name" value={form.class_name} onChange={handleChange} />
-        <TextInput label="Year of Study" name="year_of_study" type="number" value={form.year_of_study} onChange={handleChange} />
-        <TextInput label="Candidate Number" name="candidate_number" value={form.candidate_number} onChange={handleChange} />
+        <div style={{ gridColumn: '1 / -1', marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-address" style={labelStyle}>
+            Address
+          </label>
+          <Input
+            id="input-address"
+            name="address"
+            value={form.address}
+            onChange={handleChange}
+          />
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-phone" style={labelStyle}>
+            Phone
+          </label>
+          <Input
+            id="input-phone"
+            name="phone"
+            value={form.phone}
+            onChange={handleChange}
+          />
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-email" style={labelStyle}>
+            Email
+          </label>
+          <Input
+            id="input-email"
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            aria-invalid={!!errors.email}
+          />
+          {errors.email && (
+            <span style={{ display: 'block', fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', marginTop: 'var(--space-1)' }} role="alert">
+              {errors.email}
+            </span>
+          )}
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-class_name" style={labelStyle}>
+            Class
+          </label>
+          <Input
+            id="input-class_name"
+            name="class_name"
+            value={form.class_name}
+            onChange={handleChange}
+          />
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-year_of_study" style={labelStyle}>
+            Year of Study
+          </label>
+          <Input
+            id="input-year_of_study"
+            name="year_of_study"
+            type="number"
+            value={form.year_of_study}
+            onChange={handleChange}
+          />
+        </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-candidate_number" style={labelStyle}>
+            Candidate Number
+          </label>
+          <Input
+            id="input-candidate_number"
+            name="candidate_number"
+            value={form.candidate_number}
+            onChange={handleChange}
+          />
+        </div>
         <div>
           <label style={labelStyle}>Preferred Language</label>
           <select
@@ -146,7 +248,9 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
           }}
         />
       </div>
-      <Button label="Save" onClick={handleSave} loading={saving} />
+      <Button onClick={handleSave} disabled={saving}>
+        {saving ? 'Loading\u2026' : 'Save'}
+      </Button>
     </div>
   );
 }

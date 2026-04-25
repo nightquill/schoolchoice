@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePlansTab } from '../../hooks/usePlansTab';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/EmptyState/EmptyState';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 
 export default function PlansTab({ studentId, showToast }) {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function PlansTab({ studentId, showToast }) {
         <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>
           Saved Plans ({plans.length})
         </h2>
-        <Button label="Generate New Plan" variant="primary" onClick={() => navigate(`/students/${studentId}/plan`)} />
+        <Button onClick={() => navigate(`/students/${studentId}/plan`)}>Generate New Plan</Button>
       </div>
 
       {plans.length === 0 && (
@@ -58,13 +58,13 @@ export default function PlansTab({ studentId, showToast }) {
           </button>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
             <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>{selected.plan_label}</h3>
-            <button
+            <Button
+              variant="destructive"
               onClick={(e) => handleDelete(e, selected.id)}
               disabled={deleting === selected.id}
-              style={{ color: 'var(--color-error)', background: 'none', border: 'var(--border-width) solid var(--color-error)', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1) var(--space-3)' }}
             >
               {deleting === selected.id ? 'Deleting\u2026' : 'Delete Plan'}
-            </button>
+            </Button>
           </div>
           {selected.snapshot_data && (
             <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-3)', marginBottom: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>

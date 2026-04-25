@@ -6,7 +6,7 @@ import StudentForm from '../../components/StudentForm/StudentForm';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { getStudents, createStudent } from '../../api/students';
 
 function StudentListPage() {
@@ -115,10 +115,8 @@ function StudentListPage() {
           <h1 style={headingStyle}>Students</h1>
           {!showForm && (
             <Button
-              label="Add Student"
-              variant="primary"
               onClick={() => setShowForm(true)}
-            />
+            >Add Student</Button>
           )}
         </div>
 

@@ -1,5 +1,5 @@
 import { useLanguageTab } from '../../hooks/useLanguageTab';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 
 export default function LanguageTab({ studentId, student, onSaved, showToast }) {
   const {
@@ -91,9 +91,11 @@ export default function LanguageTab({ studentId, student, onSaved, showToast }) 
         </div>
       ))}
       <div style={{ marginBottom: 'var(--space-4)' }}>
-        <Button label="Add Score" variant="secondary" onClick={addOtherScore} />
+        <Button variant="secondary" onClick={addOtherScore}>Add Score</Button>
       </div>
-      <Button label="Save" onClick={handleSave} loading={saving} />
+      <Button onClick={handleSave} disabled={saving}>
+        {saving ? 'Loading\u2026' : 'Save'}
+      </Button>
     </div>
   );
 }

@@ -1,13 +1,14 @@
 // REQ-089, REQ-090, REQ-091, REQ-100: Tabbed Student Profile Page
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import Tabs from '../../components/Tabs/Tabs';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
-import Toast from '../../components/Toast/Toast';
-import { useToast } from '../../hooks/useToast';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '../../api/account';
 import { getSubjects } from '../../api/grades';
@@ -31,11 +32,17 @@ const TABS = [
   { id: 'plans', label: 'Plans' },
 ];
 
+// Sonner-compatible showToast wrapper for hooks that still accept showToast(msg, type)
+function showToast(message, type) {
+  if (type === 'success') toast.success(message);
+  else if (type === 'error') toast.error(message);
+  else toast(message);
+}
+
 function StudentProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { toasts, showToast, removeToast } = useToast();
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -95,9 +102,9 @@ function StudentProfile() {
       const updated = await graduateStudent(id, payload);
       setStudent(updated);
       setShowGraduateModal(false);
-      showToast('Student marked as graduated. Data added to analytics.', 'success');
+      toast.success('Student marked as graduated. Data added to analytics.');
     } catch {
-      showToast('Failed to graduate student.', 'error');
+      toast.error('Failed to graduate student.');
     } finally {
       setGraduateLoading(false);
     }
@@ -109,7 +116,7 @@ function StudentProfile() {
       await generatePlan(id);
       navigate(`/students/${id}/plan`);
     } catch {
-      showToast('Failed to start plan generation.', 'error');
+      toast.error('Failed to start plan generation.');
       setGeneratingPlan(false);
     }
   };
@@ -149,10 +156,12 @@ function StudentProfile() {
                 </span>
               )}
               {!student.is_graduated && (
-                <Button label="Mark as Graduated" variant="secondary" onClick={handleOpenGraduate} />
+                <Button variant="secondary" onClick={handleOpenGraduate}>Mark as Graduated</Button>
               )}
-              <Button label="Target Schools" variant="secondary" onClick={() => navigate(`/students/${id}/targets`)} />
-              <Button label="Generate Plan" variant="primary" onClick={handleGeneratePlan} loading={generatingPlan} />
+              <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>Target Schools</Button>
+              <Button onClick={handleGeneratePlan} disabled={generatingPlan}>
+                {generatingPlan ? 'Loading\u2026' : 'Generate Plan'}
+              </Button>
             </div>
           </div>
 
@@ -188,53 +197,51 @@ function StudentProfile() {
         </>
       )}
 
-      <Toast toasts={toasts} removeToast={removeToast} />
-
-      {showGraduateModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-6)', width: '440px', maxWidth: '95vw', boxShadow: 'var(--shadow-lg)' }}>
-            <h2 style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>Mark as Graduated</h2>
-            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-              This will move the student to the alumni record and add their data to the analytics data store (grades and final destination will be anonymized).
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final School</label>
-                <select
-                  value={graduateForm.final_school_id}
-                  onChange={(e) => setGraduateForm((f) => ({ ...f, final_school_id: e.target.value }))}
-                  style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                >
-                  <option value="">None / Unknown</option>
-                  {schoolOptions.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final Major</label>
-                <input
-                  value={graduateForm.final_major}
-                  onChange={(e) => setGraduateForm((f) => ({ ...f, final_major: e.target.value }))}
-                  placeholder="e.g. Computer Science"
-                  style={{ width: '100%', boxSizing: 'border-box', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Graduation Year</label>
-                <input
-                  type="number"
-                  value={graduateForm.graduation_year}
-                  onChange={(e) => setGraduateForm((f) => ({ ...f, graduation_year: e.target.value }))}
-                  style={{ width: '100%', boxSizing: 'border-box', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                />
-              </div>
+      <Dialog open={showGraduateModal} onOpenChange={setShowGraduateModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as Graduated</DialogTitle>
+          </DialogHeader>
+          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+            This will move the student to the alumni record and add their data to the analytics data store (grades and final destination will be anonymized).
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final School</label>
+              <select
+                value={graduateForm.final_school_id}
+                onChange={(e) => setGraduateForm((f) => ({ ...f, final_school_id: e.target.value }))}
+                style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
+              >
+                <option value="">None / Unknown</option>
+                {schoolOptions.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
             </div>
-            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-5)' }}>
-              <Button label="Cancel" variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateLoading} />
-              <Button label={graduateLoading ? 'Saving\u2026' : 'Confirm Graduate'} variant="primary" onClick={handleGraduate} disabled={graduateLoading} />
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final Major</label>
+              <Input
+                value={graduateForm.final_major}
+                onChange={(e) => setGraduateForm((f) => ({ ...f, final_major: e.target.value }))}
+                placeholder="e.g. Computer Science"
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Graduation Year</label>
+              <Input
+                type="number"
+                value={graduateForm.graduation_year}
+                onChange={(e) => setGraduateForm((f) => ({ ...f, graduation_year: e.target.value }))}
+              />
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateLoading}>Cancel</Button>
+            <Button onClick={handleGraduate} disabled={graduateLoading}>
+              {graduateLoading ? 'Saving\u2026' : 'Confirm Graduate'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

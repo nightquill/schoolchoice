@@ -5,7 +5,7 @@ import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { getStudents, createStudent } from '../../api/students';
 import { getAccount } from '../../api/account';
 
@@ -172,10 +172,9 @@ function Dashboard() {
           <h1 style={headingStyle}>Students</h1>
           {!showAddForm && (
             <Button
-              label="Add Student"
               variant="secondary"
               onClick={() => setShowAddForm(true)}
-            />
+            >Add Student</Button>
           )}
         </div>
 
@@ -233,8 +232,8 @@ function Dashboard() {
               />
               {formError && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)' }}>{formError}</span>}
             </div>
-            <Button label={formLoading ? 'Creating…' : 'Create'} variant="primary" type="submit" disabled={formLoading} onClick={() => {}} />
-            <Button label="Cancel" variant="secondary" onClick={() => { setShowAddForm(false); setNewName(''); setFormError(''); }} disabled={formLoading} />
+            <Button type="submit" disabled={formLoading}>{formLoading ? 'Creating\u2026' : 'Create'}</Button>
+            <Button variant="secondary" onClick={() => { setShowAddForm(false); setNewName(''); setFormError(''); }} disabled={formLoading}>Cancel</Button>
           </form>
         )}
 
@@ -265,10 +264,8 @@ function Dashboard() {
                     : 'No plan yet'}
                 </p>
                 <Button
-                  label="View Profile"
-                  variant="primary"
                   onClick={() => navigate(`/students/${student.id}/profile`)}
-                />
+                >View Profile</Button>
               </div>
             ))}
           </div>

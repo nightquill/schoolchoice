@@ -1,7 +1,7 @@
 import { useGradesTab } from '../../hooks/useGradesTab';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import PredictedGradeBadge from '../../components/PredictedGradeBadge/PredictedGradeBadge';
 import FileUpload from '../../components/FileUpload/FileUpload';
 
@@ -116,8 +116,8 @@ export default function GradesTab({ studentId, showToast, subjects }) {
           {parsedGrades.map((g, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
               <span style={{ fontSize: 'var(--font-size-sm)' }}>{g.subject} — Grade: {g.grade} (Confidence: {g.confidence})</span>
-              <Button label="Accept" variant="primary" onClick={() => handleAcceptSuggestion(g)} />
-              <Button label="Dismiss" variant="secondary" onClick={() => dismissParsedGrade(i)} />
+              <Button onClick={() => handleAcceptSuggestion(g)}>Accept</Button>
+              <Button variant="secondary" onClick={() => dismissParsedGrade(i)}>Dismiss</Button>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export default function GradesTab({ studentId, showToast, subjects }) {
       </div>
       {!newRow ? (
         <div>
-          <Button label="Add Grade" variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })} />
+          <Button variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })}>Add Grade</Button>
         </div>
       ) : (
         <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-primary)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
@@ -226,8 +226,8 @@ export default function GradesTab({ studentId, showToast, subjects }) {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            <Button label="Save Grade" variant="primary" onClick={handleSaveNewRow} />
-            <Button label="Cancel" variant="secondary" onClick={() => setNewRow(null)} />
+            <Button onClick={handleSaveNewRow}>Save Grade</Button>
+            <Button variant="secondary" onClick={() => setNewRow(null)}>Cancel</Button>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useActivitiesTab } from '../../hooks/useActivitiesTab';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 
 export default function ActivitiesTab({ studentId, student, showToast }) {
   const {
@@ -104,8 +104,10 @@ export default function ActivitiesTab({ studentId, student, showToast }) {
         </div>
       ))}
       <div style={{ marginBottom: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
-        <Button label="Add Activity" variant="secondary" onClick={addActivity} />
-        <Button label="Save Activities" onClick={handleSaveActivities} loading={saving} />
+        <Button variant="secondary" onClick={addActivity}>Add Activity</Button>
+        <Button onClick={handleSaveActivities} disabled={saving}>
+          {saving ? 'Loading\u2026' : 'Save Activities'}
+        </Button>
       </div>
 
       <div style={{ marginTop: 'var(--space-8)' }}>
@@ -151,8 +153,10 @@ export default function ActivitiesTab({ studentId, student, showToast }) {
           </div>
         ))}
         <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
-          <Button label="Add Award" variant="secondary" onClick={addAward} />
-          <Button label="Save Awards" onClick={handleSaveAwards} loading={saving} />
+          <Button variant="secondary" onClick={addAward}>Add Award</Button>
+          <Button onClick={handleSaveAwards} disabled={saving}>
+            {saving ? 'Loading\u2026' : 'Save Awards'}
+          </Button>
         </div>
       </div>
     </div>

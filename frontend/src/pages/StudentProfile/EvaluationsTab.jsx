@@ -1,6 +1,6 @@
 import { useEvaluationsTab } from '../../hooks/useEvaluationsTab';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import StarRating from '../../components/StarRating/StarRating';
 
 export default function EvaluationsTab({ studentId, showToast }) {
@@ -41,7 +41,7 @@ export default function EvaluationsTab({ studentId, showToast }) {
   return (
     <div>
       <div style={{ marginBottom: 'var(--space-4)' }}>
-        <Button label="Add Evaluation" variant="secondary" onClick={addEval} />
+        <Button variant="secondary" onClick={addEval}>Add Evaluation</Button>
       </div>
       {evaluations.map((ev, index) => (
         <div key={index} style={cardStyle}>
@@ -74,8 +74,10 @@ export default function EvaluationsTab({ studentId, showToast }) {
             <input type="date" value={ev.date || ''} onChange={(e) => updateEval(index, 'date', e.target.value)} style={inputStyle} aria-label="Evaluation date" />
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            <Button label="Save" onClick={() => saveAll(evaluations)} loading={saving === 'all'} />
-            <Button label="Delete" variant="danger" onClick={() => removeEval(index)} />
+            <Button onClick={() => saveAll(evaluations)} disabled={saving === 'all'}>
+              {saving === 'all' ? 'Loading\u2026' : 'Save'}
+            </Button>
+            <Button variant="destructive" onClick={() => removeEval(index)}>Delete</Button>
           </div>
         </div>
       ))}
