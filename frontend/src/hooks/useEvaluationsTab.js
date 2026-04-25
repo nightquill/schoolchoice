@@ -35,9 +35,12 @@ export function useEvaluationsTab(studentId, showToast) {
   }, []);
 
   const removeEval = useCallback((index) => {
-    const next = evaluations.filter((_, i) => i !== index);
-    saveAll(next);
-  }, [evaluations, saveAll]);
+    setEvaluations((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      saveAll(next);
+      return next;
+    });
+  }, [saveAll]);
 
   return {
     evaluations,
