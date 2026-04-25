@@ -151,9 +151,9 @@ async def import_parse(
 
     filename = file.filename or ""
     if filename.lower().endswith((".xlsx", ".xls")):
-        result = parse_excel(content)
+        result = parse_excel(content, config)
     else:
-        result = parse_csv(content)
+        result = parse_csv(content, config)
 
     # If multiple sheets, return early with sheet list for user to pick
     if result.get("sheets"):
@@ -189,7 +189,7 @@ async def import_parse_sheet(
     if len(content) > _10MB:
         raise HTTPException(status_code=413, detail="File too large (max 10 MB)")
 
-    result = parse_excel_sheet(content, sheet_name)
+    result = parse_excel_sheet(content, sheet_name, config)
 
     if result.get("error"):
         raise HTTPException(status_code=400, detail=result["error"])
@@ -221,7 +221,7 @@ def import_validate(
         raise HTTPException(status_code=404, detail=f"Entity '{name}' not found")
 
     valid_rows, error_rows = validate_rows(body.rows, body.mapping, config.fields)
-    duplicate_rows = find_duplicates(valid_rows)
+    duplicate_rows = find_duplicates(valid_rows, config)
 
     # Count warnings (duplicates that are still valid, just flagged)
     return {
@@ -329,7 +329,7 @@ def export_error_csv(
         except (ValueError, TypeError):
             rows = []
 
-    csv_content = generate_error_csv(rows)
+    csv_content = generate_error_csv(rows, config)
     today = date.today().isoformat()
     filename = f"{name}-import-errors-{today}.csv"
     return Response(
