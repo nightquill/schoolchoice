@@ -67,8 +67,16 @@ Plans:
   3. Adding a new entity via YAML config results in a generated list view and form appearing in the frontend without writing React code
   4. UI is consistent throughout — spacing, typography, and color are uniform across all pages and the interface reads as professional to a non-technical business owner
   5. All pages render correctly on a 375px-wide mobile viewport with no horizontal overflow
-**Plans**: TBD
+**Plans:** 6 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 03-01-PLAN.md — Infrastructure: Vitest + RTL, TanStack Query, Tailwind v3 + shadcn init, @ alias, backend entity endpoints (UX-01, UX-04, PLAT-03)
+- [ ] 03-02-PLAN.md — QueryClientProvider + QueryBoundary + characterization tests for StudentProfile monolith (UX-01, UX-03)
+- [ ] 03-03-PLAN.md — StudentProfile decomposition: 7 tab components + 7 custom hooks + parent rewrite (UX-02, UX-03)
+- [ ] 03-04-PLAN.md — Config-driven entity UI: API layer, EntityListView, EntityForm, field type map, entity pages, dynamic nav (PLAT-03)
+- [ ] 03-05-PLAN.md — shadcn/ui component replacements (Button, Dialog, Tabs, Input, Card, Sonner) + UI polish (UX-04)
+- [ ] 03-06-PLAN.md — Mobile responsive, config-driven dashboard, TipTap preservation, template switching (UX-05, UX-06, UX-07, UX-08)
 
 ### Phase 4: Import and Export
 **Goal**: Users can import CSV and Excel files into any entity with a column-mapping UI and validation preview; users can export entity data as CSV and reports as HTML
@@ -117,7 +125,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 0/6 | Planning complete | - |
 | 2. AI Provider Abstraction | 0/3 | Planning complete | - |
-| 3. Frontend Stabilization | 0/TBD | Not started | - |
+| 3. Frontend Stabilization | 0/6 | Planning complete | - |
 | 4. Import and Export | 0/TBD | Not started | - |
 | 5. Consultant Engine | 0/TBD | Not started | - |
 | 6. Deployment and Production Readiness | 0/TBD | Not started | - |
