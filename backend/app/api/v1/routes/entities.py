@@ -28,9 +28,29 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
-from app.db.models import User
+from app.db.models import Base, User
 from app.db.session import get_db
 from app.platform.entity_registry import registry
+
+
+def _resolve_model(name: str):
+    """Look up the SQLAlchemy model for an entity by name.
+
+    Tries the entity registry first (auto_crud entities), then falls back
+    to scanning Base.metadata for hand-written models whose __tablename__
+    matches the entity config's table name.
+    """
+    model = registry.get_model(name)
+    if model:
+        return model
+    config = registry.get_config(name)
+    if not config:
+        return None
+    for mapper in Base.registry.mappers:
+        cls = mapper.class_
+        if getattr(cls, "__tablename__", None) == config.table:
+            return cls
+    return None
 from app.services.import_service import (
     find_duplicates,
     generate_error_csv,
@@ -204,6 +224,7 @@ async def import_parse_sheet(
 def import_validate(
     name: str,
     body: ImportValidateRequest,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Validate mapped rows against entity field rules.
@@ -216,7 +237,7 @@ def import_validate(
         raise HTTPException(status_code=404, detail=f"Entity '{name}' not found")
 
     valid_rows, error_rows = validate_rows(body.rows, body.mapping, config)
-    duplicate_rows = find_duplicates(valid_rows, config)
+    duplicate_rows = find_duplicates(valid_rows, config, db)
 
     # Count warnings (duplicates that are still valid, just flagged)
     return {
@@ -246,11 +267,11 @@ def import_commit(
     if not config:
         raise HTTPException(status_code=404, detail=f"Entity '{name}' not found")
 
-    model_cls = registry.get_model(name)
+    model_cls = _resolve_model(name)
     if not model_cls:
         raise HTTPException(
             status_code=422,
-            detail=f"Entity '{name}' has no auto-managed model — manual import not supported",
+            detail=f"Entity '{name}' has no resolvable model — import not supported",
         )
 
     # Re-validate before committing (T-04-10 mitigation: never trust client "valid" claim)
@@ -267,6 +288,9 @@ def import_commit(
     for i, row in enumerate(valid_rows):
         # Remove internal metadata keys before inserting
         clean_row = {k: v for k, v in row.items() if not k.startswith("_")}
+        # Inject user_id if the model has it (e.g. Student requires user_id NOT NULL)
+        if hasattr(model_cls, "user_id") and "user_id" not in clean_row:
+            clean_row["user_id"] = current_user.id
 
         decision = body.duplicate_decisions.get(str(i), "new")
 
@@ -352,11 +376,11 @@ def export_entity_csv(
     if not config:
         raise HTTPException(status_code=404, detail=f"Entity '{name}' not found")
 
-    model_cls = registry.get_model(name)
+    model_cls = _resolve_model(name)
     if not model_cls:
         raise HTTPException(
             status_code=422,
-            detail=f"Entity '{name}' has no auto-managed model — export not supported",
+            detail=f"Entity '{name}' has no resolvable model — export not supported",
         )
 
     from sqlalchemy import or_
