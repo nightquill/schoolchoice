@@ -15,6 +15,8 @@ os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 os.environ.setdefault("CORS_ORIGINS", "http://localhost:5173")
 os.environ.setdefault("UPLOAD_DIR", "/tmp/test_advisor_uploads")
 os.environ.setdefault("PLAN_GENERATION_TIMEOUT_SECONDS", "30")
+os.environ.setdefault("AI_PROVIDER", "gemini")
+os.environ.setdefault("AI_API_KEY", "")
 
 import pytest
 from fastapi.testclient import TestClient
