@@ -7,7 +7,10 @@ REQ-078
 
 from __future__ import annotations
 
+import logging
 import os
+
+import nh3
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -25,6 +28,8 @@ from app.services import student_service, plan_chat_service
 from app.services.hkdse_service import grade_to_int
 from app.services.matchmaker_v2 import run_matching
 from app.services.plan_generator import _build_action_items, generate_html_plan
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/students", tags=["plan-v2"])
 
@@ -501,7 +506,8 @@ def edit_plan_section(
         raise HTTPException(status_code=404, detail="No plan found for this student")
 
     overrides: dict = dict(plan.overrides or {})
-    overrides[body.section_key] = body.html_content
+    safe_html = nh3.clean(body.html_content)
+    overrides[body.section_key] = safe_html
     plan.overrides = overrides
 
     student_for_regen, match_results_for_regen = _load_student_and_results(db, student_id, plan)
