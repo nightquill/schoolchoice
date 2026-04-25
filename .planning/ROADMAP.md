@@ -71,7 +71,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md — Infrastructure: Vitest + RTL, TanStack Query, Tailwind v3 + shadcn init, @ alias, backend entity endpoints (UX-01, UX-04, PLAT-03)
+- [x] 03-01-PLAN.md — Infrastructure: Vitest + RTL, TanStack Query, Tailwind v3 + shadcn init, @ alias, backend entity endpoints (UX-01, UX-04, PLAT-03)
 - [ ] 03-02-PLAN.md — QueryClientProvider + QueryBoundary + characterization tests for StudentProfile monolith (UX-01, UX-03)
 - [ ] 03-03-PLAN.md — StudentProfile decomposition: 7 tab components + 7 custom hooks + parent rewrite (UX-02, UX-03)
 - [ ] 03-04-PLAN.md — Config-driven entity UI: API layer, EntityListView, EntityForm, field type map, entity pages, dynamic nav (PLAT-03)
