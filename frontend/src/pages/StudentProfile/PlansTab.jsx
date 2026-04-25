@@ -77,7 +77,7 @@ export default function PlansTab({ studentId, showToast }) {
               style={iframeStyle}
               srcDoc={selected.html_content}
               title={selected.plan_label}
-              sandbox="allow-same-origin"
+              sandbox=""
             />
           ) : (
             <EmptyState message="Plan content was not stored for this entry." />
