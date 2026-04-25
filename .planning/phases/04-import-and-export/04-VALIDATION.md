@@ -2,8 +2,8 @@
 phase: 4
 slug: import-and-export
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-25
 ---
 
@@ -38,14 +38,14 @@ created: 2026-04-25
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 01 | 1 | DATA-01 | — | File type validation | unit | `pytest tests/test_import.py -k parse` | ❌ W0 | ⬜ pending |
-| 04-01-02 | 01 | 1 | DATA-02 | — | Column mapping accuracy | unit | `pytest tests/test_import.py -k mapping` | ❌ W0 | ⬜ pending |
-| 04-01-03 | 01 | 1 | DATA-03 | — | Validation error reporting | unit | `pytest tests/test_import.py -k validate` | ❌ W0 | ⬜ pending |
-| 04-01-04 | 01 | 1 | DATA-04 | — | Import commit atomicity | integration | `pytest tests/test_import.py -k commit` | ❌ W0 | ⬜ pending |
-| 04-02-01 | 02 | 1 | DATA-05 | — | Error CSV download | unit | `pytest tests/test_export.py -k error_csv` | ❌ W0 | ⬜ pending |
-| 04-02-02 | 02 | 1 | DATA-06 | — | Entity CSV export | unit | `pytest tests/test_export.py -k entity_csv` | ❌ W0 | ⬜ pending |
-| 04-02-03 | 02 | 2 | DATA-07 | — | HTML report export | unit | `pytest tests/test_export.py -k html_export` | ❌ W0 | ⬜ pending |
-| 04-03-01 | 03 | 2 | DATA-08 | — | Search and filter | integration | `pytest tests/test_search.py` | ❌ W0 | ⬜ pending |
+| 04-01-01 | 01 | 1 | DATA-01 | — | File type validation | unit | `pytest tests/test_import_export.py -k parse` | ❌ W0 | ⬜ pending |
+| 04-01-02 | 01 | 1 | DATA-02 | — | Column mapping accuracy | unit | `pytest tests/test_import_export.py -k mapping` | ❌ W0 | ⬜ pending |
+| 04-01-03 | 01 | 1 | DATA-03 | — | Validation error reporting | unit | `pytest tests/test_import_export.py -k validate` | ❌ W0 | ⬜ pending |
+| 04-01-04 | 01 | 1 | DATA-04 | — | Import commit atomicity | integration | `pytest tests/test_import_export.py -k commit` | ❌ W0 | ⬜ pending |
+| 04-02-01 | 02 | 1 | DATA-04 | — | Entity CSV export | unit | `pytest tests/test_import_export.py -k entity_csv` | ❌ W0 | ⬜ pending |
+| 04-02-02 | 02 | 1 | DATA-06 | — | HTML report export | unit | `pytest tests/test_import_export.py -k html_export` | ❌ W0 | ⬜ pending |
+| 04-02-03 | 02 | 1 | DATA-07, DATA-08 | — | Search and filter endpoints | unit | `pytest tests/test_import_export.py -k search` | ❌ W0 | ⬜ pending |
+| 04-03-01 | 03 | 2 | DATA-08 | — | Search and filter | integration | `pytest tests/test_entities.py -k search_filter` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,10 +53,9 @@ created: 2026-04-25
 
 ## Wave 0 Requirements
 
-- [ ] `tests/test_import.py` — stubs for DATA-01 through DATA-04
-- [ ] `tests/test_export.py` — stubs for DATA-05 through DATA-07
-- [ ] `tests/test_search.py` — stubs for DATA-08
-- [ ] `openpyxl==3.0.9` added to requirements.txt
+- [ ] `tests/test_import_export.py` — stubs for DATA-01 through DATA-07 (created by Plan 01 Task 3)
+- [ ] `tests/test_entities.py` — search/filter stubs for DATA-08 (extended by Plan 02 Task 3)
+- [ ] `openpyxl==3.0.9` added to requirements.txt (Plan 01 Task 1)
 
 *If none: "Existing infrastructure covers all phase requirements."*
 
