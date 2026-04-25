@@ -1,0 +1,23 @@
+name: school
+table: schools
+auto_crud: false
+fields:
+  - name: name
+    type: string
+    required: true
+    max_length: 255
+  - name: type
+    type: enum
+    choices: [UNIVERSITY, POLYTECHNIC, COMMUNITY_COLLEGE, VOCATIONAL, HIGH_SCHOOL]
+  - name: jupas_code
+    type: string
+    max_length: 50
+  - name: location
+    type: string
+    max_length: 255
+  - name: is_custom
+    type: boolean
+  - name: major_requirements
+    type: jsonb
+  - name: programs
+    type: jsonb
