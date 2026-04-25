@@ -2,6 +2,7 @@
 // REQ-16: Counsellor AI Chat panel
 // REQ-17: Template selector + per-section TipTap editing
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { FileDown } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
@@ -21,6 +22,7 @@ import {
   editPlanSection,
   resetPlanSection,
 } from '../../api/plan';
+import { exportPlanHTML } from '../../api/entities';
 import { getStudent } from '../../api/students';
 import { getAccount } from '../../api/account';
 
@@ -63,6 +65,22 @@ function AcademicPlan() {
   const [error, setError] = useState(null);
   const [planType, setPlanType] = useState('UNIVERSITY');
   const pollRef = useRef(null);
+
+  // --- html export state ---
+  const [isExportingHTML, setIsExportingHTML] = useState(false);
+
+  const handleExportHTML = useCallback(async () => {
+    if (!plan?.id) return;
+    setIsExportingHTML(true);
+    try {
+      await exportPlanHTML(plan.id);
+      showToast('Plan exported as HTML.', 'success');
+    } catch {
+      showToast('Failed to export HTML. Please try again.', 'error');
+    } finally {
+      setIsExportingHTML(false);
+    }
+  }, [plan?.id, showToast]);
 
   // --- template state ---
   const [activeTemplate, setActiveTemplate] = useState('professional');
@@ -496,6 +514,28 @@ function AcademicPlan() {
         <div style={toolbarRightStyle}>
           {plan?.html_content && (
             <Button label="Print" variant="secondary" onClick={() => window.print()} />
+          )}
+          {plan?.id && (
+            <button
+              onClick={handleExportHTML}
+              disabled={isExportingHTML || !plan?.id}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                padding: 'var(--space-2) var(--space-3)',
+                fontSize: 'var(--font-size-sm)',
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--border-radius-md)',
+                color: 'var(--color-text-primary)',
+                cursor: isExportingHTML ? 'wait' : 'pointer',
+                fontFamily: 'var(--font-family-base)',
+              }}
+            >
+              <FileDown size={16} />
+              {isExportingHTML ? 'Exporting...' : 'Export HTML'}
+            </button>
           )}
           {plan?.generated_at && (
             <span style={timestampStyle}>
