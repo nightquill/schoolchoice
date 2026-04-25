@@ -14,9 +14,47 @@ export const getEntities = () =>
 export const getEntitySchema = (name) =>
   client.get(`/api/v1/entities/${name}/schema`).then((r) => r.data);
 
-export const getEntityList = (tableName) => {
+export const getEntityList = (tableName, params = {}) => {
   validateTableName(tableName);
-  return client.get(`/api/v1/${tableName}`).then((r) => r.data);
+  return client.get(`/api/v1/${tableName}`, { params }).then((r) => r.data);
+};
+
+/**
+ * Download entity data as CSV.
+ * T-04-16: Uses Axios with auth interceptor (Bearer token) — never a bare <a href>.
+ * params may include q= and filters= to match current search/filter state.
+ */
+export const exportEntityCSV = async (entityName, params = {}) => {
+  const response = await client.get(`/api/v1/entities/${entityName}/export`, {
+    params,
+    responseType: 'blob',
+  });
+  const url = URL.createObjectURL(response.data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${entityName}-export.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Download academic plan as self-contained HTML file.
+ * T-04-18: Uses Axios with auth interceptor — plan-export endpoint requires auth.
+ */
+export const exportPlanHTML = async (planId) => {
+  const response = await client.get(`/api/v1/entities/plan-export/${planId}`, {
+    responseType: 'blob',
+  });
+  const url = URL.createObjectURL(response.data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `plan-${planId}.html`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 };
 
 export const getEntityDetail = (tableName, id) => {
