@@ -92,11 +92,11 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01-PLAN.md — Backend import service: CSV/Excel parsing, auto-mapping, validation, duplicate detection (DATA-01, DATA-02, DATA-03)
-- [ ] 04-02-PLAN.md — Backend endpoints: import parse/validate/commit, CSV export, HTML export, search/filter on auto-CRUD (DATA-04, DATA-06, DATA-07, DATA-08)
-- [ ] 04-03-PLAN.md — Frontend import wizard: ImportWizardPage, ImportWizard, ColumnMapper, ValidationSummary, shadcn components, API layer (DATA-01, DATA-02, DATA-03)
-- [ ] 04-04-PLAN.md — Frontend search/filter/export: SearchFilterBar, FilterControl, ActionBar, EntityListPage extension (DATA-04, DATA-05, DATA-06, DATA-07, DATA-08)
-- [ ] 04-05-PLAN.md — Human verification: full import/export flow, search/filter, regression check (all DATA requirements)
+- [x] 04-01-PLAN.md — Backend import service: CSV/Excel parsing, auto-mapping, validation, duplicate detection (DATA-01, DATA-02, DATA-03)
+- [x] 04-02-PLAN.md — Backend endpoints: import parse/validate/commit, CSV export, HTML export, search/filter on auto-CRUD (DATA-04, DATA-06, DATA-07, DATA-08)
+- [x] 04-03-PLAN.md — Frontend import wizard: ImportWizardPage, ImportWizard, ColumnMapper, ValidationSummary, shadcn components, API layer (DATA-01, DATA-02, DATA-03)
+- [x] 04-04-PLAN.md — Frontend search/filter/export: SearchFilterBar, FilterControl, ActionBar, EntityListPage extension (DATA-04, DATA-05, DATA-06, DATA-07, DATA-08)
+- [x] 04-05-PLAN.md — Human verification: full import/export flow, search/filter, regression check (all DATA requirements)
 
 ### Phase 5: Consultant Engine
 **Goal**: Users can ask freeform AI questions about their entity data and run structured guided workflows; school choice plan generation is migrated to the workflow engine; recommendation engine is generalized across domains
