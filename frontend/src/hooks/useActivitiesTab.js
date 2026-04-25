@@ -4,7 +4,8 @@ import client from '../api/client';
 export function useActivitiesTab(student, studentId, showToast) {
   const [activities, setActivities] = useState(student?.extra_curricular || []);
   const [awards, setAwards] = useState(student?.awards || []);
-  const [saving, setSaving] = useState(false);
+  const [savingActivities, setSavingActivities] = useState(false);
+  const [savingAwards, setSavingAwards] = useState(false);
   const [activityOpen, setActivityOpen] = useState(() =>
     (student?.extra_curricular || []).map((a) => !a.activity)
   );
@@ -21,26 +22,26 @@ export function useActivitiesTab(student, studentId, showToast) {
   }, []);
 
   const handleSaveActivities = useCallback(async () => {
-    setSaving(true);
+    setSavingActivities(true);
     try {
       await client.post(`/api/v1/students/${studentId}/extracurricular`, activities).then((r) => r.data);
       showToast('Activities saved.', 'success');
     } catch {
       showToast('Failed to save activities.', 'error');
     } finally {
-      setSaving(false);
+      setSavingActivities(false);
     }
   }, [activities, studentId, showToast]);
 
   const handleSaveAwards = useCallback(async () => {
-    setSaving(true);
+    setSavingAwards(true);
     try {
       await client.post(`/api/v1/students/${studentId}/awards`, awards).then((r) => r.data);
       showToast('Awards saved.', 'success');
     } catch {
       showToast('Failed to save awards.', 'error');
     } finally {
-      setSaving(false);
+      setSavingAwards(false);
     }
   }, [awards, studentId, showToast]);
 
@@ -75,7 +76,9 @@ export function useActivitiesTab(student, studentId, showToast) {
   return {
     activities,
     awards,
-    saving,
+    saving: savingActivities || savingAwards,
+    savingActivities,
+    savingAwards,
     activityOpen,
     awardOpen,
     toggleActivity,
