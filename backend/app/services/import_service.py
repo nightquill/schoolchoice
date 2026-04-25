@@ -264,8 +264,12 @@ def find_duplicates(
             continue
 
         # Dynamic query: look up any record where key_field column == key_value.
-        # This requires the DB model to be discoverable; we use a raw text query
-        # so the service remains decoupled from specific ORM models.
+        # Table and column names come from EntityConfig (YAML), not user input,
+        # but we validate identifiers as defense-in-depth against injection.
+        import re
+        _IDENT = re.compile(r"^[a-z_][a-z0-9_]*$")
+        if not _IDENT.match(config.table) or not _IDENT.match(key_field):
+            continue
         from sqlalchemy import text
         result = db_session.execute(
             text(f"SELECT id FROM {config.table} WHERE {key_field} = :val LIMIT 1"),

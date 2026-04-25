@@ -182,6 +182,7 @@ async def import_parse(
     return {
         "columns": result["columns"],
         "preview_rows": result["preview_rows"],
+        "all_rows": all_rows,
         "total_rows": len(all_rows),
         "auto_mapping": result.get("auto_mapping", {}),
     }
@@ -215,6 +216,7 @@ async def import_parse_sheet(
     return {
         "columns": result["columns"],
         "preview_rows": result["preview_rows"],
+        "all_rows": all_rows,
         "total_rows": len(all_rows),
         "auto_mapping": result.get("auto_mapping", {}),
     }
