@@ -138,7 +138,7 @@ function StudentProfile() {
 
       {!loading && !error && student && (
         <>
-          <div style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4) var(--space-8)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="px-4 md:px-8" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
               <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
                 {student.full_name || 'Student Profile'}
@@ -166,7 +166,7 @@ function StudentProfile() {
           </div>
 
           <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <div style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
+            <div className="overflow-x-auto whitespace-nowrap" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
               <TabsList variant="line" className="w-full justify-start" aria-label="Student profile sections">
                 {TABS.map((tab) => (
                   <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
@@ -174,7 +174,7 @@ function StudentProfile() {
               </TabsList>
             </div>
 
-            <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 var(--space-8)' }}>
+            <div className="px-4 md:px-8" style={{ maxWidth: '960px', margin: '0 auto' }}>
               <TabsContent value="personal">
                 <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
               </TabsContent>

@@ -110,7 +110,7 @@ function StudentListPage() {
   return (
     <div style={pageStyle}>
       <NavBar />
-      <div style={contentStyle}>
+      <div className="px-4 md:px-8" style={{ maxWidth: '960px', margin: '0 auto', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <div style={headerRowStyle}>
           <h1 style={headingStyle}>Students</h1>
           {!showForm && (
@@ -134,6 +134,7 @@ function StudentListPage() {
           </div>
         )}
 
+        <div className="overflow-x-auto">
         <table style={tableStyle}>
           <thead>
             <tr>
@@ -169,6 +170,7 @@ function StudentListPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -78,6 +78,7 @@ function Dashboard() {
     display: 'flex',
     gap: 'var(--space-8)',
     alignItems: 'center',
+    flexWrap: 'wrap',
   };
 
   const statBlockStyle = {
@@ -101,13 +102,6 @@ function Dashboard() {
 
   const contentStyle = {
     padding: 'var(--space-6) var(--space-8)',
-  };
-
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: 'var(--space-6)',
-    marginTop: 'var(--space-6)',
   };
 
   const cardStyle = {
@@ -167,7 +161,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <main id="main-content" style={contentStyle}>
+      <main id="main-content" className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         <div style={headerRowStyle}>
           <h1 style={headingStyle}>Students</h1>
           {!showAddForm && (
@@ -246,7 +240,7 @@ function Dashboard() {
           <EmptyState message="No students match the current filters." />
         )}
         {!loading && !error && filteredStudents.length > 0 && (
-          <div style={gridStyle} role="list" aria-label="Student cards">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ marginTop: 'var(--space-6)' }} role="list" aria-label="Student cards">
             {filteredStudents.map((student) => (
               <div key={student.id} style={cardStyle} role="listitem">
                 <p style={cardNameStyle}>{student.full_name || student.name || 'Unnamed Student'}</p>

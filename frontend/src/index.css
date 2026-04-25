@@ -81,8 +81,8 @@ body {
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 1126px;
   margin: 0 auto;
   text-align: center;
   border-inline: 1px solid var(--border);
@@ -134,4 +134,30 @@ code {
   line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+}
+
+/* Mobile responsive overrides */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px; /* prevent iOS zoom on input focus */
+  }
+  input, select, textarea {
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
+/* Preserve TipTap/ProseMirror styles from Tailwind resets */
+.ProseMirror {
+  outline: none;
+}
+.ProseMirror p {
+  margin-bottom: 0.75em;
+}
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+.ProseMirror ul, .ProseMirror ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
 }

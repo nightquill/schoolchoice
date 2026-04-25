@@ -6,7 +6,7 @@ import EntityListView from '../../components/EntityListView/EntityListView';
 import { getEntitySchema, getEntityList } from '../../api/entities';
 
 const pageStyle = { background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' };
-const contentStyle = { padding: 'var(--space-6) var(--space-8)' };
+const contentStyle = { paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' };
 const headingStyle = { fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)', textTransform: 'capitalize' };
 
 export default function EntityListPage() {
@@ -23,7 +23,7 @@ export default function EntityListPage() {
   return (
     <div style={pageStyle}>
       <NavBarV2 />
-      <main id="main-content" style={contentStyle}>
+      <main id="main-content" className="px-4 md:px-8 overflow-x-auto" style={contentStyle}>
         <h1 style={headingStyle}>{name}</h1>
         <QueryBoundary
           isLoading={schemaQuery.isLoading || listQuery.isLoading}
