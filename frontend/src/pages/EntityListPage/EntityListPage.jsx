@@ -4,6 +4,7 @@ import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
 import EntityListView from '../../components/EntityListView/EntityListView';
 import { getEntitySchema, getEntityList } from '../../api/entities';
+import { getAccount } from '../../api/account';
 
 const pageStyle = { background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' };
 const contentStyle = { paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' };
@@ -13,6 +14,7 @@ export default function EntityListPage() {
   const { name } = useParams();
   const navigate = useNavigate();
 
+  const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const schemaQuery = useQuery({ queryKey: ['schema', name], queryFn: () => getEntitySchema(name) });
   const listQuery = useQuery({
     queryKey: ['entities', name],
@@ -22,7 +24,7 @@ export default function EntityListPage() {
 
   return (
     <div style={pageStyle}>
-      <NavBarV2 />
+      <NavBarV2 account={accountQuery.data ?? null} />
       <main id="main-content" className="px-4 md:px-8 overflow-x-auto" style={contentStyle}>
         <h1 style={headingStyle}>{name}</h1>
         <QueryBoundary

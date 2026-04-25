@@ -5,6 +5,7 @@ import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
 import EntityForm from '../../components/EntityForm/EntityForm';
 import { toast } from 'sonner';
 import { getEntitySchema, getEntityDetail, updateEntity } from '../../api/entities';
+import { getAccount } from '../../api/account';
 
 const pageStyle = { background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' };
 const contentStyle = { paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)', maxWidth: '640px' };
@@ -15,6 +16,7 @@ export default function EntityDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const schemaQuery = useQuery({ queryKey: ['schema', name], queryFn: () => getEntitySchema(name) });
   const detailQuery = useQuery({
     queryKey: ['entity', name, id],
@@ -36,7 +38,7 @@ export default function EntityDetailPage() {
 
   return (
     <div style={pageStyle}>
-      <NavBarV2 />
+      <NavBarV2 account={accountQuery.data ?? null} />
       <main id="main-content" className="px-4 md:px-8" style={contentStyle}>
         <h1 style={headingStyle}>Edit {name}</h1>
         <QueryBoundary
