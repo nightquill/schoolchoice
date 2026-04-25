@@ -1,0 +1,254 @@
+"""
+tests/test_platform.py
+
+Unit tests for the platform entity layer:
+- YAML config parsing (yaml_loader)
+- Entity registration (entity_registry)
+- CRUD router generation (crud_generator)
+"""
+import os
+
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+os.environ.setdefault("SECRET_KEY", "test-secret-key-for-pytest-only")
+os.environ.setdefault("ALGORITHM", "HS256")
+os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
+os.environ.setdefault("CORS_ORIGINS", "http://localhost:5173")
+os.environ.setdefault("UPLOAD_DIR", "/tmp/test_advisor_uploads")
+os.environ.setdefault("PLAN_GENERATION_TIMEOUT_SECONDS", "30")
+
+import pytest
+from pathlib import Path
+
+from app.platform.yaml_loader import (
+    EntityConfig,
+    FieldConfig,
+    load_entity_yaml,
+    SUPPORTED_TYPES,
+)
+from app.platform.entity_registry import EntityRegistry
+from app.platform.crud_generator import build_pydantic_schema, build_crud_router
+
+
+# ---------------------------------------------------------------------------
+# TestEntityYamlParse
+# ---------------------------------------------------------------------------
+
+
+class TestEntityYamlParse:
+    """Tests for YAML entity config parsing."""
+
+    def test_valid_yaml_loads(self, tmp_path: Path):
+        """A minimal valid YAML file is parsed into a correct EntityConfig."""
+        yaml_file = tmp_path / "widget.yaml"
+        yaml_file.write_text(
+            "name: widget\n"
+            "table: widgets\n"
+            "fields:\n"
+            "  - name: title\n"
+            "    type: string\n"
+            "    required: true\n"
+            "    max_length: 100\n"
+            "  - name: count\n"
+            "    type: int\n"
+        )
+        ec = load_entity_yaml(yaml_file)
+        assert ec.name == "widget"
+        assert ec.table == "widgets"
+        assert len(ec.fields) == 2
+        assert ec.fields[0].name == "title"
+        assert ec.fields[0].type == "string"
+        assert ec.fields[0].required is True
+        assert ec.fields[0].max_length == 100
+        assert ec.fields[1].name == "count"
+        assert ec.fields[1].type == "int"
+        assert ec.fields[1].required is False
+        assert ec.auto_crud is True
+
+    def test_empty_yaml_returns_error(self, tmp_path: Path):
+        """An empty YAML file raises ValueError (missing name)."""
+        yaml_file = tmp_path / "empty.yaml"
+        yaml_file.write_text("")
+        with pytest.raises(ValueError, match="missing required 'name' field"):
+            load_entity_yaml(yaml_file)
+
+    def test_unsupported_type_raises(self, tmp_path: Path):
+        """A YAML with unsupported field type raises ValueError."""
+        yaml_file = tmp_path / "bad.yaml"
+        yaml_file.write_text(
+            "name: bad_entity\n"
+            "fields:\n"
+            "  - name: data\n"
+            "    type: binary\n"
+        )
+        with pytest.raises(ValueError, match="Unsupported field type 'binary'"):
+            load_entity_yaml(yaml_file)
+
+    def test_all_field_types_accepted(self, tmp_path: Path):
+        """All 9 supported field types from D-02 can be parsed without error."""
+        fields_yaml = "\n".join(
+            f"  - name: f_{ftype}\n    type: {ftype}"
+            for ftype in sorted(SUPPORTED_TYPES)
+        )
+        # enum needs choices to be meaningful, but should parse without them too
+        yaml_file = tmp_path / "all_types.yaml"
+        yaml_file.write_text(f"name: all_types\nfields:\n{fields_yaml}\n")
+        ec = load_entity_yaml(yaml_file)
+        assert len(ec.fields) == len(SUPPORTED_TYPES)
+        parsed_types = {f.type for f in ec.fields}
+        assert parsed_types == SUPPORTED_TYPES
+
+    def test_default_table_name(self, tmp_path: Path):
+        """If table is omitted, it defaults to name + 's'."""
+        yaml_file = tmp_path / "item.yaml"
+        yaml_file.write_text("name: item\nfields: []\n")
+        ec = load_entity_yaml(yaml_file)
+        assert ec.table == "items"
+
+    def test_auto_crud_false(self, tmp_path: Path):
+        """auto_crud: false is correctly parsed."""
+        yaml_file = tmp_path / "custom.yaml"
+        yaml_file.write_text("name: custom\nauto_crud: false\nfields: []\n")
+        ec = load_entity_yaml(yaml_file)
+        assert ec.auto_crud is False
+
+
+# ---------------------------------------------------------------------------
+# TestEntityRegistry
+# ---------------------------------------------------------------------------
+
+
+class TestEntityRegistry:
+    """Tests for dynamic SQLAlchemy model generation."""
+
+    def test_register_creates_model(self):
+        """Registering an EntityConfig produces a model with correct tablename and columns."""
+        reg = EntityRegistry()
+        config = EntityConfig(
+            name="test_widget",
+            table="test_widgets_reg",
+            fields=[
+                FieldConfig(name="title", type="string", required=True, max_length=200),
+                FieldConfig(name="count", type="int"),
+            ],
+        )
+        model_cls = reg.register(config)
+        assert model_cls.__tablename__ == "test_widgets_reg"
+        assert hasattr(model_cls, "id")
+        assert hasattr(model_cls, "title")
+        assert hasattr(model_cls, "count")
+
+    def test_get_model_returns_registered(self):
+        """get_model returns the registered model class by name."""
+        reg = EntityRegistry()
+        config = EntityConfig(
+            name="test_gadget",
+            table="test_gadgets_reg",
+            fields=[FieldConfig(name="label", type="string")],
+        )
+        model_cls = reg.register(config)
+        assert reg.get_model("test_gadget") is model_cls
+
+    def test_get_model_unknown_returns_none(self):
+        """get_model returns None for unregistered entity names."""
+        reg = EntityRegistry()
+        assert reg.get_model("nonexistent") is None
+
+    def test_enum_field_with_choices(self):
+        """Enum fields with choices produce a CheckConstraint on the model."""
+        reg = EntityRegistry()
+        config = EntityConfig(
+            name="test_status_entity",
+            table="test_status_entities_reg",
+            fields=[
+                FieldConfig(name="status", type="enum", choices=["active", "inactive"]),
+            ],
+        )
+        model_cls = reg.register(config)
+        assert hasattr(model_cls, "status")
+        # Check that table_args contains a CheckConstraint
+        assert hasattr(model_cls, "__table_args__")
+        constraints = [
+            arg for arg in model_cls.__table_args__
+            if hasattr(arg, "name") and "ck_" in (arg.name or "")
+        ]
+        assert len(constraints) == 1
+
+
+# ---------------------------------------------------------------------------
+# TestCrudGenerator
+# ---------------------------------------------------------------------------
+
+
+class TestCrudGenerator:
+    """Tests for Pydantic schema and CRUD router generation."""
+
+    def test_build_pydantic_schema(self):
+        """build_pydantic_schema creates a Pydantic model with correct field types."""
+        config = EntityConfig(
+            name="product",
+            table="products",
+            fields=[
+                FieldConfig(name="name", type="string", required=True),
+                FieldConfig(name="price", type="decimal"),
+                FieldConfig(name="active", type="boolean"),
+            ],
+        )
+        Schema = build_pydantic_schema(config, "ProductCreate")
+        assert "name" in Schema.model_fields
+        assert "price" in Schema.model_fields
+        assert "active" in Schema.model_fields
+        # Required field should not have a default
+        assert Schema.model_fields["name"].is_required()
+        # Optional field should have a default of None
+        assert not Schema.model_fields["price"].is_required()
+
+    def test_build_crud_router(self):
+        """build_crud_router produces a router with 5 routes (list, create, get, update, delete)."""
+        reg = EntityRegistry()
+        config = EntityConfig(
+            name="test_item_crud",
+            table="test_items_crud",
+            fields=[
+                FieldConfig(name="label", type="string", required=True),
+            ],
+        )
+        model_cls = reg.register(config)
+        router = build_crud_router(config, model_cls)
+
+        # Extract route paths
+        route_methods = []
+        for route in router.routes:
+            if hasattr(route, "methods"):
+                for method in route.methods:
+                    route_methods.append((method, route.path))
+
+        # Should have: GET /, POST /, GET /{id}, PUT /{id}, DELETE /{id}
+        assert ("GET", "/test_items_crud") in route_methods
+        assert ("POST", "/test_items_crud") in route_methods
+        assert ("GET", "/test_items_crud/{entity_id}") in route_methods
+        assert ("PUT", "/test_items_crud/{entity_id}") in route_methods
+        assert ("DELETE", "/test_items_crud/{entity_id}") in route_methods
+
+    def test_crud_router_requires_auth(self):
+        """All CRUD router endpoints include get_current_user dependency (T-02-01 mitigation)."""
+        reg = EntityRegistry()
+        config = EntityConfig(
+            name="test_secure_crud",
+            table="test_secure_items",
+            fields=[
+                FieldConfig(name="value", type="string"),
+            ],
+        )
+        model_cls = reg.register(config)
+        router = build_crud_router(config, model_cls)
+
+        for route in router.routes:
+            if hasattr(route, "dependant"):
+                dep_names = [
+                    d.call.__name__
+                    for d in route.dependant.dependencies
+                    if hasattr(d, "call") and hasattr(d.call, "__name__")
+                ]
+                assert "get_current_user" in dep_names, (
+                    f"Route {route.path} missing get_current_user dependency"
+                )
