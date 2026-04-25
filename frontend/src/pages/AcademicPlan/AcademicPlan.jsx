@@ -10,6 +10,7 @@ import EmptyState from '../../components/EmptyState/EmptyState';
 import Button from '../../components/Button/Button';
 import Toast from '../../components/Toast/Toast';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
+import TemplateSelector from '../../components/TemplateSelector/TemplateSelector';
 import { useToast } from '../../hooks/useToast';
 import {
   generatePlan,
@@ -515,29 +516,11 @@ function AcademicPlan() {
           gap: 'var(--space-4)',
           flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
-            Template:
-          </span>
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => handleSetTemplate(t.id)}
-              disabled={templateLoading}
-              style={templateBtnStyle(activeTemplate === t.id)}
-              onMouseEnter={(e) => { if (activeTemplate !== t.id && !templateLoading) e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
-              onMouseLeave={(e) => { if (activeTemplate !== t.id) e.currentTarget.style.borderColor = 'var(--color-border)'; }}
-            >
-              {/* Mini preview swatch */}
-              <div style={{ width: '72px', borderRadius: '3px', overflow: 'hidden', border: '1px solid #e5e7eb', flexShrink: 0 }}>
-                <div style={{ height: '8px', background: t.headerColor }} />
-                <div style={{ padding: '3px 4px', background: '#f9fafb' }}>
-                  <div style={{ height: '3px', background: '#d1d5db', borderRadius: '1px', marginBottom: '2px' }} />
-                  <div style={{ height: '3px', background: '#e5e7eb', borderRadius: '1px', width: '70%' }} />
-                </div>
-              </div>
-              {t.label}
-            </button>
-          ))}
+          <TemplateSelector
+            templateId={activeTemplate}
+            onTemplateChange={handleSetTemplate}
+            isPending={templateLoading}
+          />
           <div style={{ marginLeft: 'auto' }}>
             <button
               onClick={() => setEditMode((v) => !v)}

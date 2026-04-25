@@ -1,6 +1,8 @@
 // REQ-088: Dashboard Page
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useQuery, useQueries } from '@tanstack/react-query';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
@@ -8,13 +10,10 @@ import EmptyState from '../../components/EmptyState/EmptyState';
 import { Button } from '@/components/ui/button';
 import { getStudents, createStudent } from '../../api/students';
 import { getAccount } from '../../api/account';
+import { getEntities, getEntityList } from '../../api/entities';
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [students, setStudents] = useState([]);
-  const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -23,17 +22,42 @@ function Dashboard() {
   const [filterClass, setFilterClass] = useState('');
   const [filterYear, setFilterYear] = useState('');
 
-  useEffect(() => {
-    Promise.all([getStudents(), getAccount()])
-      .then(([studentData, accountData]) => {
-        setStudents(Array.isArray(studentData) ? studentData : (studentData.items ?? []));
-        setAccount(accountData);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load dashboard data.');
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  // Config-driven: fetch entity registry for dynamic metrics
+  const entitiesQuery = useQuery({ queryKey: ['entities'], queryFn: getEntities });
+  const studentsQuery = useQuery({ queryKey: ['students'], queryFn: getStudents });
+  const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
+
+  const students = Array.isArray(studentsQuery.data) ? studentsQuery.data : (studentsQuery.data?.items ?? []);
+  const account = accountQuery.data ?? null;
+  const loading = studentsQuery.isLoading || accountQuery.isLoading;
+  const error = studentsQuery.error || accountQuery.error;
+
+  // Build dynamic metrics from entity config (auto_crud entities)
+  const entityMetrics = (entitiesQuery.data ?? [])
+    .filter(e => e.auto_crud)
+    .map(entity => ({
+      label: entity.name.charAt(0).toUpperCase() + entity.name.slice(1),
+      queryKey: ['entities', entity.name, 'count'],
+      queryFn: () => getEntityList(entity.table),
+    }));
+
+  const entityCountQueries = useQueries({
+    queries: entityMetrics.map(m => ({
+      queryKey: m.queryKey,
+      queryFn: m.queryFn,
+      enabled: !!entitiesQuery.data,
+    })),
+  });
+
+  // Combine domain-specific + config-driven metrics
+  const metrics = [
+    { label: 'Total Students', value: loading ? '--' : students.length },
+    { label: 'Plans Generated', value: loading ? '--' : students.filter((s) => s.has_plan).length },
+    ...entityMetrics.map((m, i) => ({
+      label: m.label,
+      value: entityCountQueries[i]?.data?.length ?? '--',
+    })),
+  ];
 
   const plansGenerated = students.filter((s) => s.has_plan).length;
 
@@ -71,38 +95,7 @@ function Dashboard() {
     fontFamily: 'var(--font-family-base)',
   };
 
-  const statsBarStyle = {
-    background: 'var(--color-surface)',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
-    padding: 'var(--space-4) var(--space-8)',
-    display: 'flex',
-    gap: 'var(--space-8)',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  };
-
-  const statBlockStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 'var(--space-1)',
-  };
-
-  const statValueStyle = {
-    fontSize: 'var(--font-size-2xl)',
-    fontWeight: 'var(--font-weight-bold)',
-    color: 'var(--color-text-primary)',
-    lineHeight: 'var(--line-height-tight)',
-  };
-
-  const statLabelStyle = {
-    fontSize: 'var(--font-size-sm)',
-    color: 'var(--color-text-secondary)',
-  };
-
-  const contentStyle = {
-    padding: 'var(--space-6) var(--space-8)',
-  };
+  // (stats bar styles removed — now using Card-based config-driven metrics grid)
 
   const cardStyle = {
     background: 'var(--color-surface)',
@@ -146,19 +139,22 @@ function Dashboard() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
 
-      <div style={statsBarStyle} role="region" aria-label="Summary statistics">
-        <div style={statBlockStyle}>
-          <span style={statValueStyle}>{loading ? '--' : students.length}</span>
-          <span style={statLabelStyle}>Total Students</span>
-        </div>
-        <div style={statBlockStyle}>
-          <span style={statValueStyle}>{loading ? '--' : plansGenerated}</span>
-          <span style={statLabelStyle}>Plans Generated</span>
-        </div>
-        <div style={statBlockStyle}>
-          <span style={statValueStyle}>--</span>
-          <span style={statLabelStyle}>Active Targets</span>
-        </div>
+      {/* Config-driven metrics: domain-specific + auto_crud entity counts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)', background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)' }} role="region" aria-label="Summary statistics">
+        {metrics.map((m) => (
+          <Card key={m.label}>
+            <CardHeader>
+              <CardTitle style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-secondary)' }}>
+                {m.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>
+                {m.value}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <main id="main-content" className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
