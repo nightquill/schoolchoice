@@ -268,7 +268,7 @@ def save_consultant_task(
 
     # Load or create AcademicPlan row
     plan = db.query(AcademicPlan).filter(
-        AcademicPlan.student_id == body.entity_id
+        AcademicPlan.student_id == _to_uuid(body.entity_id)
     ).first()
 
     if not plan:
