@@ -29,6 +29,7 @@ from app.main import app as fastapi_app
 _RATE_LIMIT_PATCH = "app.api.v1.routes.consultant._check_consultant_rate_limit"
 _STREAM_PATCH = "app.api.v1.routes.consultant.call_ai_stream"
 _ENGINE_PATCH = "app.api.v1.routes.consultant.TaskEngine"
+_CHAT_SERVICE_PATCH = "app.api.v1.routes.consultant.plan_chat_service"
 
 
 @pytest.fixture
@@ -248,3 +249,94 @@ class TestConsultantStatus:
             headers=auth_headers,
         )
         assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Chat endpoint tests
+# ---------------------------------------------------------------------------
+
+class TestConsultantChat:
+    def test_chat_requires_auth(self, client):
+        """Chat endpoint returns 401 without authentication."""
+        response = client.post(
+            "/api/v1/consultant/tasks/academic_plan/chat",
+            json={"entity_id": "test-id", "message": "change the summary"},
+        )
+        assert response.status_code == 401
+
+    def test_chat_404_for_missing_plan(self, client, auth_headers):
+        """Chat returns 404 when no plan exists for entity_id."""
+        import uuid
+        fake_id = str(uuid.uuid4())
+        with patch(_RATE_LIMIT_PATCH):
+            response = client.post(
+                "/api/v1/consultant/tasks/academic_plan/chat",
+                json={"entity_id": fake_id, "message": "update summary"},
+                headers=auth_headers,
+            )
+        assert response.status_code == 404
+
+    def test_chat_returns_message(self, client, auth_headers, db):
+        """Chat returns AI response message when plan exists."""
+        import uuid
+        from app.db.models import User
+        from app.db.models_v2 import AcademicPlan
+        from app.modules.school_choice.models.models import Student
+        from datetime import datetime, timezone
+
+        # Get the test user for FK
+        user = db.query(User).filter(User.email == "test@example.com").first()
+
+        # Create a student row (AcademicPlan FK -> students.id)
+        student_id = uuid.uuid4()
+        student = Student(
+            id=student_id,
+            user_id=user.id,
+            name="Test Student",
+            target_region="local",
+        )
+        db.add(student)
+        db.flush()
+
+        # Create a plan row
+        plan = AcademicPlan(
+            id=uuid.uuid4(),
+            student_id=student_id,
+            version=1,
+            html_content="<p>test</p>",
+            generated_at=datetime.now(timezone.utc),
+        )
+        db.add(plan)
+        db.commit()
+
+        mock_result = MagicMock()
+        mock_result.message = "Done. Updated: student_summary."
+        mock_result.plan_id = str(plan.id)
+        mock_result.version = 2
+        mock_result.html_content = "<p>updated</p>"
+
+        with patch(_RATE_LIMIT_PATCH), \
+             patch(_CHAT_SERVICE_PATCH) as mock_svc:
+            mock_svc.handle_chat.return_value = mock_result
+
+            response = client.post(
+                "/api/v1/consultant/tasks/academic_plan/chat",
+                json={"entity_id": str(student_id), "message": "shorten the summary"},
+                headers=auth_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["message"] == "Done. Updated: student_summary."
+        assert data["plan_id"] == str(plan.id)
+        assert data["version"] == 2
+
+    def test_chat_400_for_invalid_entity_id(self, client, auth_headers):
+        """Chat returns 400 for malformed entity_id."""
+        response = client.post(
+            "/api/v1/consultant/tasks/academic_plan/chat",
+            json={"entity_id": "not-a-uuid", "message": "test"},
+            headers=auth_headers,
+        )
+        assert response.status_code == 400
+        assert "Invalid entity_id" in response.json()["detail"]
