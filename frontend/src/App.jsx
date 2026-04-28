@@ -22,6 +22,7 @@ import SubjectDetail from './pages/SubjectDetail/SubjectDetail';
 import EntityListPage from './pages/EntityListPage/EntityListPage';
 import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
+import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/students/:id/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
         <Route path="/students/:id/targets" element={<ProtectedRoute><TargetSchools /></ProtectedRoute>} />
         <Route path="/students/:id/plan" element={<ProtectedRoute><AcademicPlan /></ProtectedRoute>} />
+        <Route path="/students/:id/consultant" element={<ProtectedRoute><ConsultantTask /></ProtectedRoute>} />
         <Route path="/schools" element={<ProtectedRoute><SchoolDirectory /></ProtectedRoute>} />
         <Route path="/schools/:id" element={<ProtectedRoute><SchoolProfile /></ProtectedRoute>} />
         <Route path="/account/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
