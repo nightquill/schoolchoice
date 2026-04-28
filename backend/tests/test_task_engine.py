@@ -27,21 +27,7 @@ from dataclasses import dataclass
 from app.platform.task_engine import TaskEngine, TaskDefinition, PII_BLOCKLIST
 
 
-# ---------------------------------------------------------------------------
-# Fixture: patch TASK_DIRS to use paths relative to backend/ (where pytest runs)
-# ---------------------------------------------------------------------------
-
-@pytest.fixture(autouse=True)
-def _patch_task_dirs():
-    """TASK_DIRS in task_engine.py use 'backend/app/...' paths which only resolve
-    from the project root. Tests run from backend/, so patch to 'app/...' paths."""
-    original = TaskEngine.TASK_DIRS
-    TaskEngine.TASK_DIRS = [
-        Path("app/platform/tasks"),
-        Path("app/modules/school_choice/tasks"),
-    ]
-    yield
-    TaskEngine.TASK_DIRS = original
+# TASK_DIRS uses absolute paths anchored to __file__, no fixture needed.
 
 
 # ---------------------------------------------------------------------------

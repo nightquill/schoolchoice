@@ -57,10 +57,13 @@ class TaskEngine:
     Data slot resolution maps slot type names to actual data from DB/services.
     """
 
+    # Anchor to project root (three levels up from this file: platform/ -> app/ -> backend/)
+    _BACKEND_ROOT: Path = Path(__file__).resolve().parent.parent.parent
+
     # Ordered by priority -- module tasks are discovered after platform tasks
     TASK_DIRS: list[Path] = [
-        Path("backend/app/platform/tasks"),
-        Path("backend/app/modules/school_choice/tasks"),
+        _BACKEND_ROOT / "app" / "platform" / "tasks",
+        _BACKEND_ROOT / "app" / "modules" / "school_choice" / "tasks",
     ]
 
     def load_task(self, task_id: str) -> TaskDefinition:
