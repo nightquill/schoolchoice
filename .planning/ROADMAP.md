@@ -115,8 +115,8 @@ Plans:
 - [x] 05-01-PLAN.md — Backend foundation: TaskEngine, call_ai_stream(), yaml_loader extensions, Pydantic output schemas (AI-04, AI-05)
 - [x] 05-02-PLAN.md — RecommendationEngine with YAML rules, confidence tiers, SHAP support, unit tests (AI-07, AI-08, AI-09)
 - [x] 05-03-PLAN.md — School choice migration: academic_plan.yaml, matching_rules.yaml, Jinja2 template hierarchy, TaskEngine tests (AI-04, AI-06)
-- [ ] 05-04-PLAN.md — Consultant API endpoints (SSE stream, save, status), main.py wiring, integration tests (AI-05, AI-06)
-- [ ] 05-05-PLAN.md — Frontend: ConsultantTaskPage, SSEStreamDisplay, ConfidenceBadge, API client, route registration (AI-05, AI-06, AI-09)
+- [x] 05-04-PLAN.md — Consultant API endpoints (SSE stream, save, status), main.py wiring, integration tests (AI-05, AI-06)
+- [x] 05-05-PLAN.md — Frontend: ConsultantTaskPage, SSEStreamDisplay, ConfidenceBadge, API client, route registration (AI-05, AI-06, AI-09)
 - [ ] 05-06-PLAN.md — Human verification: end-to-end SSE streaming, confidence badges, chat, template switching, export (all AI requirements)
 
 ### Phase 6: Deployment and Production Readiness
