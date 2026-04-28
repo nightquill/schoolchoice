@@ -54,6 +54,18 @@ def _to_uuid(val: str) -> _uuid_mod.UUID:
         raise HTTPException(status_code=400, detail=f"Invalid entity_id: {val}")
 
 
+def _verify_student_ownership(db: Session, entity_id: str, user: User) -> None:
+    """
+    Verify the current user owns the student identified by entity_id.
+    Raises HTTP 403 if the student does not belong to the user.
+    """
+    from app.modules.school_choice.models.models import Student
+
+    student = db.query(Student).filter(Student.id == _to_uuid(entity_id)).first()
+    if not student or student.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+
 def _check_consultant_rate_limit(db: Session, entity_id: str, user_id: Any) -> None:
     """
     Enforce a rolling 24-hour rate limit of 20 requests per entity per user.
@@ -114,6 +126,9 @@ async def stream_consultant_task(
     Uses GET (not POST) because EventSource is GET-only (RESEARCH.md A1).
     Accepts auth token from query param for EventSource compatibility.
     """
+    # Ownership check
+    _verify_student_ownership(db, entity_id, current_user)
+
     # Rate limit check
     _check_consultant_rate_limit(db, entity_id, current_user.id)
 
@@ -158,6 +173,8 @@ def get_consultant_task_status(
     """
     Return the current plan state for the given entity.
     """
+    # Ownership check
+    _verify_student_ownership(db, entity_id, current_user)
 
     plan = db.query(AcademicPlan).filter(
         AcademicPlan.student_id == _to_uuid(entity_id)
@@ -222,6 +239,8 @@ def save_consultant_task(
     """
     Validate AI output, apply confidence guardrail, render HTML, persist to DB.
     """
+    # Ownership check
+    _verify_student_ownership(db, body.entity_id, current_user)
 
     # Parse raw JSON from frontend SSE buffer
     try:
@@ -318,6 +337,9 @@ def consultant_chat(
     """
     # Validate entity_id is a real UUID
     entity_uuid = _to_uuid(body.entity_id)
+
+    # Ownership check
+    _verify_student_ownership(db, body.entity_id, current_user)
 
     # Rate limit
     _check_consultant_rate_limit(db, body.entity_id, current_user.id)
