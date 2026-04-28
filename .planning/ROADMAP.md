@@ -118,7 +118,7 @@ Plans:
 - [x] 05-04-PLAN.md — Consultant API endpoints (SSE stream, save, status), main.py wiring, integration tests (AI-05, AI-06)
 - [x] 05-05-PLAN.md — Frontend: ConsultantTaskPage, SSEStreamDisplay, ConfidenceBadge, API client, route registration (AI-05, AI-06, AI-09)
 - [x] 05-06-PLAN.md — Human verification: end-to-end SSE streaming, confidence badges, chat, template switching, export (all AI requirements)
-- [ ] 05-07-PLAN.md — Gap closure: add POST /consultant/tasks/{task_id}/chat endpoint + tests (AI-05, AI-06)
+- [x] 05-07-PLAN.md — Gap closure: add POST /consultant/tasks/{task_id}/chat endpoint + tests (AI-05, AI-06)
 
 ### Phase 6: Deployment and Production Readiness
 **Goal**: Any developer can clone the repo, follow a documented setup, and have a running production instance on Vercel + Neon with a seeded demo in under an hour; RBAC enforces admin/staff roles throughout
@@ -143,5 +143,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. AI Provider Abstraction | 0/3 | Planning complete | - |
 | 3. Frontend Stabilization | 6/6 | Complete | 2026-04-25 |
 | 4. Import and Export | 0/5 | Planning complete | - |
-| 5. Consultant Engine | 0/7 | Planning complete | - |
+| 5. Consultant Engine | 7/7 | Complete | 2026-04-28 |
 | 6. Deployment and Production Readiness | 0/TBD | Not started | - |

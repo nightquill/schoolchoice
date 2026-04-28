@@ -24,8 +24,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **AI-02**: AI provider abstraction (LiteLLM) routes all AI calls through a single interface regardless of configured provider
 - [ ] **AI-03**: Deployer can bring their own API key (BYOK) — key stored in environment, never exposed to frontend
 - [ ] **AI-04**: Developer can define guided AI workflows in YAML (step sequences with AI calls at designated steps)
-- [ ] **AI-05**: Guided workflow engine executes YAML-defined workflows with session state persisted between steps
-- [ ] **AI-06**: School choice plan generation rebuilt as a guided workflow on the platform engine
+- [x] **AI-05**: Guided workflow engine executes YAML-defined workflows with session state persisted between steps
+- [x] **AI-06**: School choice plan generation rebuilt as a guided workflow on the platform engine
 - [ ] **AI-07**: Hybrid recommendation engine generalized: configurable eligibility rules + weighted scoring + optional ML model per domain
 - [ ] **AI-08**: SHAP explainability available for any domain module using the ML scoring component
 - [ ] **AI-09**: Eligibility confidence indicator shows data completeness level on each recommendation
@@ -130,8 +130,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-02 | Phase 2 | Pending |
 | AI-03 | Phase 2 | Pending |
 | AI-04 | Phase 5 | Pending |
-| AI-05 | Phase 5 | Pending |
-| AI-06 | Phase 5 | Pending |
+| AI-05 | Phase 5 | Complete |
+| AI-06 | Phase 5 | Complete |
 | AI-07 | Phase 5 | Pending |
 | AI-08 | Phase 5 | Pending |
 | AI-09 | Phase 5 | Pending |
