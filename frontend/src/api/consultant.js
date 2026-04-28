@@ -20,10 +20,3 @@ export const sendConsultantChat = (taskId, entityId, message) =>
     entity_id: entityId,
     message,
   }).then((r) => r.data);
-
-// Change template for existing plan
-export const changeConsultantTemplate = (taskId, entityId, templateName) =>
-  client.post(`/api/v1/consultant/tasks/${taskId}/template`, {
-    entity_id: entityId,
-    template_name: templateName,
-  }).then((r) => r.data);
