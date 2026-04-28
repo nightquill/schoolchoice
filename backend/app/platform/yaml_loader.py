@@ -69,3 +69,53 @@ def load_entity_yaml(path: Path) -> EntityConfig:
         auto_crud=raw.get("auto_crud", True),
         key_fields=raw.get("key_fields", []),
     )
+
+
+def load_task_yaml(path: Path) -> "TaskDefinition":
+    """Parse a YAML task definition file into a TaskDefinition dataclass.
+
+    Raises ValueError if required fields are missing.
+    """
+    from app.platform.task_engine import TaskDefinition
+
+    with open(path) as f:
+        raw = yaml.safe_load(f) or {}
+
+    required = ["task_id", "name", "prompts", "output_schema", "jinja2_template"]
+    for key in required:
+        if key not in raw:
+            raise ValueError(f"Task YAML missing required '{key}' field: {path}")
+
+    prompts = raw["prompts"]
+    if "system" not in prompts or "user" not in prompts:
+        raise ValueError(f"Task YAML prompts must have 'system' and 'user': {path}")
+
+    return TaskDefinition(
+        task_id=raw["task_id"],
+        name=raw["name"],
+        description=raw.get("description", ""),
+        data_slots=raw.get("data_slots", {}),
+        system_prompt_template=prompts["system"],
+        user_prompt_template=prompts["user"],
+        output_schema=raw["output_schema"],
+        jinja2_template=raw["jinja2_template"],
+        max_tokens=raw.get("max_tokens", 4096),
+        temperature=raw.get("temperature", 0.3),
+        enable_chat=raw.get("enable_chat", True),
+        max_context_tokens=raw.get("max_context_tokens", 60_000),
+    )
+
+
+def load_rules_yaml(path: Path) -> dict:
+    """Parse a YAML rules definition file.
+
+    Raises ValueError if required 'domain' field is missing.
+    Returns raw dict for consumption by RecommendationEngine.
+    """
+    with open(path) as f:
+        raw = yaml.safe_load(f) or {}
+
+    if "domain" not in raw:
+        raise ValueError(f"Rules YAML missing required 'domain' field: {path}")
+
+    return raw
