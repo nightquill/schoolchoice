@@ -150,7 +150,7 @@
 {% if chart_data %}
 <script>
 (function() {
-  var chartData = {{ chart_data | tojson }};
+  var chartData = {{ chart_data | tojson | safe }};
   if (chartData && chartData.schools) {
     chartData.schools.forEach(function(schoolChart, idx) {
       var canvasId = 'chart-school-' + (idx + 1);

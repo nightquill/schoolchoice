@@ -215,8 +215,10 @@ def _render_plan_html(
 
     env = Environment(
         loader=FileSystemLoader(template_dirs),
-        autoescape=False,  # We use explicit html_escape filter
+        autoescape=True,
     )
+    # Keep html_escape filter for backward compat; with autoescape=True it's
+    # redundant on normal variables but harmless.
     env.filters["html_escape"] = html.escape
 
     tpl_name = template_name or task_def.jinja2_template
