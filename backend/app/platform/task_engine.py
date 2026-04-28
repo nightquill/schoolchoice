@@ -94,10 +94,11 @@ class TaskEngine:
         system_prompt = env.from_string(task.system_prompt_template).render(**context)
         user_prompt = env.from_string(task.user_prompt_template).render(**context)
 
-        # PII blocklist scan (T-05-02 mitigation)
+        # PII blocklist scan (T-05-02 mitigation) -- use word-boundary matching
+        # to avoid false positives (e.g. "dob" in "adobe", "ssn" in data)
         combined_prompt = system_prompt + user_prompt
         for pii_field in PII_BLOCKLIST:
-            if pii_field in combined_prompt:
+            if re.search(rf'\b{pii_field}\b', combined_prompt):
                 raise ValueError(f"PII scope violation: prompt contains blocked field '{pii_field}'")
 
         messages = [
