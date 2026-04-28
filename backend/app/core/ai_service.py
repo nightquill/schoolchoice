@@ -101,6 +101,7 @@ async def call_ai_stream(
     model_string = _build_model_string()
     logger.info("Streaming AI call: %s", model_string)
 
+    started = False  # Track whether any chunks have been sent
     try:
         response = await litellm.acompletion(
             model=model_string,
@@ -114,14 +115,24 @@ async def call_ai_stream(
         async for chunk in response:
             content = chunk.choices[0].delta.content or ""
             if content:
+                started = True
                 yield f"data: {content}\n\n"
         yield "event: done\ndata: \n\n"
     except litellm.AuthenticationError as exc:
         logger.error("AI auth failed: %s", exc)
+        if started:
+            yield "event: error\ndata: AI provider authentication failed.\n\n"
+            return
         raise HTTPException(status_code=503, detail="AI provider authentication failed.")
     except litellm.ServiceUnavailableError as exc:
         logger.error("AI provider unreachable: %s", exc)
+        if started:
+            yield "event: error\ndata: AI provider is temporarily unavailable.\n\n"
+            return
         raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
     except Exception as exc:
         logger.error("AI streaming error: %s", exc)
+        if started:
+            yield "event: error\ndata: Unexpected error communicating with AI provider.\n\n"
+            return
         raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
