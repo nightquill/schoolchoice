@@ -10,6 +10,7 @@ from __future__ import annotations
 import html
 import json
 import logging
+import uuid as _uuid_mod
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -42,6 +43,14 @@ _RATE_LIMIT_MAX = 20
 _RATE_LIMIT_WINDOW_HOURS = 24
 
 
+def _to_uuid(val: str) -> _uuid_mod.UUID:
+    """Convert a string to UUID, raising 400 if invalid."""
+    try:
+        return _uuid_mod.UUID(val)
+    except (ValueError, AttributeError):
+        raise HTTPException(status_code=400, detail=f"Invalid entity_id: {val}")
+
+
 def _check_consultant_rate_limit(db: Session, entity_id: str, user_id: Any) -> None:
     """
     Enforce a rolling 24-hour rate limit of 20 requests per entity per user.
@@ -53,7 +62,7 @@ def _check_consultant_rate_limit(db: Session, entity_id: str, user_id: Any) -> N
     from app.db.models_v2 import AcademicPlan
 
     plan = db.query(AcademicPlan).filter(
-        AcademicPlan.student_id == entity_id
+        AcademicPlan.student_id == _to_uuid(entity_id)
     ).first()
     if not plan:
         # No plan row yet -- no rate limit to enforce
@@ -150,7 +159,7 @@ def get_consultant_task_status(
     from app.db.models_v2 import AcademicPlan
 
     plan = db.query(AcademicPlan).filter(
-        AcademicPlan.student_id == entity_id
+        AcademicPlan.student_id == _to_uuid(entity_id)
     ).first()
 
     if not plan:
@@ -212,7 +221,6 @@ def save_consultant_task(
     """
     Validate AI output, apply confidence guardrail, render HTML, persist to DB.
     """
-    import uuid as _uuid
     from app.db.models_v2 import AcademicPlan
 
     # Parse raw JSON from frontend SSE buffer
@@ -265,8 +273,8 @@ def save_consultant_task(
 
     if not plan:
         plan = AcademicPlan(
-            id=_uuid.uuid4(),
-            student_id=body.entity_id,
+            id=_uuid_mod.uuid4(),
+            student_id=_to_uuid(body.entity_id),
             version=1,
         )
         db.add(plan)
