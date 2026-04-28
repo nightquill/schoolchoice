@@ -118,6 +118,9 @@ class TestTruncation:
         # Original should still have all 8 results with shap_explanation
         assert len(context["matchmaker"]) == 8
         assert "shap_explanation" in context["matchmaker"][0]
+        # Also verify a high-scoring item (index 7, score 0.7) that IS in
+        # the truncated top-5 still has shap_explanation in the original
+        assert "shap_explanation" in context["matchmaker"][7]
         # Truncated should have <=5
         assert len(truncated["matchmaker"]) <= 5
 

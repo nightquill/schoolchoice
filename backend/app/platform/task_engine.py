@@ -7,6 +7,7 @@ calls the AI provider, and validates structured JSON output.
 """
 from __future__ import annotations
 
+import copy
 import json
 import logging
 import re
@@ -244,7 +245,8 @@ class TaskEngine:
         """
         ctx = dict(context)
         if "matchmaker" in ctx and isinstance(ctx["matchmaker"], list):
-            results = list(ctx["matchmaker"])
+            # Deep copy inner dicts so mutations don't affect the originals
+            results = [copy.deepcopy(r) for r in ctx["matchmaker"]]
             # Step 1: reduce to top 5 by final_score
             results = sorted(results, key=lambda r: r.get("final_score", 0), reverse=True)[:5]
             # Step 2: truncate rationale to first sentence
