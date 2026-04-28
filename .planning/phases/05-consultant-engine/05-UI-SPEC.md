@@ -47,6 +47,7 @@ All values are multiples of 4. Sourced from `src/utils/tokens.css`.
 | 2xl | `--space-12` | 48px | Page-level vertical breathing room |
 
 **Exceptions:**
+- 12px (`--space-3`): sourced from existing `tokens.css` and used in existing `AcademicPlan.jsx` chat message padding — established pattern, not a new value. Retained as a documented non-standard step between 8px and 16px.
 - Confidence badge touch target minimum: 44px height on mobile (WCAG 2.5.5)
 - Chat panel fixed width on desktop: 360px (matches existing `AcademicPlan.jsx` chat column)
 - SSE streaming text area minimum height: 200px to prevent layout jump during generation
@@ -55,14 +56,18 @@ All values are multiples of 4. Sourced from `src/utils/tokens.css`.
 
 ## Typography
 
-All values are sourced from `src/utils/tokens.css`. Use exactly these four roles — no additional sizes.
+All values are sourced from `src/utils/tokens.css`. Use exactly these four roles — no additional sizes. Exactly two font weights are used: 400 (normal) and 700 (bold).
 
 | Role | CSS Variable | Size | Weight | Line Height | Usage |
 |------|-------------|------|--------|-------------|-------|
 | Body | `--font-size-md` / `--font-weight-normal` | 16px (1rem) | 400 | 1.5 (`--line-height-normal`) | Chat messages, section descriptions, form help text |
-| Label | `--font-size-sm` / `--font-weight-medium` | 14px (0.875rem) | 500 | 1.5 | Confidence badge text, section labels, toolbar metadata, chat input placeholder |
+| Label | `--font-size-sm` / `--font-weight-normal` | 14px (0.875rem) | 400 | 1.5 | Confidence badge text, section labels, toolbar metadata, chat input placeholder — differentiated from Body by smaller size and UPPERCASE case transform where needed |
 | Heading | `--font-size-xl` / `--font-weight-bold` | 20px (1.25rem) | 700 | 1.25 (`--line-height-tight`) | Panel headers (AI Assistant, Fit Analysis), task page section titles |
 | Display | `--font-size-2xl` / `--font-weight-bold` | 24px (1.5rem) | 700 | 1.25 | Page-level headings (Recommendations for [Name]) |
+
+**Weight summary:** 400 (`--font-weight-normal`) and 700 (`--font-weight-bold`) only. No 500 / medium weight is introduced.
+
+**Label differentiation without weight:** Use `font-size: 14px` + `letter-spacing: 0.05em` + `text-transform: uppercase` for tier labels (LOW / MEDIUM / HIGH) and metadata labels where visual separation from body copy is needed.
 
 **Streaming text rendering:** Use `--font-size-md` / `--font-weight-normal` / line-height 1.6 inside the SSE streaming output container (extra breathing room compensates for token-by-token append). `font-family: var(--font-family-base)`.
 
@@ -157,6 +162,8 @@ New components required by Phase 5. All extend existing patterns — no new desi
 
 **Purpose:** Full-page view for triggering a YAML-defined consultant task and displaying the streaming output. This is the generalized replacement for `AcademicPlan.jsx` — school choice plan generation is the first task migrated to this page.
 
+**Primary focal point:** The SSEStreamDisplay / rendered plan iframe in the left column is the primary visual anchor of this page. Before generation begins, the "Generate Plan" button in the toolbar is the CTA anchor that draws the user's eye. During and after generation, the streaming output becomes the focal point — it occupies the majority of the viewport (flex: 1) and receives auto-scroll attention as tokens arrive.
+
 **Layout (desktop, ≥768px):**
 - Left column (flex: 1, min-width: 0): SSEStreamDisplay or rendered plan iframe
 - Right column (360px fixed): ChatPanel (existing from `AcademicPlan.jsx`)
@@ -170,7 +177,7 @@ New components required by Phase 5. All extend existing patterns — no new desi
 - Chat panel collapsible via a "Show AI Chat" toggle button
 
 **Toolbar contents (left to right):**
-1. Student/entity name (`--font-size-lg`, `--font-weight-medium`)
+1. Student/entity name (`--font-size-lg`, `--font-weight-bold`)
 2. Plan version if available (`--font-size-xs`, `--color-text-secondary`)
 3. Template selector (existing `TemplateSelector` component, unchanged)
 4. "Generate Plan" primary button (accent fill)
@@ -200,7 +207,7 @@ New components required by Phase 5. All extend existing patterns — no new desi
 5. `done` event received: cursor disappears; backend DB save triggered; plan re-fetched via existing `loadPlan()` pattern; button returns to idle state; success toast "Plan ready — view it here."
 6. `error` event or `onerror`: container shows error state; "Generation was interrupted. Please try again." copy; button returns to idle
 
-**Cancel during streaming:** "Cancel" button (secondary variant) visible while streaming. Click closes `EventSource` immediately; button returns to idle; SSEStreamDisplay resets to idle state. No partial plan is saved.
+**Cancel during streaming:** "Stop Generation" button (secondary variant) visible while streaming. Click closes `EventSource` immediately; button returns to idle; SSEStreamDisplay resets to idle state. No partial plan is saved.
 
 ### Confidence Badge — hover/focus
 
@@ -225,6 +232,7 @@ No changes from existing `PlanSectionEditor` interaction. Keep existing behavior
 | Element | Copy | Notes |
 |---------|------|-------|
 | Primary CTA | "Generate Plan" | Verb + noun. Matches existing label in `AcademicPlan.jsx` — do not change. |
+| Streaming cancel | "Stop Generation" | Verb + noun. Visible only while SSE streaming is active. Closes EventSource immediately. |
 | Streaming progress | "Generating plan…" | Replaces "This usually takes up to 10 seconds." — SSE shows live output so no timing estimate needed. |
 | Empty state heading | "No plan has been generated yet." | Matches existing `AcademicPlan.jsx` EmptyState copy — do not change. |
 | Empty state body | "Click Generate Plan to create a school choice plan for this student." | Replaces current buttonless empty state with actionable instruction. |
