@@ -104,8 +104,8 @@ Plans:
 **Requirements**: AI-04, AI-05, AI-06, AI-07, AI-08, AI-09
 **Success Criteria** (what must be TRUE):
   1. User can open an AI chat panel for any entity, ask a question about that entity's data, and receive a streamed response without a page reload
-  2. User can run the school choice fit analysis as a guided multi-step workflow — each step presents a prompt, accepts input, and the workflow produces a final structured plan
-  3. Developer can define a new guided workflow by writing a YAML file — no Python code changes required to add workflow steps or AI prompt templates
+  2. User can trigger a school choice fit analysis as a single-click consultant task — the engine assembles data, runs AI, and produces a complete structured plan with streaming output
+  3. Developer can define a new consultant task by writing a YAML file — no Python code changes required to add task definitions or AI prompt templates
   4. Each school recommendation displays an eligibility confidence indicator (e.g., LOW / MEDIUM / HIGH) reflecting how complete the student's data is
   5. The hybrid recommendation engine (eligibility rules + weighted scoring + optional XGBoost) works for the school choice domain and the configuration interface allows a second domain to plug in its own rules and weights
 **Plans:** 6 plans
