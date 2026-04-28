@@ -389,5 +389,8 @@ def _apply_confidence_guardrail(
                     code_tier,
                 )
                 school.confidence_tier = code_tier
+    except (ImportError, AttributeError) as exc:
+        logger.warning("Confidence guardrail skipped (expected): %s", exc)
     except Exception as exc:
-        logger.warning("Confidence guardrail skipped: %s", exc)
+        logger.error("Confidence guardrail unexpected failure: %s", exc, exc_info=True)
+        raise
