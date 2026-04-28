@@ -117,7 +117,7 @@ Plans:
 - [x] 05-03-PLAN.md — School choice migration: academic_plan.yaml, matching_rules.yaml, Jinja2 template hierarchy, TaskEngine tests (AI-04, AI-06)
 - [x] 05-04-PLAN.md — Consultant API endpoints (SSE stream, save, status), main.py wiring, integration tests (AI-05, AI-06)
 - [x] 05-05-PLAN.md — Frontend: ConsultantTaskPage, SSEStreamDisplay, ConfidenceBadge, API client, route registration (AI-05, AI-06, AI-09)
-- [ ] 05-06-PLAN.md — Human verification: end-to-end SSE streaming, confidence badges, chat, template switching, export (all AI requirements)
+- [x] 05-06-PLAN.md — Human verification: end-to-end SSE streaming, confidence badges, chat, template switching, export (all AI requirements)
 
 ### Phase 6: Deployment and Production Readiness
 **Goal**: Any developer can clone the repo, follow a documented setup, and have a running production instance on Vercel + Neon with a seeded demo in under an hour; RBAC enforces admin/staff roles throughout
