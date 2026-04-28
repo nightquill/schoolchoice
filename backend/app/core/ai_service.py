@@ -8,6 +8,7 @@ invokes litellm.completion() synchronously.
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncGenerator
 from typing import Any
 
 import litellm
@@ -77,4 +78,50 @@ def call_ai(messages: list[dict[str, str]], **kwargs: Any) -> str:
         raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
     except Exception as exc:
         logger.error("AI provider error: %s", exc)
+        raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
+
+
+async def call_ai_stream(
+    messages: list[dict[str, str]],
+    **kwargs: Any,
+) -> AsyncGenerator[str, None]:
+    """
+    Async streaming variant of call_ai(). Yields SSE-formatted text chunks.
+    Returns an async generator — wrap in FastAPI StreamingResponse.
+
+    Raises HTTPException(503) if AI_API_KEY is not configured or auth fails.
+    Raises HTTPException(502) on unexpected provider error.
+    """
+    if not settings.AI_API_KEY:
+        raise HTTPException(
+            status_code=503,
+            detail="AI chat is not available: AI_API_KEY is not configured.",
+        )
+
+    model_string = _build_model_string()
+    logger.info("Streaming AI call: %s", model_string)
+
+    try:
+        response = await litellm.acompletion(
+            model=model_string,
+            messages=messages,
+            api_key=settings.AI_API_KEY,
+            api_base=settings.AI_BASE_URL or None,
+            timeout=settings.AI_TIMEOUT,
+            stream=True,
+            **kwargs,
+        )
+        async for chunk in response:
+            content = chunk.choices[0].delta.content or ""
+            if content:
+                yield f"data: {content}\n\n"
+        yield "event: done\ndata: \n\n"
+    except litellm.AuthenticationError as exc:
+        logger.error("AI auth failed: %s", exc)
+        raise HTTPException(status_code=503, detail="AI provider authentication failed.")
+    except litellm.ServiceUnavailableError as exc:
+        logger.error("AI provider unreachable: %s", exc)
+        raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
+    except Exception as exc:
+        logger.error("AI streaming error: %s", exc)
         raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
