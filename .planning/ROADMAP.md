@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 2: AI Provider Abstraction** - Replace hardcoded Gemini with LiteLLM multi-provider layer and BYOK config
 - [x] **Phase 3: Frontend Stabilization** - Establish test coverage, decompose StudentProfile, introduce TanStack Query, and build platform-level UI components
 - [ ] **Phase 4: Import and Export** - CSV/Excel import with column-mapping UI, data export, and report export
-- [ ] **Phase 5: Consultant Engine** - Freeform AI chat and YAML-driven guided workflow engine with school choice workflow migrated
+- [ ] **Phase 5: Consultant Engine** - YAML-driven AI consultant engine with SSE streaming, school choice migration, and generalized recommendation engine
 - [ ] **Phase 6: Deployment and Production Readiness** - Vercel + Neon deployment template, secrets management, RBAC enforcement, and demo seed
 
 ## Phase Details
@@ -99,7 +99,7 @@ Plans:
 - [x] 04-05-PLAN.md — Human verification: full import/export flow, search/filter, regression check (all DATA requirements)
 
 ### Phase 5: Consultant Engine
-**Goal**: Users can ask freeform AI questions about their entity data and run structured guided workflows; school choice plan generation is migrated to the workflow engine; recommendation engine is generalized across domains
+**Goal**: Users can trigger YAML-driven AI consultant tasks that stream structured output via SSE; school choice plan generation is migrated to the task engine; recommendation engine is generalized with configurable rules, scoring, and confidence badges across domains
 **Depends on**: Phase 4
 **Requirements**: AI-04, AI-05, AI-06, AI-07, AI-08, AI-09
 **Success Criteria** (what must be TRUE):
@@ -108,8 +108,16 @@ Plans:
   3. Developer can define a new guided workflow by writing a YAML file — no Python code changes required to add workflow steps or AI prompt templates
   4. Each school recommendation displays an eligibility confidence indicator (e.g., LOW / MEDIUM / HIGH) reflecting how complete the student's data is
   5. The hybrid recommendation engine (eligibility rules + weighted scoring + optional XGBoost) works for the school choice domain and the configuration interface allows a second domain to plug in its own rules and weights
-**Plans**: TBD
+**Plans:** 6 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 05-01-PLAN.md — Backend foundation: TaskEngine, call_ai_stream(), yaml_loader extensions, Pydantic output schemas (AI-04, AI-05)
+- [ ] 05-02-PLAN.md — RecommendationEngine with YAML rules, confidence tiers, SHAP support, unit tests (AI-07, AI-08, AI-09)
+- [ ] 05-03-PLAN.md — School choice migration: academic_plan.yaml, matching_rules.yaml, Jinja2 template hierarchy, TaskEngine tests (AI-04, AI-06)
+- [ ] 05-04-PLAN.md — Consultant API endpoints (SSE stream, save, status), main.py wiring, integration tests (AI-05, AI-06)
+- [ ] 05-05-PLAN.md — Frontend: ConsultantTaskPage, SSEStreamDisplay, ConfidenceBadge, API client, route registration (AI-05, AI-06, AI-09)
+- [ ] 05-06-PLAN.md — Human verification: end-to-end SSE streaming, confidence badges, chat, template switching, export (all AI requirements)
 
 ### Phase 6: Deployment and Production Readiness
 **Goal**: Any developer can clone the repo, follow a documented setup, and have a running production instance on Vercel + Neon with a seeded demo in under an hour; RBAC enforces admin/staff roles throughout
@@ -134,5 +142,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. AI Provider Abstraction | 0/3 | Planning complete | - |
 | 3. Frontend Stabilization | 6/6 | Complete | 2026-04-25 |
 | 4. Import and Export | 0/5 | Planning complete | - |
-| 5. Consultant Engine | 0/TBD | Not started | - |
+| 5. Consultant Engine | 0/6 | Planning complete | - |
 | 6. Deployment and Production Readiness | 0/TBD | Not started | - |
