@@ -343,8 +343,8 @@ def consultant_chat(
     # Ownership check
     _verify_student_ownership(db, body.entity_id, current_user)
 
-    # Rate limit
-    _check_consultant_rate_limit(db, body.entity_id, current_user.id)
+    # Rate limit is handled inside plan_chat_service.handle_chat() --
+    # do NOT duplicate it here (was double-counting: 1 request = 2 slots).
 
     # Load existing plan
     plan = db.query(AcademicPlan).filter(
