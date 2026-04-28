@@ -42,6 +42,11 @@ class ConsultantTaskRequest(BaseModel):
     entity_id: str
 
 
+class ConsultantChatRequest(BaseModel):
+    entity_id: str
+    message: str
+
+
 class ConsultantSaveRequest(BaseModel):
     task_id: str
     entity_id: str

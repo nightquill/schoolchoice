@@ -25,7 +25,10 @@ from app.core.dependencies import get_current_user, get_current_user_or_query_to
 from app.db.models import User
 from app.db.session import get_db
 from app.platform.task_engine import TaskEngine
+from app.db.models_v2 import AcademicPlan
+from app.modules.school_choice.services import plan_chat_service
 from app.platform.schemas.consultant_output import (
+    ConsultantChatRequest,
     ConsultantPlanOutput,
     ConsultantSaveRequest,
     ConsultantTaskResponse,
@@ -59,7 +62,6 @@ def _check_consultant_rate_limit(db: Session, entity_id: str, user_id: Any) -> N
 
     Raises HTTPException(429) if the limit is exceeded.
     """
-    from app.db.models_v2 import AcademicPlan
 
     plan = db.query(AcademicPlan).filter(
         AcademicPlan.student_id == _to_uuid(entity_id)
@@ -156,7 +158,6 @@ def get_consultant_task_status(
     """
     Return the current plan state for the given entity.
     """
-    from app.db.models_v2 import AcademicPlan
 
     plan = db.query(AcademicPlan).filter(
         AcademicPlan.student_id == _to_uuid(entity_id)
@@ -221,7 +222,6 @@ def save_consultant_task(
     """
     Validate AI output, apply confidence guardrail, render HTML, persist to DB.
     """
-    from app.db.models_v2 import AcademicPlan
 
     # Parse raw JSON from frontend SSE buffer
     try:
@@ -297,6 +297,47 @@ def save_consultant_task(
         recommended_schools=plan.recommended_schools,
         action_items=plan.action_items,
     )
+
+
+# ---------------------------------------------------------------------------
+# Endpoint 4: Chat (modify existing plan via AI)
+# ---------------------------------------------------------------------------
+
+
+@router.post("/tasks/{task_id}/chat")
+def consultant_chat(
+    task_id: str,
+    body: ConsultantChatRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """
+    Accept a natural-language message to modify an existing consultant plan.
+    Delegates to plan_chat_service.handle_chat() which calls AI, applies patch,
+    regenerates HTML, and persists. Returns {message, plan_id, version, html_content}.
+    """
+    # Validate entity_id is a real UUID
+    entity_uuid = _to_uuid(body.entity_id)
+
+    # Rate limit
+    _check_consultant_rate_limit(db, body.entity_id, current_user.id)
+
+    # Load existing plan
+    plan = db.query(AcademicPlan).filter(
+        AcademicPlan.student_id == entity_uuid
+    ).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="No plan found for this entity.")
+
+    # Delegate to existing plan_chat_service
+    result = plan_chat_service.handle_chat(db, plan, body.message, current_user.id)
+
+    return {
+        "message": result.message,
+        "plan_id": result.plan_id,
+        "version": result.version,
+        "html_content": result.html_content,
+    }
 
 
 def _apply_confidence_guardrail(
