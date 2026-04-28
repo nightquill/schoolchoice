@@ -1,0 +1,95 @@
+task_id: academic_plan
+name: Academic Plan
+description: Generate a school choice academic plan for a student
+
+data_slots:
+  student: student
+  matchmaker: matchmaker
+
+prompts:
+  system: |
+    You are a professional academic consultant generating a structured university application plan
+    for a student.
+
+    GROUNDING RULES - these are absolute constraints, not suggestions:
+    1. Only reference schools, programs, JUPAS codes, and admission scores that appear in the
+       provided match results. Do not use your training knowledge about any school's programs,
+       class sizes, or reputation - only what is in the data.
+    2. Every recommended school must have a rationale of at least 2 sentences, each sentence
+       grounded in a specific field from the student profile.
+    3. Respond with ONLY a valid JSON object matching the schema below. No markdown, no
+       explanation, no code fences. The response must begin with '{' and end with '}'.
+    4. The confidence_tier for each school MUST reflect data completeness, not your assessment
+       of the school's quality. Use LOW if student data is sparse, MEDIUM if some fields are
+       missing, HIGH only if all eligibility-relevant fields are populated.
+    5. Action items must be ordered chronologically by deadline when deadline data is available.
+
+    OUTPUT SCHEMA:
+    {
+      "student_summary": "string - minimum 50 characters, student name and key profile facts",
+      "recommended_schools": [
+        {
+          "school_name": "string - exact name from match results",
+          "jupas_code": "string or null",
+          "rationale": "string - minimum 20 characters, data-grounded",
+          "fit_score": "float 0.0 to 1.0",
+          "confidence_tier": "LOW | MEDIUM | HIGH",
+          "action_items": ["string"]
+        }
+      ],
+      "skill_gaps": ["string"],
+      "language_readiness": "string or null",
+      "action_plan": [
+        {"task": "string", "priority": "High | Medium | Low", "deadline": "string or null"}
+      ]
+    }
+
+  user: |
+    Student Profile:
+    {{ student | tojson(indent=2) }}
+
+    School Match Results (ranked by final_score, highest first):
+    {{ matchmaker | tojson(indent=2) }}
+
+    Generate the academic plan now.
+
+output_schema:
+  type: object
+  required: [student_summary, recommended_schools, action_plan]
+  properties:
+    student_summary:
+      type: string
+      minLength: 50
+    recommended_schools:
+      type: array
+      minItems: 1
+      maxItems: 15
+      items:
+        type: object
+        required: [school_name, rationale, fit_score, confidence_tier]
+        properties:
+          school_name: {type: string}
+          jupas_code: {type: [string, "null"]}
+          rationale: {type: string, minLength: 20}
+          fit_score: {type: number, minimum: 0, maximum: 1}
+          confidence_tier: {type: string, enum: [LOW, MEDIUM, HIGH]}
+          action_items: {type: array, items: {type: string}}
+    skill_gaps:
+      type: array
+      items: {type: string}
+    language_readiness:
+      type: [string, "null"]
+    action_plan:
+      type: array
+      items:
+        type: object
+        properties:
+          task: {type: string}
+          priority: {type: string, enum: [High, Medium, Low]}
+          deadline: {type: [string, "null"]}
+
+jinja2_template: professional.html.j2
+max_tokens: 4096
+temperature: 0.3
+enable_chat: true
+max_context_tokens: 60000

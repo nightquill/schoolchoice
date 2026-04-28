@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title | default("Academic Plan") }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* CSS Reset + Base Typography */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --plan-bg: #ffffff;
+      --plan-heading-color: #1e3a5f;
+      --plan-accent: #1e3a5f;
+      --plan-font-body: Georgia, serif;
+      --plan-font-heading: Georgia, serif;
+      --plan-section-padding: 28px 32px;
+      --plan-section-gap: 32px;
+      --plan-line-height: 1.8;
+      --plan-letter-spacing: 0.01em;
+    }
+
+    body {
+      background: var(--plan-bg);
+      font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
+      line-height: var(--plan-line-height, 1.6);
+      letter-spacing: var(--plan-letter-spacing, 0);
+      color: #1a1a1a;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
+      color: var(--plan-heading-color);
+    }
+
+    .plan-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .section {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: var(--plan-section-padding, 24px);
+      margin-bottom: var(--plan-section-gap, 24px);
+    }
+
+    .section h2 {
+      color: var(--plan-heading-color);
+      margin-bottom: 16px;
+      font-size: 1.4em;
+    }
+
+    .section h3 {
+      color: var(--plan-heading-color);
+      margin-bottom: 12px;
+      font-size: 1.15em;
+    }
+
+    .header {
+      background: var(--plan-heading-color) !important;
+      color: #ffffff;
+      padding: 24px 32px;
+      border-radius: 8px;
+      margin-bottom: var(--plan-section-gap, 24px);
+    }
+
+    .header h1 {
+      color: #ffffff;
+      font-size: 1.8em;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95em;
+    }
+
+    /* Tables */
+    .summary-table, .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    .summary-table th, .data-table th {
+      background: var(--plan-accent);
+      color: #ffffff;
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+
+    .summary-table td, .data-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 0.9em;
+    }
+
+    .summary-table tr:nth-child(even) td,
+    .data-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+
+    /* School cards */
+    .school-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .school-card h3 {
+      color: var(--plan-heading-color);
+    }
+
+    /* Score bar */
+    .score-bar-container {
+      width: 100%;
+      background: #e5e7eb;
+      border-radius: 4px;
+      height: 8px;
+      margin: 8px 0;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--plan-accent);
+    }
+
+    /* Confidence badges */
+    .confidence-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    .confidence-badge.high {
+      background: #16a34a;
+      color: #ffffff;
+    }
+
+    .confidence-badge.medium {
+      background: #d97706;
+      color: #ffffff;
+    }
+
+    .confidence-badge.low {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    /* Lists */
+    ul {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      font-size: 0.9em;
+    }
+
+    /* Charts */
+    .chart-container {
+      max-width: 400px;
+      margin: 16px auto;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: #ffffff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .plan-container {
+        max-width: 100%;
+        padding: 0;
+      }
+
+      .section {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+      }
+
+      .header {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      canvas {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <div class="plan-container">
+    {% block content %}{% endblock %}
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
