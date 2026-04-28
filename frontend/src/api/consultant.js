@@ -1,0 +1,29 @@
+import client from './client';
+
+// Save validated plan output (called after SSE stream completes)
+export const saveConsultantTask = (taskId, entityId, aiOutputJson) =>
+  client.post(`/api/v1/consultant/tasks/${taskId}/save`, {
+    task_id: taskId,
+    entity_id: entityId,
+    ai_output_json: aiOutputJson,
+  }).then((r) => r.data);
+
+// Get current plan status
+export const getConsultantTaskStatus = (taskId, entityId) =>
+  client.get(`/api/v1/consultant/tasks/${taskId}/status`, {
+    params: { entity_id: entityId },
+  }).then((r) => r.data);
+
+// Send chat message to modify existing plan (reuse plan chat pattern)
+export const sendConsultantChat = (taskId, entityId, message) =>
+  client.post(`/api/v1/consultant/tasks/${taskId}/chat`, {
+    entity_id: entityId,
+    message,
+  }).then((r) => r.data);
+
+// Change template for existing plan
+export const changeConsultantTemplate = (taskId, entityId, templateName) =>
+  client.post(`/api/v1/consultant/tasks/${taskId}/template`, {
+    entity_id: entityId,
+    template_name: templateName,
+  }).then((r) => r.data);
