@@ -30,6 +30,7 @@ _RATE_LIMIT_PATCH = "app.api.v1.routes.consultant._check_consultant_rate_limit"
 _STREAM_PATCH = "app.api.v1.routes.consultant.call_ai_stream"
 _ENGINE_PATCH = "app.api.v1.routes.consultant.TaskEngine"
 _CHAT_SERVICE_PATCH = "app.api.v1.routes.consultant.plan_chat_service"
+_OWNERSHIP_PATCH = "app.api.v1.routes.consultant._verify_student_ownership"
 
 
 @pytest.fixture
@@ -86,6 +87,7 @@ class TestConsultantStream:
             yield "event: done\ndata: \n\n"
 
         with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH), \
              patch(_STREAM_PATCH, side_effect=mock_stream), \
              patch(_ENGINE_PATCH) as MockEngine:
             MockEngine.return_value.load_task.return_value = _mock_task()
@@ -114,6 +116,7 @@ class TestConsultantStream:
             yield "event: done\ndata: \n\n"
 
         with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH), \
              patch(_STREAM_PATCH, side_effect=fake_stream), \
              patch(_ENGINE_PATCH) as MockEngine:
             MockEngine.return_value.load_task.return_value = _mock_task()
@@ -133,6 +136,7 @@ class TestConsultantStream:
             yield "event: done\ndata: \n\n"
 
         with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH), \
              patch(_STREAM_PATCH, side_effect=mock_stream), \
              patch(_ENGINE_PATCH) as MockEngine:
             MockEngine.return_value.load_task.return_value = _mock_task()
@@ -150,6 +154,7 @@ class TestConsultantStream:
     def test_stream_404_for_unknown_task(self, client, auth_headers, override_query_token_auth):
         """Stream returns 404 for nonexistent task_id."""
         with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH), \
              patch(_ENGINE_PATCH) as MockEngine:
             MockEngine.return_value.load_task.side_effect = ValueError(
                 "No task definition found for task_id='nonexistent'"
@@ -164,6 +169,7 @@ class TestConsultantStream:
     def test_stream_400_for_bad_entity(self, client, auth_headers, override_query_token_auth):
         """Stream returns 400 when build_messages raises ValueError (PII, missing entity)."""
         with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH), \
              patch(_ENGINE_PATCH) as MockEngine:
             MockEngine.return_value.load_task.return_value = _mock_task()
             MockEngine.return_value.build_messages.side_effect = ValueError(
@@ -196,21 +202,25 @@ class TestConsultantSave:
 
     def test_save_rejects_invalid_json(self, client, auth_headers):
         """Save endpoint returns 400 for malformed JSON string."""
-        response = client.post(
-            "/api/v1/consultant/tasks/academic_plan/save",
-            json={
-                "task_id": "academic_plan",
-                "entity_id": "test",
-                "ai_output_json": "not valid json {{{",
-            },
-            headers=auth_headers,
-        )
+        import uuid
+        with patch(_OWNERSHIP_PATCH):
+            response = client.post(
+                "/api/v1/consultant/tasks/academic_plan/save",
+                json={
+                    "task_id": "academic_plan",
+                    "entity_id": str(uuid.uuid4()),
+                    "ai_output_json": "not valid json {{{",
+                },
+                headers=auth_headers,
+            )
         assert response.status_code == 400
         assert "Invalid JSON" in response.json()["detail"]
 
     def test_save_rejects_schema_mismatch(self, client, auth_headers):
         """Save returns 400 when AI output fails jsonschema validation."""
-        with patch(_ENGINE_PATCH) as MockEngine:
+        import uuid
+        with patch(_OWNERSHIP_PATCH), \
+             patch(_ENGINE_PATCH) as MockEngine:
             task = _mock_task()
             MockEngine.return_value.load_task.return_value = task
 
@@ -219,7 +229,7 @@ class TestConsultantSave:
                 "/api/v1/consultant/tasks/academic_plan/save",
                 json={
                     "task_id": "academic_plan",
-                    "entity_id": "test",
+                    "entity_id": str(uuid.uuid4()),
                     "ai_output_json": json.dumps({"recommended_schools": []}),
                 },
                 headers=auth_headers,
@@ -244,10 +254,11 @@ class TestConsultantStatus:
         """Status returns 404 when no plan exists for entity_id."""
         import uuid
         fake_id = str(uuid.uuid4())
-        response = client.get(
-            f"/api/v1/consultant/tasks/academic_plan/status?entity_id={fake_id}",
-            headers=auth_headers,
-        )
+        with patch(_OWNERSHIP_PATCH):
+            response = client.get(
+                f"/api/v1/consultant/tasks/academic_plan/status?entity_id={fake_id}",
+                headers=auth_headers,
+            )
         assert response.status_code == 404
 
 
@@ -268,7 +279,8 @@ class TestConsultantChat:
         """Chat returns 404 when no plan exists for entity_id."""
         import uuid
         fake_id = str(uuid.uuid4())
-        with patch(_RATE_LIMIT_PATCH):
+        with patch(_RATE_LIMIT_PATCH), \
+             patch(_OWNERSHIP_PATCH):
             response = client.post(
                 "/api/v1/consultant/tasks/academic_plan/chat",
                 json={"entity_id": fake_id, "message": "update summary"},
