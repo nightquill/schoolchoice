@@ -1,0 +1,33 @@
+domain: school_choice
+
+confidence_thresholds:
+  high: 0.7
+  medium: 0.4
+
+eligibility_rules:
+  - name: minimum_aggregate_score
+    field: best5_aggregate
+    operator: ">="
+    threshold_field: minimum_entry_score
+    skip_when_null: true
+    type: comparison
+  - name: ielts_requirement
+    field: ielts_score
+    operator: ">="
+    threshold_field: ielts_requirement
+    skip_when_null: true
+    type: comparison
+  - name: required_subjects
+    type: custom
+    # Complex rule: delegates to Python hook in matchmaker_v2
+
+scoring_weights:
+  academic_fit: 0.50
+  subject_alignment: 0.20
+  language_fit: 0.15
+  interest_alignment: 0.15
+
+ml_model:
+  enabled: true
+  blend_weight: 0.4
+  shap_enabled: true

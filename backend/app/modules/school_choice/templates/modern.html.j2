@@ -1,0 +1,187 @@
+{% extends "base_plan.html.j2" %}
+
+{% block styles %}
+<style>
+  :root {
+    --plan-bg: #f0f4f8;
+    --plan-heading-color: #0d9488;
+    --plan-accent: #0d9488;
+    --plan-font-body: 'Inter', system-ui, sans-serif;
+    --plan-font-heading: 'Inter', system-ui, sans-serif;
+    --plan-section-padding: 36px 40px;
+    --plan-section-gap: 40px;
+    --plan-line-height: 1.7;
+    --plan-letter-spacing: 0em;
+  }
+
+  body {
+    background: var(--plan-bg);
+  }
+
+  .section {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .school-card {
+    border-radius: 12px;
+    border-color: #d1d5db;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+{# --- Header --- #}
+<div class="header">
+  <h1>{{ title | default("Academic Plan") | html_escape }}</h1>
+  <p>Generated {{ generated_at | default("") | html_escape }}</p>
+</div>
+
+{# --- Student Summary --- #}
+{% if student_summary %}
+<div class="section">
+  <h2>Student Summary</h2>
+  <p>{{ student_summary | html_escape }}</p>
+</div>
+{% endif %}
+
+{# --- Academic Profile --- #}
+{% if grades %}
+<div class="section">
+  <h2>Academic Profile</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for grade in grades %}
+      <tr>
+        <td>{{ grade.subject | html_escape }}</td>
+        <td>{{ grade.grade | html_escape }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{# --- Recommended Schools --- #}
+{% if recommended_schools %}
+<div class="section">
+  <h2>Recommended Schools</h2>
+  {% for school in recommended_schools %}
+  <div class="school-card">
+    <h3>{{ school.school_name | html_escape }}</h3>
+    {% if school.jupas_code %}
+    <p style="color:#6b7280;font-size:0.85em;">JUPAS Code: {{ school.jupas_code | html_escape }}</p>
+    {% endif %}
+
+    <p style="margin-top:8px;">{{ school.rationale | html_escape }}</p>
+
+    {# Fit score bar #}
+    <div style="margin-top:12px;">
+      <span style="font-size:0.85em;color:#6b7280;">Fit Score: {{ "%.0f" | format(school.fit_score * 100) }}%</span>
+      <div class="score-bar-container">
+        <div class="score-bar-fill" style="width:{{ "%.1f" | format(school.fit_score * 100) }}%"></div>
+      </div>
+    </div>
+
+    {# Confidence badge #}
+    <span class="confidence-badge {{ school.confidence_tier | lower }}">
+      {{ school.confidence_tier | html_escape }}
+    </span>
+
+    {# Action items #}
+    {% if school.action_items %}
+    <ul style="margin-top:12px;">
+      {% for item in school.action_items %}
+      <li>{{ item | html_escape }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {# Chart placeholder for per-school charts #}
+    {% if school.chart_data %}
+    <div class="chart-container">
+      <canvas id="chart-school-{{ loop.index }}"></canvas>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{# --- Action Plan --- #}
+{% if action_plan %}
+<div class="section">
+  <h2>Action Plan</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Priority</th>
+        <th>Deadline</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for action in action_plan %}
+      <tr>
+        <td>{{ action.task | html_escape }}</td>
+        <td>{{ action.priority | default("Medium") | html_escape }}</td>
+        <td>{{ action.deadline | default("TBD") | html_escape }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{# --- Skill Gaps --- #}
+{% if skill_gaps %}
+<div class="section">
+  <h2>Skill Gaps</h2>
+  <ul>
+    {% for gap in skill_gaps %}
+    <li>{{ gap | html_escape }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{# --- Language Readiness --- #}
+{% if language_readiness %}
+<div class="section">
+  <h2>Language Readiness</h2>
+  <p>{{ language_readiness | html_escape }}</p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if chart_data %}
+<script>
+(function() {
+  var chartData = {{ chart_data | tojson }};
+  if (chartData && chartData.schools) {
+    chartData.schools.forEach(function(schoolChart, idx) {
+      var canvasId = 'chart-school-' + (idx + 1);
+      var canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      new Chart(canvas, {
+        type: schoolChart.type || 'radar',
+        data: schoolChart.data,
+        options: schoolChart.options || {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    });
+  }
+})();
+</script>
+{% endif %}
+{% endblock %}
