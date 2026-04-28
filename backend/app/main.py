@@ -13,7 +13,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.routes import action_plan, auth, recommendations, students
+from app.api.v1.routes import action_plan, auth, consultant, recommendations, students
 from app.api.v1.routes import (
     account,
     admin,
@@ -238,6 +238,20 @@ app.include_router(admin.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 app.include_router(cohorts.router, prefix="/api/v1")
 app.include_router(entities.router, prefix="/api/v1")
+app.include_router(consultant.router, prefix="/api/v1")
+
+# ---------------------------------------------------------------------------
+# Task YAML validation at startup (Pitfall 4 prevention)
+# ---------------------------------------------------------------------------
+try:
+    from app.platform.task_engine import TaskEngine as _TaskEngine
+    _yaml_errors = _TaskEngine.validate_all_task_yamls()
+    if _yaml_errors:
+        _startup_logger.warning("Task YAML validation errors: %s", _yaml_errors)
+    else:
+        _startup_logger.info("Task YAML validation: all tasks OK")
+except Exception as _yaml_exc:
+    _startup_logger.warning("Task YAML validation skipped: %s", _yaml_exc)
 
 
 # ---------------------------------------------------------------------------
