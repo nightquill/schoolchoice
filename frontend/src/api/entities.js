@@ -16,7 +16,13 @@ export const getEntitySchema = (name) =>
 
 export const getEntityList = (tableName, params = {}) => {
   validateTableName(tableName);
-  return client.get(`/api/v1/${tableName}`, { params }).then((r) => r.data);
+  return client.get(`/api/v1/${tableName}`, { params }).then((r) => {
+    const data = r.data;
+    // Some endpoints return {items: [...], total: N}, others return a plain array
+    if (data && Array.isArray(data.items)) return data.items;
+    if (Array.isArray(data)) return data;
+    return [];
+  });
 };
 
 export const getEntityDetail = (tableName, id) => {
