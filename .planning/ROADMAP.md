@@ -134,9 +134,11 @@ Plans:
 **UI hint**: yes
 
 Plans:
+**Wave 1** *(no dependencies — run in parallel)*
 - [ ] 06-01-PLAN.md — RBAC backend: require_role(), admin user CRUD endpoints, startup validation, tests (SEC-01, SEC-02, DEP-04)
-- [ ] 06-02-PLAN.md — RBAC frontend: AuthContext role, Settings page with user management UI, route guards (SEC-01, SEC-02)
 - [ ] 06-03-PLAN.md — Deployment configs: Vercel, Railway, CI/CD workflow, generate_secrets.sh, DEPLOY.md (DEP-01, DEP-02, DEP-03, DEP-04, DEP-06)
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 06-02-PLAN.md — RBAC frontend: AuthContext role, Settings page with user management UI, route guards (SEC-01, SEC-02)
 - [ ] 06-04-PLAN.md — Demo seed script: users, students, schools, reference data (DEP-05)
 
 ## Progress
