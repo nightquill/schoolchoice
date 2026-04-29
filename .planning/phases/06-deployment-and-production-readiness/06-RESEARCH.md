@@ -697,22 +697,25 @@ if __name__ == "__main__":
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Vercel project linking in CI**
    - What we know: `vercel deploy --prod` requires `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` env vars in the CI environment.
    - What's unclear: Whether the deployer runs `vercel link` once manually before CI works, or whether these IDs can be injected via GitHub secrets without a prior `vercel link`.
    - Recommendation: The DEPLOY.md should instruct the deployer to run `vercel link` locally once (it writes `.vercel/project.json`) and then add `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` to GitHub secrets. The CI workflow reads from secrets, not from `.vercel/project.json` (which must not be committed).
+   - RESOLVED: Instruct deployer to run `vercel link` locally once, then add VERCEL_ORG_ID and VERCEL_PROJECT_ID to GitHub secrets. CI reads from secrets only.
 
 2. **Vercel bundle size gate**
    - What we know: The phase success criterion specifies the output bundle must be under 500MB.
    - What's unclear: Whether the Vite frontend build (React + TipTap + TanStack Query) will actually hit that limit. Vite builds are typically 1-10 MB.
    - Recommendation: The 500MB limit appears to be a concern for the backend (XGBoost + SHAP), not the frontend SPA. It's effectively a non-issue for the Vercel static bundle; the planner should note this so the verification step is not surprising when it passes trivially.
+   - RESOLVED: 500MB limit is for Vercel function bundles (not applicable to static SPA). Vite frontend build is typically 1-10 MB. Non-issue for this deployment.
 
 3. **Railway root directory configuration**
    - What we know: `backend/requirements.txt` is the Python project root.
    - What's unclear: Whether the deployer must set Root Directory to `backend/` in the Railway dashboard, or whether a `railway.toml` in the repo root can specify a `rootDirectory` field.
    - Recommendation: Document both approaches in `DEPLOY.md`. The `railway.toml` `rootDirectory` key is the infrastructure-as-code approach; the dashboard setting is the manual fallback.
+   - RESOLVED: Document both approaches in DEPLOY.md. Primary: `railway.toml` with `rootDirectory = "backend"`. Fallback: set Root Directory in Railway dashboard.
 
 ---
 
