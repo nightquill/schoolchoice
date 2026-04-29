@@ -16,10 +16,17 @@ export function useLanguageTab(student, studentId, showToast, onSaved) {
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      const updated = await client.post(`/api/v1/students/${studentId}/language-scores`, {
-        ...ielts,
+      const toFloat = (v) => (v === '' || v === null || v === undefined) ? null : parseFloat(v);
+      const payload = {
+        ielts_score: toFloat(ielts.ielts_score),
+        ielts_listening: toFloat(ielts.ielts_listening),
+        ielts_reading: toFloat(ielts.ielts_reading),
+        ielts_writing: toFloat(ielts.ielts_writing),
+        ielts_speaking: toFloat(ielts.ielts_speaking),
+        ielts_date: ielts.ielts_date || null,
         other_language_scores: otherScores,
-      }).then((r) => r.data);
+      };
+      const updated = await client.post(`/api/v1/students/${studentId}/language-scores`, payload).then((r) => r.data);
       onSaved(updated);
       showToast('Language scores saved.', 'success');
     } catch {

@@ -159,10 +159,15 @@ def create_grade(
             .first()
         )
         if not subject:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Subject '{payload.subject_name}' not found",
+            # Auto-create subject if it doesn't exist (supports unseeded DBs)
+            subject = Subject(
+                name=payload.subject_name,
+                code=payload.subject_name[:10].upper().replace(" ", ""),
+                category="elective",
+                is_compulsory=False,
             )
+            db.add(subject)
+            db.flush()
         payload = payload.model_copy(update={"subject_id": subject.id})
     elif payload.subject_id is None:
         raise HTTPException(
