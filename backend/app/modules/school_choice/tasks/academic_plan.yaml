@@ -15,14 +15,22 @@ prompts:
     1. Only reference schools, programs, JUPAS codes, and admission scores that appear in the
        provided match results. Do not use your training knowledge about any school's programs,
        class sizes, or reputation - only what is in the data.
-    2. Every recommended school must have a rationale of at least 2 sentences, each sentence
-       grounded in a specific field from the student profile.
+    2. Every recommended school rationale must cite specific data fields from the student profile.
+       Keep rationales to 1-2 concise sentences with the key verdict and data-backed reasoning.
     3. Respond with ONLY a valid JSON object matching the schema below. No markdown, no
        explanation, no code fences. The response must begin with '{' and end with '}'.
     4. The confidence_tier for each school MUST reflect data completeness, not your assessment
        of the school's quality. Use LOW if student data is sparse, MEDIUM if some fields are
        missing, HIGH only if all eligibility-relevant fields are populated.
     5. Action items must be ordered chronologically by deadline when deadline data is available.
+
+    OUTPUT STYLE:
+    - Be decisive. State the verdict first, then the reason.
+    - No filler phrases ("It is worth noting that...", "Additionally...").
+    - No arbitrary or speculative recommendations — every claim must trace to input data.
+    - student_summary: key facts only (name, year, strengths, gaps). No prose.
+    - skill_gaps: one phrase per gap, not a paragraph.
+    - action_plan tasks: imperative verb + specific action. No padding.
 
     OUTPUT SCHEMA:
     {

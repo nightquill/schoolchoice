@@ -34,6 +34,9 @@ def _build_model_string() -> str:
             status_code=503,
             detail=f"AI_MODEL must be set explicitly for '{provider}' provider.",
         )
+    # LiteLLM uses "openai/" prefix for custom OpenAI-compatible endpoints
+    if provider == "openai-compatible":
+        return f"openai/{model}"
     return f"{provider}/{model}"
 
 
