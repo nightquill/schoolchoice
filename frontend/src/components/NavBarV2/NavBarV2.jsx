@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Menu, X, Settings } from 'lucide-react';
@@ -12,6 +12,14 @@ function NavBarV2({ account }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)');
+    const handler = (e) => { setIsMobile(e.matches); setMobileMenuOpen(false); };
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -51,15 +59,11 @@ function NavBarV2({ account }) {
   };
 
   const centreLinksStyle = {
-    display: 'flex',
-    flexDirection: 'row',
     gap: 'var(--space-4)',
     alignItems: 'center',
   };
 
   const rightStyle = {
-    display: 'flex',
-    flexDirection: 'row',
     gap: 'var(--space-3)',
     alignItems: 'center',
     flexShrink: 0,
@@ -116,69 +120,74 @@ function NavBarV2({ account }) {
         Academic Advisor
       </Link>
 
-      {/* Hamburger button — visible only below 768px */}
-      <button
-        className="md:hidden"
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--color-text-primary)' }}
-      >
-        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      {/* Hamburger button — visible only on mobile */}
+      {isMobile && (
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--color-text-primary)' }}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      )}
 
       {/* Desktop links — hidden on mobile */}
-      <div className="hidden md:flex" style={centreLinksStyle}>
-        <Link to="/dashboard" style={getLinkStyle('/dashboard')}>
-          Dashboard
-        </Link>
-        <Link to="/schools" style={getLinkStyle('/schools')}>
-          School Directory
-        </Link>
-        <Link to="/cohorts" style={getLinkStyle('/cohorts')}>
-          Cohorts
-        </Link>
-        <Link to="/data-analysis" style={getLinkStyle('/data-analysis')}>
-          Data Analysis
-        </Link>
-        {isAdmin && (
-          <Link to="/admin/data-refresh" style={getLinkStyle('/admin/data-refresh')}>
-            Data Refresh
+      {!isMobile && (
+        <div style={{ ...centreLinksStyle, display: 'flex' }}>
+          <Link to="/dashboard" style={getLinkStyle('/dashboard')}>
+            Dashboard
           </Link>
-        )}
-        {isAdmin && (
-          <Link to="/settings" style={{ ...getLinkStyle('/settings'), display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Settings size={18} />
-            Settings
+          <Link to="/schools" style={getLinkStyle('/schools')}>
+            School Directory
           </Link>
-        )}
-        {entityLinks.map((entity) => (
-          <Link key={entity.name} to={`/entities/${entity.name}`} style={getLinkStyle(`/entities/${entity.name}`)}>
-            {entity.name}
+          <Link to="/cohorts" style={getLinkStyle('/cohorts')}>
+            Cohorts
           </Link>
-        ))}
-      </div>
+          <Link to="/data-analysis" style={getLinkStyle('/data-analysis')}>
+            Data Analysis
+          </Link>
+          {isAdmin && (
+            <Link to="/admin/data-refresh" style={getLinkStyle('/admin/data-refresh')}>
+              Data Refresh
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/settings" style={{ ...getLinkStyle('/settings'), display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+              <Settings size={18} />
+              Settings
+            </Link>
+          )}
+          {entityLinks.map((entity) => (
+            <Link key={entity.name} to={`/entities/${entity.name}`} style={getLinkStyle(`/entities/${entity.name}`)}>
+              {entity.name}
+            </Link>
+          ))}
+        </div>
+      )}
 
-      <div className="hidden md:flex" style={rightStyle}>
-        {displayName && <span style={userStyle}>{displayName}</span>}
-        <Link
-          to="/account/settings"
-          style={{
-            fontSize: 'var(--font-size-xs)',
-            color: 'var(--color-text-secondary)',
-            textDecoration: 'none',
-            fontFamily: 'var(--font-family-base)',
-          }}
-        >
-          Account Settings
-        </Link>
-        <button
-          style={logoutStyle}
-          onClick={handleLogout}
-          aria-label="Log out"
-        >
-          Logout
-        </button>
-      </div>
+      {!isMobile && (
+        <div style={{ ...rightStyle, display: 'flex' }}>
+          {displayName && <span style={userStyle}>{displayName}</span>}
+          <Link
+            to="/account/settings"
+            style={{
+              fontSize: 'var(--font-size-xs)',
+              color: 'var(--color-text-secondary)',
+              textDecoration: 'none',
+              fontFamily: 'var(--font-family-base)',
+            }}
+          >
+            Account Settings
+          </Link>
+          <button
+            style={logoutStyle}
+            onClick={handleLogout}
+            aria-label="Log out"
+          >
+            Logout
+          </button>
+        </div>
+      )}
 
       {/* Mobile menu — shown when mobileMenuOpen */}
       {mobileMenuOpen && (

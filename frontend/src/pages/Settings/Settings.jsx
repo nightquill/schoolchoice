@@ -371,9 +371,9 @@ function Settings() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon-sm" aria-label="Actions">
+                                <span role="button" tabIndex={0} className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent cursor-pointer" aria-label="Actions">
                                   <MoreVertical size={16} />
-                                </Button>
+                                </span>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openEditDialog(u)}>
