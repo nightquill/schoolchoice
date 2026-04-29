@@ -9,7 +9,8 @@ app.modules.school_choice.models.models and are re-exported below
 for backward compatibility.
 """
 
-import uuid
+import uuid as _uuid_mod
+uuid = _uuid_mod  # backward compat: models reference uuid.uuid4
 from datetime import datetime, timezone
 
 from sqlalchemy import (
@@ -17,11 +18,56 @@ from sqlalchemy import (
     Column,
     String,
     Text,
+    TypeDecorator,
     UniqueConstraint,
+    CHAR,
 )
-from sqlalchemy.dialects.postgresql import TIMESTAMP, UUID
+from sqlalchemy.dialects.postgresql import TIMESTAMP, UUID as PG_UUID
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.sql import func
+
+
+# ---------------------------------------------------------------------------
+# Portable UUID type — works on both PostgreSQL and SQLite
+# ---------------------------------------------------------------------------
+
+class UUID(TypeDecorator):
+    """Platform-agnostic UUID type.
+    Uses PostgreSQL's native UUID on Postgres, CHAR(32) on SQLite.
+    Always returns Python uuid.UUID objects on read.
+    """
+    impl = CHAR(32)
+    cache_ok = True
+
+    def __init__(self, as_uuid=True, *args, **kwargs):
+        # Accept as_uuid for backward compat with postgresql UUID usage
+        super().__init__(*args, **kwargs)
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PG_UUID(as_uuid=True))
+        return dialect.type_descriptor(CHAR(32))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        if dialect.name == "postgresql":
+            return value if isinstance(value, _uuid_mod.UUID) else _uuid_mod.UUID(str(value))
+        # SQLite: store as 32-char hex
+        if isinstance(value, _uuid_mod.UUID):
+            return value.hex
+        return _uuid_mod.UUID(str(value)).hex
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        if isinstance(value, _uuid_mod.UUID):
+            return value
+        if isinstance(value, int):
+            return _uuid_mod.UUID(int=value)
+        if isinstance(value, bytes):
+            return _uuid_mod.UUID(bytes=value)
+        return _uuid_mod.UUID(str(value))
 
 
 # ---------------------------------------------------------------------------

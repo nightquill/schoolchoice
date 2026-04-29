@@ -1160,6 +1160,7 @@ def generate_html_plan(
     plan_type: str = "UNIVERSITY",
     template_id: str = "professional",
     overrides: dict | None = None,
+    ai_assessment: str | None = None,
 ) -> str:
     """
     Returns complete HTML string with inline CSS and @media print.
@@ -1304,8 +1305,18 @@ def generate_html_plan(
     # Build action plan section (support override)
     action_plan_html = _section_action_plan(action_items, current_year=current_year, overrides=overrides)
 
+    # AI counselor assessment section (if available)
+    ai_section = ""
+    if ai_assessment:
+        ai_section = f"""
+    <section class="section" style="border-left: 4px solid #2563eb; background: #eff6ff;">
+      <h2>Counselor Assessment</h2>
+      <p style="font-style: italic; line-height: 1.8;">{_esc(ai_assessment)}</p>
+    </section>"""
+
     sections = "".join([
         summary_html,
+        ai_section,
         _section_academic_profile(student),
         recommended_section_html,
         action_plan_html,

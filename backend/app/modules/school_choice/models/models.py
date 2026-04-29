@@ -22,7 +22,8 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy import JSON as JSONB
-from sqlalchemy.dialects.postgresql import TIMESTAMP, UUID
+from sqlalchemy.dialects.postgresql import TIMESTAMP
+from app.db.models import UUID  # Portable UUID type (works on PostgreSQL + SQLite)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from sqlalchemy.types import JSON

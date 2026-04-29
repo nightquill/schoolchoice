@@ -127,20 +127,55 @@ def run_eligibility_filter(
 # REQ-073: Weighted multi-criteria score
 # ---------------------------------------------------------------------------
 
+_SYNONYM_MAP = {
+    "hospital": {"medicine", "health", "nursing"},
+    "volunteer": {"social", "community"},
+    "paediatric": {"medicine", "health"},
+    "pediatric": {"medicine", "health"},
+    "biology": {"medicine", "science", "biotechnology"},
+    "olympiad": {"science", "engineering"},
+    "debating": {"law", "communication", "journalism"},
+    "debate": {"law", "communication", "journalism"},
+    "investment": {"business", "finance"},
+    "business": {"finance", "accounting", "management", "commerce"},
+    "film": {"creative", "media", "communication"},
+    "art": {"visual", "design", "creative"},
+    "drawing": {"visual", "design", "creative"},
+    "youtube": {"creative", "media", "communication"},
+    "neon": {"design", "creative", "heritage"},
+    "mural": {"design", "creative", "visual"},
+    "documentary": {"film", "journalism", "communication", "media"},
+    "basketball": {"sports", "physical"},
+    "red": {"community", "social"},
+    "cross": {"community", "social"},
+    "teacher": {"education"},
+    "teaching": {"education"},
+    "chemistry": {"science", "medicine", "engineering"},
+    "physics": {"science", "engineering"},
+    "computer": {"technology", "data", "science"},
+    "coding": {"technology", "computer", "engineering"},
+}
+
+
 def _keyword_overlap(items_a: list[str], items_b: list[str]) -> float:
-    """Normalised keyword overlap between two token lists (0.0–1.0)."""
+    """Normalised keyword overlap with synonym expansion (0.0–1.0)."""
     if not items_a or not items_b:
         return 0.0
     tokens_a = set()
     for item in items_a:
-        tokens_a.update(w.lower() for w in str(item).split())
+        words = [w.lower().strip(".,()") for w in str(item).split()]
+        tokens_a.update(words)
+        # Expand synonyms
+        for w in words:
+            if w in _SYNONYM_MAP:
+                tokens_a.update(_SYNONYM_MAP[w])
     tokens_b = set()
     for item in items_b:
-        tokens_b.update(w.lower() for w in str(item).split())
+        tokens_b.update(w.lower().strip(".,()") for w in str(item).split())
     if not tokens_b:
         return 0.0
     overlap = len(tokens_a & tokens_b)
-    return min(1.0, overlap / len(tokens_b))
+    return min(1.0, overlap / max(len(tokens_b), 1))
 
 
 SUBJECT_KEYWORDS = {

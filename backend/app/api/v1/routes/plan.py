@@ -172,9 +172,93 @@ def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVER
 
         match_results = run_matching(student_data, school_dicts, target_dicts)
 
+        # ── AI Enhancement: personalized rationales + advice ──
+        ai_commentary = None
+        try:
+            from app.core.ai_service import call_ai
+            from app.core.config import settings as _cfg
+            if _cfg.AI_API_KEY:
+                eligible_for_ai = [r for r in match_results if r.eligibility_pass][:5]
+                schools_summary = "\n".join([
+                    f"- {r.school_name}: fit={r.fit_score:.0%}, academic={r.component_scores.get('academic_fit',0):.0%}, "
+                    f"subject_align={r.component_scores.get('subject_alignment',0):.0%}, "
+                    f"language={r.component_scores.get('language_fit',0):.0%}, "
+                    f"interest={r.component_scores.get('interest_alignment',0):.0%}"
+                    for r in eligible_for_ai
+                ])
+                activities_text = ", ".join(extra_activities[:5]) if extra_activities else "None listed"
+                awards_text = ", ".join(award_titles[:5]) if award_titles else "None listed"
+                grades_text = ", ".join([f"{k}: {v}" for k, v in grades_by_code.items()])
+                personal_stmt = getattr(student, "personal_statement", "") or ""
+
+                ai_prompt = f"""You are an experienced Hong Kong secondary school academic counselor generating a personalized university application plan.
+
+STUDENT PROFILE:
+- Name: {student.name}, Year {getattr(student, 'year_of_study', '?')}
+- HKDSE Grades: {grades_text}
+- Best-5 Aggregate: {best5}
+- IELTS: {ielts_overall or 'Not taken'}
+- Activities: {activities_text}
+- Awards: {awards_text}
+- Personal Statement: {personal_stmt[:300]}
+
+MATCHED SCHOOLS (from scoring algorithm):
+{schools_summary}
+
+Respond with ONLY a JSON object:
+{{
+  "school_rationales": {{
+    "<school_name>": "<2-3 sentences: why this school fits THIS student specifically, referencing their grades, interests, and goals. Be specific — cite the student's actual subjects, scores, activities.>"
+  }},
+  "action_items": [
+    {{"task": "<specific actionable task>", "priority": "High|Medium|Low", "deadline": "<specific date or timeframe>", "reason": "<why this matters for this student>"}}
+  ],
+  "overall_assessment": "<3-4 sentences: honest assessment of this student's university prospects, key strengths, and the most important thing they should focus on>"
+}}
+
+Rules:
+- Reference the student's ACTUAL data — do not invent grades or activities they don't have.
+- If IELTS is already above a school's requirement, do NOT suggest taking IELTS again.
+- Action items must be specific to this student's gaps, not generic advice.
+- Be honest about competitive chances based on their best-5 vs school averages."""
+
+                ai_response = call_ai([
+                    {"role": "system", "content": "You are a Hong Kong academic counselor. Respond with valid JSON only."},
+                    {"role": "user", "content": ai_prompt},
+                ], max_tokens=2000, temperature=0.3)
+
+                import re
+                # Strip markdown fences if present
+                cleaned = ai_response.strip()
+                if cleaned.startswith("```"):
+                    cleaned = re.sub(r"^```[a-z]*\n?", "", cleaned)
+                    cleaned = re.sub(r"\n?```$", "", cleaned.strip())
+
+                import json as _json
+                ai_commentary = _json.loads(cleaned)
+                logger.info("AI plan enhancement successful")
+
+                # Apply AI rationales to match results
+                if "school_rationales" in ai_commentary:
+                    for r in match_results:
+                        if r.school_name in ai_commentary["school_rationales"]:
+                            r.rationale = ai_commentary["school_rationales"][r.school_name]
+
+        except Exception as exc:
+            logger.warning("AI plan enhancement failed (non-blocking): %s", exc)
+            # Continue with deterministic plan — AI is optional enhancement
+
         # Generate HTML
         action_items = _build_action_items(student_dict, match_results)
-        html_content = generate_html_plan(student_dict, match_results, action_items, plan_type=plan_type)
+
+        # If AI provided action items, use those instead
+        if ai_commentary and "action_items" in ai_commentary:
+            action_items = ai_commentary["action_items"]
+
+        html_content = generate_html_plan(
+            student_dict, match_results, action_items, plan_type=plan_type,
+            ai_assessment=ai_commentary.get("overall_assessment") if ai_commentary else None,
+        )
 
         # Build recommended schools list (top 5 eligible)
         eligible = [r for r in match_results if r.eligibility_pass][:5]

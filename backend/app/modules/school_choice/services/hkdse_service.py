@@ -21,6 +21,11 @@ GRADE_MAP: dict[str, int] = {
     "1": 1,
     "U": 0,
     "X": 0,
+    # CSD (Citizenship and Social Development) uses pass/distinction, not numeric
+    "A": 2,   # Attained — counts as a pass (equivalent to grade 2 for aggregate)
+    "AD": 3,  # Attained with Distinction
+    "Attained": 2,
+    "Attained with Distinction": 3,
 }
 
 # Reverse map: numeric -> canonical grade string (picks highest grade for ties)
