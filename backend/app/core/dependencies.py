@@ -6,6 +6,7 @@ FastAPI dependency: extract and validate JWT Bearer token, return User ORM objec
 from __future__ import annotations
 
 from typing import Optional
+from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, Query, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -35,8 +36,13 @@ def _resolve_user_from_token(token_str: str, db: Session) -> User:
     except JWTError:
         raise _unauthorized
 
-    user_id: Optional[str] = payload.get("sub")
-    if user_id is None:
+    user_id_str: Optional[str] = payload.get("sub")
+    if user_id_str is None:
+        raise _unauthorized
+
+    try:
+        user_id = UUID(user_id_str)
+    except (ValueError, AttributeError):
         raise _unauthorized
 
     user = db.query(User).filter(User.id == user_id).first()
