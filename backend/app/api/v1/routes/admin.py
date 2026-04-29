@@ -8,7 +8,7 @@ REQ-080
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -157,7 +157,7 @@ def create_user(
 
 @router.patch("/users/{user_id}", response_model=UserAdminResponse)
 def update_user(
-    user_id: str,
+    user_id: UUID,
     payload: UserUpdateAdmin,
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
@@ -181,7 +181,7 @@ def update_user(
 
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
-    user_id: str,
+    user_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("admin")),
 ):
