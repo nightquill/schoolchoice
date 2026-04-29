@@ -194,7 +194,7 @@ function SchoolDirectory() {
             value={filters.q}
             onChange={(e) => handleFilterChange('q', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="School name\u2026"
+            placeholder="School name…"
             style={inputStyle}
           />
         </div>
@@ -221,7 +221,7 @@ function SchoolDirectory() {
             value={filters.location}
             onChange={(e) => handleFilterChange('location', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Location\u2026"
+            placeholder="Location…"
             style={inputStyle}
           />
         </div>

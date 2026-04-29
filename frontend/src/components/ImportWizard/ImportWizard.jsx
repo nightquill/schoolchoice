@@ -211,7 +211,7 @@ export default function ImportWizard({ entityName, schema }) {
               disabled={!file || parseMutation.isPending}
               onClick={() => parseMutation.mutate(file)}
             >
-              {parseMutation.isPending ? 'Parsing\u2026' : 'Next'}
+              {parseMutation.isPending ? 'Parsing…' : 'Next'}
             </Button>
           </div>
         </div>
@@ -265,7 +265,7 @@ export default function ImportWizard({ entityName, schema }) {
               disabled={!selectedSheet || parseSheetMutation.isPending}
               onClick={() => parseSheetMutation.mutate({ f: file, sheet: selectedSheet })}
             >
-              {parseSheetMutation.isPending ? 'Loading\u2026' : 'Next'}
+              {parseSheetMutation.isPending ? 'Loading…' : 'Next'}
             </Button>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function ImportWizard({ entityName, schema }) {
               disabled={validateMutation.isPending}
               onClick={() => validateMutation.mutate()}
             >
-              {validateMutation.isPending ? 'Validating\u2026' : 'Next'}
+              {validateMutation.isPending ? 'Validating…' : 'Next'}
             </Button>
           </div>
         </div>

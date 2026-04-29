@@ -94,7 +94,7 @@ export default function LanguageTab({ studentId, student, onSaved, showToast }) 
         <Button variant="secondary" onClick={addOtherScore}>Add Score</Button>
       </div>
       <Button onClick={handleSave} disabled={saving}>
-        {saving ? 'Loading\u2026' : 'Save'}
+        {saving ? 'Loading…' : 'Save'}
       </Button>
     </div>
   );

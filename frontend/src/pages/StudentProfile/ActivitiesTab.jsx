@@ -106,7 +106,7 @@ export default function ActivitiesTab({ studentId, student, showToast }) {
       <div style={{ marginBottom: 'var(--space-4)', display: 'flex', gap: 'var(--space-3)' }}>
         <Button variant="secondary" onClick={addActivity}>Add Activity</Button>
         <Button onClick={handleSaveActivities} disabled={saving}>
-          {saving ? 'Loading\u2026' : 'Save Activities'}
+          {saving ? 'Loading…' : 'Save Activities'}
         </Button>
       </div>
 
@@ -155,7 +155,7 @@ export default function ActivitiesTab({ studentId, student, showToast }) {
         <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
           <Button variant="secondary" onClick={addAward}>Add Award</Button>
           <Button onClick={handleSaveAwards} disabled={saving}>
-            {saving ? 'Loading\u2026' : 'Save Awards'}
+            {saving ? 'Loading…' : 'Save Awards'}
           </Button>
         </div>
       </div>

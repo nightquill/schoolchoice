@@ -43,7 +43,7 @@ function Button({ label, onClick, variant = 'primary', disabled = false, loading
       aria-busy={loading}
       aria-label={loading ? `${label}, loading` : label}
     >
-      {loading ? 'Loading\u2026' : label}
+      {loading ? 'Loading…' : label}
     </button>
   );
 }

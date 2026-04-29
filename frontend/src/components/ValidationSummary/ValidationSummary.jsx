@@ -168,7 +168,7 @@ export default function ValidationSummary({
               textDecoration: 'underline',
             }}
           >
-            {isDownloading ? 'Downloading\u2026' : 'Download error rows as CSV'}
+            {isDownloading ? 'Downloading…' : 'Download error rows as CSV'}
           </button>
         </>
       )}
@@ -248,7 +248,7 @@ export default function ValidationSummary({
           disabled={validCount === 0 || isCommitting}
           onClick={onConfirm}
         >
-          {isCommitting ? 'Importing\u2026' : `Import ${validCount} Valid Row${validCount !== 1 ? 's' : ''}`}
+          {isCommitting ? 'Importing…' : `Import ${validCount} Valid Row${validCount !== 1 ? 's' : ''}`}
         </Button>
       </div>
     </div>

@@ -222,7 +222,7 @@ function Dashboard() {
               />
               {formError && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)' }}>{formError}</span>}
             </div>
-            <Button type="submit" disabled={formLoading}>{formLoading ? 'Creating\u2026' : 'Create'}</Button>
+            <Button type="submit" disabled={formLoading}>{formLoading ? 'Creating…' : 'Create'}</Button>
             <Button variant="secondary" onClick={() => { setShowAddForm(false); setNewName(''); setFormError(''); }} disabled={formLoading}>Cancel</Button>
           </form>
         )}

@@ -303,7 +303,7 @@ function AccountSettings() {
           setDeleteError('');
         }}
         onConfirm={handleDeleteAccount}
-        confirmLabel={deleting ? 'Deleting\u2026' : 'Yes, Delete My Account'}
+        confirmLabel={deleting ? 'Deleting…' : 'Yes, Delete My Account'}
         confirmVariant="danger"
       >
         <p style={{ marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>

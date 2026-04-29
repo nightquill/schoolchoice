@@ -75,7 +75,7 @@ export default function EvaluationsTab({ studentId, showToast }) {
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <Button onClick={() => saveAll(evaluations)} disabled={saving === 'all'}>
-              {saving === 'all' ? 'Loading\u2026' : 'Save'}
+              {saving === 'all' ? 'Loading…' : 'Save'}
             </Button>
             <Button variant="destructive" onClick={() => removeEval(index)}>Delete</Button>
           </div>

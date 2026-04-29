@@ -105,7 +105,7 @@ export default function GradesTab({ studentId, showToast, subjects }) {
         />
         {transcriptState === 'parsing' && (
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-            Transcript uploaded. Parsing in progress{'\u2026'}
+            Transcript uploaded. Parsing in progress{'…'}
           </p>
         )}
       </div>
@@ -181,7 +181,7 @@ export default function GradesTab({ studentId, showToast, subjects }) {
                 style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '100%' }}
                 aria-label="Subject"
               >
-                <option value="">Select subject{'\u2026'}</option>
+                <option value="">Select subject{'…'}</option>
                 {(subjects && subjects.length > 0 ? subjects : HKDSE_SUBJECTS).map((s) => (
                   <option key={s.code} value={s.name}>{s.name}</option>
                 ))}

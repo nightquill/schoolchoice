@@ -210,7 +210,7 @@ function StudentDetailPage() {
       <div style={pageStyle}>
         <NavBar />
         <div style={contentStyle}>
-          <LoadingSpinner label="Loading\u2026" />
+          <LoadingSpinner label="Loading…" />
         </div>
       </div>
     );

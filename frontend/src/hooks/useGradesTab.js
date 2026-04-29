@@ -25,7 +25,7 @@ export function useGradesTab(studentId, showToast) {
       await uploadTranscript(studentId, file);
       setUploadProgress(100);
       setTranscriptState('parsing');
-      showToast('Transcript uploaded. Parsing in progress\u2026', 'info');
+      showToast('Transcript uploaded. Parsing in progress…', 'info');
       pollRef.current = setInterval(async () => {
         try {
           const result = await getTranscript(studentId);

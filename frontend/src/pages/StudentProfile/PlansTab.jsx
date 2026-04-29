@@ -33,7 +33,7 @@ export default function PlansTab({ studentId, showToast }) {
     marginTop: 'var(--space-4)',
   };
 
-  if (loading) return <LoadingSpinner label="Loading plan history\u2026" />;
+  if (loading) return <LoadingSpinner label="Loading plan history…" />;
 
   return (
     <div>
@@ -63,7 +63,7 @@ export default function PlansTab({ studentId, showToast }) {
               onClick={(e) => handleDelete(e, selected.id)}
               disabled={deleting === selected.id}
             >
-              {deleting === selected.id ? 'Deleting\u2026' : 'Delete Plan'}
+              {deleting === selected.id ? 'Deleting…' : 'Delete Plan'}
             </Button>
           </div>
           {selected.snapshot_data && (
@@ -115,7 +115,7 @@ export default function PlansTab({ studentId, showToast }) {
               disabled={deleting === plan.id}
               style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)' }}
             >
-              {deleting === plan.id ? '\u2026' : 'Delete'}
+              {deleting === plan.id ? '…' : 'Delete'}
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-function LoadingSpinner({ label = 'Loading\u2026' }) {
+function LoadingSpinner({ label = 'Loading…' }) {
   return (
     <p
       role="status"

@@ -148,7 +148,7 @@ function StudentListPage() {
             {loading ? (
               <tr>
                 <td colSpan={4}>
-                  <LoadingSpinner label="Loading students\u2026" />
+                  <LoadingSpinner label="Loading students…" />
                 </td>
               </tr>
             ) : error ? (

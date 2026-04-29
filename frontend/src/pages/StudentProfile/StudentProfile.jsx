@@ -160,7 +160,7 @@ function StudentProfile() {
               )}
               <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>Target Schools</Button>
               <Button onClick={handleGeneratePlan} disabled={generatingPlan}>
-                {generatingPlan ? 'Loading\u2026' : 'Generate Plan'}
+                {generatingPlan ? 'Loading…' : 'Generate Plan'}
               </Button>
             </div>
           </div>
@@ -241,7 +241,7 @@ function StudentProfile() {
           <DialogFooter>
             <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateLoading}>Cancel</Button>
             <Button onClick={handleGraduate} disabled={graduateLoading}>
-              {graduateLoading ? 'Saving\u2026' : 'Confirm Graduate'}
+              {graduateLoading ? 'Saving…' : 'Confirm Graduate'}
             </Button>
           </DialogFooter>
         </DialogContent>

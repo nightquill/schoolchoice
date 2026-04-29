@@ -233,7 +233,7 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
           name="personal_statement"
           value={form.personal_statement}
           onChange={handleChange}
-          placeholder="Write a personal statement for university applications\u2026"
+          placeholder="Write a personal statement for university applications…"
           rows={6}
           style={{
             width: '100%',
@@ -249,7 +249,7 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
         />
       </div>
       <Button onClick={handleSave} disabled={saving}>
-        {saving ? 'Loading\u2026' : 'Save'}
+        {saving ? 'Loading…' : 'Save'}
       </Button>
     </div>
   );

@@ -538,7 +538,7 @@ function TargetSchools() {
           setNewMajors([]);
         }}
         onConfirm={handleAddTarget}
-        confirmLabel={addingTarget ? 'Adding\u2026' : 'Add School'}
+        confirmLabel={addingTarget ? 'Adding…' : 'Add School'}
         confirmVariant="primary"
       >
         <div>

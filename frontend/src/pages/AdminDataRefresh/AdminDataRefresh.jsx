@@ -127,7 +127,7 @@ function AdminDataRefresh() {
 
   const getStatusIcon = (status) => {
     if (!status) return { icon: '\u2014', color: 'var(--color-text-secondary)' };
-    if (status === 'pending' || status === 'running') return { icon: '\u2026', color: 'var(--color-warning)' };
+    if (status === 'pending' || status === 'running') return { icon: '…', color: 'var(--color-warning)' };
     if (status === 'success' || status === 'complete') return { icon: '\u2713', color: 'var(--color-success)' };
     return { icon: '\u2014', color: 'var(--color-text-secondary)' };
   };
@@ -208,7 +208,7 @@ function AdminDataRefresh() {
         title="Confirm Data Refresh"
         onClose={() => setConfirmModalOpen(false)}
         onConfirm={handleTriggerRefresh}
-        confirmLabel={triggering ? 'Triggering\u2026' : 'Yes, Trigger Refresh'}
+        confirmLabel={triggering ? 'Triggering…' : 'Yes, Trigger Refresh'}
         confirmVariant="primary"
       >
         <p>This will queue a full data re-import. Continue?</p>

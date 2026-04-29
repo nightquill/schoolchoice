@@ -10,7 +10,7 @@ export default function NotesTab({ studentId, student, onSaved, showToast }) {
           Counsellor Notes
         </label>
         {saveStatus === 'saving' && (
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Saving{'\u2026'}</span>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Saving{'…'}</span>
         )}
         {saveStatus === 'saved' && (
           <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)' }}>{'\u2713'} Saved</span>

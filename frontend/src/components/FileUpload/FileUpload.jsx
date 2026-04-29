@@ -87,7 +87,7 @@ function FileUpload({ onFile, accept = '*', loading = false, progress = null }) 
       >
         <span style={labelStyle}>
           {loading
-            ? 'Uploading\u2026'
+            ? 'Uploading…'
             : selectedFile
             ? selectedFile.name
             : 'Drag file here or'}

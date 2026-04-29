@@ -129,7 +129,7 @@ function RecommendationPage() {
         <section>
           <h2 style={sectionHeadingStyle}>School Recommendations</h2>
           {recLoading ? (
-            <LoadingSpinner label="Loading recommendations\u2026" />
+            <LoadingSpinner label="Loading recommendations…" />
           ) : recError ? (
             <ErrorMessage message={recError} />
           ) : recommendations.length === 0 ? (
@@ -147,7 +147,7 @@ function RecommendationPage() {
         <section style={{ marginTop: 'var(--space-8)' }}>
           <h2 style={sectionHeadingStyle}>Action Plan</h2>
           {planLoading ? (
-            <LoadingSpinner label="Loading action plan\u2026" />
+            <LoadingSpinner label="Loading action plan…" />
           ) : planError ? (
             <ErrorMessage message={planError} />
           ) : planEmpty ? (
