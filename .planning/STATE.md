@@ -25,11 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 ## Current Position
 
-Phase: 06 (deployment-and-production-readiness) — NOT STARTED
-Plan: 0 of TBD
-Status: Ready to plan
-Last activity: 2026-04-28 -- Phase 05 complete
-Last activity: 2026-04-28 -- Completed 05-07 chat endpoint gap closure
+Phase: 06 (deployment-and-production-readiness) — PLANNED
+Plan: 0 of 4
+Status: Ready to execute
+Last activity: 2026-04-28 -- Phase 06 planning complete (4 plans, 2 waves)
 
 Progress: [##########] 100%
 

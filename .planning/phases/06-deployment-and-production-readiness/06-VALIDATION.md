@@ -40,12 +40,12 @@ created: 2026-04-28
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 06-01-01 | 01 | 1 | SEC-01 | — | Staff user gets 403 on admin routes | integration | `pytest tests/test_admin_users.py` | ❌ W0 | ⬜ pending |
 | 06-01-02 | 01 | 1 | SEC-02 | — | Admin can CRUD users via API | integration | `pytest tests/test_admin_users.py` | ❌ W0 | ⬜ pending |
-| 06-02-01 | 02 | 1 | DEP-01 | — | generate_secrets.sh produces valid .env | script | `bash scripts/generate_secrets.sh && grep -q SECRET_KEY .env` | ❌ W0 | ⬜ pending |
-| 06-02-02 | 02 | 1 | DEP-02 | — | App refuses to start with placeholder secrets | integration | `pytest tests/test_startup_validation.py` | ❌ W0 | ⬜ pending |
-| 06-03-01 | 03 | 2 | DEP-03 | — | seed_demo.py creates demo data idempotently | script | `python scripts/seed_demo.py && python scripts/seed_demo.py` | ❌ W0 | ⬜ pending |
-| 06-04-01 | 04 | 2 | DEP-04 | — | vercel build succeeds | build | `cd frontend && npx vercel build` | ✅ | ⬜ pending |
-| 06-04-02 | 04 | 2 | DEP-05 | — | GitHub Actions CI workflow passes | ci | `act -j test` (local) or PR check | ❌ W0 | ⬜ pending |
-| 06-04-03 | 04 | 2 | DEP-06 | — | Railway start command works | manual | See manual verifications | — | ⬜ pending |
+| 06-01-03 | 01 | 1 | DEP-04 | — | App refuses to start with placeholder secrets | integration | `pytest tests/test_startup_validation.py` | ❌ W0 | ⬜ pending |
+| 06-03-01 | 03 | 1 | DEP-01 | — | vercel.json SPA rewrite configured | config | `cat frontend/vercel.json \| grep rewrites` | ✅ | ⬜ pending |
+| 06-03-02 | 03 | 1 | DEP-06 | — | generate_secrets.sh produces valid .env | script | `bash scripts/generate_secrets.sh && grep -q SECRET_KEY .env` | ❌ W0 | ⬜ pending |
+| 06-03-03 | 03 | 1 | DEP-02 | — | Neon setup documented in DEPLOY.md | docs | `grep -q 'Neon' DEPLOY.md` | ❌ W0 | ⬜ pending |
+| 06-03-04 | 03 | 1 | DEP-03 | — | Railway start command configured | config | `grep -q 'uvicorn' backend/railway.toml` | ❌ W0 | ⬜ pending |
+| 06-04-01 | 04 | 2 | DEP-05 | — | seed_demo.py creates demo data idempotently | script | `python scripts/seed_demo.py && python scripts/seed_demo.py` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
