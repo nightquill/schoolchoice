@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Settings } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { getEntities } from '../../api/entities';
 
@@ -145,6 +145,12 @@ function NavBarV2({ account }) {
             Data Refresh
           </Link>
         )}
+        {isAdmin && (
+          <Link to="/settings" style={{ ...getLinkStyle('/settings'), display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Settings size={18} />
+            Settings
+          </Link>
+        )}
         {entityLinks.map((entity) => (
           <Link key={entity.name} to={`/entities/${entity.name}`} style={getLinkStyle(`/entities/${entity.name}`)}>
             {entity.name}
@@ -193,6 +199,12 @@ function NavBarV2({ account }) {
           <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>Data Analysis</Link>
           {isAdmin && (
             <Link to="/admin/data-refresh" style={getMobileLinkStyle('/admin/data-refresh')} onClick={() => setMobileMenuOpen(false)}>Data Refresh</Link>
+          )}
+          {isAdmin && (
+            <Link to="/settings" style={{ ...getMobileLinkStyle('/settings'), display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setMobileMenuOpen(false)}>
+              <Settings size={18} />
+              Settings
+            </Link>
           )}
           {entityLinks.map((entity) => (
             <Link key={entity.name} to={`/entities/${entity.name}`} style={getMobileLinkStyle(`/entities/${entity.name}`)} onClick={() => setMobileMenuOpen(false)}>

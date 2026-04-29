@@ -23,6 +23,7 @@ import EntityListPage from './pages/EntityListPage/EntityListPage';
 import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
+import Settings from './pages/Settings/Settings';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,6 +34,13 @@ const queryClient = new QueryClient({
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+function AdminRoute({ children }) {
+  const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user && user.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  return children;
 }
 
 export default function App() {
@@ -66,6 +74,8 @@ export default function App() {
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
+
+        <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
 
         {/* Entity routes (PLAT-03) */}
         <Route path="/entities/:name" element={<ProtectedRoute><EntityListPage /></ProtectedRoute>} />
