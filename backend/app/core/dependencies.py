@@ -94,3 +94,21 @@ def get_current_user_or_query_token(
         return _resolve_user_from_token(token, db)
     else:
         raise _unauthorized
+
+
+def require_role(role: str):
+    """Factory: returns a FastAPI dependency that enforces a specific role.
+
+    Usage:
+        @router.get("/admin/users", dependencies=[Depends(require_role("admin"))])
+    Or as a positional dependency returning the user:
+        current_user: User = Depends(require_role("admin"))
+    """
+    def _check(current_user: User = Depends(get_current_user)) -> User:
+        if getattr(current_user, "role", "counsellor") != role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Admin access required",
+            )
+        return current_user
+    return _check
