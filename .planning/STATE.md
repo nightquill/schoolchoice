@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-24)
 
 ## Current Position
 
-Phase: 06 (deployment-and-production-readiness) — PLANNED
-Plan: 0 of 4
-Status: Ready to execute
-Last activity: 2026-04-28 -- Phase 06 planning complete (4 plans, 2 waves)
+Phase: 06 (deployment-and-production-readiness) — EXECUTING
+Plan: 2 of 4
+Status: Wave 1 complete, executing Wave 2
+Last activity: 2026-04-28 -- Wave 1 complete (06-01 RBAC backend, 06-03 deployment configs)
 
 Progress: [##########] 100%
 

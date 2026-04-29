@@ -135,8 +135,8 @@ Plans:
 
 Plans:
 **Wave 1** *(no dependencies — run in parallel)*
-- [ ] 06-01-PLAN.md — RBAC backend: require_role(), admin user CRUD endpoints, startup validation, tests (SEC-01, SEC-02, DEP-04)
-- [ ] 06-03-PLAN.md — Deployment configs: Vercel, Railway, CI/CD workflow, generate_secrets.sh, DEPLOY.md (DEP-01, DEP-02, DEP-03, DEP-04, DEP-06)
+- [x] 06-01-PLAN.md — RBAC backend: require_role(), admin user CRUD endpoints, startup validation, tests (SEC-01, SEC-02, DEP-04)
+- [x] 06-03-PLAN.md — Deployment configs: Vercel, Railway, CI/CD workflow, generate_secrets.sh, DEPLOY.md (DEP-01, DEP-02, DEP-03, DEP-04, DEP-06)
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 06-02-PLAN.md — RBAC frontend: AuthContext role, Settings page with user management UI, route guards (SEC-01, SEC-02)
 - [ ] 06-04-PLAN.md — Demo seed script: users, students, schools, reference data (DEP-05)
@@ -153,4 +153,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Frontend Stabilization | 6/6 | Complete | 2026-04-25 |
 | 4. Import and Export | 0/5 | Planning complete | - |
 | 5. Consultant Engine | 7/7 | Complete (human UAT pending) | 2026-04-28 |
-| 6. Deployment and Production Readiness | 0/4 | Planning complete | - |
+| 6. Deployment and Production Readiness | 2/4 | Executing (Wave 1 complete) | - |
