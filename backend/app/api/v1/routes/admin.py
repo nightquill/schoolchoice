@@ -13,9 +13,17 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_user
+from sqlalchemy.exc import IntegrityError
+
+from app.core.dependencies import get_current_user, require_role
+from app.core.security import get_password_hash
 from app.db.models import User
 from app.db.session import get_db
+from app.schemas.v2.admin_users import (
+    UserAdminResponse,
+    UserCreateAdmin,
+    UserUpdateAdmin,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin-v2"])
 
@@ -101,3 +109,92 @@ def get_data_refresh_status(
         "triggered_at": _last_refresh.get("triggered_at"),
         "status": _last_refresh.get("status", "idle"),
     }
+
+
+# ---------------------------------------------------------------------------
+# User management CRUD (SEC-01, SEC-02)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/users", response_model=list[UserAdminResponse])
+def list_users(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """List all active users. Admin only."""
+    return db.query(User).filter(User.is_active == True).all()  # noqa: E712
+
+
+@router.post(
+    "/users",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserAdminResponse,
+)
+def create_user(
+    payload: UserCreateAdmin,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Create a new user account. Admin only."""
+    user = User(
+        email=payload.email,
+        hashed_password=get_password_hash(payload.password),
+        display_name=payload.display_name,
+        role=payload.role,
+    )
+    db.add(user)
+    try:
+        db.commit()
+        db.refresh(user)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+    return user
+
+
+@router.patch("/users/{user_id}", response_model=UserAdminResponse)
+def update_user(
+    user_id: str,
+    payload: UserUpdateAdmin,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Update a user's profile or role. Admin only."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    if payload.display_name is not None:
+        user.display_name = payload.display_name
+    if payload.role is not None:
+        user.role = payload.role
+    if payload.password is not None:
+        user.hashed_password = get_password_hash(payload.password)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    """Soft-delete a user (set is_active=False). Admin only. Self-delete blocked."""
+    if str(user_id) == str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You cannot delete your own account.",
+        )
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    user.is_active = False
+    db.commit()
