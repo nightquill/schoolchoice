@@ -60,15 +60,9 @@ def login_for_access_token(db: Session, email: str, password: str) -> dict:
     """
     user, error_code = authenticate_user(db, email, password)
     if user is None:
-        if error_code == "email_not_found":
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No account found with this email address. Please register.",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect password. Please try again.",
+            detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

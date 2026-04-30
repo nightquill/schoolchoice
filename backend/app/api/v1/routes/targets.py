@@ -236,6 +236,7 @@ def add_target(
         shap_explanation={"failing_criteria": failing},
         intended_majors=payload.intended_majors,
         year_of_entry=payload.year_of_entry,
+        preference_confidence=payload.preference_confidence if payload.preference_confidence is not None else 3,
     )
     db.add(target)
     db.commit()
@@ -277,6 +278,8 @@ def update_target(
         target.intended_majors = payload.intended_majors
     if payload.year_of_entry is not None:
         target.year_of_entry = payload.year_of_entry
+    if payload.preference_confidence is not None:
+        target.preference_confidence = payload.preference_confidence
 
     db.commit()
     db.refresh(target)

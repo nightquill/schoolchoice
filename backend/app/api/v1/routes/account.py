@@ -36,6 +36,24 @@ def get_account(
 
 
 # ---------------------------------------------------------------------------
+# PUT /account  — alias for PATCH (spec compatibility)
+# ---------------------------------------------------------------------------
+
+@router.put(
+    "",
+    response_model=AccountResponse,
+    status_code=status.HTTP_200_OK,
+)
+def update_account_put(
+    payload: AccountUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update display_name and preferred_language (PUT alias). REQ-079"""
+    return update_account(payload=payload, db=db, current_user=current_user)
+
+
+# ---------------------------------------------------------------------------
 # PATCH /account
 # ---------------------------------------------------------------------------
 

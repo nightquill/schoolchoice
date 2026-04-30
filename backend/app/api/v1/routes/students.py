@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Body, Depends, status
+from fastapi import APIRouter, Body, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
@@ -24,6 +24,11 @@ from app.schemas.student import (
     StudentProfileUpdate,
     StudentResponse,
     StudentUpdate,
+)
+from app.schemas.v2.jsonb_models import (
+    AwardSchema,
+    ExtracurricularSchema,
+    TeacherEvaluationSchema,
 )
 from app.services import student_service
 
@@ -80,15 +85,19 @@ def _build_full_response(student: Student) -> dict:
 
 
 # REQ-015, REQ-032
-@router.get("", response_model=list[StudentListItem], status_code=status.HTTP_200_OK)
+@router.get("", status_code=status.HTTP_200_OK)
 def list_students(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """List all student profiles owned by the authenticated counselor. REQ-015, REQ-032"""
-    from sqlalchemy import exists, select
+    """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
+    from sqlalchemy import select
 
-    students = student_service.get_students(db, user_id=current_user.id)
+    all_students = student_service.get_students(db, user_id=current_user.id)
+    total = len(all_students)
+    students = all_students[skip : skip + limit]
 
     # Build a set of student_ids that have a generated plan — single query, no N+1
     student_ids = [s.id for s in students]
@@ -108,7 +117,7 @@ def list_students(
         item = StudentListItem.model_validate(s)
         item.has_plan = s.id in has_plan_ids
         result.append(item)
-    return result
+    return {"items": result, "total": total}
 
 
 # REQ-012, REQ-025, REQ-028, REQ-033
@@ -249,8 +258,14 @@ def update_teacher_evaluations(
     current_user: User = Depends(get_current_user),
 ):
     """Replace the teacher evaluation array for a student."""
+    # Validate each item against TeacherEvaluationSchema — reject truly malformed data
+    try:
+        validated = [TeacherEvaluationSchema(**item).model_dump() if isinstance(item, dict) else item for item in payload]
+    except Exception as exc:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail=f"Invalid teacher evaluation data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
-    student.teacher_evaluation = payload
+    student.teacher_evaluation = validated
     db.commit()
     db.refresh(student)
     return student.teacher_evaluation or []
@@ -265,8 +280,14 @@ def update_extracurricular(
     current_user: User = Depends(get_current_user),
 ):
     """Replace the extracurricular activities array for a student."""
+    # Validate each item against ExtracurricularSchema — reject truly malformed data
+    try:
+        validated = [ExtracurricularSchema(**item).model_dump() if isinstance(item, dict) else item for item in payload]
+    except Exception as exc:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail=f"Invalid extracurricular data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
-    student.extra_curricular = payload
+    student.extra_curricular = validated
     db.commit()
     db.refresh(student)
     return student.extra_curricular or []
@@ -281,8 +302,14 @@ def update_awards(
     current_user: User = Depends(get_current_user),
 ):
     """Replace the awards array for a student."""
+    # Validate each item against AwardSchema — reject truly malformed data
+    try:
+        validated = [AwardSchema(**item).model_dump() if isinstance(item, dict) else item for item in payload]
+    except Exception as exc:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=422, detail=f"Invalid award data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
-    student.awards = payload
+    student.awards = validated
     db.commit()
     db.refresh(student)
     return student.awards or []

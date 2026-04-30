@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from sqlalchemy.exc import IntegrityError
@@ -48,14 +48,23 @@ def _require_admin(current_user: User = Depends(get_current_user)) -> User:
 
 def _data_refresh_background() -> None:
     """
-    Stub background task for data refresh.
-    In production this would invoke the data agent script via subprocess.
+    Re-execute seed_schools.sql to refresh school data from canonical source.
+    Uses the same _run_sql_file / engine pattern as main.py startup seeding.
     """
+    from pathlib import Path
+    from app.db.session import engine
+    from app.main import _run_sql_file
+
     _last_refresh["status"] = "running"
-    # Simulate data agent invocation (MVP stub)
-    import time
-    time.sleep(0.1)
-    _last_refresh["status"] = "complete"
+    try:
+        seed_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "seed"
+        schools_sql_path = seed_dir / "seed_schools.sql"
+        if schools_sql_path.exists():
+            with engine.connect() as conn:
+                _run_sql_file(conn, schools_sql_path)
+        _last_refresh["status"] = "complete"
+    except Exception as exc:
+        _last_refresh["status"] = f"failed: {exc}"
 
 
 # ---------------------------------------------------------------------------
@@ -116,13 +125,18 @@ def get_data_refresh_status(
 # ---------------------------------------------------------------------------
 
 
-@router.get("/users", response_model=list[UserAdminResponse])
+@router.get("/users")
 def list_users(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
 ):
-    """List all active users. Admin only."""
-    return db.query(User).filter(User.is_active == True).all()  # noqa: E712
+    """List all active users (paginated). Admin only."""
+    query = db.query(User).filter(User.is_active == True)  # noqa: E712
+    total = query.count()
+    users = query.offset(skip).limit(limit).all()
+    return {"items": [UserAdminResponse.model_validate(u).model_dump() for u in users], "total": total}
 
 
 @router.post(

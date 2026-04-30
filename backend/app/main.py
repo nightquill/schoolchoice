@@ -12,6 +12,8 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.api.v1.routes import action_plan, auth, consultant, recommendations, students
 from app.api.v1.routes import (
@@ -45,6 +47,14 @@ app = FastAPI(
     version="2.0.0",
     description="Backend API for the Intelligent Academic Advisor (v1 + v2)",
 )
+
+# ---------------------------------------------------------------------------
+# Rate limiting (slowapi)
+# ---------------------------------------------------------------------------
+from app.api.v1.routes.auth import limiter  # noqa: E402
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # ---------------------------------------------------------------------------
 # Create tables on startup (v1 + v2 share the same Base.metadata)
@@ -100,10 +110,29 @@ def _run_sql_file(conn, path) -> int:
     sql = path.read_text()
     stmts = _split_sql_statements(sql)
     executed = 0
-    # Use raw psycopg2 cursor to bypass SQLAlchemy bind-parameter interpolation
+
+    # Detect dialect — SQLite needs function replacements
+    dialect = engine.dialect.name
+    is_sqlite = dialect == "sqlite"
+
+    # Use raw cursor to bypass SQLAlchemy bind-parameter interpolation
     # (JSON content in seed SQL contains patterns like :N that SQLAlchemy misinterprets)
     raw_cursor = conn.connection.cursor()
     for stmt in stmts:
+        # Replace PostgreSQL-specific functions for SQLite
+        if is_sqlite:
+            stmt = stmt.replace("NOW()", "datetime('now')")
+            stmt = stmt.replace("now()", "datetime('now')")
+            stmt = stmt.replace("::uuid", "")
+            stmt = stmt.replace("::text", "")
+            # SQLAlchemy stores UUIDs as 32-char hex on SQLite (no hyphens).
+            # Seed SQL uses hyphenated UUIDs — convert them.
+            import re
+            stmt = re.sub(
+                r"'([0-9a-fA-F]{8})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{4})-([0-9a-fA-F]{12})'",
+                lambda m: "'" + m.group(0)[1:-1].replace("-", "") + "'",
+                stmt,
+            )
         try:
             raw_cursor.execute("SAVEPOINT sp")
             raw_cursor.execute(stmt)
@@ -167,6 +196,15 @@ if engine.dialect.name == "postgresql":
         _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS template_id VARCHAR(50) DEFAULT 'professional'"))
         _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS overrides JSON DEFAULT '{}'"))
         _conn.execute(_sql_text("ALTER TABLE academic_plans ADD COLUMN IF NOT EXISTS chat_request_counts JSON DEFAULT '{}'"))
+        # Preference confidence on student_school_targets (ship-ready spec)
+        _conn.execute(_sql_text("ALTER TABLE student_school_targets ADD COLUMN IF NOT EXISTS preference_confidence INTEGER DEFAULT 3 NOT NULL"))
+        _conn.execute(_sql_text(
+            "ALTER TABLE student_school_targets DROP CONSTRAINT IF EXISTS ck_sst_preference_confidence"
+        ))
+        _conn.execute(_sql_text(
+            "ALTER TABLE student_school_targets ADD CONSTRAINT ck_sst_preference_confidence "
+            "CHECK (preference_confidence >= 1 AND preference_confidence <= 5)"
+        ))
         _conn.commit()
 
 # ---------------------------------------------------------------------------

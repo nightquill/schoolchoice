@@ -1002,6 +1002,10 @@ class StudentSchoolTarget(Base):
             "status IN ('CONSIDERING', 'APPLIED', 'ADMITTED', 'REJECTED', 'WITHDRAWN')",
             name="ck_sst_status",
         ),
+        CheckConstraint(
+            "preference_confidence >= 1 AND preference_confidence <= 5",
+            name="ck_sst_preference_confidence",
+        ),
     )
 
     id = Column(
@@ -1061,6 +1065,13 @@ class StudentSchoolTarget(Base):
         default="CONSIDERING",
         server_default="'CONSIDERING'",
         comment="Enum: CONSIDERING | APPLIED | ADMITTED | REJECTED | WITHDRAWN",
+    )
+    preference_confidence = Column(
+        Integer,
+        nullable=False,
+        default=3,
+        server_default="3",
+        comment="Counselor confidence in student preference 1-5 (1=unsure, 5=decided)",
     )
     # Added via ALTER TABLE
     intended_majors = Column(JSON, nullable=True)

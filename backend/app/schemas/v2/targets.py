@@ -20,6 +20,14 @@ class TargetCreate(BaseModel):
     status: str = "CONSIDERING"
     intended_majors: Optional[list[str]] = None
     year_of_entry: Optional[int] = None
+    preference_confidence: Optional[int] = 3
+
+    @field_validator("preference_confidence")
+    @classmethod
+    def validate_preference_confidence(cls, v: Optional[int]) -> Optional[int]:
+        if v is not None and not 1 <= v <= 5:
+            raise ValueError("preference_confidence must be 1-5")
+        return v
 
     @field_validator("status")
     @classmethod
@@ -35,6 +43,14 @@ class TargetUpdate(BaseModel):
     status: Optional[str] = None
     intended_majors: Optional[list[str]] = None
     year_of_entry: Optional[int] = None
+    preference_confidence: Optional[int] = None
+
+    @field_validator("preference_confidence")
+    @classmethod
+    def validate_preference_confidence(cls, v: Optional[int]) -> Optional[int]:
+        if v is not None and not 1 <= v <= 5:
+            raise ValueError("preference_confidence must be 1-5")
+        return v
 
     @field_validator("status")
     @classmethod
@@ -63,6 +79,7 @@ class TargetResponse(BaseModel):
     failing_criteria: Optional[list[str]] = None
     intended_majors: Optional[list] = None
     year_of_entry: Optional[int] = None
+    preference_confidence: int = 3
     status: str
     created_at: datetime
     updated_at: datetime
