@@ -1,0 +1,713 @@
+{
+  "_meta": {
+    "institution": "The Education University of Hong Kong",
+    "institution_code": "EdUHK",
+    "school_id": "20000000-0000-0000-0000-000000000010",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS8001",
+      "name": "BA in Creative and Digital Arts and BEd (Music)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 21.5,
+          "lower_quartile": 21.3,
+          "upper_quartile": 21.7,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8002",
+      "name": "BA in Creative and Digital Arts and BEd (Visual Arts)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 22,
+          "upper_quartile": 22,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8003",
+      "name": "BA in Digital Chinese Culture and Communication and BEd (Chinese Language)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 27.5,
+          "lower_quartile": 26,
+          "upper_quartile": 29.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8004",
+      "name": "BA in English Studies and Digital Communication and BEd (English Language)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 23.5,
+          "lower_quartile": 23.5,
+          "upper_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8005",
+      "name": "BA in Heritage Education and Arts Management and BEd (Chinese History)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 26.3,
+          "lower_quartile": 26,
+          "upper_quartile": 26.6,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8006",
+      "name": "BSocSc in Psychology and BEd (Early Childhood Education)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 24,
+          "lower_quartile": 23.5,
+          "upper_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8007",
+      "name": "BA in Personal Finance and BEd (BAFS)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25,
+          "lower_quartile": 24.5,
+          "upper_quartile": 25.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8008",
+      "name": "BSc in AI and Educational Technology and BEd (ICT and Primary Science)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 26,
+          "lower_quartile": 24.1,
+          "upper_quartile": 27.9,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8009",
+      "name": "BSc in AI and Educational Technology and BEd (Primary Mathematics)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25.5,
+          "lower_quartile": 25,
+          "upper_quartile": 26.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8010",
+      "name": "BSc in Sports Science and Coaching and BEd (Physical Education)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 20.8,
+          "upper_quartile": 23.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8011",
+      "name": "BSc in Integrated Environmental Management and BEd (Science)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 24.6,
+          "lower_quartile": 24,
+          "upper_quartile": 25.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8012",
+      "name": "BSocSc in Sociology and Community Studies and BEd (Geography)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25.3,
+          "lower_quartile": 25,
+          "upper_quartile": 25.6,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8013",
+      "name": "BSocSc in Sociology and Community Studies and BEd (Primary Humanities)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25.3,
+          "lower_quartile": 24.5,
+          "upper_quartile": 26.1,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8651",
+      "name": "BSocSc in Psychology",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20,
+          "lower_quartile": 20,
+          "upper_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 20,
+          "lower_quartile": 20,
+          "upper_quartile": 20,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8663",
+      "name": "BA in Special Education",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 23.5,
+          "lower_quartile": 23,
+          "upper_quartile": 24.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 23,
+          "lower_quartile": 22.8,
+          "upper_quartile": 23.2,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8674",
+      "name": "BA in Digital Chinese Culture and Communication",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 23.8,
+          "lower_quartile": 23.1,
+          "upper_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8675",
+      "name": "BA in English Studies and Digital Communication",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 21.5,
+          "lower_quartile": 21.0,
+          "upper_quartile": 22.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 20.5,
+          "lower_quartile": 20,
+          "upper_quartile": 21.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8685",
+      "name": "BA in Creative and Digital Arts (Music)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20.3,
+          "lower_quartile": 19.3,
+          "upper_quartile": 21.3,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8686",
+      "name": "BA in Creative and Digital Arts (Visual Arts)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 21.8,
+          "upper_quartile": 22.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8687",
+      "name": "BA in Heritage Education and Arts Management",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25.5,
+          "lower_quartile": 25.5,
+          "upper_quartile": 25.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 25.5,
+          "lower_quartile": 25,
+          "upper_quartile": 26.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8688",
+      "name": "BA in Personal Finance",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 19,
+          "lower_quartile": 18.8,
+          "upper_quartile": 19.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8702",
+      "name": "BSc in Integrated Environmental Management",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 23.2,
+          "lower_quartile": 23,
+          "upper_quartile": 23.4,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 22.2,
+          "lower_quartile": 21.7,
+          "upper_quartile": 22.7,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8714",
+      "name": "BSc in AI and Educational Technology",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 25,
+          "lower_quartile": 24.5,
+          "upper_quartile": 25.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 23.5,
+          "lower_quartile": 22.5,
+          "upper_quartile": 24.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8726",
+      "name": "BSc in Sports Science and Coaching",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 28.5,
+          "lower_quartile": 27.5,
+          "upper_quartile": 29.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 28.5,
+          "lower_quartile": 26.5,
+          "upper_quartile": 30.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8727",
+      "name": "BSc in Speech Pathology and Rehabilitation",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 28,
+          "lower_quartile": 26,
+          "upper_quartile": 30,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS8507",
+      "name": "HD in Early Childhood Education",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects with programme-specific subject weightings",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17.5,
+          "lower_quartile": 16,
+          "upper_quartile": 19.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 14.5,
+          "upper_quartile": 17.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}

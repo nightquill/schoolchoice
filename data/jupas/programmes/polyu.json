@@ -1,0 +1,1378 @@
+{
+  "_meta": {
+    "institution": "The Hong Kong Polytechnic University",
+    "institution_code": "PolyU",
+    "school_id": "20000000-0000-0000-0000-000000000004",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS3060",
+      "name": "Accounting and Finance - BBA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 188.2,
+          "median": 185.5,
+          "lower_quartile": 185.0,
+          "upper_quartile": 186.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 178.3,
+          "median": 178,
+          "lower_quartile": 172,
+          "upper_quartile": 184,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3220",
+      "name": "Applied Mathematics and Finance Analytics - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 200.7,
+          "median": 193.5,
+          "lower_quartile": 189.5,
+          "upper_quartile": 197.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3250",
+      "name": "Applied Social Sciences - BA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 171.1,
+          "median": 171.5,
+          "lower_quartile": 164.5,
+          "upper_quartile": 178.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 166.6,
+          "median": 164.5,
+          "lower_quartile": 161,
+          "upper_quartile": 168.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3214",
+      "name": "Architectural Studies - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 169.4,
+          "median": 165.8,
+          "lower_quartile": 163.1,
+          "upper_quartile": 168.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3140",
+      "name": "Aviation Engineering - BEng (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 220.4,
+          "median": 210.0,
+          "lower_quartile": 205.0,
+          "upper_quartile": 215.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 203.3,
+          "median": 195,
+          "lower_quartile": 184,
+          "upper_quartile": 206,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3150",
+      "name": "Biomedical Engineering - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 226.0,
+          "median": 218.0,
+          "lower_quartile": 213.5,
+          "upper_quartile": 222.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 211,
+          "median": 208,
+          "lower_quartile": 178,
+          "upper_quartile": 238,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3011",
+      "name": "Biotechnology and Chemical Technology - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 212.2,
+          "median": 209.0,
+          "lower_quartile": 203.5,
+          "upper_quartile": 214.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 200.6,
+          "median": 196,
+          "lower_quartile": 190,
+          "upper_quartile": 202,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3791",
+      "name": "Building Engineering and Management - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 192.0,
+          "median": 188.1,
+          "lower_quartile": 185.1,
+          "upper_quartile": 191.1,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3211",
+      "name": "Building Sciences and Engineering - BEng (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 184.7,
+          "median": 181.5,
+          "lower_quartile": 179.5,
+          "upper_quartile": 183.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3003",
+      "name": "Business Administration - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 179.2,
+          "median": 179.0,
+          "lower_quartile": 177.0,
+          "upper_quartile": 181.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3320",
+      "name": "Chinese History and Culture - BA (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 221.4,
+          "median": 223.0,
+          "lower_quartile": 210.0,
+          "upper_quartile": 236.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 194.7,
+          "median": 193,
+          "lower_quartile": 186,
+          "upper_quartile": 200,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3739",
+      "name": "Civil Engineering - BEng (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 218.5,
+          "median": 216.5,
+          "lower_quartile": 205.0,
+          "upper_quartile": 228.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3006",
+      "name": "Computer and Mathematical Sciences - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 220.4,
+          "median": 215.0,
+          "lower_quartile": 210.0,
+          "upper_quartile": 220.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3868",
+      "name": "Computing and AI - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 228.5,
+          "median": 230.0,
+          "lower_quartile": 215.0,
+          "upper_quartile": 245.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 203.5,
+          "median": 193,
+          "lower_quartile": 191,
+          "upper_quartile": 195,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3004",
+      "name": "Construction and Environment - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 188.8,
+          "median": 184.0,
+          "lower_quartile": 181.0,
+          "upper_quartile": 187.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3223",
+      "name": "Data Science and Artificial Intelligence - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 220.4,
+          "median": 220.0,
+          "lower_quartile": 211.0,
+          "upper_quartile": 229.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3569",
+      "name": "Design - BA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 200.0,
+          "median": 178.0,
+          "lower_quartile": 190.0,
+          "upper_quartile": 166.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 188.2,
+          "median": 176,
+          "lower_quartile": 202.5,
+          "upper_quartile": 149.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3170",
+      "name": "Electrical Engineering - BEng (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 221.9,
+          "median": 215.0,
+          "lower_quartile": 210.0,
+          "upper_quartile": 220.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 201.7,
+          "median": 195,
+          "lower_quartile": 191,
+          "upper_quartile": 199,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3005",
+      "name": "Engineering - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 216.6,
+          "median": 215.0,
+          "lower_quartile": 205.0,
+          "upper_quartile": 225.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3240",
+      "name": "English and Applied Linguistics - BA (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 178.4,
+          "median": 178.0,
+          "lower_quartile": 175.0,
+          "upper_quartile": 181.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 169.8,
+          "median": 169.5,
+          "lower_quartile": 163,
+          "upper_quartile": 176.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3375",
+      "name": "Environmental Engineering and Sustainable Development - BEng (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 225.1,
+          "median": 220.0,
+          "lower_quartile": 218.0,
+          "upper_quartile": 222.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3050",
+      "name": "Fashion - BA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 170.4,
+          "median": 177.0,
+          "lower_quartile": 164.0,
+          "upper_quartile": 190.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 164.6,
+          "median": 160.5,
+          "lower_quartile": 146,
+          "upper_quartile": 175.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3255",
+      "name": "Food Science and Nutrition - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 210.6,
+          "median": 203.0,
+          "lower_quartile": 198.5,
+          "upper_quartile": 207.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3070",
+      "name": "Global Business and Logistics - BBA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 180.9,
+          "median": 179.0,
+          "lower_quartile": 175.0,
+          "upper_quartile": 183.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 169.3,
+          "median": 168,
+          "lower_quartile": 164.5,
+          "upper_quartile": 171.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3310",
+      "name": "Hotel and Tourism Management - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 170.6,
+          "median": 166.5,
+          "lower_quartile": 163.0,
+          "upper_quartile": 170.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 160.5,
+          "median": 156,
+          "lower_quartile": 155.5,
+          "upper_quartile": 156.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3007",
+      "name": "Humanities - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 185.5,
+          "median": 185.0,
+          "lower_quartile": 179.0,
+          "upper_quartile": 191.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3180",
+      "name": "Information and AI Engineering - BEng/BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 222.5,
+          "median": 218.0,
+          "lower_quartile": 210.0,
+          "upper_quartile": 226.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 207.7,
+          "median": 201,
+          "lower_quartile": 195,
+          "upper_quartile": 207,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3237",
+      "name": "Intelligent Supply Chain and Engineering Management - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 194.3,
+          "median": 195.0,
+          "lower_quartile": 193.0,
+          "upper_quartile": 197.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3080",
+      "name": "Management and Marketing - BBA (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 184.0,
+          "median": 182.5,
+          "lower_quartile": 179.0,
+          "upper_quartile": 186.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 175.2,
+          "median": 174.5,
+          "lower_quartile": 169,
+          "upper_quartile": 180.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3741",
+      "name": "Mechanical Engineering - BEng (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 216.6,
+          "median": 208.0,
+          "lower_quartile": 205.0,
+          "upper_quartile": 211.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 195.9,
+          "median": 191,
+          "lower_quartile": 186,
+          "upper_quartile": 196,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3478",
+      "name": "Medical Laboratory Science - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 310.5,
+          "median": 309.0,
+          "lower_quartile": 306.5,
+          "upper_quartile": 311.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 300.9,
+          "median": 299,
+          "lower_quartile": 290,
+          "upper_quartile": 308,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3337",
+      "name": "Mental Health Nursing - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 216.1,
+          "median": 209.0,
+          "lower_quartile": 206.0,
+          "upper_quartile": 212.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 212.5,
+          "median": 203.5,
+          "lower_quartile": 203,
+          "upper_quartile": 204.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3648",
+      "name": "Nursing - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 222.7,
+          "median": 218.0,
+          "lower_quartile": 213.5,
+          "upper_quartile": 222.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 216.7,
+          "median": 213.5,
+          "lower_quartile": 208,
+          "upper_quartile": 219.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3624",
+      "name": "Occupational Therapy - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 285.6,
+          "median": 278.0,
+          "lower_quartile": 279.5,
+          "upper_quartile": 276.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 281.8,
+          "median": 293,
+          "lower_quartile": 273.5,
+          "upper_quartile": 312.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3290",
+      "name": "Optometry - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 260.6,
+          "median": 277.8,
+          "lower_quartile": 247.8,
+          "upper_quartile": 307.8,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 284,
+          "median": 275,
+          "lower_quartile": 275,
+          "upper_quartile": 275,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3030",
+      "name": "Physics with Secondary Major in AI/IE - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 216.3,
+          "median": 215.0,
+          "lower_quartile": 205.0,
+          "upper_quartile": 225.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 205.3,
+          "median": 208,
+          "lower_quartile": 190,
+          "upper_quartile": 226,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3636",
+      "name": "Physiotherapy - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 329.3,
+          "median": 320.0,
+          "lower_quartile": 320.0,
+          "upper_quartile": 320.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 294.7,
+          "median": 293,
+          "lower_quartile": 284,
+          "upper_quartile": 302,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3236",
+      "name": "Product Innovation and Smart Manufacturing - BEng (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 196.5,
+          "median": 195.0,
+          "lower_quartile": 193.0,
+          "upper_quartile": 197.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3612",
+      "name": "Radiography - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 339.9,
+          "median": 339.0,
+          "lower_quartile": 328.5,
+          "upper_quartile": 349.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 325.8,
+          "median": 320,
+          "lower_quartile": 318.5,
+          "upper_quartile": 321.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3008",
+      "name": "Science - Bachelor's Degree Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 211.4,
+          "median": 208.0,
+          "lower_quartile": 205.0,
+          "upper_quartile": 211.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3130",
+      "name": "Spatial Data Science and Smart Cities - BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 211.1,
+          "median": 206.0,
+          "lower_quartile": 203.0,
+          "upper_quartile": 209.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        },
+        "2024": {
+          "mean": 199.5,
+          "median": 199.5,
+          "lower_quartile": 191,
+          "upper_quartile": 208.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3242",
+      "name": "Speech Therapy - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 267.0,
+          "median": 264.3,
+          "lower_quartile": 259.8,
+          "upper_quartile": 268.8,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3789",
+      "name": "Surveying - BSc (Hons)",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 178.4,
+          "median": 175.8,
+          "lower_quartile": 165.3,
+          "upper_quartile": 186.3,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS3241",
+      "name": "Translation, Language Sciences and Analytics - BA/BSc (Hons) Scheme",
+      "faculty": "",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Any Best 5 Subjects (with programme-specific subject weightings)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "PolyU applies programme-specific weightings (multipliers from 10-50x) resulting in scores in the 100-350 range. See polyu.edu.hk for details."
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 200.6,
+          "median": 189.5,
+          "lower_quartile": 188.6,
+          "upper_quartile": 190.4,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
+        }
+      }
+    }
+  ]
+}

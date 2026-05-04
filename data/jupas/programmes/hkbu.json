@@ -1,0 +1,648 @@
+{
+  "_meta": {
+    "institution": "Hong Kong Baptist University",
+    "institution_code": "HKBU",
+    "school_id": "20000000-0000-0000-0000-000000000006",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS2020",
+      "name": "BA (Hons) (Chinese Language and Literature / Creative and Professional Writing / English Language and Literature / Humanities / Translation)",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 21.95,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 21.04,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2025",
+      "name": "BA (Hons) in Religion, Philosophy and Ethics",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 21.0,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.5,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2060",
+      "name": "BA (Hons) / BMus (Hons) (Music / Creative Industries)",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 20.68,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.87,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2110",
+      "name": "BBA (Hons) - Accounting Concentration",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 22.15,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 21.06,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2120",
+      "name": "BBA (Hons)",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 22.07,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 21.12,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2310",
+      "name": "BComm (Hons) (Journalism and Digital Media / Public Relations and Advertising)",
+      "faculty": "School of Communication",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 22.99,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 22.81,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2330",
+      "name": "BA (Hons) in Film and Television",
+      "faculty": "School of Communication",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 21.83,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 22.93,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2340",
+      "name": "BFA (Hons) in Acting for Global Screen",
+      "faculty": "School of Communication",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 18.55,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 16.75,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2370",
+      "name": "BComm (Hons) in Game Design and Animation",
+      "faculty": "School of Communication",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 21.85,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 21.9,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2410",
+      "name": "BChinMed and BSc (Hons) in Biomedical Science",
+      "faculty": "School of Chinese Medicine",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 32.27,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 31.4,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2420",
+      "name": "BPharm (Hons) in Chinese Medicine",
+      "faculty": "School of Chinese Medicine",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 27.04,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 25.01,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2510",
+      "name": "BSc (Hons)",
+      "faculty": "Faculty of Science",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 20.15,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.1,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2610",
+      "name": "BA (Hons) / BSocSc (Hons) (European Studies / Geography / Global and China Studies / Government and International Studies / History / Sociology)",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 24.88,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 24.11,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2620",
+      "name": "BA (Hons) in Physical Education and Recreation Management",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 21.3,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 21.12,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2660",
+      "name": "BSW (Hons)",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 25.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 25.17,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2810",
+      "name": "BA (Hons) in Visual Arts",
+      "faculty": "Academy of Visual Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 19.34,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.56,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2910",
+      "name": "BSc (Hons) in Business Computing and Data Analytics",
+      "faculty": "Faculty of Science",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 20.46,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.57,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2920",
+      "name": "BASc (Hons) in Arts and Technology",
+      "faculty": "Interdisciplinary",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 18.7,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 18.29,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2930",
+      "name": "BA (Hons) in Business Administration (Global Entertainment)",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 19.5,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 18.83,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2940",
+      "name": "BSocSc (Hons) / BSc (Hons) in Innovation in Health and Social Well-Being",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 25.54,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 19.33,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2950",
+      "name": "BASciTech (Hons) in Individualised Major",
+      "faculty": "Interdisciplinary",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 19.73,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        },
+        "2024": {
+          "mean": 18.07,
+          "source": "JUPAS 2024 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS2960",
+      "name": "BASc (Hons) in Digital Futures and Humanities",
+      "faculty": "Interdisciplinary",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKBU uses standard 7pt scale and reports mean scores"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "mean": 18.9,
+          "source": "JUPAS 2025 Admissions Scores PDF",
+          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+        }
+      }
+    }
+  ]
+}

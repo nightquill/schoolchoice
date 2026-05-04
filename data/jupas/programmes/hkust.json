@@ -1,0 +1,1074 @@
+{
+  "_meta": {
+    "institution": "The Hong Kong University of Science and Technology",
+    "institution_code": "HKUST",
+    "school_id": "20000000-0000-0000-0000-000000000003",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS5101",
+      "name": "International Research Enrichment",
+      "faculty": "School of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 44.63,
+          "median": 38.25,
+          "lower_quartile": 37.88,
+          "upper_quartile": 38.62,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 44.63,
+          "median": 36.75,
+          "lower_quartile": 34.5,
+          "upper_quartile": 39.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5102",
+      "name": "Science (Group A)",
+      "faculty": "School of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 33.13,
+          "lower_quartile": 32.63,
+          "upper_quartile": 33.63,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 31.13,
+          "lower_quartile": 29.66,
+          "upper_quartile": 32.6,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5103",
+      "name": "Science (Group B)",
+      "faculty": "School of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 33.38,
+          "lower_quartile": 32.75,
+          "upper_quartile": 34.01,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 32.0,
+          "lower_quartile": 30.44,
+          "upper_quartile": 33.56,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5118",
+      "name": "BSc in Biomedical and Health Sciences",
+      "faculty": "School of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 43.13,
+          "lower_quartile": 40.5,
+          "upper_quartile": 45.76,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5181",
+      "name": "Science (Group A) with Extended Major in AI",
+      "faculty": "School of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 37.5,
+          "lower_quartile": 36.0,
+          "upper_quartile": 39.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 37.38,
+          "lower_quartile": 34.0,
+          "upper_quartile": 40.76,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5212",
+      "name": "BEng in Computer Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 43.49,
+          "lower_quartile": 41.97,
+          "upper_quartile": 45.01,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5220",
+      "name": "Dept of Chemical & Biological Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 41.49,
+          "lower_quartile": 39.59,
+          "upper_quartile": 43.39,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5230",
+      "name": "Dept of Civil & Environmental Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 39.7,
+          "lower_quartile": 38.2,
+          "upper_quartile": 41.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5240",
+      "name": "Dept of Computer Science & Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 48.45,
+          "lower_quartile": 46.45,
+          "upper_quartile": 50.45,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5250",
+      "name": "Dept of Electronic & Computer Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 41.74,
+          "lower_quartile": 40.78,
+          "upper_quartile": 42.7,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5260",
+      "name": "Dept of Industrial Engineering & Decision Analytics",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 36.28,
+          "lower_quartile": 35.1,
+          "upper_quartile": 37.46,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5270",
+      "name": "Dept of Mechanical & Aerospace Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 41.14,
+          "lower_quartile": 39.72,
+          "upper_quartile": 42.56,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5282",
+      "name": "Engineering with Extended Major in AI",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 48.7,
+          "lower_quartile": 46.48,
+          "upper_quartile": 50.92,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 75.86,
+          "median": 48.45,
+          "lower_quartile": 45.7,
+          "upper_quartile": 51.2,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5200",
+      "name": "Engineering",
+      "faculty": "School of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2024": {
+          "highest_attainable": 75.86,
+          "median": 39.78,
+          "lower_quartile": 38.21,
+          "upper_quartile": 41.35,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5411",
+      "name": "BSc in Global China Studies",
+      "faculty": "School of Humanities and Social Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 58.01,
+          "median": 29.23,
+          "lower_quartile": 28.8,
+          "upper_quartile": 29.66,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 58.01,
+          "median": 28.0,
+          "lower_quartile": 27.5,
+          "upper_quartile": 28.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5412",
+      "name": "BSc in Quantitative Social Analysis",
+      "faculty": "School of Humanities and Social Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 33.0,
+          "lower_quartile": 32.5,
+          "upper_quartile": 33.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 30.88,
+          "lower_quartile": 30.0,
+          "upper_quartile": 31.76,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5711",
+      "name": "BSc in Innovation, Design and Technology",
+      "faculty": "Academy of Interdisciplinary Studies",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 36.36,
+          "lower_quartile": 34.72,
+          "upper_quartile": 38.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 75.86,
+          "median": 39.28,
+          "lower_quartile": 33.24,
+          "upper_quartile": 45.32,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5812",
+      "name": "BSc in Environmental Management and Technology",
+      "faculty": "Academy of Interdisciplinary Studies",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 32.5,
+          "lower_quartile": 31.05,
+          "upper_quartile": 33.95,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 31.4,
+          "lower_quartile": 30.55,
+          "upper_quartile": 32.25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5901",
+      "name": "BEng/BSc & BBA Dual Degree in Technology and Management",
+      "faculty": "Academy of Interdisciplinary Studies",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 75.86,
+          "median": 62.48,
+          "lower_quartile": 60.23,
+          "upper_quartile": 64.73,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 75.86,
+          "median": 61.66,
+          "lower_quartile": 58.55,
+          "upper_quartile": 64.77,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5811",
+      "name": "BSc in Biotechnology and Business",
+      "faculty": "Joint Programs",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 38.63,
+          "lower_quartile": 36.56,
+          "upper_quartile": 40.7,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 39.75,
+          "lower_quartile": 38.91,
+          "upper_quartile": 40.59,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5813",
+      "name": "BSc in Mathematics and Economics",
+      "faculty": "Joint Programs",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 71.4,
+          "median": 44.1,
+          "lower_quartile": 39.2,
+          "upper_quartile": 49.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 71.4,
+          "median": 42.6,
+          "lower_quartile": 39.2,
+          "upper_quartile": 46.0,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5300",
+      "name": "Business & Management",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 35.0,
+          "lower_quartile": 33.9,
+          "upper_quartile": 36.1,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 32.5,
+          "lower_quartile": 32.05,
+          "upper_quartile": 32.95,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5311",
+      "name": "BBA in Economics",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 36.55,
+          "lower_quartile": 35.4,
+          "upper_quartile": 37.7,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 35.05,
+          "lower_quartile": 34.14,
+          "upper_quartile": 35.96,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5312",
+      "name": "BBA in Finance",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 43.31,
+          "lower_quartile": 41.81,
+          "upper_quartile": 44.81,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 43.5,
+          "lower_quartile": 42.75,
+          "upper_quartile": 44.25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5313",
+      "name": "BBA in Global Business",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 52.43,
+          "lower_quartile": 50.4,
+          "upper_quartile": 54.46,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 53.44,
+          "lower_quartile": 50.06,
+          "upper_quartile": 56.82,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5314",
+      "name": "BBA in Information Systems",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 35.93,
+          "lower_quartile": 35.4,
+          "upper_quartile": 36.46,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 35.4,
+          "lower_quartile": 34.0,
+          "upper_quartile": 36.8,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5315",
+      "name": "BBA in Management",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 33.9,
+          "lower_quartile": 33.9,
+          "upper_quartile": 33.9,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 33.55,
+          "lower_quartile": 32.04,
+          "upper_quartile": 35.06,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5316",
+      "name": "BBA in Marketing",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 32.55,
+          "lower_quartile": 32.4,
+          "upper_quartile": 32.7,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 32.5,
+          "lower_quartile": 32.05,
+          "upper_quartile": 32.95,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5317",
+      "name": "BBA in Operations Management",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 32.4,
+          "lower_quartile": 32.05,
+          "upper_quartile": 32.75,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 32.48,
+          "lower_quartile": 31.3,
+          "upper_quartile": 33.66,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5318",
+      "name": "BBA in Professional Accounting",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 62.48,
+          "median": 34.05,
+          "lower_quartile": 33.55,
+          "upper_quartile": 34.55,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 62.48,
+          "median": 32.4,
+          "lower_quartile": 31.93,
+          "upper_quartile": 32.87,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5331",
+      "name": "BSc in Economics and Finance",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 48.19,
+          "lower_quartile": 46.5,
+          "upper_quartile": 49.88,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 50.06,
+          "lower_quartile": 48.56,
+          "upper_quartile": 51.56,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5332",
+      "name": "BSc in Quantitative Finance",
+      "faculty": "School of Business and Management",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 58.13,
+          "lower_quartile": 56.06,
+          "upper_quartile": 60.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 60.94,
+          "lower_quartile": 59.11,
+          "upper_quartile": 62.77,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5814",
+      "name": "BSc in Risk Management and Business Intelligence",
+      "faculty": "Joint Programs",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 44.25,
+          "lower_quartile": 43.5,
+          "upper_quartile": 45.0,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 45.0,
+          "lower_quartile": 42.88,
+          "upper_quartile": 47.12,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS5822",
+      "name": "BSc in Sustainable and Green Finance",
+      "faculty": "Joint Programs",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects + 6th subject bonus",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKUST uses heavier weighting for specific subjects per programme; details at join.hkust.edu.hk"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "highest_attainable": 66.94,
+          "median": 37.88,
+          "lower_quartile": 37.13,
+          "upper_quartile": 38.63,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "highest_attainable": 66.94,
+          "median": 38.63,
+          "lower_quartile": 37.13,
+          "upper_quartile": 40.13,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}

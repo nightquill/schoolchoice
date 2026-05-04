@@ -1,16 +1,50 @@
 {
   "_meta": {
-    "description": "HKDSE grade-to-point conversion scales used by JUPAS universities. Each scale maps raw HKDSE letter grades to numerical points for admissions scoring purposes.",
+    "description": "HKDSE grade-to-point conversion scales used by JUPAS universities. From 2025 entry, ALL JUPAS institutions use the enhanced 8.5-point scale for calculating admissions scores. The standard 7pt scale remains used by some institutions for reporting (e.g. HKBU, Lingnan, EdUHK, HKMU) and by CUHK/HKU Medicine.",
     "sources": [
+      "JUPAS 2025 Admissions Scores PDF (all 9 participating institutions)",
+      "JUPAS 2024 Admissions Scores PDF (all 9 participating institutions)",
       "https://admissions.hku.hk/node/877",
-      "https://admission.cuhk.edu.hk/application/jupas/programme-specific-requirements-and-score-calculator/",
-      "https://www.cityu.edu.hk/admo/sites/default/files/2025-11/2026_JUPAS_AdmissionScoreFormulaAndScores.pdf"
+      "https://admission.cuhk.edu.hk/application/jupas/programme-specific-requirements-and-score-calculator/"
     ],
     "last_updated": "2026-05-04",
-    "confidence": "verified_from_official_sources"
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "jupas_2025_enhanced": {
+    "description": "Enhanced 8.5-point scale adopted by ALL JUPAS participating institutions from 2025 entry. This is the official unified scale for JUPAS admissions scoring. Used by CityU, PolyU, HKUST, and most HKU/CUHK programmes for score calculation.",
+    "grades": {
+      "5**": 8.5,
+      "5*": 7,
+      "5": 5.5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
+      "U": 0
+    },
+    "category_c_2025": {
+      "description": "Category C Other Language subjects conversion for 2025+ entry",
+      "Japanese": {"N1": 7, "N2": 5.5, "N3": 4},
+      "Korean": {"Grade 6": 7, "Grade 5": 5.5, "Grade 4": 4, "Grade 3": 3},
+      "French_German_Spanish": {"C2": 7, "C1": 5.5, "B2": 4, "B1": 3, "A2": 3},
+      "Urdu": {"A++": 7, "A+": 7, "A": 7, "B++": 5.5, "B+": 5.5, "B": 4, "C": 4, "D": 3, "E": 3}
+    },
+    "applied_learning": {
+      "Attained with Distinction (II)": 4,
+      "Attained with Distinction": 3,
+      "Attained with Distinction (I)": 3,
+      "Attained": 0
+    },
+    "used_by": [
+      "CityU (all programmes)",
+      "PolyU (all programmes)",
+      "HKUST (all programmes)",
+      "HKU (most programmes)",
+      "CUHK (most programmes, except JS4501/JS4502 Medicine)"
+    ]
   },
   "standard_7pt": {
-    "description": "Standard 7-point scale used by most JUPAS universities including HKUST, PolyU, CityU, HKBU, Lingnan, HKMU, HSUHK, EdUHK, and selected HKU/CUHK programmes (e.g. HKU Medicine).",
+    "description": "Standard 7-point scale. Still used by HKBU, Lingnan, EdUHK, HKMU, HSUHK for reporting admission scores. Also used by CUHK Medicine (JS4501/JS4502). Note: from 2025, some institutions that report using this scale may still internally use enhanced scoring.",
     "grades": {
       "5**": 7,
       "5*": 6,
@@ -21,28 +55,30 @@
       "1": 1,
       "U": 0
     },
-    "csd_grades": {
-      "Attained with Distinction": 2,
-      "AD": 2,
-      "Attained": 1,
-      "A": 1,
-      "U": 0
+    "category_c_pre2025": {
+      "A": 7,
+      "B": 6,
+      "C": 5,
+      "D": 4,
+      "E": 3
+    },
+    "applied_learning": {
+      "Attained with Distinction (II)": 4,
+      "Attained with Distinction": 3,
+      "Attained with Distinction (I)": 3,
+      "Attained": 0
     },
     "used_by": [
-      "HKUST",
-      "PolyU",
-      "CityU",
-      "HKBU",
-      "Lingnan",
-      "HKMU",
-      "HSUHK",
-      "EdUHK",
-      "HKU Medicine",
-      "Selected CUHK programmes"
+      "HKBU (all programmes)",
+      "Lingnan (all programmes)",
+      "EdUHK (all programmes)",
+      "HKMU (all programmes)",
+      "HSUHK (all programmes)",
+      "CUHK Medicine (JS4501, JS4502)"
     ]
   },
   "hku_enhanced": {
-    "description": "Enhanced scale used by most HKU programmes (excluding Medicine, which uses standard_7pt). Awards higher points for top grades to differentiate among high-achieving applicants.",
+    "description": "Alias for jupas_2025_enhanced. HKU was an early adopter of this scale. From 2025, this is the same as the unified JUPAS scale.",
     "grades": {
       "5**": 8.5,
       "5*": 7,
@@ -53,19 +89,13 @@
       "1": 1,
       "U": 0
     },
-    "csd_grades": {
-      "Attained with Distinction": 2,
-      "AD": 2,
-      "Attained": 1,
-      "A": 1,
-      "U": 0
-    },
     "used_by": [
-      "HKU (most programmes, excluding Medicine)"
-    ]
+      "HKU (all programmes)"
+    ],
+    "note": "Identical to jupas_2025_enhanced"
   },
   "cuhk_enhanced": {
-    "description": "Enhanced scale used by most CUHK programmes. Awards higher points for top grades to differentiate among high-achieving applicants.",
+    "description": "Alias for jupas_2025_enhanced. CUHK uses this for most programmes except Medicine (JS4501/JS4502 which use standard 7pt).",
     "grades": {
       "5**": 8.5,
       "5*": 7,
@@ -76,15 +106,26 @@
       "1": 1,
       "U": 0
     },
-    "csd_grades": {
-      "Attained with Distinction": 2,
-      "AD": 2,
-      "Attained": 1,
-      "A": 1,
+    "used_by": [
+      "CUHK (most programmes, excluding JS4501 and JS4502)"
+    ],
+    "note": "Identical to jupas_2025_enhanced"
+  },
+  "polyu_weighted": {
+    "description": "PolyU uses the enhanced 8.5-point scale but applies large multiplier weightings (e.g. 10x-50x) to subject scores, resulting in admission scores in the 100-350 range. The base conversion is identical to jupas_2025_enhanced.",
+    "grades": {
+      "5**": 8.5,
+      "5*": 7,
+      "5": 5.5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
       "U": 0
     },
     "used_by": [
-      "CUHK (most programmes)"
-    ]
+      "PolyU (all programmes)"
+    ],
+    "note": "PolyU scores are NOT directly comparable to other universities due to large multiplier weightings"
   }
 }

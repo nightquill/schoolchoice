@@ -1,0 +1,717 @@
+{
+  "_meta": {
+    "institution": "Lingnan University",
+    "institution_code": "Lingnan",
+    "school_id": "20000000-0000-0000-0000-000000000007",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS7101",
+      "name": "BA (Hons) in Chinese",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.42,
+          "median": 25.845,
+          "lower_quartile": 25.27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.5,
+          "median": 25,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7133",
+      "name": "BA (Hons) in Animation and Digital Arts",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.5,
+          "median": 24,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 23.75,
+          "median": 23,
+          "lower_quartile": 22.25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7204",
+      "name": "BA (Hons) in Translation",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.75,
+          "median": 25.125,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.0,
+          "median": 24.5,
+          "lower_quartile": 24,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7503",
+      "name": "BA (Hons) in English Studies",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27.9,
+          "median": 27.05,
+          "lower_quartile": 26.2,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7606",
+      "name": "BA (Hons) in Cultural Studies",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.15,
+          "median": 25.15,
+          "lower_quartile": 24.15,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24,
+          "median": 24,
+          "lower_quartile": 24,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7709",
+      "name": "BA (Hons) in History",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.4,
+          "median": 26.2,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.9,
+          "median": 25.6,
+          "lower_quartile": 25.3,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7802",
+      "name": "BA (Hons) in Philosophy",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27,
+          "median": 26,
+          "lower_quartile": 25,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.5,
+          "median": 25,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7905",
+      "name": "BA (Hons) in Film and Visual Arts",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29,
+          "median": 28,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7211",
+      "name": "BBA (Hons) - Accounting and Corporate Governance",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27.1,
+          "median": 27.05,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7212",
+      "name": "BBA (Hons) - Business Analytics and Innovation",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28.95,
+          "median": 27,
+          "lower_quartile": 25.05,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7213",
+      "name": "BBA (Hons) - Finance",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 30.5,
+          "median": 28.75,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7214",
+      "name": "BBA (Hons) - Human Resource Management and Analytics",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 30.5,
+          "median": 28.5,
+          "lower_quartile": 26.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7215",
+      "name": "BBA (Hons) - Marketing and Social Media",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29.95,
+          "median": 28.5,
+          "lower_quartile": 27.05,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7216",
+      "name": "BBA (Hons) in Risk and Insurance Management",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7200",
+      "name": "BBA (Hons)",
+      "faculty": "Faculty of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2024": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7301",
+      "name": "BSocSc (Hons) in Economics",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.8,
+          "median": 26.4,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 27,
+          "median": 26,
+          "lower_quartile": 25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7302",
+      "name": "BSocSc (Hons) in Government and International Affairs",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29.1,
+          "median": 28,
+          "lower_quartile": 26.9,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 26.5,
+          "median": 25,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7303",
+      "name": "BSocSc (Hons) in Psychology",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.5,
+          "median": 25,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.75,
+          "median": 24,
+          "lower_quartile": 23.25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7304",
+      "name": "BSocSc (Hons) in Sociology",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.5,
+          "median": 25,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7305",
+      "name": "BSocSc (Hons) in Health and Social Services Management",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.0,
+          "median": 21.5,
+          "lower_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.0,
+          "median": 19.75,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7306",
+      "name": "BSocSc (Hons) in Social and Public Policy Studies",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.1,
+          "median": 24,
+          "lower_quartile": 23.9,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 23.5,
+          "median": 23,
+          "lower_quartile": 22.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7307",
+      "name": "BSocSc (Hons) in Social Data Science",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.5,
+          "median": 24.25,
+          "lower_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7225",
+      "name": "BSc (Hons) in Data Science",
+      "faculty": "School of Data Science",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 32.56,
+          "median": 31.365,
+          "lower_quartile": 30.17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 30.62,
+          "median": 29.75,
+          "lower_quartile": 28.88,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS7123",
+      "name": "BSocSc (Hons) in Global Development and Sustainability",
+      "faculty": "School of Interdisciplinary Studies",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects (any best five)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Lingnan uses standard 7pt scale; subject weightings vary by programme but not listed in JUPAS PDF"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27.85,
+          "median": 26.96,
+          "lower_quartile": 26.07,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 26.25,
+          "median": 25,
+          "lower_quartile": 23.75,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}

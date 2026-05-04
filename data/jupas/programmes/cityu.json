@@ -1,0 +1,1890 @@
+{
+  "_meta": {
+    "institution": "City University of Hong Kong",
+    "institution_code": "CityU",
+    "school_id": "20000000-0000-0000-0000-000000000005",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF (12 Nov 2025)",
+      "JUPAS 2024 Admissions Scores PDF (6 Jan 2025)"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS1211",
+      "name": "BEng Biomedical Engineering",
+      "faculty": "College of Biomedicine",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "M1": 2,
+          "M2": 2,
+          "PHYS": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 40,
+          "median": 39,
+          "lower_quartile": 38,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 37,
+          "median": 36,
+          "lower_quartile": 35,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1300",
+      "name": "Integrative Bioscience & Bioengineering Programme (Bio3)",
+      "faculty": "College of Biomedicine",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "MATH": 1.5,
+          "BAFS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "PHYS": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2026 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {}
+    },
+    {
+      "jupas_code": "JS1805",
+      "name": "Biomedical Sciences",
+      "faculty": "College of Biomedicine",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "MATH": 1.5,
+          "BAFS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "PHYS": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 39.5,
+          "median": 38.5,
+          "lower_quartile": 37.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 37.0,
+          "median": 35.5,
+          "lower_quartile": 34,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1806",
+      "name": "BSc Biological Sciences",
+      "faculty": "College of Biomedicine",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36.0,
+          "median": 35.5,
+          "lower_quartile": 35,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34.0,
+          "median": 33.5,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1807",
+      "name": "BSc Biomedical Sciences",
+      "faculty": "College of Biomedicine",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 48.0,
+          "median": 45.5,
+          "lower_quartile": 43,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 44,
+          "median": 42,
+          "lower_quartile": 40,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1000",
+      "name": "BSc Computational Finance and Financial Technology",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.5,
+          "median": 24.5,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": null,
+          "median": 24.5,
+          "lower_quartile": null,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1001",
+      "name": "BBA Global Business",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31.0,
+          "median": 29.5,
+          "lower_quartile": 28,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 32.5,
+          "median": 29,
+          "lower_quartile": 25.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1002",
+      "name": "BBA Accountancy",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.5,
+          "median": 22,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.0,
+          "median": 20.5,
+          "lower_quartile": 20,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1005",
+      "name": "BBA Management",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.5,
+          "median": 22,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.5,
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1007",
+      "name": "BBA Marketing",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.5,
+          "median": 24.5,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.0,
+          "median": 23.5,
+          "lower_quartile": 22,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1012",
+      "name": "Economics and Finance",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 23.5,
+          "median": 23,
+          "lower_quartile": 22.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.5,
+          "median": 21.5,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1013",
+      "name": "BBA Business Economics",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.5,
+          "median": 22,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.5,
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1014",
+      "name": "BBA Finance",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 21.5,
+          "median": 21.5,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.5,
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1017",
+      "name": "Intelligent Information Systems",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 21.5,
+          "median": 21,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.5,
+          "median": 20.5,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1018",
+      "name": "BBA Global Business Systems Management",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.5,
+          "median": 24,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 22,
+          "median": 22,
+          "lower_quartile": 22,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1019",
+      "name": "BBA Artificial Intelligence in Business",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 21,
+          "median": 21,
+          "lower_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.5,
+          "median": 20.5,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1026",
+      "name": "BBA Business Decision Analytics",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.0,
+          "median": 21.5,
+          "lower_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.0,
+          "median": 19.5,
+          "lower_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1027",
+      "name": "BBA Global Operations Management",
+      "faculty": "College of Business",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22.0,
+          "median": 21.5,
+          "lower_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.0,
+          "median": 19.5,
+          "lower_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1070",
+      "name": "AI, Computing and Transformation (ACT)",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 32,
+          "median": 31,
+          "lower_quartile": 30,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1071",
+      "name": "Data Science",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2,
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27.5,
+          "median": 27.5,
+          "lower_quartile": 27.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 29,
+          "median": 28,
+          "lower_quartile": 27,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1072",
+      "name": "BSc Data Science",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2,
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29.5,
+          "median": 29,
+          "lower_quartile": 28.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 30,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1074",
+      "name": "BSc Data and Systems Engineering",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2,
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28.5,
+          "median": 28,
+          "lower_quartile": 27.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 27,
+          "median": 27,
+          "lower_quartile": 27,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1204",
+      "name": "BSc Computer Science",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24,
+          "median": 23,
+          "lower_quartile": 22,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.5,
+          "median": 20.5,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1218",
+      "name": "BSc Cybersecurity",
+      "faculty": "College of Computing",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 20.5,
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1201",
+      "name": "Architecture and Civil Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2.5,
+          "MATH": 2.5,
+          "M1": 2.5,
+          "M2": 2.5,
+          "PHYS": 2.5,
+          "CHIN": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 44.5,
+          "median": 43.5,
+          "lower_quartile": 42.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 44,
+          "median": 42,
+          "lower_quartile": 40,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1205",
+      "name": "Electrical Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2,
+          "ICT": 2,
+          "M1": 2,
+          "M2": 2,
+          "PHYS": 2,
+          "BIOL": 1.5,
+          "CHEM": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41,
+          "median": 39,
+          "lower_quartile": 37,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 35.0,
+          "median": 34.5,
+          "lower_quartile": 34,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1207",
+      "name": "Mechanical Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2,
+          "PHYS": 2,
+          "CHEM": 1.5,
+          "DAT": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35.0,
+          "median": 34.5,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 31.5,
+          "median": 31,
+          "lower_quartile": 30.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1210",
+      "name": "BEng Materials Science and Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include Mathematics)",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2,
+          "PHYS": 2,
+          "ENGL": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35.5,
+          "median": 34,
+          "lower_quartile": 32.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 30.0,
+          "median": 29.5,
+          "lower_quartile": 29,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1216",
+      "name": "BEng Intelligent Manufacturing Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 22,
+          "median": 20,
+          "lower_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 36.5,
+          "median": 35,
+          "lower_quartile": 33.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1217",
+      "name": "PRIME (Pathway for Research, Innovation, and Multinational Engineering)",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2,
+          "BIOL": 2,
+          "CHEM": 2,
+          "DAT": 2,
+          "ICT": 2,
+          "M1": 2,
+          "M2": 2,
+          "PHYS": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 39.0,
+          "median": 38.5,
+          "lower_quartile": 38,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 36,
+          "median": 36,
+          "lower_quartile": 36,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1219",
+      "name": "BEng Innovation and Enterprise Engineering",
+      "faculty": "College of Engineering",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 20.5,
+          "median": 19.5,
+          "lower_quartile": 18.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1102",
+      "name": "BSocSc International Relations and Global Affairs",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.5,
+          "median": 24,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.5,
+          "median": 24,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1103",
+      "name": "BA Chinese and History",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "CHIN": 2,
+          "CHIS": 1.5,
+          "CHLI": 1.5,
+          "HIST": 1.5,
+          "VART": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36.5,
+          "median": 36,
+          "lower_quartile": 35.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 35,
+          "median": 34,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1104",
+      "name": "BA English",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2.5,
+          "LITE": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34.5,
+          "median": 32,
+          "lower_quartile": 29.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34.5,
+          "median": 32.5,
+          "lower_quartile": 30.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1106",
+      "name": "Media and Communication",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include English)",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 1.25,
+          "CHIN": 1.25
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 21.0,
+          "median": 20.5,
+          "lower_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 20.0,
+          "median": 19.5,
+          "lower_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1108",
+      "name": "BSocSc Public Affairs and Management",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 23,
+          "median": 22,
+          "lower_quartile": 21,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1109",
+      "name": "BA Linguistics and Language Applications",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "3 core + 2 elective subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "CHIN": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 30.5,
+          "median": 30,
+          "lower_quartile": 29.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 31.5,
+          "median": 30.5,
+          "lower_quartile": 29.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1111",
+      "name": "BSocSc Crime Science",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include English)",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 23,
+          "median": 23,
+          "lower_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 21.5,
+          "median": 21.5,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1112",
+      "name": "BSocSc Psychology",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include English)",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 25.0,
+          "median": 24.5,
+          "lower_quartile": 24,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1113",
+      "name": "BSocSc Social Work",
+      "faculty": "College of Liberal Arts and Social Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include English)",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 23,
+          "median": 23,
+          "lower_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 23.5,
+          "median": 22.5,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1200",
+      "name": "GREAT (Global Research Enrichment and Technopreneurship)",
+      "faculty": "College of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects",
+        "best_n": 4,
+        "subject_weights": {
+          "CHEM": 2.5,
+          "M2": 2.5,
+          "PHYS": 2.5,
+          "ENGL": 2,
+          "MATH": 2,
+          "M1": 2,
+          "BIOL": 1.5,
+          "ECON": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 37.5,
+          "median": 37,
+          "lower_quartile": 36.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33,
+          "median": 33,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1202",
+      "name": "BSc Chemistry",
+      "faculty": "College of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 2,
+          "CHEM": 2,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28.0,
+          "median": 27.5,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 26.5,
+          "median": 26,
+          "lower_quartile": 25.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1206",
+      "name": "BSc Computing Mathematics",
+      "faculty": "College of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include Mathematics)",
+        "best_n": 4,
+        "subject_weights": {
+          "MATH": 2.5,
+          "ENGL": 2,
+          "M1": 2,
+          "M2": 2,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 38,
+          "median": 37,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 35.5,
+          "median": 34,
+          "lower_quartile": 32.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1208",
+      "name": "BSc Physics",
+      "faculty": "College of Science",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 4 subjects (include Mathematics)",
+        "best_n": 4,
+        "subject_weights": {
+          "ENGL": 2,
+          "PHYS": 2,
+          "M1": 1.5,
+          "M2": 1.5,
+          "MATH": 1.25
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29,
+          "median": 28,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 26.0,
+          "median": 25.5,
+          "lower_quartile": 25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1801",
+      "name": "Bachelor of Veterinary Medicine",
+      "faculty": "Jockey Club College of Veterinary Medicine and Life Sciences",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English, Mathematics, Biology and Chemistry)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35.0,
+          "median": 33.5,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 35.0,
+          "median": 33.5,
+          "lower_quartile": 32,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1040",
+      "name": "Creative Arts and Technology Excellence (CREATE)",
+      "faculty": "School of Creative Media",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31.5,
+          "median": 28,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1041",
+      "name": "Creative Media",
+      "faculty": "School of Creative Media",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.0,
+          "median": 25.5,
+          "lower_quartile": 25,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 26.5,
+          "median": 25,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1042",
+      "name": "BA Creative Media",
+      "faculty": "School of Creative Media",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28.0,
+          "median": 27.5,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 27.5,
+          "median": 27,
+          "lower_quartile": 26.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1043",
+      "name": "BSc Creative Media",
+      "faculty": "School of Creative Media",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English and Mathematics)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27.5,
+          "median": 26.5,
+          "lower_quartile": 25.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 28.5,
+          "median": 27,
+          "lower_quartile": 25.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1044",
+      "name": "BAS New Media",
+      "faculty": "School of Creative Media",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24,
+          "median": 24,
+          "lower_quartile": 24,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 24.0,
+          "median": 23.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1050",
+      "name": "INSPIRE (International Sustainability Programme)",
+      "faculty": "School of Energy and Environment",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English, Mathematics and one of Bio/Chem/Phys)",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2.5,
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 39.5,
+          "median": 38,
+          "lower_quartile": 36.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1051",
+      "name": "Energy and Environment",
+      "faculty": "School of Energy and Environment",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2.5,
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41.0,
+          "median": 40.5,
+          "lower_quartile": 40,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 38.5,
+          "median": 37.5,
+          "lower_quartile": 36.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1053",
+      "name": "BSc Environment and Sustainable Business",
+      "faculty": "School of Energy and Environment",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2.5,
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "New Programme in 2025 JUPAS"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 40.5,
+          "median": 40,
+          "lower_quartile": 39.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1061",
+      "name": "Bachelor of Laws",
+      "faculty": "School of Law",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24.5,
+          "median": 23,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 25.5,
+          "median": 24.5,
+          "lower_quartile": 23.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1052",
+      "name": "BEng Environmental Science and Engineering and BBA Finance (Double Degree)",
+      "faculty": "Double Degree Programmes",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 2.5,
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 40.5,
+          "median": 40,
+          "lower_quartile": 39.5,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 37,
+          "median": 36,
+          "lower_quartile": 35,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1062",
+      "name": "Bachelor of Laws and BBA Accountancy (Double Degree)",
+      "faculty": "Double Degree Programmes",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 33,
+          "median": 29,
+          "lower_quartile": 25,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33.5,
+          "median": 29,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1123",
+      "name": "BSocSc Crime Science and Bachelor of Laws (Double Degree)",
+      "faculty": "Double Degree Programmes",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects (include English)",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 26.0,
+          "median": 24.5,
+          "lower_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 23.5,
+          "median": 22,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS1221",
+      "name": "BSc Computer Science and BSc Computational Finance and Financial Technology (Double Degree)",
+      "faculty": "Double Degree Programmes",
+      "scoring_formula": {
+        "scale": "jupas_2025_enhanced",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 24,
+          "median": 23,
+          "lower_quartile": 22,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 22,
+          "median": 21,
+          "lower_quartile": 20,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}

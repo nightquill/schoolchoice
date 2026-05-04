@@ -1,0 +1,865 @@
+{
+  "_meta": {
+    "institution": "Hong Kong Metropolitan University",
+    "institution_code": "HKMU",
+    "school_id": "20000000-0000-0000-0000-000000000008",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS9009",
+      "name": "BSocSc (Hons) (Streams: Ageing Society / Applied Economics / Applied Social Studies / Global and China Studies / Politics and Public Administration)",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9010",
+      "name": "BSocSc (Hons) in Psychology",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9011",
+      "name": "BA (Hons) in Chinese",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 21,
+          "upper_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 21,
+          "lower_quartile": 20,
+          "upper_quartile": 22,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9013",
+      "name": "BA (Hons) in Language Studies and Translation",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20,
+          "lower_quartile": 19,
+          "upper_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 20,
+          "lower_quartile": 18,
+          "upper_quartile": 22,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9016",
+      "name": "BA (Hons) in Creative Advertising and Media Design",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20,
+          "lower_quartile": 18,
+          "upper_quartile": 22,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 19,
+          "lower_quartile": 18,
+          "upper_quartile": 20,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9019",
+      "name": "BA (Hons) in English Language and Culture",
+      "faculty": "School of Arts & Social Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 15,
+          "upper_quartile": 19,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9220",
+      "name": "BBA (Hons) in Professional Accounting",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 17,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9230",
+      "name": "BBA (Hons) in Business Management",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9240",
+      "name": "BBA (Hons) in Global Business",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 18,
+          "lower_quartile": 17,
+          "upper_quartile": 19,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9262",
+      "name": "BBA (Hons) in Human Resource Management",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 16,
+          "upper_quartile": 16,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9266",
+      "name": "BBA (Hons) in Marketing",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9276",
+      "name": "BBA (Hons) in Real Estate and Surveying",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9280",
+      "name": "BAppPsy (Hons) / BBusMgt (Hons)",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 15,
+          "lower_quartile": 14,
+          "upper_quartile": 16,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9291",
+      "name": "BBA (Hons) in Sustainable Tourism and Hospitality Management",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 15,
+          "upper_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9294",
+      "name": "BBA (Hons) in Sports and eSports Management",
+      "faculty": "Lee Shau Kee School of Business & Administration",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 15,
+          "upper_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9520",
+      "name": "BEd (Hons) (Putonghua and Chinese Language Education) and BLS (Hons) (Chinese Linguistic Studies)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 21,
+          "upper_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 20,
+          "lower_quartile": 18,
+          "upper_quartile": 22,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9530",
+      "name": "BEd (Hons) in English Language Teaching and BELS (Hons)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20,
+          "lower_quartile": 19,
+          "upper_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 20,
+          "lower_quartile": 19,
+          "upper_quartile": 21,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9540",
+      "name": "BELS (Hons)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 20,
+          "lower_quartile": 18,
+          "upper_quartile": 22,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 19,
+          "lower_quartile": 17,
+          "upper_quartile": 21,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9550",
+      "name": "BLS (Hons) (Applied Chinese Language Studies)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 19,
+          "upper_quartile": 25,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 19,
+          "lower_quartile": 19,
+          "upper_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9555",
+      "name": "BLS (Hons) in Bilingual Studies with Applied Drama",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 23,
+          "lower_quartile": 22,
+          "upper_quartile": 24,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9560",
+      "name": "BEd (Hons) (Chinese Language Teaching) and BLS (Hons) (Applied Chinese Language Studies)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 22,
+          "lower_quartile": 21,
+          "upper_quartile": 23,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 22,
+          "lower_quartile": 21,
+          "upper_quartile": 23,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9580",
+      "name": "BEd (Hons) in Early Childhood Education (Leadership and SEN)",
+      "faculty": "School of Education & Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9719",
+      "name": "BSc (Hons) in Cyber and Computer Security",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 15,
+          "lower_quartile": 15,
+          "upper_quartile": 15,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 14,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9720",
+      "name": "BEng (Hons) in Electronic and Computer Engineering",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9731",
+      "name": "BSc (Hons) in Environmental Science and Green Management",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 15,
+          "upper_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9732",
+      "name": "BSc (Hons) in Biomedical Sciences and Biotechnology",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 16,
+          "upper_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 16,
+          "lower_quartile": 16,
+          "upper_quartile": 16,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9733",
+      "name": "BSc (Hons) in Science (STEAM)",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 17,
+          "lower_quartile": 15,
+          "upper_quartile": 19,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "median": 17,
+          "lower_quartile": 15,
+          "upper_quartile": 19,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS9776",
+      "name": "BSc (Hons) in Building Engineering and Management",
+      "faculty": "School of Science & Technology",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "formula_text": "Best 5 subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKMU uses standard 7pt scale"
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "median": 19,
+          "lower_quartile": 17,
+          "upper_quartile": 21,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}

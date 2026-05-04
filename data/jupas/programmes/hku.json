@@ -1,0 +1,1650 @@
+{
+  "_meta": {
+    "institution": "The University of Hong Kong",
+    "institution_code": "HKU",
+    "school_id": "20000000-0000-0000-0000-000000000001",
+    "sources": [
+      "JUPAS 2025 Admissions Scores PDF",
+      "JUPAS 2024 Admissions Scores PDF"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_jupas_2025_pdf"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS6004",
+      "name": "Bachelor of Arts in Architectural Studies",
+      "faculty": "Faculty of Architecture",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 32,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6016",
+      "name": "Bachelor of Science in Surveying",
+      "faculty": "Faculty of Architecture",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 29,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6028",
+      "name": "Bachelor of Arts in Landscape Studies",
+      "faculty": "Faculty of Architecture",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 38,
+          "median": 35,
+          "lower_quartile": 31,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33,
+          "median": 32,
+          "lower_quartile": 30,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6042",
+      "name": "Bachelor of Arts in Urban Studies",
+      "faculty": "Faculty of Architecture",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 32,
+          "median": 29,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 31,
+          "median": 28,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6054",
+      "name": "Bachelor of Arts",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + Best 4 Subjects a with [Weighting: 1.5x Chinese]",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "CHIN": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 37,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33,
+          "median": 31,
+          "lower_quartile": 29,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6274",
+      "name": "Bachelor of Arts in Global Creative Industries",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + Best 4 Subjects a",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 33,
+          "median": 33,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6286",
+      "name": "Bachelor of Arts in Humanities and Digital Technologies",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + Best 4 Subjects a with [Weighting: 1.5x Chinese]",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "CHIN": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41,
+          "median": 37,
+          "lower_quartile": 35,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 30,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6298",
+      "name": "BA and BEng in Artificial Intelligence and Data Science",
+      "faculty": "Faculty of Arts",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + 1.5 x Math + Best 2 Subjects with [1.5x STEM/Econ/ICT/M1-M2] + Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 44,
+          "median": 42,
+          "lower_quartile": 42,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6755",
+      "name": "Bachelor of Business Administration",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 3 Subjects + 0.2 x 6th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 37,
+          "median": 37,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 33,
+          "lower_quartile": 32,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6767",
+      "name": "Bachelor of Economics / Bachelor of Economics and Finance",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 3 Subjects + 0.2 x 6th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 40,
+          "median": 40,
+          "lower_quartile": 39,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 38,
+          "median": 36,
+          "lower_quartile": 35,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6781",
+      "name": "BBA in Accounting and Finance / Accounting Data Analytics",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 3 Subjects + 0.2 x 6th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 35,
+          "median": 34,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6793",
+      "name": "BBA (Business Analytics)",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 3 Subjects + 0.2 x 6th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 31,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6808",
+      "name": "BBA (Law) and Bachelor of Laws",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 4 Subjects + 0.2 x 7th Best Subject",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 49,
+          "median": 46,
+          "lower_quartile": 45,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 48,
+          "median": 46,
+          "lower_quartile": 45,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6846",
+      "name": "BSc in Marketing Analytics and Technology",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 3 Subjects + 0.2 x 6th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 33,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33,
+          "median": 32,
+          "lower_quartile": 31,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6860",
+      "name": "Bachelor of Finance in Asset Management and Private Banking",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 4 Subjects + 0.2 x 7th Best Subject",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 48,
+          "median": 47,
+          "lower_quartile": 46,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 48,
+          "median": 47,
+          "lower_quartile": 47,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6884",
+      "name": "BSc in Quantitative Finance",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.25 x Math + 1.25 x M1/M2 + Best 3 Subjects + 0.2 x 7th Best Subject",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.25,
+          "M1": 1.25,
+          "M2": 1.25
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 55,
+          "median": 51,
+          "lower_quartile": 50,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 51,
+          "median": 49,
+          "lower_quartile": 48,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6896",
+      "name": "BBA in International Business and Global Management",
+      "faculty": "HKU Business School",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + 1.5 x Math + Best 4 Subjects + 0.2 x 7th Best Subject",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0.2
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 56,
+          "median": 54,
+          "lower_quartile": 53,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 52,
+          "median": 51,
+          "lower_quartile": 49,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6107",
+      "name": "Bachelor of Dental Surgery",
+      "faculty": "Faculty of Dentistry",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best of Biology or Chemistry with [1.3x] + Best 5 Subjects",
+        "best_n": 6,
+        "subject_weights": {
+          "BIOL": 1.3,
+          "CHEM": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 50,
+          "median": 48,
+          "lower_quartile": 47,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 49,
+          "median": 46,
+          "lower_quartile": 45,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6066",
+      "name": "BA and BEd in Language Education - English",
+      "faculty": "Faculty of Education",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + Best 4 Subjects a",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 39,
+          "median": 36,
+          "lower_quartile": 32,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6080",
+      "name": "BA and BEd in Language Education - Chinese",
+      "faculty": "Faculty of Education",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Chin + Best 4 Subjects a",
+        "best_n": 5,
+        "subject_weights": {
+          "CHIN": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6092",
+      "name": "BEd in Early Childhood Education and Special Education",
+      "faculty": "Faculty of Education",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + Best 4 Subjects a",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 27,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6119",
+      "name": "BEd and BSc",
+      "faculty": "Faculty of Education",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + 1.5 x Math + 1.5 x Best Sci Subject + Best 2 Subjects with [1.5x STEM/M1-M2]",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 46,
+          "median": 44,
+          "lower_quartile": 43,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 44,
+          "median": 42,
+          "lower_quartile": 40,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6157",
+      "name": "BSc in Speech-Language Pathology",
+      "faculty": "Faculty of Education",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35,
+          "median": 34,
+          "lower_quartile": 34,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 32,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6303",
+      "name": "Bachelor of Engineering Elite Programme",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 38,
+          "median": 36,
+          "lower_quartile": 35,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6315",
+      "name": "BEng in Data and Systems Engineering",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28,
+          "median": 26,
+          "lower_quartile": 25,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6339",
+      "name": "BEng in Mechanical Engineering",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6353",
+      "name": "BEng in Civil Engineering",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 29,
+          "median": 28,
+          "lower_quartile": 27,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6377",
+      "name": "BEng and MSc in AI in Engineering",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 33,
+          "lower_quartile": 31,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6937",
+      "name": "Global Engineering and Business Programme",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 30,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 32,
+          "lower_quartile": 31,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6987",
+      "name": "BEng in Computer/Electrical/Electronic Engineering",
+      "faculty": "Faculty of Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6925",
+      "name": "BEng in Biomedical Engineering",
+      "faculty": "School of Biomedical Engineering",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 29,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 32,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6078",
+      "name": "Bachelor of Arts and Bachelor of Laws",
+      "faculty": "Faculty of Law",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Best 5 Subjects",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41,
+          "median": 38,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 41,
+          "median": 38,
+          "lower_quartile": 38,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6406",
+      "name": "Bachelor of Laws",
+      "faculty": "Faculty of Law",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Best 5 Subjects",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 35,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6250",
+      "name": "BA and Sciences in Global Health and Development",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 28,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6418",
+      "name": "Bachelor of Nursing Advanced Leadership Track",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a + 0.5 x 6th Best Subject a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0.5
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 37,
+          "median": 37,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 34,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6456",
+      "name": "Bachelor of Medicine and Bachelor of Surgery",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 6 Subjects",
+        "best_n": 6,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 47,
+          "median": 44,
+          "lower_quartile": 42,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 45,
+          "median": 44,
+          "lower_quartile": 42,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6468",
+      "name": "Bachelor of Nursing",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a + 0.5 x 6th Best Subject a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0.5
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 27,
+          "median": 26,
+          "lower_quartile": 25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6482",
+      "name": "Bachelor of Chinese Medicine",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a + 0.5 x 6th Best Subject a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0.5
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 33,
+          "lower_quartile": 31,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 33,
+          "median": 32,
+          "lower_quartile": 31,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6494",
+      "name": "Bachelor of Pharmacy",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 6 Subjects",
+        "best_n": 6,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41,
+          "median": 39,
+          "lower_quartile": 38,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 39,
+          "median": 39,
+          "lower_quartile": 37,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6949",
+      "name": "Bachelor of Biomedical Sciences",
+      "faculty": "Li Ka Shing Faculty of Medicine",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 6 Subjects",
+        "best_n": 6,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 41,
+          "median": 40,
+          "lower_quartile": 39,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 41,
+          "median": 39,
+          "lower_quartile": 39,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6688",
+      "name": "Science Master Class",
+      "faculty": "Faculty of Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 2 from Bio/Chem/Phys/M1-M2 + Best Subjects with [1.2x STEM/M1-M2]",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 34,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 38,
+          "median": 35,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6858",
+      "name": "BSc and Bachelor of Laws",
+      "faculty": "Faculty of Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + 2 x Math/M1/M2 + 2 x Best Sci Subject + Best 3 Subjects",
+        "best_n": 8,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 56,
+          "median": 54,
+          "lower_quartile": 50,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 57,
+          "median": 54,
+          "lower_quartile": 53,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6901",
+      "name": "Bachelor of Science",
+      "faculty": "Faculty of Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + 1.5 x Math + 1.5 x Best Sci Subject + Best 2 Subjects with [1.5x STEM/M1-M2]",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 39,
+          "median": 37,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 37,
+          "median": 34,
+          "lower_quartile": 33,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6705",
+      "name": "Bachelor of Psychology",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 31,
+          "median": 31,
+          "lower_quartile": 29,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 32,
+          "median": 29,
+          "lower_quartile": 28,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6717",
+      "name": "Bachelor of Social Sciences",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 34,
+          "median": 31,
+          "lower_quartile": 29,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 27,
+          "median": 26,
+          "lower_quartile": 25,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6731",
+      "name": "Bachelor of Social Work",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 5 Subjects a",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 28,
+          "median": 28,
+          "lower_quartile": 26,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 29,
+          "median": 27,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6810",
+      "name": "BSocSc (Government and Laws) and Bachelor of Laws",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Best 6 Subjects",
+        "best_n": 6,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 39,
+          "median": 37,
+          "lower_quartile": 36,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 39,
+          "median": 38,
+          "lower_quartile": 36,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6822",
+      "name": "Bachelor of Journalism, Media and Artificial Intelligence",
+      "faculty": "Faculty of Social Sciences",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Eng + Best 4 Subjects a",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35,
+          "median": 32,
+          "lower_quartile": 31,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 29,
+          "median": 26,
+          "lower_quartile": 26,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6224",
+      "name": "BASc in Applied Artificial Intelligence",
+      "faculty": "School of Computing and Data Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + 2 x Math + 2 x M1/M2 + Best 2 Subjects with [1.5x Bio/Chem/Phys/ICT]",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2,
+          "M1": 2,
+          "M2": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 57,
+          "median": 53,
+          "lower_quartile": 51,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 57,
+          "median": 55,
+          "lower_quartile": 52,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6248",
+      "name": "BASc in Financial Technology",
+      "faculty": "School of Computing and Data Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + Math + Best 3 Subjects c",
+        "best_n": 5,
+        "subject_weights": {},
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 35,
+          "median": 34,
+          "lower_quartile": 32,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 32,
+          "median": 31,
+          "lower_quartile": 29,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6729",
+      "name": "BSc in Actuarial Science",
+      "faculty": "School of Computing and Data Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.2 x Eng + 1.2 x Math + 1.2 x M1/M2 + Best 2 Subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.2,
+          "MATH": 1.2,
+          "M1": 1.2,
+          "M2": 1.2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 36,
+          "median": 35,
+          "lower_quartile": 35,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        },
+        "2024": {
+          "upper_quartile": 34,
+          "median": 33,
+          "lower_quartile": 31,
+          "source": "JUPAS 2024 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6779",
+      "name": "Statistical Decision Sciences",
+      "faculty": "School of Computing and Data Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "1.5 x Math + Best 4 Subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 33,
+          "median": 33,
+          "lower_quartile": 31,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6999",
+      "name": "Computing and Data Science",
+      "faculty": "School of Computing and Data Science",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "Eng + 1.5 x Math + Best 2 Subjects with [1.5x STEM/Econ/ICT/M1-M2] + Best Subjects",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 44,
+          "median": 41,
+          "lower_quartile": 39,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    },
+    {
+      "jupas_code": "JS6602",
+      "name": "BSc in Innovation and Technology",
+      "faculty": "School of Innovation",
+      "scoring_formula": {
+        "scale": "hku_enhanced",
+        "formula_text": "2 x Eng + 2 x Math + Best 4 Subjects with [2x STEM/ICT/DAT/M1-M2; 1.5x others]",
+        "best_n": 6,
+        "subject_weights": {
+          "ENGL": 2,
+          "MATH": 2
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0
+      },
+      "minimum_requirements": {
+        "general": "33222"
+      },
+      "admission_stats": {
+        "2025": {
+          "upper_quartile": 58,
+          "median": 55,
+          "lower_quartile": 52,
+          "source": "JUPAS 2025 Admissions Scores PDF"
+        }
+      }
+    }
+  ]
+}
