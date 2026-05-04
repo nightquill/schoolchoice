@@ -70,6 +70,11 @@ def load_grade_scale(scale_name: str) -> dict[str, float]:
     for grade_str, points in scale_data.get("applied_learning", {}).items():
         grades[grade_str] = float(points)
 
+    # CSD grades (loaded AFTER applied_learning so CSD values take precedence
+    # since "Attained" means 1pt for CSD but 0pt for Applied Learning)
+    for grade_str, points in scale_data.get("csd_grades", {}).items():
+        grades[grade_str] = float(points)
+
     _scale_cache[scale_name] = grades
     return grades
 
@@ -91,11 +96,13 @@ def grade_to_points(grade: str, scale: dict[str, float]) -> float:
         return scale[grade]
 
     # CSD-specific mappings (Citizenship and Social Development)
+    # Attained = 1 point, Attained with Distinction = 2 points
+    # These values are consistent across all JUPAS scales
     csd_map = {
-        "A": 2.0,
-        "AD": 3.0,
-        "Attained": 2.0,
-        "Attained with Distinction": 3.0,
+        "A": 1.0,
+        "AD": 2.0,
+        "Attained": 1.0,
+        "Attained with Distinction": 2.0,
     }
     if grade in csd_map:
         return csd_map[grade]

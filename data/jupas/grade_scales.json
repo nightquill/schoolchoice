@@ -22,6 +22,13 @@
       "1": 1,
       "U": 0
     },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
     "category_c_2025": {
       "description": "Category C Other Language subjects conversion for 2025+ entry",
       "Japanese": {"N1": 7, "N2": 5.5, "N3": 4},
@@ -53,6 +60,13 @@
       "3": 3,
       "2": 2,
       "1": 1,
+      "U": 0
+    },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
       "U": 0
     },
     "category_c_pre2025": {
@@ -89,6 +103,13 @@
       "1": 1,
       "U": 0
     },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
     "used_by": [
       "HKU (all programmes)"
     ],
@@ -106,6 +127,13 @@
       "1": 1,
       "U": 0
     },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
     "used_by": [
       "CUHK (most programmes, excluding JS4501 and JS4502)"
     ],
@@ -121,6 +149,13 @@
       "3": 3,
       "2": 2,
       "1": 1,
+      "U": 0
+    },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
       "U": 0
     },
     "used_by": [
