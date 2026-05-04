@@ -11,6 +11,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional
 
+from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+
 
 # ---------------------------------------------------------------------------
 # Data classes
@@ -276,10 +278,11 @@ def compute_weighted_score(student_data: dict, school: dict) -> dict:
         else:
             language_fit = 0.65  # default neutral (not 1.0)
 
-    # Interest alignment — check extra_curricular and award_titles
+    # Interest alignment — check declared interests, extra_curricular, and award_titles
+    interests: list[str] = student_data.get("interests") or []
     extra_curricular: list[str] = student_data.get("extra_curricular_activities") or []
     awards: list[str] = student_data.get("award_titles") or []
-    student_activities = extra_curricular + awards
+    student_activities = interests + extra_curricular + awards
     if student_activities and notable_programs:
         interest_alignment = _keyword_overlap(student_activities, notable_programs)
     else:
@@ -542,6 +545,133 @@ def run_matching(
                 )
             )
             continue
+
+        # -----------------------------------------------------------------
+        # NEW PATH: JUPAS scorer when programme data is available
+        # -----------------------------------------------------------------
+        jupas_programmes = school.get("jupas_programmes") or []
+
+        if jupas_programmes:
+            student_grades = student_data.get("grades_by_code", {})
+
+            # Compute interest alignment once for blending
+            interests: list[str] = student_data.get("interests") or []
+            extra_curricular: list[str] = student_data.get("extra_curricular_activities") or []
+            awards: list[str] = student_data.get("award_titles") or []
+            student_activities = interests + extra_curricular + awards
+            notable_programs: list[str] = school.get("notable_programs") or []
+            if student_activities and notable_programs:
+                interest_score = _keyword_overlap(student_activities, notable_programs)
+            else:
+                interest_score = 0.2  # neutral baseline
+
+            for prog in jupas_programmes:
+                scorer_result = score_student_for_programme(
+                    student_grades,
+                    prog,
+                )
+
+                jupas_code = scorer_result.get("jupas_code", "")
+                prog_name = scorer_result.get("programme_name", "")
+
+                if not scorer_result["eligible"]:
+                    ineligible_results.append(
+                        MatchResult(
+                            school_id=school_id,
+                            school_name=school_name,
+                            major_name=prog_name,
+                            major_jupas_code=jupas_code,
+                            eligibility_pass=False,
+                            failing_criteria=scorer_result["eligibility_failures"],
+                            fit_score=0.0,
+                            component_scores={"provenance": scorer_result["provenance"]},
+                            ml_probability=None,
+                            final_score=0.0,
+                            shap_explanation=None,
+                            rationale=f"Not eligible for {prog_name}: {'; '.join(scorer_result['eligibility_failures'])}",
+                            data_completeness=data_completeness,
+                        )
+                    )
+                    continue
+
+                # Use admission_probability as primary fit_score (0.01-0.99)
+                admission_prob = scorer_result["admission_probability"]
+
+                # Blend: 80% scorer probability, 20% interest alignment
+                final_score = round(0.8 * admission_prob + 0.2 * interest_score, 4)
+
+                # Build component scores with provenance
+                comp_scores = {
+                    "admission_probability": admission_prob,
+                    "weighted_score_raw": scorer_result["weighted_score"],
+                    "interest_alignment": round(interest_score, 4),
+                    "risk_level": scorer_result["risk_level"],
+                    "provenance": scorer_result["provenance"],
+                }
+
+                # Build SHAP-style explanation from scorer details
+                top_subjects = sorted(
+                    scorer_result.get("subject_details", []),
+                    key=lambda s: s.get("weighted_points", 0),
+                    reverse=True,
+                )[:3]
+                shap_out = {
+                    "features": [
+                        {
+                            "feature": f"{s['code']} ({s['grade']})",
+                            "direction": "positive" if s.get("weighted_points", 0) > 0 else "negative",
+                            "magnitude": round(s.get("weighted_points", 0), 4),
+                            "explanation": (
+                                f"{s['code']} grade {s['grade']} contributes "
+                                f"{s.get('weighted_points', 0):.1f} points "
+                                f"(weight {s.get('weight', 1.0)}x)"
+                            ),
+                        }
+                        for s in top_subjects
+                    ]
+                }
+
+                # Add probability feature
+                shap_out["features"].insert(0, {
+                    "feature": "Admission Probability",
+                    "direction": "positive" if admission_prob >= 0.5 else "negative",
+                    "magnitude": round(admission_prob, 4),
+                    "explanation": (
+                        f"{admission_prob:.0%} estimated admission probability "
+                        f"({scorer_result['risk_level']})"
+                    ),
+                })
+
+                risk = scorer_result["risk_level"]
+                risk_label = {"safe": "strong", "borderline": "moderate", "at_risk": "challenging"}.get(risk, "moderate")
+                rationale = (
+                    f"{school_name} — {prog_name} is a {risk_label} match "
+                    f"({admission_prob:.0%} admission probability, "
+                    f"score {scorer_result['weighted_score']:.1f})."
+                )
+
+                result = MatchResult(
+                    school_id=school_id,
+                    school_name=school_name,
+                    major_name=prog_name,
+                    major_jupas_code=jupas_code,
+                    eligibility_pass=True,
+                    failing_criteria=[],
+                    fit_score=round(admission_prob, 4),
+                    component_scores=comp_scores,
+                    ml_probability=admission_prob,
+                    final_score=final_score,
+                    shap_explanation=shap_out,
+                    rationale=rationale,
+                    data_completeness=data_completeness,
+                )
+                eligible_results.append(result)
+
+            continue  # skip old path for this school
+
+        # -----------------------------------------------------------------
+        # OLD PATH: heuristic scoring (fallback when no JUPAS programmes)
+        # -----------------------------------------------------------------
 
         # Compute weighted score
         comp_scores = compute_weighted_score(student_data, school)

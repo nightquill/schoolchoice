@@ -21,21 +21,21 @@ os.environ.setdefault("PLAN_GENERATION_TIMEOUT_SECONDS", "30")
 
 import pytest
 
-from app.services.hkdse_service import (
+from app.modules.school_choice.services.hkdse_service import (
     COMPULSORY_CODES,
     GRADE_MAP,
     compute_best5_aggregate,
     compute_predicted_grade,
     grade_to_int,
 )
-from app.services.matchmaker_v2 import (
+from app.modules.school_choice.services.matchmaker_v2 import (
     MatchResult,
     compute_weighted_score,
     generate_rationale,
     run_eligibility_filter,
     run_matching,
 )
-from app.services.plan_generator import _build_action_items, generate_html_plan
+from app.modules.school_choice.services.plan_generator import _build_action_items, generate_html_plan
 
 
 # ---------------------------------------------------------------------------
@@ -644,7 +644,7 @@ class TestBuildActionItems:
 
 class TestChartsInUniversityPlan:
     def _make_result_eligible(self):
-        from app.services.matchmaker_v2 import MatchResult
+        from app.modules.school_choice.services.matchmaker_v2 import MatchResult
         return MatchResult(
             school_id="school-chart",
             school_name="Chart University",
@@ -804,3 +804,159 @@ class TestPlanTemplates:
         # Then reset (empty overrides)
         html_without = generate_html_plan(student, [], [], overrides={})
         assert "Override text" not in html_without
+
+
+# ---------------------------------------------------------------------------
+# JUPAS scorer integration tests
+# ---------------------------------------------------------------------------
+
+
+class TestMatchmakerJupasIntegration:
+    """Tests for JUPAS scorer integration in matchmaker_v2."""
+
+    def _make_student(self):
+        return {
+            "best5_aggregate": 28,
+            "grades_by_code": {
+                "CHLA": "5", "ENGL": "5*", "MATH": "5**", "CSD": "A",
+                "PHYS": "5", "CHEM": "4",
+            },
+            "elective_codes": ["PHYS", "CHEM"],
+            "ielts_score": None,
+            "interests": [],
+            "extra_curricular_activities": [],
+            "award_titles": [],
+        }
+
+    def _make_jupas_school(self):
+        return {
+            "id": "20000000-0000-0000-0000-000000000001",
+            "name": "HKU",
+            "minimum_entry_score": 20,
+            "required_subjects": [],
+            "language_requirements": {},
+            "notable_programs": [],
+            "average_admitted_score": None,
+            "major_requirements": [],
+            "jupas_programmes": [
+                {
+                    "jupas_code": "JS6755",
+                    "name": "BBA",
+                    "scoring_formula": {
+                        "scale": "hku_enhanced",
+                        "best_n": 5,
+                        "subject_weights": {"ENGL": 1.5, "MATH": 1.5},
+                        "bonus_subjects": [],
+                        "bonus_weight": 0.2,
+                    },
+                    "minimum_requirements": {"general": "332A", "subject_specific": []},
+                    "admission_stats": {
+                        "2024": {"median": 33, "lower_quartile": 32, "upper_quartile": 34},
+                    },
+                },
+            ],
+        }
+
+    def test_matchmaker_uses_jupas_scorer_when_programmes_present(self):
+        """When school has jupas_programmes, use the JUPAS scorer."""
+        student_data = self._make_student()
+        school = self._make_jupas_school()
+
+        results = run_matching(student_data, [school], [])
+        assert len(results) >= 1
+        result = results[0]
+        assert result.major_jupas_code == "JS6755"
+        assert result.eligibility_pass is True
+        assert 0.0 < result.fit_score <= 1.0
+        # Should have provenance from scorer
+        assert "provenance" in result.component_scores
+        assert result.component_scores["provenance"]["scale"] == "hku_enhanced"
+
+    def test_jupas_path_sets_admission_probability(self):
+        """JUPAS path should populate ml_probability with admission_probability."""
+        student_data = self._make_student()
+        school = self._make_jupas_school()
+
+        results = run_matching(student_data, [school], [])
+        eligible = [r for r in results if r.eligibility_pass]
+        assert len(eligible) >= 1
+        result = eligible[0]
+        assert result.ml_probability is not None
+        assert 0.0 < result.ml_probability <= 1.0
+
+    def test_jupas_path_has_shap_explanation(self):
+        """JUPAS path should build a SHAP-style explanation."""
+        student_data = self._make_student()
+        school = self._make_jupas_school()
+
+        results = run_matching(student_data, [school], [])
+        eligible = [r for r in results if r.eligibility_pass]
+        assert len(eligible) >= 1
+        result = eligible[0]
+        assert result.shap_explanation is not None
+        assert "features" in result.shap_explanation
+        assert len(result.shap_explanation["features"]) >= 1
+
+    def test_jupas_ineligible_programme_in_results(self):
+        """When student fails programme requirements, result is ineligible."""
+        # Student passes school-level filter (best5 > min_entry) but fails
+        # programme-level minimum_requirements (33222 needs level 3 in CHIN/ENGL/MATH)
+        student_data = {
+            "best5_aggregate": 22,
+            "grades_by_code": {
+                "CHIN": "2", "ENGL": "2", "MATH": "2", "CSD": "A",
+                "PHYS": "4",
+            },
+            "elective_codes": ["PHYS"],
+            "ielts_score": None,
+            "interests": [],
+            "extra_curricular_activities": [],
+            "award_titles": [],
+        }
+        # Override school to use parseable requirements
+        school = self._make_jupas_school()
+        school["jupas_programmes"][0]["minimum_requirements"] = {
+            "general": "33222",
+            "subject_specific": [],
+        }
+
+        results = run_matching(student_data, [school], [])
+        # Should have at least one ineligible result for the programme
+        ineligible = [r for r in results if not r.eligibility_pass]
+        assert len(ineligible) >= 1
+        prog_result = [r for r in ineligible if r.major_jupas_code == "JS6755"]
+        assert len(prog_result) >= 1
+
+    def test_fallback_to_heuristic_when_no_jupas_programmes(self):
+        """When school has no jupas_programmes, old heuristic path is used."""
+        student_data = self._make_student()
+        school = {
+            "id": "30000000-0000-0000-0000-000000000001",
+            "name": "Old School",
+            "minimum_entry_score": 15,
+            "required_subjects": [],
+            "language_requirements": {},
+            "notable_programs": [],
+            "average_admitted_score": None,
+            "major_requirements": [],
+        }
+
+        results = run_matching(student_data, [school], [])
+        assert len(results) == 1
+        result = results[0]
+        # Old path: no provenance in component_scores
+        assert "provenance" not in result.component_scores
+        # Old path: has academic_fit component
+        assert "academic_fit" in result.component_scores
+
+    def test_jupas_path_includes_risk_level(self):
+        """JUPAS results should include risk_level in component_scores."""
+        student_data = self._make_student()
+        school = self._make_jupas_school()
+
+        results = run_matching(student_data, [school], [])
+        eligible = [r for r in results if r.eligibility_pass]
+        assert len(eligible) >= 1
+        result = eligible[0]
+        assert "risk_level" in result.component_scores
+        assert result.component_scores["risk_level"] in ("safe", "borderline", "at_risk")
