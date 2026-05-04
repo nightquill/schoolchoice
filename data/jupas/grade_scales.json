@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "description": "HKDSE grade-to-point conversion scales used by JUPAS universities. Each scale maps raw HKDSE letter grades to numerical points for admissions scoring purposes.",
+    "sources": [
+      "https://admissions.hku.hk/node/877",
+      "https://admission.cuhk.edu.hk/application/jupas/programme-specific-requirements-and-score-calculator/",
+      "https://www.cityu.edu.hk/admo/sites/default/files/2025-11/2026_JUPAS_AdmissionScoreFormulaAndScores.pdf"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "verified_from_official_sources"
+  },
+  "standard_7pt": {
+    "description": "Standard 7-point scale used by most JUPAS universities including HKUST, PolyU, CityU, HKBU, Lingnan, HKMU, HSUHK, EdUHK, and selected HKU/CUHK programmes (e.g. HKU Medicine).",
+    "grades": {
+      "5**": 7,
+      "5*": 6,
+      "5": 5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
+      "U": 0
+    },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
+    "used_by": [
+      "HKUST",
+      "PolyU",
+      "CityU",
+      "HKBU",
+      "Lingnan",
+      "HKMU",
+      "HSUHK",
+      "EdUHK",
+      "HKU Medicine",
+      "Selected CUHK programmes"
+    ]
+  },
+  "hku_enhanced": {
+    "description": "Enhanced scale used by most HKU programmes (excluding Medicine, which uses standard_7pt). Awards higher points for top grades to differentiate among high-achieving applicants.",
+    "grades": {
+      "5**": 8.5,
+      "5*": 7,
+      "5": 5.5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
+      "U": 0
+    },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
+    "used_by": [
+      "HKU (most programmes, excluding Medicine)"
+    ]
+  },
+  "cuhk_enhanced": {
+    "description": "Enhanced scale used by most CUHK programmes. Awards higher points for top grades to differentiate among high-achieving applicants.",
+    "grades": {
+      "5**": 8.5,
+      "5*": 7,
+      "5": 5.5,
+      "4": 4,
+      "3": 3,
+      "2": 2,
+      "1": 1,
+      "U": 0
+    },
+    "csd_grades": {
+      "Attained with Distinction": 2,
+      "AD": 2,
+      "Attained": 1,
+      "A": 1,
+      "U": 0
+    },
+    "used_by": [
+      "CUHK (most programmes)"
+    ]
+  }
+}
