@@ -396,6 +396,43 @@ class School(Base):
 
 
 # ---------------------------------------------------------------------------
+# jupas_programmes
+# ---------------------------------------------------------------------------
+
+
+class JupasProgramme(Base):
+    """
+    Normalized JUPAS programme with scoring formula and admission statistics.
+    Each row = one programme at one institution (e.g., JS6456 = HKU Medicine).
+    """
+
+    __tablename__ = "jupas_programmes"
+    __table_args__ = (
+        UniqueConstraint("jupas_code", name="uq_jupas_programmes_code"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid(), nullable=False)
+    jupas_code = Column(String(10), nullable=False, index=True, comment="JUPAS programme code e.g. JS6456")
+    name = Column(String(255), nullable=False, comment="Programme name")
+    institution_code = Column(String(10), nullable=False, index=True, comment="Short code e.g. HKU, CUHK")
+    school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id", ondelete="SET NULL"), nullable=True, comment="FK to schools table")
+    faculty = Column(String(255), nullable=True)
+    scoring_formula = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="Scoring formula with scale, weights, best_n")
+    minimum_requirements = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="General and subject-specific requirements")
+    admission_stats = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="Per-year UQ/Median/LQ stats")
+    notes = Column(Text, nullable=True)
+    data_source = Column(Text, nullable=True)
+    data_confidence = Column(String(50), nullable=True, server_default="'estimated'", comment="verified | estimated")
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now(), default=_utcnow)
+
+    school = relationship("School", backref="jupas_programmes", lazy="select")
+
+    def __repr__(self):
+        return f"<JupasProgramme {self.jupas_code} {self.name!r}>"
+
+
+# ---------------------------------------------------------------------------
 # recommendations
 # REQ-027, REQ-029
 # ---------------------------------------------------------------------------
