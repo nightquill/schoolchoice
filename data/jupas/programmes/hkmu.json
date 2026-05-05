@@ -81,7 +81,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -112,7 +114,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -143,7 +147,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 2.0,
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -478,7 +485,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -509,7 +518,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -540,7 +551,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -571,7 +584,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -602,7 +617,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 2.0,
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"
@@ -627,7 +645,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 2.0
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "HKMU uses standard 7pt scale"

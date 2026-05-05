@@ -1,0 +1,266 @@
+{
+  "_meta": {
+    "institution": "Hang Seng University of Hong Kong",
+    "institution_code": "HSUHK",
+    "school_id": "20000000-0000-0000-0000-000000000009",
+    "sources": [
+      "https://www.hsu.edu.hk"
+    ],
+    "last_updated": "2026-05-04",
+    "confidence": "estimated_pending_pdf_verification"
+  },
+  "programmes": [
+    {
+      "jupas_code": "JS2811",
+      "name": "Accountancy",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "HKICPA-recognised; CPA fast-track available."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "MATH", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2802",
+      "name": "Business Administration",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Entrepreneurship and international business tracks."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "ENGL", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2815",
+      "name": "Marketing",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Digital marketing focus; industry project-based learning."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "ENGL", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2902",
+      "name": "Communication",
+      "faculty": "School of Communication",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Journalism, PR, and media production tracks."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "ENGL", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2911",
+      "name": "Translation and Interpreting",
+      "faculty": "School of Translation",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "ENGL": 1.5,
+          "CHLA": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Chinese-English and Japanese-English; interpreting labs."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "ENGL", "min_grade": "3"},
+          {"code": "CHLA", "min_grade": "3"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2801",
+      "name": "Computing",
+      "faculty": "School of Decision Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Software engineering and network administration."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "MATH", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2891",
+      "name": "Data Science",
+      "faculty": "School of Decision Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.3
+        },
+        "bonus_subjects": ["M1"],
+        "bonus_weight": 0.5,
+        "notes": "Business analytics and machine learning tracks."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "MATH", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2822",
+      "name": "Supply Chain Management",
+      "faculty": "School of Decision Sciences",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Logistics and procurement focus; industry mentorship."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "MATH", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2813",
+      "name": "Finance",
+      "faculty": "School of Business",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "MATH": 1.3
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Investment and fintech tracks."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "MATH", "min_grade": "2"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
+      }
+    },
+    {
+      "jupas_code": "JS2921",
+      "name": "Chinese Language and Literature",
+      "faculty": "School of Humanities and Languages",
+      "scoring_formula": {
+        "scale": "standard_7pt",
+        "best_n": 5,
+        "subject_weights": {
+          "CHLA": 1.5
+        },
+        "bonus_subjects": [],
+        "bonus_weight": 0,
+        "notes": "Classical and modern literature; teaching pathway available."
+      },
+      "minimum_requirements": {
+        "general": "222A",
+        "subject_specific": [
+          {"code": "CHLA", "min_grade": "3"}
+        ]
+      },
+      "admission_stats": {
+        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
+        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
+      }
+    }
+  ]
+}

@@ -19,7 +19,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MUSC": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -44,7 +46,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "VART": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -69,7 +73,11 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -94,7 +102,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -119,7 +130,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "HIST": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -144,7 +157,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -169,7 +185,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "BAFS": 1.5,
+          "ECON": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -194,7 +213,14 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MATH": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "ICT": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -219,7 +245,12 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MATH": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "PHYS": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -244,7 +275,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "PE": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -269,7 +302,15 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHEM": 1.5,
+          "BIOL": 1.5,
+          "PHYS": 1.2,
+          "MATH": 1.1,
+          "M1": 1.1,
+          "M2": 1.1,
+          "GEOG": 1.1
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -294,7 +335,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 1.5,
+          "GEOG": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -319,7 +363,11 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ECON": 1.5,
+          "GEOG": 1.5,
+          "HIST": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -375,7 +423,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -406,7 +457,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -431,7 +485,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -462,7 +519,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MUSC": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -487,7 +546,9 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "VART": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -512,7 +573,13 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5,
+          "DAT": 1.5,
+          "HIST": 1.5,
+          "VART": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -568,7 +635,15 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "BIOL": 1.6,
+          "CHEM": 1.6,
+          "GEOG": 1.2,
+          "MATH": 1.2,
+          "M1": 1.2,
+          "M2": 1.2,
+          "PHYS": 1.2
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -599,7 +674,15 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MATH": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -630,7 +713,16 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "BIOL": 2.0,
+          "PE": 2.0,
+          "ENGL": 1.5,
+          "MATH": 1.5,
+          "M1": 1.5,
+          "M2": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -661,7 +753,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."
@@ -686,7 +781,10 @@
         "scale": "standard_7pt",
         "formula_text": "Best 5 subjects with programme-specific subject weightings",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "CHLA": 1.5,
+          "ENGL": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0,
         "notes": "EdUHK uses standard 7pt scale. Subject weightings typically 1.5x for relevant subjects."

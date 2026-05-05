@@ -1652,7 +1652,9 @@
         "best_n": 5,
         "subject_weights": {
           "MATH": 2.5,
-          "ENGL": 2
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "ENGL": 2.0
         },
         "bonus_subjects": [],
         "bonus_weight": 0,
@@ -1713,7 +1715,10 @@
         "best_n": 5,
         "subject_weights": {
           "MATH": 2.5,
-          "ENGL": 2
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "ECON": 2.5,
+          "ENGL": 2.0
         },
         "bonus_subjects": [],
         "bonus_weight": 0,
@@ -1771,7 +1776,9 @@
         "best_n": 5,
         "subject_weights": {
           "MATH": 2.5,
-          "ENGL": 2
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "ENGL": 2.0
         },
         "bonus_subjects": [],
         "bonus_weight": 0

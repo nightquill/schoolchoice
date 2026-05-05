@@ -173,7 +173,9 @@
         "scale": "cuhk_enhanced",
         "formula_text": "Best 5",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "ENGL": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0
       },
@@ -965,7 +967,12 @@
         "subject_weights": {
           "MATH": 1.5,
           "M1": 1.75,
-          "M2": 1.75
+          "M2": 1.75,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -997,9 +1004,14 @@
         "formula_text": "Best 5; Mathematics (x2), M1/M2 (x2), Bio/Chem/Phys/Econ/ICT (x1.5)",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 2,
-          "M1": 2,
-          "M2": 2
+          "MATH": 2.0,
+          "M1": 2.0,
+          "M2": 2.0,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "ECON": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1032,10 +1044,12 @@
         "best_n": 5,
         "subject_weights": {
           "ENGL": 1.25,
-          "CHIN": 1.25,
+          "CHLA": 1.25,
           "MATH": 1.75,
           "M1": 1.75,
-          "M2": 1.75
+          "M2": 1.75,
+          "ECON": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1102,9 +1116,14 @@
         "formula_text": "Best 5; Mathematics (x2), M1/M2 (x1.75), Bio/Chem/Phys/DAT/ICT (x1.5)",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 2,
+          "MATH": 2.0,
           "M1": 1.75,
-          "M2": 1.75
+          "M2": 1.75,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1138,7 +1157,9 @@
         "subject_weights": {
           "MATH": 1.5,
           "M1": 1.5,
-          "M2": 1.5
+          "M2": 1.5,
+          "ECON": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1171,7 +1192,11 @@
         "best_n": 5,
         "subject_weights": {
           "ENGL": 1.5,
-          "MATH": 1.5
+          "M1": 1.5,
+          "M2": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1205,7 +1230,14 @@
         "subject_weights": {
           "MATH": 1.5,
           "M1": 1.5,
-          "M2": 1.5
+          "M2": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "DAT": 1.5,
+          "ICT": 1.5,
+          "ECON": 1.2,
+          "GEOG": 1.2
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1232,10 +1264,14 @@
         "best_n": 5,
         "subject_weights": {
           "ENGL": 1.25,
-          "CHIN": 1.25,
+          "CHLA": 1.25,
           "MATH": 1.75,
           "M1": 1.75,
-          "M2": 1.75
+          "M2": 1.75,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1306,7 +1342,11 @@
           "MATH": 1.5,
           "M1": 1.5,
           "M2": 1.5,
-          "PHYS": 1.5
+          "PHYS": 1.5,
+          "BIOL": 1.25,
+          "CHEM": 1.25,
+          "DAT": 1.25,
+          "ICT": 1.25
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1332,9 +1372,13 @@
         "formula_text": "Best 5; Mathematics (x2), M1/M2 (x2), Bio/Chem/Phys/ICT (x1.5)",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 2,
-          "M1": 2,
-          "M2": 2
+          "MATH": 2.0,
+          "M1": 2.0,
+          "M2": 2.0,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "ICT": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1493,7 +1537,9 @@
         "scale": "cuhk_enhanced",
         "formula_text": "Best 5; best one of Bio/Chem/Phys (x1.2)",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "PHYS": 1.2
+        },
         "bonus_subjects": [],
         "bonus_weight": 0
       },
@@ -1780,8 +1826,11 @@
         "formula_text": "Best 5; English or Mathematics (x1.5), M1/M2 (x2), Bio/Chem/Phys (x2), Econ/Geog/ICT/FST (x1.5); max 3 weighted subjects",
         "best_n": 5,
         "subject_weights": {
-          "M1": 2,
-          "M2": 2
+          "M1": 2.0,
+          "M2": 2.0,
+          "BIOL": 2.0,
+          "CHEM": 2.0,
+          "PHYS": 2.0
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1935,7 +1984,9 @@
         "scale": "cuhk_enhanced",
         "formula_text": "Best 5",
         "best_n": 5,
-        "subject_weights": {},
+        "subject_weights": {
+          "MATH": 1.5
+        },
         "bonus_subjects": [],
         "bonus_weight": 0
       },
