@@ -29,9 +29,11 @@
       },
       "admission_stats": {
         "2025": {
-          "mean": 21.95,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "mean": null,
+          "median": 23.5,
+          "lower_quartile": 22.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 24.5
         },
         "2024": {
           "mean": 21.04,
@@ -59,8 +61,10 @@
       "admission_stats": {
         "2025": {
           "mean": 21.0,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 21.5,
+          "lower_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 23.0
         },
         "2024": {
           "mean": 19.5,
@@ -88,8 +92,10 @@
       "admission_stats": {
         "2025": {
           "mean": 20.68,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 21,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 22.5
         },
         "2024": {
           "mean": 19.87,
@@ -117,8 +123,10 @@
       "admission_stats": {
         "2025": {
           "mean": 22.15,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 20.5
         },
         "2024": {
           "mean": 21.06,
@@ -146,8 +154,10 @@
       "admission_stats": {
         "2025": {
           "mean": 22.07,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 19.5
         },
         "2024": {
           "mean": 21.12,
@@ -174,9 +184,11 @@
       },
       "admission_stats": {
         "2025": {
-          "mean": 22.99,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "mean": null,
+          "median": 21.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 22.5
         },
         "2024": {
           "mean": 22.81,
@@ -204,8 +216,10 @@
       "admission_stats": {
         "2025": {
           "mean": 21.83,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 20.5
         },
         "2024": {
           "mean": 22.93,
@@ -233,8 +247,10 @@
       "admission_stats": {
         "2025": {
           "mean": 18.55,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 18,
+          "lower_quartile": 17,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 19
         },
         "2024": {
           "mean": 16.75,
@@ -262,8 +278,10 @@
       "admission_stats": {
         "2025": {
           "mean": 21.85,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20.0,
+          "lower_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 20.0
         },
         "2024": {
           "mean": 21.9,
@@ -290,9 +308,11 @@
       },
       "admission_stats": {
         "2025": {
-          "mean": 32.27,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "mean": 32.2,
+          "median": 27.5,
+          "lower_quartile": 24.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 30.5
         },
         "2024": {
           "mean": 31.4,
@@ -320,8 +340,10 @@
       "admission_stats": {
         "2025": {
           "mean": 27.04,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 23.0,
+          "lower_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 26.0
         },
         "2024": {
           "mean": 25.01,
@@ -349,8 +371,10 @@
       "admission_stats": {
         "2025": {
           "mean": 20.15,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 20.5
         },
         "2024": {
           "mean": 19.1,
@@ -377,9 +401,11 @@
       },
       "admission_stats": {
         "2025": {
-          "mean": 24.88,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "mean": null,
+          "median": 23.5,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 26.5
         },
         "2024": {
           "mean": 24.11,
@@ -407,8 +433,10 @@
       "admission_stats": {
         "2025": {
           "mean": 21.3,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 23.0,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 25.5
         },
         "2024": {
           "mean": 21.12,
@@ -436,8 +464,10 @@
       "admission_stats": {
         "2025": {
           "mean": 25.5,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 21.5,
+          "lower_quartile": 21.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 21.5
         },
         "2024": {
           "mean": 25.17,
@@ -465,8 +495,10 @@
       "admission_stats": {
         "2025": {
           "mean": 19.34,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20.5,
+          "lower_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 23.0
         },
         "2024": {
           "mean": 19.56,
@@ -494,8 +526,10 @@
       "admission_stats": {
         "2025": {
           "mean": 20.46,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20.5,
+          "lower_quartile": 20,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 21.0
         },
         "2024": {
           "mean": 19.57,
@@ -523,8 +557,10 @@
       "admission_stats": {
         "2025": {
           "mean": 18.7,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 18,
+          "lower_quartile": 18,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 18
         },
         "2024": {
           "mean": 18.29,
@@ -552,8 +588,10 @@
       "admission_stats": {
         "2025": {
           "mean": 19.5,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20,
+          "lower_quartile": 19,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 21
         },
         "2024": {
           "mean": 18.83,
@@ -580,9 +618,11 @@
       },
       "admission_stats": {
         "2025": {
-          "mean": 25.54,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "mean": null,
+          "median": 20,
+          "lower_quartile": 20.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 19.5
         },
         "2024": {
           "mean": 19.33,
@@ -610,8 +650,10 @@
       "admission_stats": {
         "2025": {
           "mean": 19.73,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 18,
+          "lower_quartile": 19.5,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 16.5
         },
         "2024": {
           "mean": 18.07,
@@ -639,8 +681,10 @@
       "admission_stats": {
         "2025": {
           "mean": 18.9,
-          "source": "JUPAS 2025 Admissions Scores PDF",
-          "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
+          "median": 20,
+          "lower_quartile": 19,
+          "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
+          "upper_quartile": 21
         }
       }
     }
