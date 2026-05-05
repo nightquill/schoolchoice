@@ -254,7 +254,7 @@
       },
       "admission_stats": {
         "2025": {
-          "median": 22,
+          "median": 22.0,
           "lower_quartile": 20.8,
           "upper_quartile": 23.2,
           "source": "JUPAS 2025 Admissions Scores PDF"
@@ -671,8 +671,8 @@
       },
       "admission_stats": {
         "2025": {
-          "median": 28,
-          "lower_quartile": 26,
+          "median": 28.0,
+          "lower_quartile": 26.0,
           "upper_quartile": 30,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
