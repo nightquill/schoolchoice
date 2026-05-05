@@ -4,7 +4,6 @@ import { useAuth } from './hooks/useAuth';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import StudentListPage from './pages/StudentListPage/StudentListPage';
-import StudentDetailPage from './pages/StudentDetailPage/StudentDetailPage';
 import RecommendationPage from './pages/RecommendationPage/RecommendationPage';
 // v2 pages
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -24,6 +23,7 @@ import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
 import Settings from './pages/Settings/Settings';
+import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,7 +57,7 @@ export default function App() {
 
         {/* v1 protected routes (unchanged) */}
         <Route path="/students" element={<ProtectedRoute><StudentListPage /></ProtectedRoute>} />
-        <Route path="/students/:id" element={<ProtectedRoute><StudentDetailPage /></ProtectedRoute>} />
+        <Route path="/students/:id" element={<Navigate to="profile" replace />} />
         <Route path="/students/:id/recommendations" element={<ProtectedRoute><RecommendationPage /></ProtectedRoute>} />
 
         {/* v2 protected routes */}
@@ -76,6 +76,7 @@ export default function App() {
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
 
         <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
+        <Route path="/methodology" element={<ProtectedRoute><MethodologyReport /></ProtectedRoute>} />
 
         {/* Entity routes (PLAT-03) */}
         <Route path="/entities/:name" element={<ProtectedRoute><EntityListPage /></ProtectedRoute>} />
