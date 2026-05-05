@@ -11,6 +11,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db.models import Recommendation, School, Student
@@ -23,39 +24,103 @@ _WEIGHT_GRADE = 0.4
 _WEIGHT_INTEREST = 0.3
 _WEIGHT_STRENGTH = 0.3
 
-
-# ---------------------------------------------------------------------------
-# Grade normalisation helpers
-# ---------------------------------------------------------------------------
-
-# Letter-grade → numeric mapping for filtering and scoring when grades are strings.
-_LETTER_TO_NUMERIC: dict[str, float] = {
-    "a+": 100,
-    "a": 95,
-    "a-": 90,
-    "b+": 87,
-    "b": 83,
-    "b-": 80,
-    "c+": 77,
-    "c": 73,
-    "c-": 70,
-    "d+": 67,
-    "d": 63,
-    "d-": 60,
-    "f": 0,
+# Synonym map for interest/strength matching — maps a keyword to related terms
+_INTEREST_SYNONYMS: dict[str, set[str]] = {
+    "engineering": {"stem", "technology", "applied learning", "computer science", "design"},
+    "computer science": {"technology", "data science", "stem", "ict", "engineering", "computer", "computing"},
+    "mathematics": {"stem", "science", "engineering", "business analytics", "finance", "statistics"},
+    "science": {"stem", "research", "engineering", "technology", "biotechnology"},
+    "medicine": {"health", "nursing", "biology", "chinese medicine"},
+    "business": {"finance", "accounting", "management", "commerce", "entrepreneurship", "business analytics"},
+    "law": {"legal", "justice"},
+    "arts": {"creative", "design", "visual", "creative media", "film", "music"},
+    "technology": {"stem", "engineering", "computer science", "data science", "ict", "innovation"},
+    "data science": {"technology", "computer science", "stem", "innovation", "business analytics"},
+    "design": {"creative", "arts", "visual", "architecture", "creative media"},
+    "finance": {"business", "accounting", "economics", "management", "business analytics"},
 }
 
 
-def _to_numeric(grade_value) -> float:
+def _expand_terms(terms: list[str]) -> set[str]:
+    """Expand a list of terms with synonyms for richer matching."""
+    expanded = set()
+    for term in terms:
+        expanded.add(term)
+        # Add word-level tokens
+        words = term.split()
+        expanded.update(words)
+        # Add synonyms
+        if term in _INTEREST_SYNONYMS:
+            expanded.update(_INTEREST_SYNONYMS[term])
+        for word in words:
+            if word in _INTEREST_SYNONYMS:
+                expanded.update(_INTEREST_SYNONYMS[word])
+    return expanded
+
+
+def _terms_match(expanded_a: set[str], items_b: list[str]) -> int:
+    """Count how many items in items_b have any overlap with expanded_a."""
+    matched = 0
+    for item in items_b:
+        item_words = set(item.split())
+        if expanded_a & item_words or any(a in item or item in a for a in expanded_a):
+            matched += 1
+    return matched
+
+
+# ---------------------------------------------------------------------------
+# Grade normalisation helpers — delegates to canonical hkdse_service
+# ---------------------------------------------------------------------------
+
+from app.modules.school_choice.services.hkdse_service import letter_grade_to_numeric as _to_numeric
+
+
+# ---------------------------------------------------------------------------
+# JUPAS programme attachment — used by match/targets endpoints
+# ---------------------------------------------------------------------------
+
+
+def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
     """
-    Convert a grade value (int, float, or letter string) to a 0–100 float.
-    Unknown strings default to 0.
+    Query jupas_programmes for the given school dicts and attach as
+    school["jupas_programmes"] list on each. Returns the modified list.
     """
-    if isinstance(grade_value, (int, float)):
-        return float(grade_value)
-    if isinstance(grade_value, str):
-        return _LETTER_TO_NUMERIC.get(grade_value.strip().lower(), 0.0)
-    return 0.0
+    school_ids = [str(s.get("id")) for s in schools if s.get("id")]
+    if not school_ids:
+        return schools
+
+    result = db.execute(
+        text("""
+            SELECT jupas_code, name, institution_code, school_id::text,
+                   faculty, scoring_formula, minimum_requirements, admission_stats
+            FROM jupas_programmes
+            WHERE school_id::text = ANY(:school_ids)
+            ORDER BY jupas_code
+        """),
+        {"school_ids": school_ids},
+    )
+    rows = result.fetchall()
+
+    prog_map: dict[str, list[dict]] = {}
+    for row in rows:
+        sid = row.school_id
+        if sid not in prog_map:
+            prog_map[sid] = []
+        prog_map[sid].append({
+            "jupas_code": row.jupas_code,
+            "name": row.name,
+            "institution_code": row.institution_code,
+            "faculty": row.faculty,
+            "scoring_formula": row.scoring_formula or {},
+            "minimum_requirements": row.minimum_requirements or {},
+            "admission_stats": row.admission_stats or {},
+        })
+
+    for school in schools:
+        sid = str(school.get("id", ""))
+        school["jupas_programmes"] = prog_map.get(sid, [])
+
+    return schools
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +165,9 @@ def _score_school(student: Student, school: School) -> dict:
     requirements: dict = school.min_academic_requirements or {}
     student_grades: dict = student.grades or {}
     student_interests: list[str] = [i.lower() for i in (student.interests or [])]
-    school_strengths: list[str] = [s.lower() for s in (school.key_strengths or [])]
+    # Combine key_strengths + notable_programs for a richer match surface
+    raw_strengths = list(school.key_strengths or []) + list(school.notable_programs or [])
+    school_strengths: list[str] = list({s.lower() for s in raw_strengths})
 
     # --- grade_match_score ---
     if requirements:
@@ -113,26 +180,20 @@ def _score_school(student: Student, school: School) -> dict:
         grade_match = 1.0  # No requirements → perfect grade match
 
     # --- interest_alignment_score ---
-    # Fraction of student interests that partially match any school strength (case-insensitive)
+    # Fraction of student interests matched using synonym expansion
     if student_interests:
-        matched_interests = sum(
-            1
-            for interest in student_interests
-            if any(interest in strength or strength in interest for strength in school_strengths)
-        )
-        interest_alignment = matched_interests / len(student_interests)
+        expanded_interests = _expand_terms(student_interests)
+        matched_interests = _terms_match(expanded_interests, school_strengths)
+        interest_alignment = min(1.0, matched_interests / len(student_interests))
     else:
         interest_alignment = 0.0
 
     # --- strengths_alignment_score ---
-    # Fraction of school strengths that appear in student interests (case-insensitive)
+    # Fraction of school strengths covered by student interests
     if school_strengths:
-        matched_strengths = sum(
-            1
-            for strength in school_strengths
-            if any(strength in interest or interest in strength for interest in student_interests)
-        )
-        strength_alignment = matched_strengths / len(school_strengths)
+        expanded_interests = _expand_terms(student_interests)
+        matched_strengths = _terms_match(expanded_interests, school_strengths)
+        strength_alignment = min(1.0, matched_strengths / len(school_strengths))
     else:
         strength_alignment = 1.0  # No declared strengths → no penalty
 
@@ -188,7 +249,9 @@ def _build_gaps(student: Student, school: School) -> str:
     requirements: dict = school.min_academic_requirements or {}
     student_grades: dict = student.grades or {}
     student_interests: list[str] = [i.lower() for i in (student.interests or [])]
-    school_strengths: list[str] = school.key_strengths or []
+    # Combine key_strengths + notable_programs
+    raw_strengths = list(school.key_strengths or []) + list(school.notable_programs or [])
+    school_strengths: list[str] = list(dict.fromkeys(raw_strengths))  # deduplicate, preserve order
 
     # Grade deficits (subjects where student is below minimum)
     grade_gaps: list[str] = []
@@ -202,11 +265,12 @@ def _build_gaps(student: Student, school: School) -> str:
                 f"(deficit: {deficit:.0f})"
             )
 
-    # School strengths not covered by student interests
+    # School strengths not covered by student interests (with synonym expansion)
+    expanded_interests = _expand_terms(student_interests)
     unmatched_strengths: list[str] = [
         s
         for s in school_strengths
-        if not any(s.lower() in i or i in s.lower() for i in student_interests)
+        if not any(a in s.lower() or s.lower() in a for a in expanded_interests)
     ]
 
     parts: list[str] = []

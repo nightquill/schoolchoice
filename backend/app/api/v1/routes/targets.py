@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import School, User
-from app.db.models_v2 import StudentSchoolTarget, Subject
+from app.db.models_v2 import StudentSchoolTarget
 from app.db.session import get_db
 from app.schemas.v2.targets import (
     TargetCreate,
@@ -23,88 +23,11 @@ from app.schemas.v2.targets import (
     TargetUpdate,
 )
 from app.services import student_service
-from app.services.hkdse_service import compute_best5_aggregate, grade_to_int
-from app.services.matchmaker_v2 import compute_weighted_score, run_eligibility_filter
+from app.services.matching_service import attach_jupas_programmes
+from app.services.student_data_builder import build_school_dict, build_student_data
+from app.modules.school_choice.services.matchmaker_v2 import compute_weighted_score, run_eligibility_filter
 
 router = APIRouter(prefix="/students", tags=["targets-v2"])
-
-
-# ---------------------------------------------------------------------------
-# Helper: build student_data dict for the matching engine
-# ---------------------------------------------------------------------------
-
-def _build_student_data(student, db: Session) -> dict:
-    """Assemble the student_data dict used by run_eligibility_filter / compute_weighted_score."""
-    grade_records = getattr(student, "subject_grades", None) or []
-    grade_dicts_for_agg = []
-    grades_by_code: dict[str, str] = {}
-    elective_codes: list[str] = []
-
-    for g in grade_records:
-        subj = db.query(Subject).filter(Subject.id == g.subject_id).first()
-        if not subj:
-            continue
-        raw = g.raw_grade or g.predicted_grade or "U"
-        numeric = grade_to_int(raw)
-        grades_by_code[subj.code] = raw
-        grade_dicts_for_agg.append({
-            "subject_code": subj.code,
-            "numeric_value": numeric,
-            "is_compulsory": subj.is_compulsory,
-            "category": subj.category,
-        })
-        if not subj.is_compulsory and subj.category != "APPLIED_LEARNING":
-            elective_codes.append(subj.code)
-
-    best5 = compute_best5_aggregate(grade_dicts_for_agg)
-
-    ielts_raw = getattr(student, "ielts_score", None)
-    ielts_overall = None
-    if isinstance(ielts_raw, dict):
-        ielts_overall = ielts_raw.get("overall")
-    elif ielts_raw is not None:
-        try:
-            ielts_overall = float(ielts_raw)
-        except (TypeError, ValueError):
-            pass
-
-    extra = getattr(student, "extra_curricular", None) or []
-    extra_activities: list[str] = [
-        (ec.get("activity") or "") if isinstance(ec, dict) else str(ec)
-        for ec in extra
-    ]
-
-    awards_raw = getattr(student, "awards", None) or []
-    award_titles: list[str] = [
-        (aw.get("title") or "") if isinstance(aw, dict) else str(aw)
-        for aw in awards_raw
-    ]
-
-    return {
-        "best5_aggregate": best5,
-        "grades_by_code": grades_by_code,
-        "ielts_score": ielts_overall,
-        "elective_codes": elective_codes,
-        "extra_curricular_activities": extra_activities,
-        "award_titles": award_titles,
-    }
-
-
-def _school_to_dict(school: School) -> dict:
-    """Convert a School ORM object to the dict expected by the matching engine."""
-    return {
-        "id": str(school.id),
-        "name": school.name or "",
-        "minimum_entry_score": getattr(school, "minimum_entry_score", None),
-        "average_admitted_score": (
-            float(school.average_admitted_score)
-            if getattr(school, "average_admitted_score", None) is not None
-            else None
-        ),
-        "required_subjects": getattr(school, "required_subjects", None) or [],
-        "language_requirements": getattr(school, "language_requirements", None) or {},
-        "notable_programs": getattr(school, "notable_programs", None) or [],
-    }
 
 
 def _get_target_or_404(
@@ -147,7 +70,15 @@ def list_targets(
     )
 
     # Re-run eligibility and scoring on every GET to keep scores fresh as grades are updated
-    student_data = _build_student_data(student, db)
+    student_data = build_student_data(student, db)
+
+    # Pre-build school dicts with JUPAS programmes attached
+    school_dict_map: dict[str, dict] = {}
+    for t in targets:
+        if t.school is not None and str(t.school_id) not in school_dict_map:
+            school_dict_map[str(t.school_id)] = build_school_dict(t.school)
+    if school_dict_map:
+        attach_jupas_programmes(db, list(school_dict_map.values()))
 
     target_responses = []
     for t in targets:
@@ -156,7 +87,7 @@ def list_targets(
 
         if school is not None:
             resp.school_name = school.name
-            school_dict = _school_to_dict(school)
+            school_dict = school_dict_map.get(str(t.school_id), build_school_dict(school))
             passes, failing = run_eligibility_filter(student_data, school_dict)
             comp_scores = compute_weighted_score(student_data, school_dict)
             match_score = comp_scores.get("weighted_score", 0.0)
@@ -220,8 +151,9 @@ def add_target(
         )
 
     # Run eligibility and matching immediately
-    student_data = _build_student_data(student, db)
-    school_dict = _school_to_dict(school)
+    student_data = build_student_data(student, db)
+    school_dict = build_school_dict(school)
+    attach_jupas_programmes(db, [school_dict])
     passes, failing = run_eligibility_filter(student_data, school_dict)
     comp_scores = compute_weighted_score(student_data, school_dict)
     match_score = comp_scores.get("weighted_score", 0.0)
