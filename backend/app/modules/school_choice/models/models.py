@@ -1113,6 +1113,8 @@ class StudentSchoolTarget(Base):
     # Added via ALTER TABLE
     intended_majors = Column(JSON, nullable=True)
     year_of_entry = Column(Integer, nullable=True)
+    at_risk = Column(Boolean, nullable=True, default=False, comment="True if score below programme LQ")
+    risk_reasons = Column(JSONB, nullable=True, server_default="[]", comment="Array of risk reason strings")
     created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,

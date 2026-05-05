@@ -80,6 +80,8 @@ class TargetResponse(BaseModel):
     intended_majors: Optional[list] = None
     year_of_entry: Optional[int] = None
     preference_confidence: int = 3
+    at_risk: Optional[bool] = False
+    risk_reasons: Optional[list[str]] = None
     status: str
     created_at: datetime
     updated_at: datetime

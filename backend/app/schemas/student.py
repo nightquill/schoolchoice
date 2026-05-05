@@ -53,10 +53,15 @@ class StudentListItem(BaseModel):
 
     id: UUID
     name: str
+    full_name: str | None = None
     target_region: str
     created_at: datetime
     updated_at: datetime
     has_plan: bool = False
+    plan_generated_at: datetime | None = None
+    year_of_study: int | None = None
+    class_name: str | None = None
+    has_at_risk_targets: bool = False
 
     model_config = {"from_attributes": True}
 

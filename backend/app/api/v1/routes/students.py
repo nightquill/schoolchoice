@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import Student, User
-from app.db.models_v2 import AcademicPlan
+from app.db.models_v2 import AcademicPlan, StudentSchoolTarget
 from app.db.session import get_db
 from app.schemas.student import (
     StudentCreate,
@@ -99,23 +99,35 @@ def list_students(
     total = len(all_students)
     students = all_students[skip : skip + limit]
 
-    # Build a set of student_ids that have a generated plan — single query, no N+1
+    # Build a map of student_ids -> plan generated_at — single query, no N+1
     student_ids = [s.id for s in students]
+    plan_map = {}
+    at_risk_set: set = set()
     if student_ids:
         rows = db.execute(
-            select(AcademicPlan.student_id).where(
+            select(AcademicPlan.student_id, AcademicPlan.generated_at).where(
                 AcademicPlan.student_id.in_(student_ids),
                 AcademicPlan.generated_at.isnot(None),
             )
         ).fetchall()
-        has_plan_ids = {row[0] for row in rows}
-    else:
-        has_plan_ids = set()
+        plan_map = {row[0]: row[1] for row in rows}
+
+        # Check for at-risk targets
+        risk_rows = db.execute(
+            select(StudentSchoolTarget.student_id).where(
+                StudentSchoolTarget.student_id.in_(student_ids),
+                StudentSchoolTarget.at_risk.is_(True),
+            ).distinct()
+        ).fetchall()
+        at_risk_set = {row[0] for row in risk_rows}
 
     result = []
     for s in students:
         item = StudentListItem.model_validate(s)
-        item.has_plan = s.id in has_plan_ids
+        item.has_plan = s.id in plan_map
+        item.plan_generated_at = plan_map.get(s.id)
+        item.full_name = s.name
+        item.has_at_risk_targets = s.id in at_risk_set
         result.append(item)
     return {"items": result, "total": total}
 
