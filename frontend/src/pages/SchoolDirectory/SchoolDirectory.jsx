@@ -5,7 +5,7 @@ import SchoolCard from '../../components/SchoolCard/SchoolCard';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { searchSchools, createSchool, deleteSchool } from '../../api/schoolsV2';
 import { getAccount } from '../../api/account';
 
@@ -225,8 +225,10 @@ function SchoolDirectory() {
             style={inputStyle}
           />
         </div>
-        <Button label="Search" onClick={handleSearch} loading={loading} />
-        <Button label="+ Add Custom School" variant="secondary" onClick={() => setShowAddModal(true)} />
+        <Button onClick={handleSearch} disabled={loading}>
+          {loading ? 'Searching...' : 'Search'}
+        </Button>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>+ Add Custom School</Button>
       </div>
 
       {showAddModal && (
@@ -273,8 +275,10 @@ function SchoolDirectory() {
               </div>
               {addError && <p style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)', margin: 0 }}>{addError}</p>}
               <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
-                <Button label="Cancel" variant="secondary" onClick={() => { setShowAddModal(false); setAddError(''); }} disabled={addLoading} />
-                <Button label={addLoading ? 'Saving…' : 'Create School'} variant="primary" type="submit" disabled={addLoading} onClick={() => {}} />
+                <Button variant="outline" onClick={() => { setShowAddModal(false); setAddError(''); }} disabled={addLoading}>Cancel</Button>
+                <Button type="submit" disabled={addLoading} onClick={() => {}}>
+                  {addLoading ? 'Saving...' : 'Create School'}
+                </Button>
               </div>
             </form>
           </div>
@@ -331,19 +335,13 @@ function SchoolDirectory() {
 
             {totalPages > 1 && (
               <div style={paginationStyle} role="navigation" aria-label="Pagination">
-                <Button
-                  label="Previous"
-                  variant="secondary"
-                  disabled={page <= 1}
-                  onClick={() => fetchSchools(page - 1, filters)}
-                />
+                <Button variant="outline" disabled={page <= 1} onClick={() => fetchSchools(page - 1, filters)}>
+                  Previous
+                </Button>
                 <span style={pageIndicatorStyle}>Page {page} of {totalPages}</span>
-                <Button
-                  label="Next"
-                  variant="secondary"
-                  disabled={page >= totalPages}
-                  onClick={() => fetchSchools(page + 1, filters)}
-                />
+                <Button variant="outline" disabled={page >= totalPages} onClick={() => fetchSchools(page + 1, filters)}>
+                  Next
+                </Button>
               </div>
             )}
           </>

@@ -40,7 +40,8 @@
           "lower_quartile": 24.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7133",
@@ -71,7 +72,8 @@
           "lower_quartile": 22.25,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7204",
@@ -102,7 +104,8 @@
           "lower_quartile": 24,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7503",
@@ -133,7 +136,8 @@
           "lower_quartile": 26,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7606",
@@ -164,7 +168,8 @@
           "lower_quartile": 24,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7709",
@@ -195,7 +200,8 @@
           "lower_quartile": 25.3,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7802",
@@ -226,7 +232,8 @@
           "lower_quartile": 24.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7905",
@@ -257,7 +264,8 @@
           "lower_quartile": 26,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7211",
@@ -282,7 +290,8 @@
           "lower_quartile": 27,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7212",
@@ -307,7 +316,8 @@
           "lower_quartile": 25.05,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7213",
@@ -332,7 +342,8 @@
           "lower_quartile": 27,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7214",
@@ -357,7 +368,8 @@
           "lower_quartile": 26.5,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7215",
@@ -382,7 +394,8 @@
           "lower_quartile": 27.05,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7216",
@@ -413,7 +426,8 @@
           "lower_quartile": 23,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7200",
@@ -438,7 +452,8 @@
           "lower_quartile": 23,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7301",
@@ -469,7 +484,8 @@
           "lower_quartile": 25,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7302",
@@ -500,7 +516,8 @@
           "lower_quartile": 23.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7303",
@@ -531,7 +548,8 @@
           "lower_quartile": 23.25,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7304",
@@ -562,7 +580,8 @@
           "lower_quartile": 23,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7305",
@@ -593,7 +612,8 @@
           "lower_quartile": 19.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS7306",
@@ -624,7 +644,8 @@
           "lower_quartile": 22.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7307",
@@ -649,7 +670,8 @@
           "lower_quartile": 23,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS7225",
@@ -680,7 +702,8 @@
           "lower_quartile": 28.88,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS7123",
@@ -711,7 +734,8 @@
           "lower_quartile": 23.75,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     }
   ]
 }

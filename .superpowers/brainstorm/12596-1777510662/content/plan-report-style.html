@@ -1,0 +1,128 @@
+<h2>Plan Report Style Direction</h2>
+<p class="subtitle">The AI plan is the core product. Which visual direction should it take?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f8fafc;">
+      <div style="font-family:Georgia,serif;max-width:400px;margin:auto;">
+        <div style="background:linear-gradient(135deg,#0f3460,#16213e);color:white;padding:20px 24px;border-radius:6px;margin-bottom:12px;">
+          <div style="font-size:18px;font-weight:bold;">University Academic Plan</div>
+          <div style="opacity:0.7;font-size:11px;">Chan Siu Ming — April 2026</div>
+        </div>
+        <div style="background:white;padding:14px;border:1px solid #e2e8f0;border-radius:4px;margin-bottom:8px;">
+          <div style="font-size:12px;color:#0f3460;font-weight:bold;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:6px;">1. Student Summary</div>
+          <table style="width:100%;font-size:10px;border-collapse:collapse;">
+            <tr><td style="background:#0f3460;color:white;padding:3px 6px;width:40%;">Name</td><td style="padding:3px 6px;">Chan Siu Ming</td></tr>
+            <tr><td style="background:#0f3460;color:white;padding:3px 6px;">Best-5</td><td style="padding:3px 6px;">24</td></tr>
+          </table>
+        </div>
+        <div style="background:white;padding:14px;border:1px solid #e2e8f0;border-radius:4px;">
+          <div style="font-size:12px;color:#0f3460;font-weight:bold;">3. HKUST — Engineering</div>
+          <div style="font-size:10px;color:#666;margin-top:4px;">Strong academic match (92%). Your MATH 5** and PHYS 5* grades...</div>
+          <div style="margin-top:6px;font-size:9px;color:#999;">📊 Fit radar chart here</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Current — Traditional Report</h3>
+      <p>What we have now. Serif fonts, navy header, structured tables, Chart.js charts. Clean but looks like an academic document, not a modern consultant output.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f8fafc;">
+      <div style="font-family:'Inter',system-ui,sans-serif;max-width:400px;margin:auto;">
+        <div style="background:white;padding:20px 24px;border-bottom:3px solid #2563eb;">
+          <div style="font-size:11px;color:#2563eb;font-weight:600;letter-spacing:1px;text-transform:uppercase;">University Application Strategy</div>
+          <div style="font-size:20px;font-weight:700;color:#111;margin-top:2px;">Chan Siu Ming</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Prepared April 2026 · Best-5: 24 · Year 6</div>
+        </div>
+        <div style="padding:16px 24px;">
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <div style="flex:1;background:#eff6ff;border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:700;color:#2563eb;">24</div>
+              <div style="font-size:9px;color:#666;">Best-5 Score</div>
+            </div>
+            <div style="flex:1;background:#f0fdf4;border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:700;color:#16a34a;">5**</div>
+              <div style="font-size:9px;color:#666;">Top Grade</div>
+            </div>
+            <div style="flex:1;background:#fef3c7;border-radius:8px;padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:700;color:#d97706;">8</div>
+              <div style="font-size:9px;color:#666;">Schools Matched</div>
+            </div>
+          </div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#111;">HKUST — Electrical Engineering</div>
+                <div style="font-size:10px;color:#666;">JS5171 · Very strong match</div>
+              </div>
+              <div style="background:#2563eb;color:white;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;">92%</div>
+            </div>
+            <div style="font-size:10px;color:#444;margin-top:6px;line-height:1.4;">Your MATH 5** and PHYS 5* make you an excellent candidate. Robotics leadership adds engineering credibility.</div>
+          </div>
+          <div style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#111;">CityU — Computer Science</div>
+                <div style="font-size:10px;color:#666;">JS1221 · Strong match</div>
+              </div>
+              <div style="background:#16a34a;color:white;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:600;">87%</div>
+            </div>
+            <div style="font-size:10px;color:#444;margin-top:6px;line-height:1.4;">Strong academic profile pairs well with your coding workshop experience and Math Olympiad achievement.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Modern Consultant — Clean Cards</h3>
+      <p>Sans-serif, white background, metric cards at top, school match cards with percentage badges. Feels like a McKinsey-style deliverable. Clean, scannable, professional.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:20px;background:#f8fafc;">
+      <div style="font-family:'Inter',system-ui,sans-serif;max-width:400px;margin:auto;">
+        <div style="background:#111827;color:white;padding:24px;border-radius:12px 12px 0 0;">
+          <div style="font-size:22px;font-weight:700;">Application Strategy</div>
+          <div style="font-size:12px;color:#9ca3af;margin-top:4px;">Chan Siu Ming · Year 6 · HKDSE 2026</div>
+          <div style="display:flex;gap:16px;margin-top:14px;">
+            <div><div style="font-size:28px;font-weight:800;">24</div><div style="font-size:9px;color:#9ca3af;">BEST-5</div></div>
+            <div style="border-left:1px solid #374151;padding-left:16px;"><div style="font-size:28px;font-weight:800;">5**</div><div style="font-size:9px;color:#9ca3af;">TOP GRADE</div></div>
+            <div style="border-left:1px solid #374151;padding-left:16px;"><div style="font-size:28px;font-weight:800;">92%</div><div style="font-size:9px;color:#9ca3af;">TOP MATCH</div></div>
+          </div>
+        </div>
+        <div style="background:#f9fafb;padding:16px;border-radius:0 0 12px 12px;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <span style="background:#dbeafe;color:#1d4ed8;font-size:9px;padding:2px 8px;border-radius:10px;font-weight:500;">Engineering</span>
+            <span style="background:#dbeafe;color:#1d4ed8;font-size:9px;padding:2px 8px;border-radius:10px;font-weight:500;">Computer Science</span>
+            <span style="background:#fef3c7;color:#92400e;font-size:9px;padding:2px 8px;border-radius:10px;font-weight:500;">English needs work</span>
+          </div>
+          <div style="background:white;border-radius:8px;padding:12px;border:1px solid #e5e7eb;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">1</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:600;">HKUST — Electrical Engineering</div>
+                <div style="font-size:9px;color:#666;">92% match · JS5171</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:white;border-radius:8px;padding:12px;border:1px solid #e5e7eb;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#16a34a,#059669);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">2</div>
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:600;">CityU — Computer Science</div>
+                <div style="font-size:9px;color:#666;">87% match · JS1221</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Bold Dashboard — Data-Forward</h3>
+      <p>Dark hero header with large metrics, tag chips for strengths/gaps, numbered school cards with gradient rank indicators. Feels like a modern analytics dashboard. Bold and data-rich.</p>
+    </div>
+  </div>
+</div>

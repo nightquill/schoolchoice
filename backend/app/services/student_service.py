@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.db.models import Student
 from app.schemas.student import StudentCreate, StudentUpdate
+from app.services.student_data_builder import build_student_data, build_student_dict_for_plan
 
 
 def get_students(db: Session, user_id: UUID) -> list[Student]:
@@ -79,6 +80,26 @@ def update_student(
     db.commit()
     db.refresh(student)
     return student
+
+
+def get_student_match_data(db: Session, student_id: UUID, user_id: UUID) -> dict:
+    """
+    Return the student's data in the format expected by the matching engine.
+    Enforces ownership, then delegates to the canonical builder.
+    """
+    student = get_student(db, student_id, user_id)
+    return build_student_data(student, db)
+
+
+def get_student_plan_data(db: Session, student_id: UUID, user_id: UUID) -> tuple:
+    """
+    Return (student_orm, student_data, student_dict) for plan generation.
+    Enforces ownership, builds both match data and plan-formatted dict.
+    """
+    student = get_student(db, student_id, user_id)
+    student_data = build_student_data(student, db)
+    student_dict = build_student_dict_for_plan(student, student_data)
+    return student, student_data, student_dict
 
 
 def delete_student(db: Session, student_id: UUID, user_id: UUID) -> None:

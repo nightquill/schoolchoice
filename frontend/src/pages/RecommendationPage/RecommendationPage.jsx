@@ -121,7 +121,7 @@ function RecommendationPage() {
     <div style={pageStyle}>
       <NavBar />
       <div style={contentStyle}>
-        <Link to={`/students/${studentId}`} style={backLinkStyle}>
+        <Link to={`/students/${studentId}/profile`} style={backLinkStyle}>
           {`< Back to ${studentName}`}
         </Link>
         <h1 style={headingStyle}>Recommendations for {studentName}</h1>

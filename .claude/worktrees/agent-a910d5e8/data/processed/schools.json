@@ -1,0 +1,308 @@
+[
+  {
+    "name": "The University of Hong Kong",
+    "name_zh": "香港大學",
+    "type": "UNIVERSITY",
+    "location": "Pokfulam, Hong Kong Island",
+    "website": "https://www.hku.hk",
+    "description": "Founded in 1911, HKU is Hong Kong's oldest and most prestigious university, consistently ranked among the top universities in Asia and the world. It offers a comprehensive range of undergraduate, postgraduate, and doctoral programmes across nine faculties.",
+    "minimum_entry_score": 20,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "3"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "language_requirements": {"ielts_minimum": 6.5},
+    "notable_programs": ["Medicine", "Law", "Business Administration", "Engineering", "Architecture", "Social Sciences", "Dentistry"],
+    "faculties": [
+      "Faculty of Arts",
+      "Faculty of Business and Economics",
+      "Faculty of Dentistry",
+      "Faculty of Education",
+      "Faculty of Engineering",
+      "Faculty of Law",
+      "Faculty of Medicine",
+      "Faculty of Science",
+      "Faculty of Social Sciences"
+    ],
+    "acceptance_rate": 0.18,
+    "average_admitted_score": 26.0,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "The Chinese University of Hong Kong",
+    "name_zh": "香港中文大學",
+    "type": "UNIVERSITY",
+    "location": "Sha Tin, New Territories",
+    "website": "https://www.cuhk.edu.hk",
+    "description": "Established in 1963, CUHK is a comprehensive research university with a strong bilingual tradition. It is known for its Chinese culture and heritage programmes alongside world-class science and business schools, and operates a collegiate system.",
+    "minimum_entry_score": 18,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "language_requirements": {"ielts_minimum": 6.5},
+    "notable_programs": ["Medicine", "Business Administration", "Law", "Engineering", "Arts", "Social Science", "Chinese Studies"],
+    "faculties": [
+      "Faculty of Arts",
+      "Faculty of Business Administration",
+      "Faculty of Education",
+      "Faculty of Engineering",
+      "Faculty of Law",
+      "Faculty of Medicine",
+      "Faculty of Science",
+      "Faculty of Social Science"
+    ],
+    "acceptance_rate": 0.20,
+    "average_admitted_score": 25.0,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "The Hong Kong University of Science and Technology",
+    "name_zh": "香港科技大學",
+    "type": "UNIVERSITY",
+    "location": "Clear Water Bay, Kowloon",
+    "website": "https://www.ust.hk",
+    "description": "Founded in 1991, HKUST is a world-class research university focused on science, technology, engineering, and business. It is consistently ranked among the top universities globally for engineering and technology programmes.",
+    "minimum_entry_score": 18,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "3"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "3"},
+      {"code": "CSD", "min_grade": "2"}
+    ],
+    "language_requirements": {"ielts_minimum": 6.5},
+    "notable_programs": ["Computer Science and Engineering", "Business Management", "Data Science", "Mathematics", "Biotechnology", "Mechanical Engineering"],
+    "faculties": [
+      "School of Engineering",
+      "School of Science",
+      "School of Business and Management",
+      "School of Humanities and Social Science"
+    ],
+    "acceptance_rate": 0.22,
+    "average_admitted_score": 25.5,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "The Hong Kong Polytechnic University",
+    "name_zh": "香港理工大學",
+    "type": "POLYTECHNIC",
+    "location": "Hung Hom, Kowloon",
+    "website": "https://www.polyu.edu.hk",
+    "description": "Established in 1937 (as a technical college), PolyU is a comprehensive polytechnic university known for its applied research and professional education, with particular strengths in design, hotel management, nursing, and engineering.",
+    "minimum_entry_score": 14,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": {"ielts_minimum": 6.0},
+    "notable_programs": ["Nursing", "Hotel and Tourism Management", "Design", "Optometry", "Civil Engineering", "Business Administration"],
+    "faculties": [
+      "Faculty of Applied Science and Textiles",
+      "Faculty of Business",
+      "Faculty of Construction and Environment",
+      "Faculty of Engineering",
+      "Faculty of Health and Social Sciences",
+      "Faculty of Humanities",
+      "School of Design",
+      "School of Hotel and Tourism Management"
+    ],
+    "acceptance_rate": 0.30,
+    "average_admitted_score": 20.0,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "City University of Hong Kong",
+    "name_zh": "香港城市大學",
+    "type": "UNIVERSITY",
+    "location": "Kowloon Tong, Kowloon",
+    "website": "https://www.cityu.edu.hk",
+    "description": "Founded in 1984, CityU is a dynamic research-led university known for its professional education in law, business, engineering, and creative media. It has strong ties with industry and an international student body.",
+    "minimum_entry_score": 14,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "3"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": {"ielts_minimum": 6.0},
+    "notable_programs": ["Computer Science", "Law", "Business Administration", "Creative Media", "Data Science", "Electrical Engineering"],
+    "faculties": [
+      "College of Business",
+      "College of Computing",
+      "School of Creative Media",
+      "School of Data Science",
+      "School of Energy and Environment",
+      "School of Law",
+      "College of Engineering",
+      "College of Liberal Arts and Social Sciences"
+    ],
+    "acceptance_rate": 0.32,
+    "average_admitted_score": 19.5,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "The Hong Kong Baptist University",
+    "name_zh": "香港浸會大學",
+    "type": "UNIVERSITY",
+    "location": "Kowloon Tong, Kowloon",
+    "website": "https://www.hkbu.edu.hk",
+    "description": "Founded in 1956, HKBU is a liberal arts-oriented university with a Christian heritage, known for its strengths in communication, film, Chinese medicine, and social work. It emphasises whole-person education.",
+    "minimum_entry_score": 13,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "2"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": {"ielts_minimum": 5.5},
+    "notable_programs": ["Communication Studies", "Film", "Chinese Medicine", "Social Work", "Business Administration", "Music"],
+    "faculties": [
+      "Faculty of Arts",
+      "Faculty of Business",
+      "Faculty of Communication",
+      "Faculty of Science",
+      "Faculty of Social Sciences",
+      "School of Chinese Medicine",
+      "Academy of Music"
+    ],
+    "acceptance_rate": 0.40,
+    "average_admitted_score": 17.5,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "Lingnan University",
+    "name_zh": "嶺南大學",
+    "type": "UNIVERSITY",
+    "location": "Tuen Mun, New Territories",
+    "website": "https://www.ln.edu.hk",
+    "description": "Hong Kong's only liberal arts university, Lingnan traces its roots to 1888 and emphasises small class sizes, an interdisciplinary approach, and community engagement. It offers programmes across arts, business, and social sciences.",
+    "minimum_entry_score": 12,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": {"ielts_minimum": 5.5},
+    "notable_programs": ["Liberal Arts", "Business Administration", "Social Sciences", "Cultural Studies", "Political Science"],
+    "faculties": [
+      "Faculty of Arts",
+      "Faculty of Business",
+      "Faculty of Social Sciences"
+    ],
+    "acceptance_rate": 0.45,
+    "average_admitted_score": 15.5,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "The Education University of Hong Kong",
+    "name_zh": "香港教育大學",
+    "type": "UNIVERSITY",
+    "location": "Tai Po, New Territories",
+    "website": "https://www.eduhk.hk",
+    "description": "Established in 1994 (formerly Hong Kong Institute of Education), EdUHK is the sole teacher education-focused university in Hong Kong. It has expanded to offer a wider range of programmes including sports science, counselling, and arts.",
+    "minimum_entry_score": 12,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "2"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": {"ielts_minimum": 5.5},
+    "notable_programs": ["Primary Education", "Early Childhood Education", "Special Education", "Counselling", "Sports Science", "Creative Arts and Culture"],
+    "faculties": [
+      "Faculty of Education and Human Development",
+      "Faculty of Humanities",
+      "Faculty of Liberal Arts and Social Sciences",
+      "Faculty of Science and Technology"
+    ],
+    "acceptance_rate": 0.50,
+    "average_admitted_score": 15.0,
+    "scholarship_available": true,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "Hong Kong Community College",
+    "name_zh": "香港專上學院",
+    "type": "COMMUNITY_COLLEGE",
+    "location": "Multiple campuses, Hong Kong",
+    "website": "https://www.hkcc.polyu.edu.hk",
+    "description": "HKCC is the community college arm of The Hong Kong Polytechnic University, offering two-year associate degree programmes designed to provide a pathway to degree studies. It has campuses in Hung Hom, Mongkok, and Tsuen Wan.",
+    "minimum_entry_score": 8,
+    "required_subjects": [
+      {"code": "CHLA", "min_grade": "1"},
+      {"code": "ENGL", "min_grade": "2"},
+      {"code": "MATH", "min_grade": "1"},
+      {"code": "CSD", "min_grade": "1"}
+    ],
+    "language_requirements": null,
+    "notable_programs": ["Business Management", "Computing Studies", "Hotel Operations Management", "Nursing Studies", "Social Work", "Media and Communication"],
+    "faculties": [
+      "School of Business",
+      "School of Computing and Information Sciences",
+      "School of Creative Industries",
+      "School of Health Sciences",
+      "School of Social Sciences"
+    ],
+    "acceptance_rate": 0.70,
+    "average_admitted_score": 10.0,
+    "scholarship_available": false,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  },
+  {
+    "name": "Vocational Training Council",
+    "name_zh": "職業訓練局",
+    "type": "VOCATIONAL",
+    "location": "Multiple campuses across Hong Kong",
+    "website": "https://www.vtc.edu.hk",
+    "description": "VTC is Hong Kong's largest vocational and professional education and training provider, established in 1982. Through its member institutions including IVE and THEi, it offers craft, technician, and higher diploma programmes across a broad range of industries.",
+    "minimum_entry_score": null,
+    "required_subjects": [],
+    "language_requirements": null,
+    "notable_programs": ["Engineering Technology", "Information Technology", "Hospitality and Tourism", "Design", "Multimedia", "Hair and Beauty", "Health Sciences"],
+    "faculties": [
+      "Institute of Vocational Education (IVE)",
+      "Technological and Higher Education Institute of Hong Kong (THEi)",
+      "Hong Kong Design Institute (HKDI)",
+      "Hotel and Tourism Institute (HTI)",
+      "Youth College"
+    ],
+    "acceptance_rate": 0.85,
+    "average_admitted_score": null,
+    "scholarship_available": false,
+    "data_source": "training_knowledge",
+    "data_last_updated": "2024-01-01",
+    "confidence_level": "estimated_from_training_data"
+  }
+]

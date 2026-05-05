@@ -184,11 +184,55 @@ The probability is clamped to [1%, 99%] to avoid overconfidence.
 
 4. **HSUHK data is estimated** — HSUHK is an SSSDP institution not covered by the JUPAS 9-institution PDF. Scores and weights are estimates.
 
-5. **Normal distribution assumption** — the probability mapping assumes admission scores are normally distributed. Real distributions may be skewed, especially for very competitive programmes.
+5. ~~**Normal distribution assumption**~~ **RESOLVED** — replaced with piecewise linear interpolation between known quantiles + exponential decay tails. Zero distribution assumption. Purely data-driven. For competitive programmes with tight admission bands (e.g., HKU Medicine UQ-LQ = 3 points), 1 point now correctly makes a larger difference than for wide-band programmes.
 
 6. **Year-to-year variation** — a programme's median can shift 2-5 points between years depending on cohort quality and applicant numbers. We use the most recent year available.
 
 7. **Band choice effects** — JUPAS allows students to rank programmes in preference bands. A student's band choice affects their admission chances but is not modelled here.
+
+8. **Non-academic factors (nebulous effect)** — extracurricular activities, awards, community service, personal statement, and leadership experience have a real but unquantifiable effect on admission chances. These factors:
+   - Are considered by admissions committees alongside grades
+   - Have no published statistical weight or formula
+   - Vary by programme (Medicine values hospital volunteering; Film values portfolio)
+   - Are currently surfaced ONLY in the LLM-generated advisory language (action plans, consultancy notes) — not in the statistical probability model
+   - **Future work**: if sufficient outcome data becomes available, these factors could be incorporated as adjustment modifiers to the base probability. For now, the probability represents the grade-based statistical position only, and advisors should use professional judgment to adjust expectations based on non-academic profile strength.
+
+---
+
+## Programme Tiers
+
+Each programme is classified by competitiveness based on 2025 median admission score:
+
+| Tier | Median Threshold | Count | Examples |
+|------|-----------------|-------|----------|
+| **Elite** | >= 40 | 94 | HKU Medicine (44), HKU BBA Law (46), CUHK Medicine (40.5), HKU Quantitative Finance (49) |
+| **Competitive** | 30–39 | 85 | HKU BBA (37), CUHK Computer Science (36), HKUST Data Science (36), CityU Law (35) |
+| **Moderate** | 22–29 | 123 | CityU BBA Accountancy (22), HKBU Communication (23), EdUHK Primary Education (25) |
+| **Accessible** | < 22 | 67 | HKMU Social Work (16), HSUHK Computing (15.5), Lingnan Philosophy (20) |
+
+Tiers are stored in `programme.tier` and returned in scorer output. They serve as:
+- Quick-glance competitiveness indicator for consultants
+- Context for probability interpretation (50% at an elite programme means more than 50% at an accessible one — the student is in a stronger absolute position)
+- Grouping for UI display and danger flag prioritisation
+
+---
+
+## Non-Academic Factors (Nebulous Effect Note)
+
+The current system models admission probability using **grade-based statistical data only**. However, real JUPAS admission decisions also consider:
+
+- **Extracurricular activities** — sports, clubs, community service, leadership roles
+- **Awards and achievements** — olympiad medals, competitions, published work
+- **Personal statement / SLP** — Student Learning Profile submitted to JUPAS
+- **Interviews** — required by Medicine, Law, some Education programmes
+- **Portfolios** — required by Design, Film, Architecture, Visual Arts
+- **Band choice** — the student's preference ranking affects admission priority
+
+These factors have a **real but unquantifiable effect**. They are currently handled by:
+1. The **LLM advisory layer** — mentions relevant extracurriculars in action plans and consultancy notes
+2. The **consultant's professional judgment** — uses the statistical probability as a baseline and adjusts based on knowledge of the student's full profile
+
+The probability shown in the UI should be understood as: "based on grades alone, this is where you sit." A student with strong non-academic factors may outperform their grade-based probability, and vice versa.
 
 ---
 

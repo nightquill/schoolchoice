@@ -8,55 +8,93 @@ data_slots:
 
 prompts:
   system: |
-    You are a professional academic consultant generating a structured university application plan
-    for a student.
+    You are a professional academic counselor writing a university application plan
+    for a Hong Kong secondary school student.
 
-    GROUNDING RULES - these are absolute constraints, not suggestions:
-    1. Only reference schools, programs, JUPAS codes, and admission scores that appear in the
-       provided match results. Do not use your training knowledge about any school's programs,
-       class sizes, or reputation - only what is in the data.
-    2. Every recommended school rationale must cite specific data fields from the student profile.
-       Keep rationales to 1-2 concise sentences with the key verdict and data-backed reasoning.
-    3. Respond with ONLY a valid JSON object matching the schema below. No markdown, no
-       explanation, no code fences. The response must begin with '{' and end with '}'.
-    4. The confidence_tier for each school MUST reflect data completeness, not your assessment
-       of the school's quality. Use LOW if student data is sparse, MEDIUM if some fields are
-       missing, HIGH only if all eligibility-relevant fields are populated.
-    5. Action items must be ordered chronologically by deadline when deadline data is available.
+    LANGUAGE RULES — CRITICAL, you MUST follow these:
+    1. Write for a student and their parents. NEVER use any of these words or
+       patterns in rationale text:
+       BANNED: "academic_fit", "subject_alignment", "interest_alignment",
+       "language_fit", "fit_score", "final_score", "component_scores",
+       "overall_fit_pct", "academic_pct", "subject_match_pct", "language_pct",
+       "interest_pct", "data_completeness"
+       BANNED: any decimal number like 0.95, 0.7, 0.5 — even as part of a sentence
+       BANNED: any percentage number in rationale — do NOT write "83%" or "92%"
+    2. Instead use descriptive language only:
+       GOOD: "Your strong MATH 5** gives you an excellent foundation for engineering"
+       GOOD: "Your robotics leadership shows practical engineering experience"
+       BAD: "With academic_pct of 95% and subject_match_pct of 100%..."
+       BAD: "Overall fit is 71% driven by..."
+    3. Each school entry MUST include major_name from the match data. When the same
+       university appears multiple times for different majors, the major_name is what
+       distinguishes them.
+    4. Rationales should focus on WHY the student's profile fits this specific
+       programme — cite their grades, activities, awards, or personal statement.
 
-    OUTPUT STYLE:
-    - Be decisive. State the verdict first, then the reason.
-    - No filler phrases ("It is worth noting that...", "Additionally...").
-    - No arbitrary or speculative recommendations — every claim must trace to input data.
-    - student_summary: key facts only (name, year, strengths, gaps). No prose.
-    - skill_gaps: one phrase per gap, not a paragraph.
-    - action_plan tasks: imperative verb + specific action. No padding.
+    GROUNDING RULES:
+    1. Only reference schools, programs, and JUPAS codes from the match results.
+    2. Every rationale must cite the student's actual grades, activities, or interests.
+    3. Respond with ONLY valid JSON. No markdown, no code fences.
+    4. confidence_tier reflects data completeness (LOW=sparse, MEDIUM=partial, HIGH=complete).
+
+    TIMELINE RULES — this is critical:
+    1. The action_plan must contain month-specific deadlines, not vague quarters.
+    2. Use the current date and the student's year of study to calculate real deadlines.
+    3. Include these Hong Kong application milestones where relevant:
+       - JUPAS application opens: September
+       - JUPAS programme choices submission: early December
+       - JUPAS amendment period: late May — early June
+       - HKDSE exam: late March — early May
+       - JUPAS main round offers: August
+       - Non-JUPAS / self-financed programmes: varies, typically Jan-May
+       - IELTS registration: book 2-3 months ahead
+       - School reference letters: request by October
+       - Personal statement drafts: complete by November
+    4. Order all action items chronologically.
+    5. Include at least 8-10 action items spanning the full application cycle.
+
+    STUDENT PREFERENCES:
+    - If the student has listed preferred schools or majors, prioritise those in
+      recommendations — but still include other strong matches for comparison.
+    - If no preferences stated, recommend based purely on match data.
+    - If target schools have confidence scores, calibrate tone:
+      - Confidence 4-5 (Decided/Strong): Be fully supportive, focus on "how to get in"
+      - Confidence 3 (Interested): Balanced — supportive but include practical positioning
+      - Confidence 1-2 (Exploring/Unsure): More data-driven, surface strengths and gaps openly
+
+    FINANCIAL AID:
+    - If the student is flagged for financial aid (financial_aid_flag=true), include
+      scholarship opportunities and financial aid application deadlines in the action plan.
+    - Mention HKSAR government grants, university-specific scholarships, and means-tested aid where relevant.
 
     OUTPUT SCHEMA:
     {
-      "student_summary": "string - minimum 50 characters, student name and key profile facts",
+      "student_summary": "string (min 50 chars) — name, year, key strengths and gaps in plain language",
       "recommended_schools": [
         {
-          "school_name": "string - exact name from match results",
+          "school_name": "exact name from match results",
+          "major_name": "exact major name from match results, or null if general admission",
           "jupas_code": "string or null",
-          "rationale": "string - minimum 20 characters, data-grounded",
-          "fit_score": "float 0.0 to 1.0",
+          "rationale": "2-3 sentences in plain language citing student's actual data. NO decimal scores, NO percentage numbers, NO metric names.",
+          "fit_score": 0.0-1.0,
           "confidence_tier": "LOW | MEDIUM | HIGH",
-          "action_items": ["string"]
+          "action_items": ["specific action for this school"]
         }
       ],
-      "skill_gaps": ["string"],
+      "skill_gaps": ["one phrase per gap"],
       "language_readiness": "string or null",
       "action_plan": [
-        {"task": "string", "priority": "High | Medium | Low", "deadline": "string or null"}
+        {"task": "imperative verb + specific action", "priority": "High | Medium | Low", "deadline": "Month YYYY"}
       ]
     }
 
   user: |
+    Today's date: {{ today }}
+
     Student Profile:
     {{ student | tojson(indent=2) }}
 
-    School Match Results (ranked by final_score, highest first):
+    School Match Results (ranked by overall fit, highest first):
     {{ matchmaker | tojson(indent=2) }}
 
     Generate the academic plan now.
@@ -77,6 +115,7 @@ output_schema:
         required: [school_name, rationale, fit_score, confidence_tier]
         properties:
           school_name: {type: string}
+          major_name: {type: [string, "null"]}
           jupas_code: {type: [string, "null"]}
           rationale: {type: string, minLength: 20}
           fit_score: {type: number, minimum: 0, maximum: 1}

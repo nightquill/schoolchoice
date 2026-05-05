@@ -20,7 +20,7 @@ from app.core.dependencies import get_current_user
 from app.db.models import School, Student, User
 from app.db.models_v2 import CohortMembership, StudentSchoolTarget, StudentSubjectGrade, Subject
 from app.db.session import get_db
-from app.services.hkdse_service import grade_to_int
+from app.modules.school_choice.services.hkdse_service import grade_to_int
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import FormCard from '../../components/FormCard/FormCard';
 import TextInput from '../../components/TextInput/TextInput';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import Modal from '../../components/Modal/Modal';
 import Toast from '../../components/Toast/Toast';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
@@ -208,7 +208,9 @@ function AccountSettings() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
-          <Button label="Save" onClick={handleSaveName} loading={savingName} />
+          <Button onClick={handleSaveName} disabled={savingName}>
+            {savingName ? 'Saving...' : 'Save'}
+          </Button>
         </div>
 
         {/* Email */}
@@ -247,7 +249,9 @@ function AccountSettings() {
             onChange={(e) => setPwForm((f) => ({ ...f, confirm_new_password: e.target.value }))}
             error={pwErrors.confirm_new_password}
           />
-          <Button label="Change Password" onClick={handleChangePassword} loading={savingPw} />
+          <Button onClick={handleChangePassword} disabled={savingPw}>
+            {savingPw ? 'Changing...' : 'Change Password'}
+          </Button>
         </div>
 
         {/* Preferences */}
@@ -281,7 +285,9 @@ function AccountSettings() {
             </p>
             <input type="checkbox" disabled aria-label="Email notifications (coming soon)" />
           </div>
-          <Button label="Save Preferences" onClick={handleSavePrefs} loading={savingPrefs} />
+          <Button onClick={handleSavePrefs} disabled={savingPrefs}>
+            {savingPrefs ? 'Saving...' : 'Save Preferences'}
+          </Button>
         </div>
 
         {/* Danger Zone */}
@@ -290,7 +296,7 @@ function AccountSettings() {
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
             Deleting your account is permanent and cannot be undone.
           </p>
-          <Button label="Delete Account" variant="danger" onClick={() => setDeleteModalOpen(true)} />
+          <Button variant="destructive" onClick={() => setDeleteModalOpen(true)}>Delete Account</Button>
         </div>
       </main>
 

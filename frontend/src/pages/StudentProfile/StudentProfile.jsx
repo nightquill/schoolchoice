@@ -110,15 +110,8 @@ function StudentProfile() {
     }
   };
 
-  const handleGeneratePlan = async () => {
-    setGeneratingPlan(true);
-    try {
-      await generatePlan(id);
-      navigate(`/students/${id}/plan`);
-    } catch {
-      toast.error('Failed to start plan generation.');
-      setGeneratingPlan(false);
-    }
+  const handleGeneratePlan = () => {
+    navigate(`/students/${id}/consultant?generate=true`);
   };
 
   return (
@@ -165,7 +158,7 @@ function StudentProfile() {
             </div>
           </div>
 
-          <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <Tabs value={activeTab} onValueChange={handleTabChange} style={{ flexDirection: 'column' }}>
             <div className="overflow-x-auto whitespace-nowrap" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
               <TabsList variant="line" className="w-full justify-start" aria-label="Student profile sections">
                 {TABS.map((tab) => (
@@ -174,7 +167,7 @@ function StudentProfile() {
               </TabsList>
             </div>
 
-            <div className="px-4 md:px-8" style={{ maxWidth: '960px', margin: '0 auto' }}>
+            <div className="px-4 md:px-8" style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
               <TabsContent value="personal">
                 <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
               </TabsContent>

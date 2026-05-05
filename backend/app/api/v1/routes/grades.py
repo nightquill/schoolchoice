@@ -23,7 +23,7 @@ from app.schemas.v2.grades import (
     SubjectGradeUpdate,
 )
 from app.services import student_service
-from app.services.hkdse_service import compute_predicted_grade
+from app.modules.school_choice.services.hkdse_service import compute_predicted_grade
 
 router = APIRouter(prefix="/students", tags=["grades-v2"])
 
@@ -153,21 +153,31 @@ def create_grade(
 
     # Resolve subject_name → subject_id when subject_id not provided
     if payload.subject_id is None and payload.subject_name:
+        # Exact match first
         subject = (
             db.query(Subject)
             .filter(Subject.name == payload.subject_name)
             .first()
         )
+        # Fuzzy match: name starts with the provided name (e.g. "Mathematics" → "Mathematics (Compulsory Part)")
         if not subject:
-            # Auto-create subject if it doesn't exist (supports unseeded DBs)
-            subject = Subject(
-                name=payload.subject_name,
-                code=payload.subject_name[:10].upper().replace(" ", ""),
-                category="elective",
-                is_compulsory=False,
+            subject = (
+                db.query(Subject)
+                .filter(Subject.name.ilike(f"{payload.subject_name}%"))
+                .first()
             )
-            db.add(subject)
-            db.flush()
+        # Also try matching by code (e.g. "MATH", "ENGL")
+        if not subject:
+            subject = (
+                db.query(Subject)
+                .filter(Subject.code == payload.subject_name.upper().strip())
+                .first()
+            )
+        if not subject:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Subject '{payload.subject_name}' not found. Use the exact subject name or code from GET /grades/subjects.",
+            )
         payload = payload.model_copy(update={"subject_id": subject.id})
     elif payload.subject_id is None:
         raise HTTPException(

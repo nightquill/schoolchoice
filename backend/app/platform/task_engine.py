@@ -24,7 +24,7 @@ from app.core.ai_service import call_ai
 
 logger = logging.getLogger(__name__)
 
-MAX_RETRIES = 2  # total attempts = 3 (initial + 2 retries)
+MAX_RETRIES = 1  # total attempts = 2 (initial + 1 retry) — minimize LLM calls
 
 # PII field names that must NEVER enter an AI prompt (T-05-02 mitigation)
 PII_BLOCKLIST = frozenset([
@@ -89,6 +89,10 @@ class TaskEngine:
         Raises ValueError if prompt contains PII fields or exceeds max_context_tokens after truncation.
         """
         context = self._resolve_data_slots(task.data_slots, entity_id, db)
+
+        # Add today's date for timeline generation
+        from datetime import date
+        context["today"] = date.today().isoformat()
 
         env = Environment(loader=BaseLoader())
         system_prompt = env.from_string(task.system_prompt_template).render(**context)
@@ -267,20 +271,104 @@ class TaskEngine:
         student = db.query(Student).filter(Student.id == student_id).first()
         if not student:
             raise ValueError(f"Student {student_id} not found")
+
+        # Build grades_by_code from subject_grades relationship
+        grades_by_code = {}
+        grade_records = getattr(student, "subject_grades") or []
+        for g in grade_records:
+            from app.db.models_v2 import Subject
+            subject = db.query(Subject).filter(Subject.id == g.subject_id).first()
+            if subject:
+                grades_by_code[subject.code] = g.raw_grade or g.predicted_grade or "U"
+
+        # Teacher evaluations
+        teacher_evals = getattr(student, "teacher_evaluation", None) or []
+
+        # Target schools with preference confidence
+        from app.db.models_v2 import StudentSchoolTarget
+        from app.db.models import School
+        targets = db.query(StudentSchoolTarget).filter(
+            StudentSchoolTarget.student_id == student.id
+        ).order_by(StudentSchoolTarget.student_rank.asc().nulls_last()).all()
+
+        target_schools = []
+        for t in targets:
+            school = db.query(School).filter(School.id == t.school_id).first()
+            if school:
+                confidence = getattr(t, "preference_confidence", 3) or 3
+                target_schools.append({
+                    "school_name": school.name,
+                    "student_rank": t.student_rank,
+                    "confidence": confidence,
+                    "confidence_label": {5: "Decided", 4: "Strong preference", 3: "Interested", 2: "Exploring", 1: "Unsure"}.get(confidence, "Interested"),
+                    "status": t.status or "CONSIDERING",
+                })
+
         return {
             "name": student.name,
+            "grades_by_code": grades_by_code,
+            "interests": student.interests or [],
+            "strengths_weaknesses": student.strengths_weaknesses or "",
+            "target_region": student.target_region or "local",
             "year_of_study": getattr(student, "year_of_study", None),
             "ielts_score": getattr(student, "ielts_score", None),
+            "personal_statement": getattr(student, "personal_statement", None),
             "extra_curricular": getattr(student, "extra_curricular", None) or [],
             "awards": getattr(student, "awards", None) or [],
+            "teacher_evaluations": teacher_evals,
+            "financial_aid_flag": getattr(student, "financial_aid_flag", False),
+            "target_schools": target_schools,
         }
 
     def _load_matchmaker_results(self, student_id: str, db: Session) -> list:
         """Run matchmaker and convert results to dicts for Jinja2 template rendering."""
+        from app.api.v1.routes.match import _build_student_data, _build_school_dict
+        from app.modules.school_choice.models.models import Student
+        from app.db.models import School
+        from app.db.models_v2 import StudentSchoolTarget
         from app.modules.school_choice.services.matchmaker_v2 import run_matching
 
-        results = run_matching(student_id, db)
-        return [vars(r) if hasattr(r, "__dict__") else r for r in results]
+        student = db.query(Student).filter(Student.id == student_id).first()
+        if not student:
+            raise ValueError(f"Student {student_id} not found")
+
+        student_data = _build_student_data(student, db)
+        all_schools = db.query(School).all()
+        school_dicts = [_build_school_dict(s) for s in all_schools]
+
+        existing_targets = (
+            db.query(StudentSchoolTarget)
+            .filter(StudentSchoolTarget.student_id == student_id)
+            .all()
+        )
+        target_dicts = [
+            {"school_id": str(t.school_id), "student_rank": t.student_rank}
+            for t in existing_targets
+        ]
+
+        results = run_matching(student_data, school_dicts, target_dicts)
+
+        # Simplify for LLM context — translate raw decimals to percentages,
+        # remove internal field names that leak into AI rationales
+        simplified = []
+        for r in results:
+            d = vars(r) if hasattr(r, "__dict__") else dict(r)
+            comp = d.get("component_scores") or {}
+            simplified.append({
+                "school_name": d.get("school_name"),
+                "major_name": d.get("major_name"),
+                "major_jupas_code": d.get("major_jupas_code"),
+                "eligible": d.get("eligibility_pass", False),
+                "failing_reasons": d.get("failing_criteria", []),
+                "overall_fit_pct": round((d.get("final_score") or 0) * 100),
+                "academic_pct": round(comp.get("academic_fit", 0) * 100),
+                "subject_match_pct": round(comp.get("subject_alignment", 0) * 100),
+                "language_pct": round(comp.get("language_fit", 0) * 100),
+                "interest_pct": round(comp.get("interest_alignment", 0) * 100),
+                "rationale": d.get("rationale", ""),
+                "data_completeness_pct": round((d.get("data_completeness") or 0) * 100),
+            })
+        return simplified
 
     @classmethod
     def validate_all_task_yamls(cls) -> list[str]:

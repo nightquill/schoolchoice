@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import './index.css'
 import './utils/tokens.css'
 import { AuthProvider } from './context/AuthContext'
 import { Toaster } from '@/components/ui/sonner'

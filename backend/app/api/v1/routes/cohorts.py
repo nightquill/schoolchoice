@@ -34,7 +34,7 @@ from app.schemas.v2.cohorts import (
     StudentSearchResult,
     SubjectStatEntry,
 )
-from app.services.hkdse_service import grade_to_int
+from app.modules.school_choice.services.hkdse_service import grade_to_int
 
 router = APIRouter(prefix="/cohorts", tags=["cohorts"])
 

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
@@ -265,7 +265,7 @@ function CohortDetail() {
                 </p>
               )}
             </div>
-            <Button label="Add Students" variant="primary" onClick={() => setAddModalOpen(true)} />
+            <Button onClick={() => setAddModalOpen(true)}>Add Students</Button>
           </div>
 
           <div style={containerStyle}>
@@ -416,7 +416,9 @@ function CohortDetail() {
               style={{ ...inputStyle, flex: '1 1 60px' }}
               aria-label="Filter by year"
             />
-            <Button label="Search" onClick={handleSearch} loading={searchLoading} />
+            <Button onClick={handleSearch} disabled={searchLoading}>
+              {searchLoading ? 'Searching...' : 'Search'}
+            </Button>
           </div>
 
           {searchResults.length === 0 && !searchLoading && (

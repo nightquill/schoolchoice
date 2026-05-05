@@ -1,0 +1,1 @@
+/Users/bsg/Downloads/schoolchoice/.agents/skills/setup-matt-pocock-skills//SKILL.md

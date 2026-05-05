@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { login as apiLogin } from '../../api/auth';
 import FormCard from '../../components/FormCard/FormCard';
 import TextInput from '../../components/TextInput/TextInput';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 
 function LoginPage() {
@@ -109,13 +109,9 @@ function LoginPage() {
           />
           {error && <ErrorMessage message={error} />}
           <div style={{ marginTop: 'var(--space-4)' }}>
-            <Button
-              label="Log In"
-              variant="primary"
-              onClick={handleSubmit}
-              loading={loading}
-              disabled={loading}
-            />
+            <Button className="w-full text-base py-5" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Logging in...' : 'Log In'}
+            </Button>
           </div>
           <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
             No account?{' '}

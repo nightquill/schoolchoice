@@ -6,7 +6,7 @@ import StudentForm from '../../components/StudentForm/StudentForm';
 import ActionPlanDisplay from '../../components/ActionPlanDisplay/ActionPlanDisplay';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { getStudent, updateStudent } from '../../api/students';
 import { generateRecommendations } from '../../api/recommendations';
 import { generateActionPlan, getActionPlan } from '../../api/actionPlan';
@@ -293,26 +293,15 @@ function StudentDetailPage() {
             {actionError && <ErrorMessage message={actionError} />}
 
             <div style={buttonRowStyle}>
-              <Button
-                label="Edit Student"
-                variant="secondary"
-                onClick={() => { setIsEditing(true); setActionError(''); }}
-                disabled={anyLoading}
-              />
-              <Button
-                label="Generate Recommendations"
-                variant="primary"
-                onClick={handleGenerateRecommendations}
-                loading={genLoading}
-                disabled={anyLoading}
-              />
-              <Button
-                label="Generate Action Plan"
-                variant="secondary"
-                onClick={handleGenerateActionPlan}
-                loading={actionPlanLoading}
-                disabled={anyLoading}
-              />
+              <Button variant="outline" onClick={() => { setIsEditing(true); setActionError(''); }} disabled={anyLoading}>
+                Edit Student
+              </Button>
+              <Button onClick={handleGenerateRecommendations} disabled={anyLoading}>
+                {genLoading ? 'Generating...' : 'Generate Recommendations'}
+              </Button>
+              <Button variant="outline" onClick={handleGenerateActionPlan} disabled={anyLoading}>
+                {actionPlanLoading ? 'Generating...' : 'Generate Action Plan'}
+              </Button>
             </div>
 
             {actionPlan && (

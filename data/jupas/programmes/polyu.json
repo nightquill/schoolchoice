@@ -62,7 +62,8 @@
           "upper_quartile": 184,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3220",
@@ -104,7 +105,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3250",
@@ -149,7 +151,8 @@
           "upper_quartile": 168.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3214",
@@ -191,7 +194,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3140",
@@ -240,7 +244,8 @@
           "upper_quartile": 206,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3150",
@@ -293,7 +298,8 @@
           "upper_quartile": 238,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3011",
@@ -342,7 +348,8 @@
           "upper_quartile": 202,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3791",
@@ -384,7 +391,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3211",
@@ -426,7 +434,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3003",
@@ -468,7 +477,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3320",
@@ -517,7 +527,8 @@
           "upper_quartile": 200,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3739",
@@ -559,7 +570,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3006",
@@ -601,7 +613,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3868",
@@ -654,7 +667,8 @@
           "upper_quartile": 195,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3004",
@@ -696,7 +710,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3223",
@@ -738,7 +753,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3569",
@@ -780,7 +796,8 @@
           "upper_quartile": 149.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3170",
@@ -829,7 +846,8 @@
           "upper_quartile": 199,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3005",
@@ -871,7 +889,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3240",
@@ -920,7 +939,8 @@
           "upper_quartile": 176.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3375",
@@ -962,7 +982,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3050",
@@ -1004,7 +1025,8 @@
           "upper_quartile": 175.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3255",
@@ -1046,7 +1068,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3070",
@@ -1095,7 +1118,8 @@
           "upper_quartile": 171.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3310",
@@ -1144,7 +1168,8 @@
           "upper_quartile": 156.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3007",
@@ -1186,7 +1211,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3180",
@@ -1235,7 +1261,8 @@
           "upper_quartile": 207,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3237",
@@ -1277,7 +1304,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3080",
@@ -1326,7 +1354,8 @@
           "upper_quartile": 180.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3741",
@@ -1375,7 +1404,8 @@
           "upper_quartile": 196,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3478",
@@ -1420,7 +1450,8 @@
           "upper_quartile": 308,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3337",
@@ -1465,7 +1496,8 @@
           "upper_quartile": 204.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3648",
@@ -1510,7 +1542,8 @@
           "upper_quartile": 219.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3624",
@@ -1555,7 +1588,8 @@
           "upper_quartile": 312.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3290",
@@ -1600,7 +1634,8 @@
           "upper_quartile": 275,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3030",
@@ -1649,7 +1684,8 @@
           "upper_quartile": 226,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3636",
@@ -1694,7 +1730,8 @@
           "upper_quartile": 302,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3236",
@@ -1736,7 +1773,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3612",
@@ -1781,7 +1819,8 @@
           "upper_quartile": 321.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3008",
@@ -1823,7 +1862,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3130",
@@ -1872,7 +1912,8 @@
           "upper_quartile": 208.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3242",
@@ -1914,7 +1955,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3789",
@@ -1956,7 +1998,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS3241",
@@ -1998,7 +2041,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF",
           "note": "PolyU scores are weighted (scale factor applied); not directly comparable to other universities"
         }
-      }
+      },
+      "tier": "elite"
     }
   ]
 }

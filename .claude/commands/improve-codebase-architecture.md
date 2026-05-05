@@ -1,0 +1,1 @@
+/Users/bsg/Downloads/schoolchoice/.agents/skills/improve-codebase-architecture//SKILL.md

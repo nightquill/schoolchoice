@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { register as apiRegister, login as apiLogin } from '../../api/auth';
 import FormCard from '../../components/FormCard/FormCard';
 import TextInput from '../../components/TextInput/TextInput';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 
 function RegisterPage() {
@@ -80,13 +80,9 @@ function RegisterPage() {
           />
           {error && <ErrorMessage message={error} />}
           <div style={{ marginTop: 'var(--space-4)' }}>
-            <Button
-              label="Create Account"
-              variant="primary"
-              onClick={handleSubmit}
-              loading={loading}
-              disabled={loading}
-            />
+            <Button className="w-full text-base py-5" onClick={handleSubmit} disabled={loading}>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Button>
           </div>
           <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
             Already have an account?{' '}

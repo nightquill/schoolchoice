@@ -43,6 +43,31 @@ _INT_TO_GRADE: dict[int, str] = {
 COMPULSORY_CODES: set[str] = {"CHLA", "ENGL", "MATH", "CSD"}
 APL_CATEGORY: str = "APPLIED_LEARNING"
 
+# ---------------------------------------------------------------------------
+# Letter-grade scale (US-style A–F, used by legacy matching & action plan)
+# ---------------------------------------------------------------------------
+
+LETTER_GRADE_MAP: dict[str, float] = {
+    "a+": 100, "a": 95, "a-": 90,
+    "b+": 87, "b": 83, "b-": 80,
+    "c+": 77, "c": 73, "c-": 70,
+    "d+": 67, "d": 63, "d-": 60,
+    "f": 0,
+}
+
+
+def letter_grade_to_numeric(grade_value) -> float:
+    """
+    Convert a grade value (int, float, or US letter string) to a 0-100 float.
+    Used by the legacy matching engine and action plan service.
+    For HKDSE grades (5**/5*/5/4/3/2/1/U), use grade_to_int() instead.
+    """
+    if isinstance(grade_value, (int, float)):
+        return float(grade_value)
+    if isinstance(grade_value, str):
+        return LETTER_GRADE_MAP.get(grade_value.strip().lower(), 0.0)
+    return 0.0
+
 
 def grade_to_int(grade: str) -> int:
     """Convert HKDSE grade string to numeric value. Returns 0 for unknown."""

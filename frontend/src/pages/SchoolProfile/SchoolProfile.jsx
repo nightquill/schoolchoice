@@ -6,7 +6,7 @@ import Modal from '../../components/Modal/Modal';
 import Toast from '../../components/Toast/Toast';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import FormCard from '../../components/FormCard/FormCard';
 import { useToast } from '../../hooks/useToast';
 import { getSchoolV2 } from '../../api/schoolsV2';
@@ -354,17 +354,14 @@ function SchoolProfile() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 {addedToTarget ? (
-                  <Button label="Already in Target List" disabled variant="secondary" />
+                  <Button disabled variant="outline">Already in Target List</Button>
                 ) : (
-                  <Button
-                    label={fromStudentId ? `Add to Target List` : 'Select Student & Add'}
-                    variant="primary"
-                    onClick={handleAddToTarget}
-                    loading={addingTarget}
-                  />
+                  <Button onClick={handleAddToTarget} disabled={addingTarget}>
+                    {addingTarget ? 'Adding...' : (fromStudentId ? 'Add to Target List' : 'Select Student & Add')}
+                  </Button>
                 )}
                 <Link to="/schools">
-                  <Button label="Back to Directory" variant="secondary" />
+                  <Button variant="outline">Back to Directory</Button>
                 </Link>
               </div>
             </div>

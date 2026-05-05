@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_current_user
 from app.db.models import School, User
 from app.db.session import get_db
-from app.schemas.v2.schools_v2 import SchoolV2Response
+from app.schemas.v2.schools_v2 import SchoolCreateRequest, SchoolV2Response
 
 router = APIRouter(prefix="/schools", tags=["schools-v2"])
 
@@ -56,7 +56,8 @@ def search_schools(
         query = query.filter(School.minimum_entry_score <= max_score)
 
     total = query.count()
-    schools = query.order_by(School.name).offset(offset).limit(limit).all()
+    # Sort canonical schools first (is_custom=False), then alphabetically
+    schools = query.order_by(School.is_custom.asc(), School.name).offset(offset).limit(limit).all()
     return {
         "items": [SchoolV2Response.model_validate(s) for s in schools],
         "total": total,
@@ -69,25 +70,27 @@ def search_schools(
 
 @router.post("", response_model=SchoolV2Response, status_code=status.HTTP_201_CREATED)
 def create_custom_school(
-    payload: dict,
+    payload: SchoolCreateRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Create a custom school entry."""
     school = School(
-        name=payload.get("name") or "Custom School",
-        name_zh=payload.get("name_zh"),
-        type=payload.get("type", "UNIVERSITY"),
-        location=payload.get("location") or "",
-        description=payload.get("description"),
-        website=payload.get("website"),
-        minimum_entry_score=payload.get("minimum_entry_score"),
-        notable_programs=payload.get("notable_programs") or [],
-        required_subjects=payload.get("required_subjects") or [],
-        language_requirements=payload.get("language_requirements") or {},
-        notes=payload.get("notes"),
+        name=payload.name,
+        name_zh=payload.name_zh,
+        type=payload.type,
+        location=payload.location,
+        description=payload.description,
+        website=payload.website,
+        minimum_entry_score=payload.minimum_entry_score,
+        notable_programs=payload.notable_programs or [],
+        required_subjects=payload.required_subjects or [],
+        language_requirements=payload.language_requirements or {},
+        notes=payload.notes,
         is_custom=True,
-        major_requirements=payload.get("major_requirements"),
+        major_requirements=payload.major_requirements,
+        key_strengths=payload.key_strengths or [],
+        min_academic_requirements=payload.min_academic_requirements or {},
     )
     db.add(school)
     db.commit()

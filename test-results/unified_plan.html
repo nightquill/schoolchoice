@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Academic Plan — Lee Wing Yin</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+  :root {
+    --plan-bg: #ffffff;
+    --plan-heading-color: #1e3a5f;
+    --plan-accent: #1e3a5f;
+    --plan-font-body: Georgia, serif;
+    --plan-font-heading: Georgia, serif;
+    --plan-section-padding: 28px 32px;
+    --plan-section-gap: 32px;
+    --plan-line-height: 1.8;
+    --plan-letter-spacing: 0.01em;
+  }
+  body {
+    background: var(--plan-bg);
+    font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
+    line-height: var(--plan-line-height, 1.6);
+    letter-spacing: var(--plan-letter-spacing, 0);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
+  }
+  .section {
+    padding: var(--plan-section-padding, 24px);
+    margin-bottom: var(--plan-section-gap, 24px);
+  }
+  .section h2 {
+    color: var(--plan-heading-color);
+  }
+  .section h3 {
+    color: var(--plan-heading-color);
+  }
+  .school-card h3 {
+    color: var(--plan-heading-color);
+  }
+  .summary-table th, .data-table th {
+    background: var(--plan-accent);
+  }
+  .header {
+    background: var(--plan-heading-color) !important;
+  }
+</style>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
+      color: #1a1a2e;
+      background: #f8f9fa;
+      line-height: 1.6;
+      padding: 24px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
+    }
+    .header {
+      background: linear-gradient(135deg, #0f3460, #16213e);
+      color: white;
+      padding: 32px 40px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+    }
+    .header h1 { font-size: 28px; margin-bottom: 4px; }
+    .header .subtitle { opacity: 0.8; font-size: 14px; }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .section h2 {
+      font-size: 18px;
+      color: #0f3460;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .section h3 { font-size: 15px; color: #333; margin: 16px 0 8px 0; }
+    .section h4 { font-size: 13px; color: #555; margin: 12px 0 6px 0; }
+    .summary-table, .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .summary-table th, .data-table th {
+      background: #0f3460;
+      color: white;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .summary-table td, .data-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .summary-table tr:nth-child(even) td,
+    .data-table tr:nth-child(even) td { background: #f5f5f5; }
+    .school-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .school-card h3 { color: #0f3460; font-size: 16px; margin-bottom: 8px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+    .badge-pass { background: #d4edda; color: #155724; }
+    .badge-fail { background: #f8d7da; color: #721c24; }
+    .gap-ok td { color: #155724; }
+    .gap-fail td { color: #721c24; }
+    .gap-table { margin-top: 8px; }
+    .action-item { margin: 4px 0; }
+    ul { padding-left: 20px; }
+    li { margin: 4px 0; font-size: 14px; }
+    .priority-high { color: #c0392b; font-weight: bold; }
+    .priority-medium { color: #e67e22; }
+    .priority-low { color: #27ae60; }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-top: 24px;
+      padding: 16px;
+    }
+    @media print {
+      body { background: white; padding: 0; font-size: 12px; }
+      .header { background: #0f3460 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+      .school-card { page-break-inside: avoid; }
+      .badge { border: 1px solid currentColor; }
+      canvas { max-width: 100% !important; }
+    }
+    </style>
+</head>
+<body>
+  <div class="header">
+    <h1>University Academic Plan</h1>
+    <div class="subtitle">Lee Wing Yin &mdash; Generated 2026-04-29 19:22 UTC</div>
+  </div>
+  
+    <section class="section">
+      <h2>1. Student Summary</h2>
+      <table class="summary-table">
+        <tr><th>Name</th><td>Lee Wing Yin</td></tr>
+        <tr><th>Year of Study</th><td>N/A</td></tr>
+        <tr><th>Grade System</th><td>HKDSE</td></tr>
+        <tr><th>Best-5 Aggregate</th><td>22</td></tr>
+      </table>
+    </section>
+    <section class="section" style="border-left: 4px solid #2563eb; background: #eff6ff;">
+      <h2>Counselor Assessment</h2>
+      <p style="font-style: italic; line-height: 1.8;">Lee Wing Yin (STEM-focused, local) with strong Maths/Science grades (MATH 5*, PHYS 5, CSD A/C) and English grade 4; no personal statement, no IELTS, and no extracurricular/awards data provided.</p>
+    </section>
+    <section class="section">
+      <h2>2. Academic Profile</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Subject</th><th>Sitting</th><th>Grade</th>
+            <th>Predicted?</th><th>Predicted Grade</th>
+          </tr>
+        </thead>
+        <tbody><tr><td>Chinese Language</td><td>MOCK</td><td>5</td><td>Yes</td><td>5</td></tr><tr><td>English Language</td><td>MOCK</td><td>4</td><td>Yes</td><td>4</td></tr><tr><td>Mathematics (Compulsory Part)</td><td>MOCK</td><td>5*</td><td>Yes</td><td>5*</td></tr><tr><td>Citizenship and Social Development</td><td>MOCK</td><td>A</td><td>Yes</td><td>A</td></tr><tr><td>Physics</td><td>MOCK</td><td>5</td><td>Yes</td><td>5</td></tr><tr><td>Chemistry</td><td>MOCK</td><td>4</td><td>Yes</td><td>4</td></tr></tbody>
+      </table>
+    </section><section class="section"><h2>3. Recommended Schools</h2>
+        <div class="school-card">
+          <h3>1. City University of Hong Kong <span class="badge badge-pass">ELIGIBLE</span></h3>
+          <p><strong>Fit Score:</strong> 70.9%</p>
+          
+          <p><strong>Why this school fits:</strong> Top match: academic_fit 0.9537 and subject_alignment 1.0 are strong with CHLA/CSD/ENGL/MATH/PHS performance; language_fit is weaker at 0.5 with ENGL grade 4.</p>
+          
+          
+            <h4>Subject Grade Profile</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-grade-1"></canvas>
+            </div>
+            <script id="data-chart-grade-1" type="application/json">{"labels": ["Chinese Language", "English Language", "Mathematics (Compulsory Part)", "Citizenship and Social Development", "Physics", "Chemistry"], "datasets": [{"label": "Your Grade", "data": [5, 4, 6, 2, 5, 4], "backgroundColor": "rgba(59,130,246,0.5)", "borderColor": "rgba(59,130,246,0.9)", "borderWidth": 1}]}</script>
+            <script id="min-chart-grade-1" type="application/json">0</script>
+            <h4>School Fit Radar</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-radar-1"></canvas>
+            </div>
+            <script id="data-chart-radar-1" type="application/json">{"labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"], "datasets": [{"label": "School Fit", "data": [0.0, 0.0, 0.0, 0.0], "backgroundColor": "rgba(99,102,241,0.2)", "borderColor": "rgba(99,102,241,0.9)", "pointBackgroundColor": "rgba(99,102,241,0.9)", "borderWidth": 2}]}</script>
+          
+          <h4>Recommended Actions</h4>
+          <ul><li>Continue current preparation. Apply early.</li></ul>
+        </div>
+        <div class="school-card">
+          <h3>2. City University of Hong Kong <span class="badge badge-pass">ELIGIBLE</span></h3>
+          <p><strong>Fit Score:</strong> 70.9%</p>
+          
+          <p><strong>Why this school fits:</strong> Strong academic alignment (academic_fit 0.9537, subject_alignment 1.0) supports Physics and Astronomy (JS1901), but language_fit remains limited at 0.5 due to ENGL grade 4.</p>
+          
+          
+            <h4>Subject Grade Profile</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-grade-2"></canvas>
+            </div>
+            <script id="data-chart-grade-2" type="application/json">{"labels": ["Chinese Language", "English Language", "Mathematics (Compulsory Part)", "Citizenship and Social Development", "Physics", "Chemistry"], "datasets": [{"label": "Your Grade", "data": [5, 4, 6, 2, 5, 4], "backgroundColor": "rgba(59,130,246,0.5)", "borderColor": "rgba(59,130,246,0.9)", "borderWidth": 1}]}</script>
+            <script id="min-chart-grade-2" type="application/json">0</script>
+            <h4>School Fit Radar</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-radar-2"></canvas>
+            </div>
+            <script id="data-chart-radar-2" type="application/json">{"labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"], "datasets": [{"label": "School Fit", "data": [0.0, 0.0, 0.0, 0.0], "backgroundColor": "rgba(99,102,241,0.2)", "borderColor": "rgba(99,102,241,0.9)", "pointBackgroundColor": "rgba(99,102,241,0.9)", "borderWidth": 2}]}</script>
+          
+          <h4>Recommended Actions</h4>
+          <ul><li>Continue current preparation. Apply early.</li></ul>
+        </div>
+        <div class="school-card">
+          <h3>3. City University of Hong Kong <span class="badge badge-pass">ELIGIBLE</span></h3>
+          <p><strong>Fit Score:</strong> 70.9%</p>
+          
+          <p><strong>Why this school fits:</strong> Best-5 academic fit is high (academic_fit 0.9537, subject_alignment 1.0) supporting Architecture and Civil Engineering (JS1211), with language_fit capped at 0.5 (ENGL grade 4).</p>
+          
+          
+            <h4>Subject Grade Profile</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-grade-3"></canvas>
+            </div>
+            <script id="data-chart-grade-3" type="application/json">{"labels": ["Chinese Language", "English Language", "Mathematics (Compulsory Part)", "Citizenship and Social Development", "Physics", "Chemistry"], "datasets": [{"label": "Your Grade", "data": [5, 4, 6, 2, 5, 4], "backgroundColor": "rgba(59,130,246,0.5)", "borderColor": "rgba(59,130,246,0.9)", "borderWidth": 1}]}</script>
+            <script id="min-chart-grade-3" type="application/json">0</script>
+            <h4>School Fit Radar</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-radar-3"></canvas>
+            </div>
+            <script id="data-chart-radar-3" type="application/json">{"labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"], "datasets": [{"label": "School Fit", "data": [0.0, 0.0, 0.0, 0.0], "backgroundColor": "rgba(99,102,241,0.2)", "borderColor": "rgba(99,102,241,0.9)", "pointBackgroundColor": "rgba(99,102,241,0.9)", "borderWidth": 2}]}</script>
+          
+          <h4>Recommended Actions</h4>
+          <ul><li>Continue current preparation. Apply early.</li></ul>
+        </div>
+        <div class="school-card">
+          <h3>4. City University of Hong Kong <span class="badge badge-pass">ELIGIBLE</span></h3>
+          <p><strong>Fit Score:</strong> 70.9%</p>
+          
+          <p><strong>Why this school fits:</strong> High academic_fit (0.9537) and perfect subject_alignment (1.0) drive Environmental Science (JS1801) fit, while language_fit is limited at 0.5 from ENGL grade 4.</p>
+          
+          
+            <h4>Subject Grade Profile</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-grade-4"></canvas>
+            </div>
+            <script id="data-chart-grade-4" type="application/json">{"labels": ["Chinese Language", "English Language", "Mathematics (Compulsory Part)", "Citizenship and Social Development", "Physics", "Chemistry"], "datasets": [{"label": "Your Grade", "data": [5, 4, 6, 2, 5, 4], "backgroundColor": "rgba(59,130,246,0.5)", "borderColor": "rgba(59,130,246,0.9)", "borderWidth": 1}]}</script>
+            <script id="min-chart-grade-4" type="application/json">0</script>
+            <h4>School Fit Radar</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-radar-4"></canvas>
+            </div>
+            <script id="data-chart-radar-4" type="application/json">{"labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"], "datasets": [{"label": "School Fit", "data": [0.0, 0.0, 0.0, 0.0], "backgroundColor": "rgba(99,102,241,0.2)", "borderColor": "rgba(99,102,241,0.9)", "pointBackgroundColor": "rgba(99,102,241,0.9)", "borderWidth": 2}]}</script>
+          
+          <h4>Recommended Actions</h4>
+          <ul><li>Continue current preparation. Apply early.</li></ul>
+        </div>
+        <div class="school-card">
+          <h3>5. The Hong Kong Baptist University <span class="badge badge-pass">ELIGIBLE</span></h3>
+          <p><strong>Fit Score:</strong> 69.9%</p>
+          
+          <p><strong>Why this school fits:</strong> Strong academic profile alignment (academic_fit 0.9611, subject_alignment 1.0) supports Chinese Medicine (JS7801), but interest_alignment is low at 0.1875 and language_fit is 0.5 due to ENGL 4.</p>
+          
+          
+            <h4>Subject Grade Profile</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-grade-5"></canvas>
+            </div>
+            <script id="data-chart-grade-5" type="application/json">{"labels": ["Chinese Language", "English Language", "Mathematics (Compulsory Part)", "Citizenship and Social Development", "Physics", "Chemistry"], "datasets": [{"label": "Your Grade", "data": [5, 4, 6, 2, 5, 4], "backgroundColor": "rgba(59,130,246,0.5)", "borderColor": "rgba(59,130,246,0.9)", "borderWidth": 1}]}</script>
+            <script id="min-chart-grade-5" type="application/json">0</script>
+            <h4>School Fit Radar</h4>
+            <div style="max-width:500px;margin:16px 0;">
+              <canvas id="chart-radar-5"></canvas>
+            </div>
+            <script id="data-chart-radar-5" type="application/json">{"labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"], "datasets": [{"label": "School Fit", "data": [0.0, 0.0, 0.0, 0.0], "backgroundColor": "rgba(99,102,241,0.2)", "borderColor": "rgba(99,102,241,0.9)", "pointBackgroundColor": "rgba(99,102,241,0.9)", "borderWidth": 2}]}</script>
+          
+          <h4>Recommended Actions</h4>
+          <ul><li>Continue current preparation. Apply early.</li></ul>
+        </div></section>
+    <section class="section">
+      <h2>4. Action Plan Timeline</h2>
+      <table class="data-table">
+        <thead>
+          <tr><th>Deadline</th><th>Task</th><th>Priority</th><th>Related School</th></tr>
+        </thead>
+        <tbody><tr><td>General</td><td>Write a draft personal statement tailored to your top target programs at City University of Hong Kong (Electrical Engineering JS1221 / Physics and Astronomy JS1901 / Environmental Science JS1801), starting from your best STEM evidence (MATH 5*, PHYS 5, CHEM 4/CSD A/C) and addressing English grade 4 (language_fit=0.5).</td><td><span class="priority-high">High</span></td><td>General</td></tr><tr><td>General</td><td>Add/compile extracurricular and evidence supporting interest alignment by documenting any relevant activities (current extra_curricular is []).</td><td><span class="priority-high">High</span></td><td>General</td></tr><tr><td>General</td><td>Plan an English improvement and testing pathway by deciding whether to submit IELTS since ielts_score is currently null.</td><td><span class="priority-medium">Medium</span></td><td>General</td></tr><tr><td>General</td><td>Produce program-specific add-ons for backups at The Hong Kong Baptist University (JS7801/JS7811) and HKUST (JS5801/JS5171), explicitly linking your STEM grades to each major while countering low interest_alignment values shown in the matches.</td><td><span class="priority-medium">Medium</span></td><td>General</td></tr></tbody>
+      </table>
+      <h4 style="margin-top:20px;">Timeline Overview</h4>
+      <div style="overflow-x:auto;margin-top:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="700" height="156" style="font-family:Arial,sans-serif;font-size:11px;">
+<rect width="700" height="156" fill="#f9fafb" rx="4"/>
+<text x="192.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q1 2026</text>
+<line x1="160.0" y1="28" x2="160.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="257.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q2 2026</text>
+<line x1="225.0" y1="28" x2="225.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="322.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q3 2026</text>
+<line x1="290.0" y1="28" x2="290.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="387.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q4 2026</text>
+<line x1="355.0" y1="28" x2="355.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="452.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q1 2027</text>
+<line x1="420.0" y1="28" x2="420.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="517.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q2 2027</text>
+<line x1="485.0" y1="28" x2="485.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="582.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q3 2027</text>
+<line x1="550.0" y1="28" x2="550.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="647.5" y="20" text-anchor="middle" font-size="10" fill="#6b7280">Q4 2027</text>
+<line x1="615.0" y1="28" x2="615.0" y2="156" stroke="#e5e7eb" stroke-width="1"/>
+<text x="154" y="54" text-anchor="end" font-size="10" fill="#374151">Write a draft personal statement tailore</text>
+<rect x="615.0" y="40" width="55.2" height="18" fill="#dc2626" rx="3" opacity="0.85"/>
+<text x="154" y="78" text-anchor="end" font-size="10" fill="#374151">Add/compile extracurricular and evidence</text>
+<rect x="615.0" y="64" width="55.2" height="18" fill="#dc2626" rx="3" opacity="0.85"/>
+<text x="154" y="102" text-anchor="end" font-size="10" fill="#374151">Plan an English improvement and testing </text>
+<rect x="615.0" y="88" width="55.2" height="18" fill="#d97706" rx="3" opacity="0.85"/>
+<text x="154" y="126" text-anchor="end" font-size="10" fill="#374151">Produce program-specific add-ons for bac</text>
+<rect x="615.0" y="112" width="55.2" height="18" fill="#d97706" rx="3" opacity="0.85"/>
+</svg></div>
+    </section>
+    <section class="section">
+      <h2>5. Skill &amp; Activity Gaps</h2>
+      <ul><li>No extracurricular activities recorded. Consider joining clubs, sports, or community service to strengthen your profile.</li></ul>
+    </section>
+    <section class="section">
+      <h2>6. Language Readiness</h2>
+      <p><strong>Your IELTS Overall Band:</strong> Not on file</p>
+      <table class="data-table">
+        <thead><tr><th>School</th><th>IELTS Status</th></tr></thead>
+        <tbody><tr class="gap-ok"><td>City University of Hong Kong</td><td>Met</td></tr><tr class="gap-ok"><td>City University of Hong Kong</td><td>Met</td></tr><tr class="gap-ok"><td>City University of Hong Kong</td><td>Met</td></tr><tr class="gap-ok"><td>City University of Hong Kong</td><td>Met</td></tr><tr class="gap-ok"><td>The Hong Kong Baptist University</td><td>Met</td></tr></tbody>
+      </table>
+    </section>
+    <section class="section">
+      <h2>7. Appendix</h2>
+      <h3>Raw Grade Table</h3>
+      <table class="data-table">
+        <thead><tr><th>Subject</th><th>Sitting</th><th>Grade</th><th>Year</th></tr></thead>
+        <tbody><tr><td>Chinese Language</td><td>MOCK</td><td>5</td><td>2026</td></tr><tr><td>English Language</td><td>MOCK</td><td>4</td><td>2026</td></tr><tr><td>Mathematics (Compulsory Part)</td><td>MOCK</td><td>5*</td><td>2026</td></tr><tr><td>Citizenship and Social Development</td><td>MOCK</td><td>A</td><td>2026</td></tr><tr><td>Physics</td><td>MOCK</td><td>5</td><td>2026</td></tr><tr><td>Chemistry</td><td>MOCK</td><td>4</td><td>2026</td></tr></tbody>
+      </table>
+      <h3>Data Sources</h3>
+      <p>School profile data sourced from HKEAA, JUPAS, and individual university admissions pages. Last refreshed: 2026-04-29.</p>
+    </section>
+  <div class="footer">
+    Generated by Intelligent Academic Advisor &bull; 2026-04-29 19:22 UTC
+  </div>
+  <script>
+
+  if (document.getElementById('chart-grade-1')) {
+    var gradeData1 = JSON.parse(document.getElementById('data-chart-grade-1').textContent);
+    var perSubjectMin1 = JSON.parse(document.getElementById('min-chart-grade-1').textContent);
+    new Chart(document.getElementById('chart-grade-1'), {
+      type: 'bar',
+      data: gradeData1,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            min: 0,
+            max: 7,
+            title: { display: true, text: 'Grade (0-7)' },
+          },
+          y: { ticks: { font: { size: 11 } } },
+        },
+        plugins: {
+          annotation: void 0,
+          tooltip: { enabled: true },
+          legend: { display: false },
+          title: { display: false },
+        },
+      },
+      plugins: [{
+        id: 'refLine1',
+        afterDraw(chart) {
+          const xScale = chart.scales.x;
+          const yScale = chart.scales.y;
+          const ctx = chart.ctx;
+          const x = xScale.getPixelForValue(perSubjectMin1);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.strokeStyle = '#dc2626';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }],
+    });
+  }
+
+  if (document.getElementById('chart-radar-1')) {
+    var radarData1 = JSON.parse(document.getElementById('data-chart-radar-1').textContent);
+    new Chart(document.getElementById('chart-radar-1'), {
+      type: 'radar',
+      data: radarData1,
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { stepSize: 0.25, font: { size: 10 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
+
+  if (document.getElementById('chart-grade-2')) {
+    var gradeData2 = JSON.parse(document.getElementById('data-chart-grade-2').textContent);
+    var perSubjectMin2 = JSON.parse(document.getElementById('min-chart-grade-2').textContent);
+    new Chart(document.getElementById('chart-grade-2'), {
+      type: 'bar',
+      data: gradeData2,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            min: 0,
+            max: 7,
+            title: { display: true, text: 'Grade (0-7)' },
+          },
+          y: { ticks: { font: { size: 11 } } },
+        },
+        plugins: {
+          annotation: void 0,
+          tooltip: { enabled: true },
+          legend: { display: false },
+          title: { display: false },
+        },
+      },
+      plugins: [{
+        id: 'refLine2',
+        afterDraw(chart) {
+          const xScale = chart.scales.x;
+          const yScale = chart.scales.y;
+          const ctx = chart.ctx;
+          const x = xScale.getPixelForValue(perSubjectMin2);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.strokeStyle = '#dc2626';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }],
+    });
+  }
+
+  if (document.getElementById('chart-radar-2')) {
+    var radarData2 = JSON.parse(document.getElementById('data-chart-radar-2').textContent);
+    new Chart(document.getElementById('chart-radar-2'), {
+      type: 'radar',
+      data: radarData2,
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { stepSize: 0.25, font: { size: 10 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
+
+  if (document.getElementById('chart-grade-3')) {
+    var gradeData3 = JSON.parse(document.getElementById('data-chart-grade-3').textContent);
+    var perSubjectMin3 = JSON.parse(document.getElementById('min-chart-grade-3').textContent);
+    new Chart(document.getElementById('chart-grade-3'), {
+      type: 'bar',
+      data: gradeData3,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            min: 0,
+            max: 7,
+            title: { display: true, text: 'Grade (0-7)' },
+          },
+          y: { ticks: { font: { size: 11 } } },
+        },
+        plugins: {
+          annotation: void 0,
+          tooltip: { enabled: true },
+          legend: { display: false },
+          title: { display: false },
+        },
+      },
+      plugins: [{
+        id: 'refLine3',
+        afterDraw(chart) {
+          const xScale = chart.scales.x;
+          const yScale = chart.scales.y;
+          const ctx = chart.ctx;
+          const x = xScale.getPixelForValue(perSubjectMin3);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.strokeStyle = '#dc2626';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }],
+    });
+  }
+
+  if (document.getElementById('chart-radar-3')) {
+    var radarData3 = JSON.parse(document.getElementById('data-chart-radar-3').textContent);
+    new Chart(document.getElementById('chart-radar-3'), {
+      type: 'radar',
+      data: radarData3,
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { stepSize: 0.25, font: { size: 10 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
+
+  if (document.getElementById('chart-grade-4')) {
+    var gradeData4 = JSON.parse(document.getElementById('data-chart-grade-4').textContent);
+    var perSubjectMin4 = JSON.parse(document.getElementById('min-chart-grade-4').textContent);
+    new Chart(document.getElementById('chart-grade-4'), {
+      type: 'bar',
+      data: gradeData4,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            min: 0,
+            max: 7,
+            title: { display: true, text: 'Grade (0-7)' },
+          },
+          y: { ticks: { font: { size: 11 } } },
+        },
+        plugins: {
+          annotation: void 0,
+          tooltip: { enabled: true },
+          legend: { display: false },
+          title: { display: false },
+        },
+      },
+      plugins: [{
+        id: 'refLine4',
+        afterDraw(chart) {
+          const xScale = chart.scales.x;
+          const yScale = chart.scales.y;
+          const ctx = chart.ctx;
+          const x = xScale.getPixelForValue(perSubjectMin4);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.strokeStyle = '#dc2626';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }],
+    });
+  }
+
+  if (document.getElementById('chart-radar-4')) {
+    var radarData4 = JSON.parse(document.getElementById('data-chart-radar-4').textContent);
+    new Chart(document.getElementById('chart-radar-4'), {
+      type: 'radar',
+      data: radarData4,
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { stepSize: 0.25, font: { size: 10 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
+
+  if (document.getElementById('chart-grade-5')) {
+    var gradeData5 = JSON.parse(document.getElementById('data-chart-grade-5').textContent);
+    var perSubjectMin5 = JSON.parse(document.getElementById('min-chart-grade-5').textContent);
+    new Chart(document.getElementById('chart-grade-5'), {
+      type: 'bar',
+      data: gradeData5,
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: {
+            min: 0,
+            max: 7,
+            title: { display: true, text: 'Grade (0-7)' },
+          },
+          y: { ticks: { font: { size: 11 } } },
+        },
+        plugins: {
+          annotation: void 0,
+          tooltip: { enabled: true },
+          legend: { display: false },
+          title: { display: false },
+        },
+      },
+      plugins: [{
+        id: 'refLine5',
+        afterDraw(chart) {
+          const xScale = chart.scales.x;
+          const yScale = chart.scales.y;
+          const ctx = chart.ctx;
+          const x = xScale.getPixelForValue(perSubjectMin5);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, yScale.top);
+          ctx.lineTo(x, yScale.bottom);
+          ctx.strokeStyle = '#dc2626';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }],
+    });
+  }
+
+  if (document.getElementById('chart-radar-5')) {
+    var radarData5 = JSON.parse(document.getElementById('data-chart-radar-5').textContent);
+    new Chart(document.getElementById('chart-radar-5'), {
+      type: 'radar',
+      data: radarData5,
+      options: {
+        responsive: true,
+        scales: {
+          r: {
+            min: 0,
+            max: 1,
+            ticks: { stepSize: 0.25, font: { size: 10 } },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+        },
+      },
+    });
+  }
+</script>
+</body>
+</html>

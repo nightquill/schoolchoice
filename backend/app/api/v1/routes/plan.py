@@ -18,16 +18,17 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
-from app.db.models import School, User
+from app.db.models import School, Student, User
 from app.db.models_v2 import AcademicPlan, PlanGenerationJob, PlanHistory, StudentSchoolTarget, Subject
 from app.db.session import SessionLocal, get_db
 from app.schemas.v2.plan import PlanGenerateRequest, PlanHistoryItem, PlanHistoryResponse, PlanJobResponse, PlanResponse, PlanStatusResponse
 from app.schemas.v2.plan_chat import PlanChatRequest, PlanChatResponse
 from app.schemas.v2.plan_edit import EditSectionRequest, SetTemplateRequest
-from app.services import student_service, plan_chat_service
-from app.services.hkdse_service import grade_to_int
-from app.services.matchmaker_v2 import run_matching
-from app.services.plan_generator import _build_action_items, generate_html_plan
+from app.services import student_service
+from app.services.student_data_builder import build_school_dict, build_student_data, build_student_dict_for_plan
+from app.modules.school_choice.services.matchmaker_v2 import run_matching
+from app.modules.school_choice.services.plan_generator import _build_action_items, generate_html_plan
+from app.modules.school_choice.services.plan_chat_service import handle_chat as plan_chat_handle
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,165 @@ _TIMEOUT_SECONDS = int(os.environ.get("PLAN_GENERATION_TIMEOUT_SECONDS", "30"))
 # ---------------------------------------------------------------------------
 # Background plan generation task
 # ---------------------------------------------------------------------------
+
+def _run_ai_enhancement(student, student_data: dict, match_results: list) -> dict | None:
+    """
+    Optional AI enhancement: generate personalized rationales and action items.
+    Returns parsed JSON dict or None if AI is unavailable or fails.
+    Non-blocking — errors are logged and swallowed.
+    """
+    try:
+        from app.core.ai_service import call_ai
+        from app.core.config import settings as _cfg
+        if not _cfg.AI_API_KEY:
+            return None
+
+        eligible_for_ai = [r for r in match_results if r.eligibility_pass][:5]
+        schools_summary = "\n".join([
+            f"- {r.school_name} (major: {getattr(r, 'major_name', None) or 'General'}): "
+            f"{r.fit_score:.0%} overall match"
+            for r in eligible_for_ai
+        ])
+        activities_text = ", ".join(student_data["extra_curricular_activities"][:5]) or "None listed"
+        awards_text = ", ".join(student_data["award_titles"][:5]) or "None listed"
+        grades_text = ", ".join(f"{k}: {v}" for k, v in student_data["grades_by_code"].items())
+        interests_text = ", ".join(str(i) for i in student_data["interests"]) if student_data["interests"] else "None listed"
+        personal_stmt = getattr(student, "personal_statement", "") or ""
+
+        ai_prompt = f"""You are an experienced Hong Kong secondary school academic counselor. Generate personalized rationales and action items.
+
+STUDENT PROFILE:
+- Name: {student.name}, Year {getattr(student, 'year_of_study', '?')}
+- HKDSE Grades: {grades_text}
+- Best-5 Aggregate: {student_data['best5_aggregate']}
+- IELTS: {student_data['ielts_score'] or 'Not taken'}
+- Interests: {interests_text}
+- Activities: {activities_text}
+- Awards: {awards_text}
+- Personal Statement: {personal_stmt[:300] if personal_stmt else 'Not written yet'}
+- Strengths/Weaknesses: {student.strengths_weaknesses or 'Not specified'}
+
+MATCHED SCHOOLS (from scoring algorithm):
+{schools_summary}
+
+Respond with ONLY valid JSON — no markdown, no explanation:
+{{
+  "school_rationales": {{
+    "<school_name>": "<2-3 sentences in plain language citing the student's actual grades and interests. Do NOT use internal metric names or decimal scores. Say 'strong match' not 'fit_score=0.72'.>"
+  }},
+  "action_items": [
+    {{"task": "<specific task for THIS student>", "priority": "High|Medium|Low", "deadline": "<Month YYYY>", "reason": "<why>"}}
+  ],
+  "overall_assessment": "<3-4 sentences in plain language about university prospects, strengths, and what to focus on>"
+}}
+
+Rules:
+- Write for a student and parents — no jargon, no internal metric names, no raw decimals.
+- Every rationale MUST cite at least one specific grade from the student profile.
+- Action items must have month-specific deadlines based on HK application calendar.
+- Keep it concise: max 3 action items, max 5 school rationales."""
+
+        ai_response = call_ai([
+            {"role": "system", "content": "You are a Hong Kong academic counselor. Respond with valid JSON only. Be concise."},
+            {"role": "user", "content": ai_prompt},
+        ], max_tokens=1500, temperature=0.3)
+
+        import re as _re
+        cleaned = ai_response.strip()
+        if cleaned.startswith("```"):
+            cleaned = _re.sub(r"^```[a-z]*\n?", "", cleaned)
+            cleaned = _re.sub(r"\n?```$", "", cleaned.strip())
+
+        import json as _json
+        ai_commentary = _json.loads(cleaned)
+        logger.info("AI plan enhancement: 1 LLM call for %d school rationales", len(ai_commentary.get("school_rationales", {})))
+
+        # Apply AI rationales to match results
+        if "school_rationales" in ai_commentary:
+            for r in match_results:
+                if r.school_name in ai_commentary["school_rationales"]:
+                    r.rationale = ai_commentary["school_rationales"][r.school_name]
+
+        return ai_commentary
+
+    except Exception as exc:
+        logger.warning("AI plan enhancement failed (non-blocking): %s", exc)
+        return None
+
+
+def _build_recommended_list(match_results: list, existing_targets: list) -> list[dict]:
+    """Build the recommended schools JSON list from match results."""
+    eligible = [r for r in match_results if r.eligibility_pass][:5]
+    target_major_map = {
+        str(t.school_id): t.intended_majors
+        for t in existing_targets
+        if t.intended_majors
+    }
+    return [
+        {
+            "school_id": r.school_id,
+            "school_name": r.school_name,
+            "rationale": r.rationale,
+            "fit_score": r.fit_score,
+            "final_score": r.final_score,
+            "intended_majors": target_major_map.get(r.school_id),
+            "component_scores": r.component_scores,
+            "eligibility_pass": True,
+            "failing_criteria": [],
+            "shap_explanation": r.shap_explanation,
+            "major_name": getattr(r, "major_name", None),
+            "major_jupas_code": getattr(r, "major_jupas_code", None),
+        }
+        for r in eligible
+    ]
+
+
+def _persist_plan(
+    db: Session, student_id: UUID, html_content: str,
+    recommended: list, action_items: list, subject_grades: list,
+    best5: int, existing_targets: list,
+) -> AcademicPlan:
+    """Upsert AcademicPlan and save history snapshot."""
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if plan:
+        plan.version = (plan.version or 1) + 1
+        plan.html_content = html_content
+        plan.recommended_schools = recommended
+        plan.action_items = action_items
+        plan.generated_at = datetime.now(timezone.utc)
+    else:
+        plan = AcademicPlan(
+            student_id=student_id,
+            html_content=html_content,
+            recommended_schools=recommended,
+            action_items=action_items,
+            generated_at=datetime.now(timezone.utc),
+            version=1,
+        )
+        db.add(plan)
+
+    snapshot = {
+        "subject_grades": subject_grades,
+        "best5_aggregate": best5,
+        "target_schools": [
+            {"school_id": str(t.school_id), "student_rank": t.student_rank}
+            for t in existing_targets
+        ],
+    }
+    version_num = plan.version if plan else 1
+    history_label = f"Plan v{version_num} — {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"
+    db.add(PlanHistory(
+        student_id=student_id,
+        version=version_num,
+        plan_label=history_label,
+        html_content=html_content,
+        recommended_schools=recommended,
+        action_items=action_items,
+        snapshot_data=snapshot,
+        generated_at=datetime.now(timezone.utc),
+    ))
+    return plan
+
 
 def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVERSITY") -> None:
     """
@@ -55,110 +215,17 @@ def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVER
         db.commit()
 
         # Load student
-        from app.db.models import Student
         student = db.query(Student).filter(Student.id == student_id).first()
         if not student:
             raise RuntimeError("Student not found")
 
-        # Build grade dicts with subject name
-        grade_records = getattr(student, "subject_grades") or []
-        grade_dicts_for_agg = []
-        subject_grades_for_plan = []
-        grades_by_code: dict[str, str] = {}
-        elective_codes: list[str] = []
+        # Step 1: Build student data (single canonical source)
+        student_data = build_student_data(student, db)
+        student_dict = build_student_dict_for_plan(student, student_data)
 
-        for g in grade_records:
-            subj = db.query(Subject).filter(Subject.id == g.subject_id).first()
-            if not subj:
-                continue
-            raw = g.raw_grade or g.predicted_grade or "U"
-            numeric = grade_to_int(raw)
-            grades_by_code[subj.code] = raw
-            grade_dicts_for_agg.append({
-                "subject_code": subj.code,
-                "numeric_value": numeric,
-                "is_compulsory": subj.is_compulsory,
-                "category": subj.category,
-            })
-            if not subj.is_compulsory and subj.category != "APPLIED_LEARNING":
-                elective_codes.append(subj.code)
-            subject_grades_for_plan.append({
-                "subject_code": subj.code,
-                "subject_name": subj.name,
-                "sitting": g.sitting,
-                "raw_grade": g.raw_grade,
-                "predicted_grade": g.predicted_grade,
-                "year_of_exam": g.year_of_exam,
-                "is_compulsory": subj.is_compulsory,
-                "category": subj.category,
-            })
-
-        # Build student dict for plan generator
-        student_dict = {
-            "name": student.name,
-            "year_of_study": getattr(student, "year_of_study", None),
-            "subject_grades": subject_grades_for_plan,
-            "ielts_score": getattr(student, "ielts_score", None),
-            "extra_curricular": getattr(student, "extra_curricular", None) or [],
-            "awards": getattr(student, "awards", None) or [],
-        }
-
-        # Build IELTS overall
-        ielts_raw = getattr(student, "ielts_score", None)
-        ielts_overall = None
-        if isinstance(ielts_raw, dict):
-            ielts_overall = ielts_raw.get("overall")
-        elif ielts_raw is not None:
-            try:
-                ielts_overall = float(ielts_raw)
-            except (TypeError, ValueError):
-                pass
-
-        # Extra-curricular activities
-        extra = getattr(student, "extra_curricular") or []
-        extra_activities: list[str] = []
-        for ec in extra:
-            if isinstance(ec, dict):
-                extra_activities.append(ec.get("activity") or "")
-            else:
-                extra_activities.append(str(ec))
-
-        awards_raw = getattr(student, "awards") or []
-        award_titles: list[str] = []
-        for aw in awards_raw:
-            if isinstance(aw, dict):
-                award_titles.append(aw.get("title") or "")
-
-        from app.services.hkdse_service import compute_best5_aggregate
-        best5 = compute_best5_aggregate(grade_dicts_for_agg)
-
-        student_data = {
-            "best5_aggregate": best5,
-            "grades_by_code": grades_by_code,
-            "ielts_score": ielts_overall,
-            "elective_codes": elective_codes,
-            "extra_curricular_activities": extra_activities,
-            "award_titles": award_titles,
-        }
-
-        # Run matching against all schools
+        # Step 2: Run matching against all schools
         all_schools = db.query(School).all()
-        school_dicts = [
-            {
-                "id": str(s.id),
-                "name": s.name or "",
-                "minimum_entry_score": getattr(s, "minimum_entry_score", None),
-                "average_admitted_score": (
-                    float(s.average_admitted_score)
-                    if getattr(s, "average_admitted_score", None) is not None
-                    else None
-                ),
-                "required_subjects": getattr(s, "required_subjects", None) or [],
-                "language_requirements": getattr(s, "language_requirements", None) or {},
-                "notable_programs": getattr(s, "notable_programs", None) or [],
-            }
-            for s in all_schools
-        ]
+        school_dicts = [build_school_dict(s) for s in all_schools]
 
         existing_targets = (
             db.query(StudentSchoolTarget)
@@ -169,89 +236,13 @@ def _generate_plan_task(job_id: UUID, student_id: UUID, plan_type: str = "UNIVER
             {"school_id": str(t.school_id), "student_rank": t.student_rank}
             for t in existing_targets
         ]
-
         match_results = run_matching(student_data, school_dicts, target_dicts)
 
-        # ── AI Enhancement: personalized rationales + advice ──
-        ai_commentary = None
-        try:
-            from app.core.ai_service import call_ai
-            from app.core.config import settings as _cfg
-            if _cfg.AI_API_KEY:
-                eligible_for_ai = [r for r in match_results if r.eligibility_pass][:5]
-                schools_summary = "\n".join([
-                    f"- {r.school_name}: fit={r.fit_score:.0%}, academic={r.component_scores.get('academic_fit',0):.0%}, "
-                    f"subject_align={r.component_scores.get('subject_alignment',0):.0%}, "
-                    f"language={r.component_scores.get('language_fit',0):.0%}, "
-                    f"interest={r.component_scores.get('interest_alignment',0):.0%}"
-                    for r in eligible_for_ai
-                ])
-                activities_text = ", ".join(extra_activities[:5]) if extra_activities else "None listed"
-                awards_text = ", ".join(award_titles[:5]) if award_titles else "None listed"
-                grades_text = ", ".join([f"{k}: {v}" for k, v in grades_by_code.items()])
-                personal_stmt = getattr(student, "personal_statement", "") or ""
+        # Step 3: AI enhancement (non-blocking)
+        ai_commentary = _run_ai_enhancement(student, student_data, match_results)
 
-                ai_prompt = f"""You are an experienced Hong Kong secondary school academic counselor generating a personalized university application plan.
-
-STUDENT PROFILE:
-- Name: {student.name}, Year {getattr(student, 'year_of_study', '?')}
-- HKDSE Grades: {grades_text}
-- Best-5 Aggregate: {best5}
-- IELTS: {ielts_overall or 'Not taken'}
-- Activities: {activities_text}
-- Awards: {awards_text}
-- Personal Statement: {personal_stmt[:300]}
-
-MATCHED SCHOOLS (from scoring algorithm):
-{schools_summary}
-
-Respond with ONLY a JSON object:
-{{
-  "school_rationales": {{
-    "<school_name>": "<2-3 sentences: why this school fits THIS student specifically, referencing their grades, interests, and goals. Be specific — cite the student's actual subjects, scores, activities.>"
-  }},
-  "action_items": [
-    {{"task": "<specific actionable task>", "priority": "High|Medium|Low", "deadline": "<specific date or timeframe>", "reason": "<why this matters for this student>"}}
-  ],
-  "overall_assessment": "<3-4 sentences: honest assessment of this student's university prospects, key strengths, and the most important thing they should focus on>"
-}}
-
-Rules:
-- Reference the student's ACTUAL data — do not invent grades or activities they don't have.
-- If IELTS is already above a school's requirement, do NOT suggest taking IELTS again.
-- Action items must be specific to this student's gaps, not generic advice.
-- Be honest about competitive chances based on their best-5 vs school averages."""
-
-                ai_response = call_ai([
-                    {"role": "system", "content": "You are a Hong Kong academic counselor. Respond with valid JSON only."},
-                    {"role": "user", "content": ai_prompt},
-                ], max_tokens=2000, temperature=0.3)
-
-                import re
-                # Strip markdown fences if present
-                cleaned = ai_response.strip()
-                if cleaned.startswith("```"):
-                    cleaned = re.sub(r"^```[a-z]*\n?", "", cleaned)
-                    cleaned = re.sub(r"\n?```$", "", cleaned.strip())
-
-                import json as _json
-                ai_commentary = _json.loads(cleaned)
-                logger.info("AI plan enhancement successful")
-
-                # Apply AI rationales to match results
-                if "school_rationales" in ai_commentary:
-                    for r in match_results:
-                        if r.school_name in ai_commentary["school_rationales"]:
-                            r.rationale = ai_commentary["school_rationales"][r.school_name]
-
-        except Exception as exc:
-            logger.warning("AI plan enhancement failed (non-blocking): %s", exc)
-            # Continue with deterministic plan — AI is optional enhancement
-
-        # Generate HTML
+        # Step 4: Generate HTML
         action_items = _build_action_items(student_dict, match_results)
-
-        # If AI provided action items, use those instead
         if ai_commentary and "action_items" in ai_commentary:
             action_items = ai_commentary["action_items"]
 
@@ -260,94 +251,29 @@ Rules:
             ai_assessment=ai_commentary.get("overall_assessment") if ai_commentary else None,
         )
 
-        # Build recommended schools list (top 5 eligible)
-        eligible = [r for r in match_results if r.eligibility_pass][:5]
-
-        # Build a map of school_id → intended_majors from existing targets
-        target_major_map = {
-            str(t.school_id): t.intended_majors
-            for t in existing_targets
-            if t.intended_majors
-        }
-
-        recommended = [
-            {
-                "school_id": r.school_id,
-                "school_name": r.school_name,
-                "rationale": r.rationale,
-                "fit_score": r.fit_score,
-                "final_score": r.final_score,
-                "intended_majors": target_major_map.get(r.school_id),
-                "component_scores": r.component_scores,
-                "eligibility_pass": True,
-                "failing_criteria": [],
-                "shap_explanation": r.shap_explanation,
-                "major_name": getattr(r, "major_name", None),
-                "major_jupas_code": getattr(r, "major_jupas_code", None),
-            }
-            for r in eligible
-        ]
-
-        # Upsert AcademicPlan
-        plan = (
-            db.query(AcademicPlan)
-            .filter(AcademicPlan.student_id == student_id)
-            .first()
+        # Step 5: Build recommended list and persist
+        recommended = _build_recommended_list(match_results, existing_targets)
+        _persist_plan(
+            db, student_id, html_content, recommended, action_items,
+            student_data["subject_grades_detail"], student_data["best5_aggregate"],
+            existing_targets,
         )
-        if plan:
-            plan.version = (plan.version or 1) + 1
-            plan.html_content = html_content
-            plan.recommended_schools = recommended
-            plan.action_items = action_items
-            plan.generated_at = datetime.now(timezone.utc)
-        else:
-            plan = AcademicPlan(
-                student_id=student_id,
-                html_content=html_content,
-                recommended_schools=recommended,
-                action_items=action_items,
-                generated_at=datetime.now(timezone.utc),
-                version=1,
-            )
-            db.add(plan)
-
-        # Save plan history snapshot
-        snapshot = {
-            "subject_grades": subject_grades_for_plan,
-            "best5_aggregate": best5,
-            "target_schools": [
-                {"school_id": str(t.school_id), "student_rank": t.student_rank}
-                for t in existing_targets
-            ],
-        }
-        version_num = plan.version if plan else 1
-        history_label = f"Plan v{version_num} — {datetime.now(timezone.utc).strftime('%Y-%m-%d')}"
-        history_entry = PlanHistory(
-            student_id=student_id,
-            version=version_num,
-            plan_label=history_label,
-            html_content=html_content,
-            recommended_schools=recommended,
-            action_items=action_items,
-            snapshot_data=snapshot,
-            generated_at=datetime.now(timezone.utc),
-        )
-        db.add(history_entry)
 
         job.status = "DONE"
         job.updated_at = datetime.now(timezone.utc)
         db.commit()
 
     except Exception as exc:
+        logger.error("Plan generation failed for job %s: %s", job_id, exc, exc_info=True)
         try:
             job = db.query(PlanGenerationJob).filter(PlanGenerationJob.id == job_id).first()
             if job:
                 job.status = "FAILED"
-                job.error_message = str(exc)
+                job.error_message = str(exc)[:500]
                 job.updated_at = datetime.now(timezone.utc)
                 db.commit()
-        except Exception:
-            pass
+        except Exception as inner_exc:
+            logger.error("Failed to mark job %s as FAILED: %s", job_id, inner_exc)
     finally:
         db.close()
 
@@ -525,7 +451,7 @@ def plan_chat(
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
-    return plan_chat_service.handle_chat(db, plan, body.message, current_user.id)
+    return plan_chat_handle(db, plan, body.message, current_user.id)
 
 
 # ---------------------------------------------------------------------------
@@ -663,9 +589,6 @@ def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan)
     Build a student dict and match_results list for HTML regeneration.
     Falls back to minimal data if student is missing.
     """
-    from app.db.models import Student
-    from app.services.hkdse_service import grade_to_int
-
     student_for_regen: dict = {
         "name": "",
         "subject_grades": [],
@@ -678,30 +601,8 @@ def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan)
     try:
         student_orm = db.query(Student).filter(Student.id == student_id).first()
         if student_orm:
-            grade_records = getattr(student_orm, "subject_grades") or []
-            subject_grades_for_plan = []
-            for g in grade_records:
-                subj = db.query(Subject).filter(Subject.id == g.subject_id).first()
-                if not subj:
-                    continue
-                subject_grades_for_plan.append({
-                    "subject_code": subj.code,
-                    "subject_name": subj.name,
-                    "sitting": g.sitting,
-                    "raw_grade": g.raw_grade,
-                    "predicted_grade": g.predicted_grade,
-                    "year_of_exam": g.year_of_exam,
-                    "is_compulsory": subj.is_compulsory,
-                    "category": subj.category,
-                })
-            student_for_regen = {
-                "name": student_orm.name,
-                "year_of_study": getattr(student_orm, "year_of_study", None),
-                "subject_grades": subject_grades_for_plan,
-                "ielts_score": getattr(student_orm, "ielts_score", None),
-                "extra_curricular": getattr(student_orm, "extra_curricular", None) or [],
-                "awards": getattr(student_orm, "awards", None) or [],
-            }
+            student_data = build_student_data(student_orm, db)
+            student_for_regen = build_student_dict_for_plan(student_orm, student_data)
     except Exception as exc:
         logger.warning("Failed to load student data for regeneration: %s", exc)
 

@@ -61,57 +61,14 @@ export default function PersonalTab({ studentId, student, onSaved, showToast }) 
         </div>
         <div>
           <label style={labelStyle}>Date of Birth</label>
-          <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-            {(() => {
-              const dobParts = form.date_of_birth ? form.date_of_birth.split('-') : ['', '', ''];
-              const dobYear = dobParts[0] || '';
-              const dobMonth = dobParts[1] || '';
-              const dobDay = dobParts[2] || '';
-              const currentYear = new Date().getFullYear();
-              const selectSt = { padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', background: 'var(--color-surface)', color: 'var(--color-text-primary)' };
-              const rebuildDob = (y, m, d) => {
-                if (!y || !m || !d) return '';
-                return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
-              };
-              return (
-                <>
-                  <select
-                    aria-label="Day of birth"
-                    value={dobDay}
-                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(dobYear, dobMonth, e.target.value) } })}
-                    style={selectSt}
-                  >
-                    <option value="">Day</option>
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                      <option key={d} value={String(d).padStart(2, '0')}>{d}</option>
-                    ))}
-                  </select>
-                  <select
-                    aria-label="Month of birth"
-                    value={dobMonth}
-                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(dobYear, e.target.value, dobDay) } })}
-                    style={selectSt}
-                  >
-                    <option value="">Month</option>
-                    {[['01','January'],['02','February'],['03','March'],['04','April'],['05','May'],['06','June'],['07','July'],['08','August'],['09','September'],['10','October'],['11','November'],['12','December']].map(([v, l]) => (
-                      <option key={v} value={v}>{l}</option>
-                    ))}
-                  </select>
-                  <select
-                    aria-label="Year of birth"
-                    value={dobYear}
-                    onChange={(e) => handleChange({ target: { name: 'date_of_birth', value: rebuildDob(e.target.value, dobMonth, dobDay) } })}
-                    style={selectSt}
-                  >
-                    <option value="">Year</option>
-                    {Array.from({ length: 26 }, (_, i) => currentYear - i).map((y) => (
-                      <option key={y} value={String(y)}>{y}</option>
-                    ))}
-                  </select>
-                </>
-              );
-            })()}
-          </div>
+          <input
+            type="date"
+            name="date_of_birth"
+            value={form.date_of_birth || ''}
+            onChange={handleChange}
+            style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', background: 'var(--color-surface)', color: 'var(--color-text-primary)' }}
+            aria-label="Date of birth"
+          />
           {age !== null && (
             <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '0' }}>Age: {age}</p>
           )}

@@ -1,0 +1,27 @@
+name: student
+table: students
+auto_crud: false
+fields:
+  - name: name
+    type: string
+    required: true
+    max_length: 255
+  - name: target_region
+    type: enum
+    choices: [local, international]
+    required: true
+  - name: notes
+    type: text
+  - name: grades
+    type: jsonb
+  - name: ielts_score
+    type: jsonb
+  - name: personal_statement
+    type: text
+  - name: is_graduated
+    type: boolean
+  - name: graduation_year
+    type: int
+  - name: final_major
+    type: string
+    max_length: 255

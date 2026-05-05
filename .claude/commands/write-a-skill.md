@@ -1,0 +1,1 @@
+/Users/bsg/Downloads/schoolchoice/.agents/skills/write-a-skill//SKILL.md

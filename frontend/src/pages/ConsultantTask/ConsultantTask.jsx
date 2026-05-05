@@ -1,13 +1,13 @@
 // Phase 5: Generalized ConsultantTask page with SSE streaming
 // Replaces polling-based plan generation with live token streaming via EventSource
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { FileDown, StopCircle } from 'lucide-react';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import SSEStreamDisplay from '../../components/SSEStreamDisplay/SSEStreamDisplay';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
 import TemplateSelector from '../../components/TemplateSelector/TemplateSelector';
@@ -21,6 +21,7 @@ import { getAccount } from '../../api/account';
 
 function ConsultantTask() {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskId = 'academic_plan'; // hardcoded for school choice; future: from route param
   const { toasts, showToast, removeToast } = useToast();
 
@@ -47,6 +48,10 @@ function ConsultantTask() {
   const [editMode, setEditMode] = useState(false);
   const [editingSection, setEditingSection] = useState(null);
   const [sectionSaving, setSectionSaving] = useState(false);
+
+  // --- counselor metrics toggle ---
+  const [showCounselorMetrics, setShowCounselorMetrics] = useState(false);
+  const iframeRef = useRef(null);
 
   // --- chat state ---
   const [messages, setMessages] = useState([]);
@@ -116,7 +121,8 @@ function ConsultantTask() {
     streamTokensRef.current = ''; // reset ref
 
     const token = localStorage.getItem('token');
-    const url = `/api/v1/consultant/tasks/${taskId}/stream?entity_id=${id}&token=${token}`;
+    const base = import.meta.env.VITE_API_BASE_URL || '';
+    const url = `${base}/api/v1/consultant/tasks/${taskId}/stream?entity_id=${id}&force=true&token=${token}`;
     const source = new EventSource(url);
     eventSourceRef.current = source;
 
@@ -151,6 +157,16 @@ function ConsultantTask() {
     };
   }, [id, taskId, showToast]);
   // NOTE: streamTokens is NOT in the dependency array -- we use the ref instead
+
+  // Auto-start generation when navigated with ?generate=true
+  const autoGenerateTriggered = useRef(false);
+  useEffect(() => {
+    if (!loading && student && searchParams.get('generate') === 'true' && !autoGenerateTriggered.current) {
+      autoGenerateTriggered.current = true;
+      setSearchParams({}, { replace: true });
+      handleGenerate();
+    }
+  }, [loading, student, searchParams, setSearchParams, handleGenerate]);
 
   // --- Stop Generation handler ---
   const handleStopGeneration = useCallback(() => {
@@ -483,12 +499,11 @@ function ConsultantTask() {
 
         <div style={toolbarRightStyle}>
           <Button
-            label={streaming ? 'Generating...' : 'Generate Plan'}
-            variant="primary"
             onClick={handleGenerate}
-            loading={streaming}
             disabled={streaming}
-          />
+          >
+            {streaming ? 'Generating...' : 'Generate Plan'}
+          </Button>
 
           {streaming && (
             <button onClick={handleStopGeneration} style={stopBtnStyle}>
@@ -532,7 +547,32 @@ function ConsultantTask() {
             onTemplateChange={handleSetTemplate}
             isPending={templateLoading}
           />
-          <div style={{ marginLeft: 'auto' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: 'var(--font-size-sm)',
+              color: 'var(--color-text-secondary)',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}>
+              <input
+                type="checkbox"
+                checked={showCounselorMetrics}
+                onChange={(e) => {
+                  setShowCounselorMetrics(e.target.checked);
+                  if (iframeRef.current && iframeRef.current.contentWindow) {
+                    iframeRef.current.contentWindow.postMessage(
+                      e.target.checked ? 'show-counselor' : 'hide-counselor',
+                      '*'
+                    );
+                  }
+                }}
+                style={{ accentColor: 'var(--color-primary)' }}
+              />
+              Counselor View
+            </label>
             <button
               onClick={() => setEditMode((v) => !v)}
               style={{
@@ -619,7 +659,7 @@ function ConsultantTask() {
           {!streaming && error && (
             <div style={{ ...contentZoneStyle, padding: 'var(--space-8)' }}>
               <ErrorMessage message={error} />
-              <Button label="Try Again" variant="primary" onClick={handleGenerate} />
+              <Button onClick={handleGenerate}>Try Again</Button>
             </div>
           )}
 
@@ -640,6 +680,7 @@ function ConsultantTask() {
             <div style={planAreaStyle}>
               <div style={leftColStyle}>
                 <iframe
+                  ref={iframeRef}
                   style={iframeStyle}
                   srcDoc={plan.html_content}
                   title={`Plan for ${student?.full_name || 'student'}`}

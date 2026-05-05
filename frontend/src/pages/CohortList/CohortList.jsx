@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 import EmptyState from '../../components/EmptyState/EmptyState';
@@ -130,7 +130,7 @@ function CohortList() {
             <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
               Student Cohorts
             </h1>
-            <Button label="New Cohort" variant="primary" onClick={() => setCreateModalOpen(true)} />
+            <Button onClick={() => setCreateModalOpen(true)}>New Cohort</Button>
           </div>
 
           <div style={containerStyle}>

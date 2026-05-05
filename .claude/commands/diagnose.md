@@ -1,0 +1,1 @@
+/Users/bsg/Downloads/schoolchoice/.agents/skills/diagnose//SKILL.md

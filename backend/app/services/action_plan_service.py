@@ -1,7 +1,10 @@
 """
 app/services/action_plan_service.py
 
-Action plan generation and retrieval.
+DEPRECATED: Legacy v1 action plan generation.
+Superseded by v2 plan pipeline in app.api.v1.routes.plan + plan_generator.
+Retained for backward compatibility with /recommendations/action-plan endpoints.
+
 REQ-021, REQ-022, REQ-035, REQ-038, REQ-040
 """
 from __future__ import annotations
@@ -94,20 +97,7 @@ def _build_academic_targets(grades: dict) -> str:
     return "\n".join(f"- {t}" for t in targets)
 
 
-def _grade_to_numeric(grade_value) -> float:
-    """Convert a grade value (int, float, or letter) to a 0–100 float."""
-    _LETTER_MAP = {
-        "a+": 100, "a": 95, "a-": 90,
-        "b+": 87, "b": 83, "b-": 80,
-        "c+": 77, "c": 73, "c-": 70,
-        "d+": 67, "d": 63, "d-": 60,
-        "f": 0,
-    }
-    if isinstance(grade_value, (int, float)):
-        return float(grade_value)
-    if isinstance(grade_value, str):
-        return _LETTER_MAP.get(grade_value.strip().lower(), 0.0)
-    return 0.0
+from app.modules.school_choice.services.hkdse_service import letter_grade_to_numeric as _grade_to_numeric
 
 
 # ---------------------------------------------------------------------------

@@ -1,1152 +1,690 @@
 """
 app/services/plan_generator.py
 
-HTML academic plan generation.
+HTML academic plan generation — Modern Consultant style.
 REQ-077
 
-Generates a complete styled HTML document as a string using Python f-strings.
-Inline CSS for base styling; Chart.js (CDN v4) for UNIVERSITY plan charts.
-@media print block included.
+Philosophy: The plan is an ACTION document, not an algorithmic recommendation.
+It tells the student "what you need to do to get where you want to go."
+
+- Student view (default): encouraging, action-oriented, no match percentages
+- Counselor view (toggle): match scores, competitive positioning, risk flags
+- Counselor-only elements use class="counselor-only" (hidden by default)
 """
 
 from __future__ import annotations
 
 import html
-import json
 from datetime import datetime, timezone
 
-# Explicit __all__ so that `import *` re-exports private helpers used by routes/tests
 __all__ = [
     "TEMPLATES",
     "generate_html_plan",
     "_build_action_items",
     "_esc",
-    "_pct",
-    "_get_template_css",
-    "_gantt_svg",
-    "_derive_quarter",
-    "_charts_html_for_school",
-    "_all_charts_init_script",
-    "_section_student_summary",
-    "_section_academic_profile",
-    "_shap_section_html",
-    "_section_recommended_schools",
-    "_section_hs_subject_analysis",
-    "_section_hs_action_plan",
-    "_generate_high_school_plan",
-    "_section_action_plan",
-    "_section_skill_gaps",
-    "_section_language_readiness",
-    "_section_appendix",
 ]
 
 
 # ---------------------------------------------------------------------------
-# Template definitions (Point 17)
+# Template color schemes
 # ---------------------------------------------------------------------------
 
 TEMPLATES: dict[str, dict[str, str]] = {
     "professional": {
-        "--plan-bg": "#ffffff",
-        "--plan-heading-color": "#1e3a5f",
-        "--plan-accent": "#1e3a5f",
-        "--plan-font-body": "Georgia, serif",
-        "--plan-font-heading": "Georgia, serif",
-        "--plan-section-padding": "28px 32px",
-        "--plan-section-gap": "32px",
-        "--plan-line-height": "1.8",
-        "--plan-letter-spacing": "0.01em",
+        "primary": "#2563eb",
+        "primary-light": "#eff6ff",
+        "bg": "#ffffff",
+        "surface": "#f8fafc",
+        "text": "#111827",
+        "text-secondary": "#6b7280",
+        "border": "#e5e7eb",
+        "green": "#16a34a",
+        "green-light": "#f0fdf4",
+        "amber": "#d97706",
+        "amber-light": "#fef3c7",
+        "red": "#dc2626",
+        "red-light": "#fef2f2",
     },
     "modern": {
-        "--plan-bg": "#f5f5f5",
-        "--plan-heading-color": "#0d9488",
-        "--plan-accent": "#0d9488",
-        "--plan-font-body": "Inter, sans-serif",
-        "--plan-font-heading": "Inter, sans-serif",
-        "--plan-section-padding": "36px 40px",
-        "--plan-section-gap": "40px",
-        "--plan-line-height": "1.7",
-        "--plan-letter-spacing": "0em",
+        "primary": "#0d9488",
+        "primary-light": "#f0fdfa",
+        "bg": "#f5f5f5",
+        "surface": "#ffffff",
+        "text": "#111827",
+        "text-secondary": "#6b7280",
+        "border": "#e5e7eb",
+        "green": "#16a34a",
+        "green-light": "#f0fdf4",
+        "amber": "#d97706",
+        "amber-light": "#fef3c7",
+        "red": "#dc2626",
+        "red-light": "#fef2f2",
     },
     "minimal": {
-        "--plan-bg": "#ffffff",
-        "--plan-heading-color": "#000000",
-        "--plan-accent": "#000000",
-        "--plan-font-body": "Arial, sans-serif",
-        "--plan-font-heading": "Arial, sans-serif",
-        "--plan-section-padding": "12px 16px",
-        "--plan-section-gap": "16px",
-        "--plan-line-height": "1.5",
-        "--plan-letter-spacing": "0em",
+        "primary": "#111827",
+        "primary-light": "#f3f4f6",
+        "bg": "#ffffff",
+        "surface": "#f9fafb",
+        "text": "#111827",
+        "text-secondary": "#6b7280",
+        "border": "#d1d5db",
+        "green": "#16a34a",
+        "green-light": "#f0fdf4",
+        "amber": "#d97706",
+        "amber-light": "#fef3c7",
+        "red": "#dc2626",
+        "red-light": "#fef2f2",
     },
 }
 
-
-def _get_template_css(template_id: str) -> str:
-    """Return a <style> block with CSS variable overrides for the given template."""
-    tpl = TEMPLATES.get(template_id) or TEMPLATES["professional"]
-    vars_css = "\n    ".join(f"{k}: {v};" for k, v in tpl.items())
-    minimal_extra = ""
-    if template_id == "minimal":
-        minimal_extra = """
-  .section { box-shadow: none !important; border: 1px solid #e5e7eb !important; border-radius: 0 !important; }
-  .header { background: #000 !important; }"""
-    return f"""<style>
-  :root {{
-    {vars_css}
-  }}
-  body {{
-    background: var(--plan-bg);
-    font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
-    line-height: var(--plan-line-height, 1.6);
-    letter-spacing: var(--plan-letter-spacing, 0);
-  }}
-  h1, h2, h3, h4, h5, h6 {{
-    font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
-  }}
-  .section {{
-    padding: var(--plan-section-padding, 24px);
-    margin-bottom: var(--plan-section-gap, 24px);
-  }}
-  .section h2 {{
-    color: var(--plan-heading-color);
-  }}
-  .section h3 {{
-    color: var(--plan-heading-color);
-  }}
-  .school-card h3 {{
-    color: var(--plan-heading-color);
-  }}
-  .summary-table th, .data-table th {{
-    background: var(--plan-accent);
-  }}
-  .header {{
-    background: var(--plan-heading-color) !important;
-  }}{minimal_extra}
-</style>"""
-
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
 
 def _esc(value: object) -> str:
     """HTML-escape any value for safe embedding."""
     return html.escape(str(value) if value is not None else "")
 
 
-def _pct(score: float | None) -> str:
-    """Format a 0.0-1.0 score as percentage string."""
-    if score is None:
-        return "N/A"
-    return f"{score * 100:.1f}%"
-
-
-# ---------------------------------------------------------------------------
-# Action item builder
-# ---------------------------------------------------------------------------
-
-def _build_action_items(student: dict, match_results: list) -> list[dict]:
-    """
-    Generate action items:
-    - For each subject below grade 4: "Improve {subject} to Grade 4+" due next mock
-    - For each school with IELTS gap: "Achieve IELTS {target}"
-    - Generic: "Prepare personal statement", "Research {school} application"
-    Returns list of {task, deadline, related_school, priority}
-    """
-    items: list[dict] = []
-    current_year = datetime.now(timezone.utc).year
-
-    # Subject improvement tasks
-    grades = student.get("subject_grades") or []
-    for grade in grades:
-        raw = grade.get("raw_grade") or grade.get("predicted_grade") or ""
-        subject_name = grade.get("subject_name") or grade.get("subject_code") or "Subject"
-        # Grades below 4 need improvement
-        from app.modules.school_choice.services.hkdse_service import grade_to_int
-        if raw and grade_to_int(raw) < 4:
-            items.append({
-                "task": f"Improve {subject_name} to Grade 4 or above",
-                "deadline": f"Next Mock Exam ({current_year})",
-                "related_school": None,
-                "priority": "High",
-            })
-
-    # IELTS gap tasks
-    for result in match_results[:5]:
-        school_name = getattr(result, "school_name", None) or (result.get("school_name") if isinstance(result, dict) else None) or "School"
-        comp = getattr(result, "component_scores", {}) or (result.get("component_scores", {}) if isinstance(result, dict) else {})
-        lang_fit = comp.get("language_fit", 1.0) if comp else 1.0
-
-        if lang_fit < 1.0:
-            target_ielts = "7.0"  # recommend aiming higher
-            items.append({
-                "task": f"Achieve IELTS overall band {target_ielts} for {school_name}",
-                "deadline": f"By {current_year + 1}",
-                "related_school": school_name,
-                "priority": "High",
-            })
-
-        items.append({
-            "task": f"Research {school_name} application requirements and deadlines",
-            "deadline": f"Q3 {current_year}",
-            "related_school": school_name,
-            "priority": "Medium",
-        })
-
-    # Generic tasks
-    items.append({
-        "task": "Prepare personal statement draft",
-        "deadline": f"Q4 {current_year}",
-        "related_school": None,
-        "priority": "High",
-    })
-    items.append({
-        "task": "Gather reference letters from teachers",
-        "deadline": f"Q3 {current_year}",
-        "related_school": None,
-        "priority": "Medium",
-    })
-
-    return items
-
-
-# ---------------------------------------------------------------------------
-# Chart helpers (Point 15)
-# ---------------------------------------------------------------------------
-
-def _derive_quarter(deadline: str | None, current_year: int) -> str:
-    """
-    Try to extract a quarter label from a deadline string.
-    Recognises patterns like 'Q1 2026', 'Q3 2025', 'Next Mock Exam (2026)', 'By 2027'.
-    Returns 'Q1 YYYY'–'Q4 YYYY' or 'TBD'.
-    """
-    if not deadline:
-        return "TBD"
-    dl = deadline.strip()
-    # Explicit Qn pattern
-    import re
-    m = re.search(r"Q([1-4])\s*(\d{4})", dl)
-    if m:
-        return f"Q{m.group(1)} {m.group(2)}"
-    # "Next Mock Exam (YYYY)"
-    m2 = re.search(r"\((\d{4})\)", dl)
-    if m2:
-        return f"Q2 {m2.group(1)}"
-    # "By YYYY"
-    m3 = re.search(r"[Bb]y\s+(\d{4})", dl)
-    if m3:
-        return f"Q1 {m3.group(1)}"
-    # bare year
-    m4 = re.search(r"(\d{4})", dl)
-    if m4:
-        return f"Q2 {m4.group(1)}"
-    return "TBD"
-
-
-def _gantt_svg(action_items: list, current_year: int) -> str:
-    """
-    Build an SVG Gantt chart grouping action items by quarter.
-    Quarters shown on X-axis: Q1–Q4 for current_year and current_year+1.
-    Each item bar is coloured by priority.
-    Returns an SVG string.
-    """
-    quarters = [
-        f"Q1 {current_year}", f"Q2 {current_year}",
-        f"Q3 {current_year}", f"Q4 {current_year}",
-        f"Q1 {current_year + 1}", f"Q2 {current_year + 1}",
-        f"Q3 {current_year + 1}", f"Q4 {current_year + 1}",
-    ]
-    quarter_index = {q: i for i, q in enumerate(quarters)}
-
-    priority_colors = {
-        "High": "#dc2626",
-        "Medium": "#d97706",
-        "Low": "#16a34a",
-    }
-
-    svg_width = 700
-    left_margin = 160   # space for task label
-    right_margin = 20
-    chart_width = svg_width - left_margin - right_margin
-    bar_height = 18
-    row_gap = 6
-    header_height = 40
-    col_width = chart_width / len(quarters)
-
-    # Assign each item a quarter index (items with TBD get placed at index -1 for last col)
-    rows = []
-    for item in action_items:
-        dl = item.get("deadline") or ""
-        qkey = _derive_quarter(dl, current_year)
-        qidx = quarter_index.get(qkey, len(quarters) - 1)
-        task = item.get("task") or ""
-        truncated = task[:50] + ("…" if len(task) > 50 else "")
-        priority = item.get("priority") or "Medium"
-        color = priority_colors.get(priority, "#6b7280")
-        rows.append((qidx, truncated, color))
-
-    total_height = header_height + len(rows) * (bar_height + row_gap) + 20
-
-    lines = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{svg_width}" height="{total_height}" style="font-family:Arial,sans-serif;font-size:11px;">',
-        # Background
-        f'<rect width="{svg_width}" height="{total_height}" fill="#f9fafb" rx="4"/>',
-        # Column headers
-    ]
-
-    for i, q in enumerate(quarters):
-        x = left_margin + i * col_width
-        lines.append(f'<text x="{x + col_width / 2:.1f}" y="20" text-anchor="middle" font-size="10" fill="#6b7280">{_esc(q)}</text>')
-        # Vertical grid lines
-        lines.append(f'<line x1="{x:.1f}" y1="28" x2="{x:.1f}" y2="{total_height}" stroke="#e5e7eb" stroke-width="1"/>')
-
-    # Rows
-    for row_idx, (qidx, task_label, color) in enumerate(rows):
-        y = header_height + row_idx * (bar_height + row_gap)
-        bar_x = left_margin + qidx * col_width
-        bar_w = col_width * 0.85
-        # Task label (left column)
-        lines.append(
-            f'<text x="{left_margin - 6}" y="{y + bar_height - 4}" '
-            f'text-anchor="end" font-size="10" fill="#374151">{_esc(task_label[:40])}</text>'
-        )
-        # Bar
-        lines.append(
-            f'<rect x="{bar_x:.1f}" y="{y}" width="{bar_w:.1f}" height="{bar_height}" '
-            f'fill="{color}" rx="3" opacity="0.85"/>'
-        )
-
-    lines.append("</svg>")
-    return "\n".join(lines)
-
-
-def _charts_html_for_school(result, school_index: int, student: dict) -> str:
-    """
-    Build Chart.js canvas elements and data scripts for a single school result.
-    Returns HTML string with canvas divs (scripts are collected separately).
-    """
+def _grade_color(grade_str: str, colors: dict) -> str:
+    """Return background color for a grade cell."""
     from app.modules.school_choice.services.hkdse_service import grade_to_int
-
-    # Access component scores safely (same pattern as _shap_section_html)
-    if isinstance(result, dict):
-        comp = result.get("component_scores") or {}
-        min_entry = result.get("minimum_entry_score") or 0
-    else:
-        comp = getattr(result, "component_scores", {}) or {}
-        min_entry = getattr(result, "minimum_entry_score", 0) or 0
-
-    academic_fit = float(comp.get("academic_fit", 0.0))
-    subject_alignment = float(comp.get("subject_alignment", 0.0))
-    language_fit = float(comp.get("language_fit", 0.0))
-    interest_alignment = float(comp.get("interest_alignment", 0.0))
-
-    # Subject grade profile data
-    grades = student.get("subject_grades") or []
-    subjects_labels = []
-    subjects_values = []
-    for g in grades:
-        name = g.get("subject_name") or g.get("subject_code") or "Subject"
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        numeric = grade_to_int(raw)
-        subjects_labels.append(name)
-        subjects_values.append(numeric)
-
-    num_subjects = max(len(subjects_labels), 5)
-    per_subject_min = round(min_entry / num_subjects, 2) if min_entry else 0
-
-    grade_chart_id = f"chart-grade-{school_index}"
-    radar_chart_id = f"chart-radar-{school_index}"
-
-    grade_data = {
-        "labels": subjects_labels,
-        "datasets": [
-            {
-                "label": "Your Grade",
-                "data": subjects_values,
-                "backgroundColor": "rgba(59,130,246,0.5)",
-                "borderColor": "rgba(59,130,246,0.9)",
-                "borderWidth": 1,
-            }
-        ],
-    }
-
-    radar_data = {
-        "labels": ["Academic Fit", "Subject Alignment", "Language Fit", "Program Alignment"],
-        "datasets": [
-            {
-                "label": "School Fit",
-                "data": [
-                    round(academic_fit, 3),
-                    round(subject_alignment, 3),
-                    round(language_fit, 3),
-                    round(interest_alignment, 3),
-                ],
-                "backgroundColor": "rgba(99,102,241,0.2)",
-                "borderColor": "rgba(99,102,241,0.9)",
-                "pointBackgroundColor": "rgba(99,102,241,0.9)",
-                "borderWidth": 2,
-            }
-        ],
-    }
-
-    grade_data_json = json.dumps(grade_data)
-    radar_data_json = json.dumps(radar_data)
-    per_subject_min_js = json.dumps(per_subject_min)
-
-    html_parts = []
-
-    if subjects_labels:
-        html_parts.append(f"""
-            <h4>Subject Grade Profile</h4>
-            <div style="max-width:500px;margin:16px 0;">
-              <canvas id="{grade_chart_id}"></canvas>
-            </div>
-            <script id="data-{grade_chart_id}" type="application/json">{grade_data_json}</script>
-            <script id="min-{grade_chart_id}" type="application/json">{per_subject_min_js}</script>""")
-
-    html_parts.append(f"""
-            <h4>School Fit Radar</h4>
-            <div style="max-width:500px;margin:16px 0;">
-              <canvas id="{radar_chart_id}"></canvas>
-            </div>
-            <script id="data-{radar_chart_id}" type="application/json">{radar_data_json}</script>""")
-
-    return "".join(html_parts)
+    num = grade_to_int(grade_str)
+    if num >= 5:
+        return colors["green-light"]
+    elif num == 4:
+        return colors["amber-light"]
+    elif num > 0:
+        return colors["red-light"]
+    return "transparent"
 
 
-def _all_charts_init_script(top_schools: list, student: dict) -> str:
+# ---------------------------------------------------------------------------
+# CSS
+# ---------------------------------------------------------------------------
+
+def _build_css(colors: dict, template_id: str) -> str:
+    p = colors["primary"]
+    pl = colors["primary-light"]
+    bg = colors["bg"]
+    sf = colors["surface"]
+    tx = colors["text"]
+    ts = colors["text-secondary"]
+    bd = colors["border"]
+    shadow = "0 1px 3px rgba(0,0,0,0.1)" if template_id != "minimal" else "none"
+    border_style = f"1px solid {bd}"
+
+    return f"""
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      color: {tx};
+      background: {sf};
+      line-height: 1.6;
+      padding: 24px;
+      font-size: 14px;
+    }}
+    .header {{
+      background: {bg};
+      padding: 24px 32px;
+      border-bottom: 3px solid {p};
+      margin-bottom: 24px;
+    }}
+    .header-label {{
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: {p};
+      margin-bottom: 4px;
+    }}
+    .header h1 {{
+      font-size: 22px;
+      font-weight: 700;
+      color: {tx};
+      margin-bottom: 2px;
+    }}
+    .header .subtitle {{
+      font-size: 12px;
+      color: {ts};
+    }}
+    .metrics-row {{
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }}
+    .metric-card {{
+      flex: 1 1 120px;
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-align: center;
+      min-width: 100px;
+    }}
+    .metric-value {{
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+    }}
+    .metric-label {{
+      font-size: 10px;
+      color: {ts};
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }}
+    .section {{
+      background: {bg};
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: {shadow};
+      border: {border_style};
+    }}
+    .section h2 {{
+      font-size: 16px;
+      font-weight: 600;
+      color: {tx};
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid {bd};
+    }}
+    .assessment {{
+      border-left: 4px solid {p};
+      background: {pl};
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: {tx};
+    }}
+    .school-card {{
+      border: {border_style};
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      background: {bg};
+    }}
+    .school-header {{
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }}
+    .school-name {{
+      font-size: 14px;
+      font-weight: 600;
+      color: {tx};
+    }}
+    .school-meta {{
+      font-size: 11px;
+      color: {ts};
+      margin-top: 2px;
+    }}
+    .school-rationale {{
+      font-size: 13px;
+      color: #444;
+      line-height: 1.5;
+      margin: 8px 0;
+    }}
+    .school-actions {{
+      margin-top: 8px;
+      padding-left: 18px;
+    }}
+    .school-actions li {{
+      font-size: 12px;
+      color: {tx};
+      margin: 3px 0;
+      line-height: 1.4;
+    }}
+    .badge {{
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }}
+    .badge-blue {{ background: {p}; color: white; }}
+    .badge-green {{ background: {colors["green"]}; color: white; }}
+    .badge-amber {{ background: {colors["amber"]}; color: white; }}
+    .data-table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }}
+    .data-table th {{
+      background: {sf};
+      color: {tx};
+      font-weight: 600;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 2px solid {bd};
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }}
+    .data-table td {{
+      padding: 8px 12px;
+      border-bottom: 1px solid {bd};
+    }}
+    .data-table tr:last-child td {{
+      border-bottom: none;
+    }}
+    .pill {{
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 600;
+    }}
+    .pill-high {{ background: {colors["red-light"]}; color: {colors["red"]}; }}
+    .pill-medium {{ background: {colors["amber-light"]}; color: {colors["amber"]}; }}
+    .pill-low {{ background: {colors["green-light"]}; color: {colors["green"]}; }}
+    .gap-pill {{
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      margin: 3px 4px 3px 0;
+      background: {colors["amber-light"]};
+      color: #92400e;
+    }}
+    .counselor-only {{ display: none; }}
+    .show-counselor .counselor-only {{ display: block; }}
+    .show-counselor .counselor-only-inline {{ display: inline; }}
+    .footer {{
+      text-align: center;
+      font-size: 11px;
+      color: {ts};
+      margin-top: 24px;
+      padding: 16px;
+    }}
+    @media print {{
+      body {{ background: white; padding: 0; font-size: 12px; }}
+      .section {{ box-shadow: none; page-break-inside: avoid; }}
+      .school-card {{ page-break-inside: avoid; }}
+      .counselor-only {{ display: none !important; }}
+    }}
     """
-    Build the Chart.js initialisation <script> block for all school charts.
-    Each new Chart(...) is guarded by if (document.getElementById('...')) check.
-    """
-    from app.modules.school_choice.services.hkdse_service import grade_to_int
-
-    scripts = []
-    for idx, result in enumerate(top_schools, 1):
-        grade_chart_id = f"chart-grade-{idx}"
-        radar_chart_id = f"chart-radar-{idx}"
-
-        grades = student.get("subject_grades") or []
-        if grades:
-            scripts.append(f"""
-  if (document.getElementById('{grade_chart_id}')) {{
-    var gradeData{idx} = JSON.parse(document.getElementById('data-{grade_chart_id}').textContent);
-    var perSubjectMin{idx} = JSON.parse(document.getElementById('min-{grade_chart_id}').textContent);
-    new Chart(document.getElementById('{grade_chart_id}'), {{
-      type: 'bar',
-      data: gradeData{idx},
-      options: {{
-        indexAxis: 'y',
-        responsive: true,
-        scales: {{
-          x: {{
-            min: 0,
-            max: 7,
-            title: {{ display: true, text: 'Grade (0-7)' }},
-          }},
-          y: {{ ticks: {{ font: {{ size: 11 }} }} }},
-        }},
-        plugins: {{
-          annotation: void 0,
-          tooltip: {{ enabled: true }},
-          legend: {{ display: false }},
-          title: {{ display: false }},
-        }},
-      }},
-      plugins: [{{
-        id: 'refLine{idx}',
-        afterDraw(chart) {{
-          const xScale = chart.scales.x;
-          const yScale = chart.scales.y;
-          const ctx = chart.ctx;
-          const x = xScale.getPixelForValue(perSubjectMin{idx});
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(x, yScale.top);
-          ctx.lineTo(x, yScale.bottom);
-          ctx.strokeStyle = '#dc2626';
-          ctx.lineWidth = 2;
-          ctx.setLineDash([4, 3]);
-          ctx.stroke();
-          ctx.restore();
-        }}
-      }}],
-    }});
-  }}""")
-
-        scripts.append(f"""
-  if (document.getElementById('{radar_chart_id}')) {{
-    var radarData{idx} = JSON.parse(document.getElementById('data-{radar_chart_id}').textContent);
-    new Chart(document.getElementById('{radar_chart_id}'), {{
-      type: 'radar',
-      data: radarData{idx},
-      options: {{
-        responsive: true,
-        scales: {{
-          r: {{
-            min: 0,
-            max: 1,
-            ticks: {{ stepSize: 0.25, font: {{ size: 10 }} }},
-          }},
-        }},
-        plugins: {{
-          legend: {{ display: false }},
-        }},
-      }},
-    }});
-  }}""")
-
-    if not scripts:
-        return ""
-    return "<script>\n" + "\n".join(scripts) + "\n</script>"
 
 
 # ---------------------------------------------------------------------------
 # Section builders
 # ---------------------------------------------------------------------------
 
-def _section_student_summary(student: dict, best5: int) -> str:
-    name = _esc(student.get("name") or student.get("full_name") or "Student")
-    year = _esc(student.get("year_of_study") or "N/A")
-    grade_system = "HKDSE"
+def _section_header(student: dict, generated_at: str, best5: int) -> str:
+    name = _esc(student.get("name") or "Student")
+    year = student.get("year_of_study")
+    year_str = f" · Year {year}" if year else ""
     return f"""
-    <section class="section">
-      <h2>1. Student Summary</h2>
-      <table class="summary-table">
-        <tr><th>Name</th><td>{name}</td></tr>
-        <tr><th>Year of Study</th><td>{year}</td></tr>
-        <tr><th>Grade System</th><td>{grade_system}</td></tr>
-        <tr><th>Best-5 Aggregate</th><td>{best5}</td></tr>
-      </table>
-    </section>"""
+  <div class="header">
+    <div class="header-label">University Application Strategy</div>
+    <h1>{name}</h1>
+    <div class="subtitle">Prepared {_esc(generated_at)}{year_str}</div>
+    <div class="counselor-only" style="margin-top:8px;font-size:12px;color:#6b7280;">Best-5 Aggregate: {best5}</div>
+  </div>"""
 
 
-def _section_academic_profile(student: dict) -> str:
+def _section_metrics(student: dict, best5: int, num_schools: int, colors: dict) -> str:
     grades = student.get("subject_grades") or []
-    rows = ""
+    top_grade = "N/A"
     if grades:
-        for g in grades:
-            subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
-            sitting = _esc(g.get("sitting") or "")
-            raw = _esc(g.get("raw_grade") or "")
-            predicted = _esc(g.get("predicted_grade") or "")
-            is_pred = "Yes" if g.get("predicted_grade") else "No"
-            rows += f"<tr><td>{subj}</td><td>{sitting}</td><td>{raw}</td><td>{is_pred}</td><td>{predicted}</td></tr>"
-    else:
-        rows = '<tr><td colspan="5">No grade records on file.</td></tr>'
+        from app.modules.school_choice.services.hkdse_service import grade_to_int
+        best = max(grades, key=lambda g: grade_to_int(g.get("raw_grade") or "U"))
+        top_grade = _esc(best.get("raw_grade") or "N/A")
 
     return f"""
-    <section class="section">
-      <h2>2. Academic Profile</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Subject</th><th>Sitting</th><th>Grade</th>
-            <th>Predicted?</th><th>Predicted Grade</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-    </section>"""
+  <div class="metrics-row">
+    <div class="metric-card counselor-only" style="background:{colors['primary-light']};">
+      <div class="metric-value" style="color:{colors['primary']};">{best5}</div>
+      <div class="metric-label">Best-5 Score</div>
+    </div>
+    <div class="metric-card" style="background:{colors['green-light']};">
+      <div class="metric-value" style="color:{colors['green']};">{top_grade}</div>
+      <div class="metric-label">Top Grade</div>
+    </div>
+    <div class="metric-card" style="background:{colors['amber-light']};">
+      <div class="metric-value" style="color:{colors['amber']};">{num_schools}</div>
+      <div class="metric-label">Target Schools</div>
+    </div>
+    <div class="metric-card" style="background:{colors['primary-light']};">
+      <div class="metric-value" style="color:{colors['primary']};">{len(grades)}</div>
+      <div class="metric-label">Subjects</div>
+    </div>
+  </div>"""
 
 
-def _shap_section_html(result) -> str:
-    """
-    Build the 'What drives this score' SHAP breakdown HTML for a single school result.
-    Returns empty string if shap_explanation is None or has no features.
-    """
-    if isinstance(result, dict):
-        shap_explanation = result.get("shap_explanation")
-    else:
-        shap_explanation = getattr(result, "shap_explanation", None)
-
-    if not shap_explanation:
+def _section_assessment(ai_assessment: str | None) -> str:
+    if not ai_assessment:
         return ""
-
-    features = shap_explanation.get("features") if isinstance(shap_explanation, dict) else None
-    if not features:
-        return ""
-
-    # Sort by magnitude descending, take top 4
-    sorted_features = sorted(features, key=lambda f: f.get("magnitude", 0.0), reverse=True)[:4]
-
-    rows = ""
-    for feat in sorted_features:
-        feature_name = _esc(feat.get("feature", ""))
-        direction = feat.get("direction", "")
-        magnitude = feat.get("magnitude", 0.0)
-        explanation = _esc(feat.get("explanation", ""))
-        pct_str = f"{magnitude * 100:.1f}%"
-        if direction == "positive":
-            arrow = "&#8593;"  # ↑
-            dir_label = "boosts score"
-            dir_color = "#155724"
-            sign = "+"
-        else:
-            arrow = "&#8595;"  # ↓
-            dir_label = "reduces score"
-            dir_color = "#721c24"
-            sign = ""
-        rows += (
-            f'<li style="margin:6px 0; font-size:14px;">'
-            f'<span style="color:{dir_color}; font-weight:bold;">{arrow} {feature_name} ({sign}{pct_str})</span>'
-            f' &mdash; {explanation}'
-            f'</li>'
-        )
-
     return f"""
-            <h4>What drives this score</h4>
-            <ul style="padding-left:20px;">{rows}</ul>"""
+  <div class="assessment">
+    {_esc(ai_assessment)}
+  </div>"""
 
 
-def _section_recommended_schools(match_results: list, student: dict, overrides: dict | None = None) -> str:
-    content = '<section class="section"><h2>3. Recommended Schools</h2>'
-
-    from app.modules.school_choice.services.hkdse_service import grade_to_int
-
-    grades = student.get("subject_grades") or []
-    grades_by_code: dict[str, int] = {}
-    for g in grades:
-        code = g.get("subject_code") or ""
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        if code:
-            grades_by_code[code] = grade_to_int(raw)
-
-    top_schools = [r for r in match_results if (
-        getattr(r, "eligibility_pass", False) if not isinstance(r, dict) else r.get("eligibility_pass", False)
-    )][:5]
-
-    for idx, result in enumerate(top_schools, 1):
-        if isinstance(result, dict):
-            school_name = _esc(result.get("school_name", ""))
-            fit_score = result.get("fit_score", 0.0)
-            eligibility = result.get("eligibility_pass", False)
-            rationale = _esc(result.get("rationale", ""))
-            req_subjects = result.get("required_subjects") or []
-            failing = result.get("failing_criteria") or []
-            intended_majors = result.get("intended_majors") or []
-        else:
-            school_name = _esc(getattr(result, "school_name", ""))
-            fit_score = getattr(result, "fit_score", 0.0)
-            eligibility = getattr(result, "eligibility_pass", False)
-            rationale = _esc(getattr(result, "rationale", ""))
-            req_subjects = []
-            failing = getattr(result, "failing_criteria") or []
-            intended_majors = []
-
-        # Check for rationale override (escape user-provided override text)
-        rationale_override_key = f"school_{idx - 1}_rationale"
-        if overrides and overrides.get(rationale_override_key):
-            rationale = _esc(overrides[rationale_override_key])
-
-        elig_badge = (
-            '<span class="badge badge-pass">ELIGIBLE</span>'
-            if eligibility
-            else '<span class="badge badge-fail">INELIGIBLE</span>'
-        )
-
-        # Gap analysis table
-        gap_rows = ""
-        if req_subjects:
-            for req in req_subjects:
-                code = req.get("subject_code", "")
-                min_grade = req.get("min_grade", "")
-                student_val = grades_by_code.get(code)
-                student_display = str(student_val) if student_val is not None else "N/A"
-                from app.modules.school_choice.services.hkdse_service import grade_to_int
-                min_val = grade_to_int(min_grade)
-                gap_class = "gap-ok" if student_val is not None and student_val >= min_val else "gap-fail"
-                gap_rows += (
-                    f'<tr class="{gap_class}">'
-                    f"<td>{_esc(code)}</td>"
-                    f"<td>{_esc(min_grade)}</td>"
-                    f"<td>{_esc(student_display)}</td>"
-                    f"</tr>"
-                )
-
-        gap_table = ""
-        if gap_rows:
-            gap_table = f"""
-            <h4>Gap Analysis</h4>
-            <table class="data-table gap-table">
-              <thead><tr><th>Subject</th><th>Required</th><th>Your Grade</th></tr></thead>
-              <tbody>{gap_rows}</tbody>
-            </table>"""
-
-        actions = ""
-        for fc in failing:
-            actions += f'<li class="action-item">{_esc(fc)}</li>'
-        if not actions:
-            actions = "<li>Continue current preparation. Apply early.</li>"
-
-        majors_html = ""
-        if intended_majors:
-            if isinstance(intended_majors, list):
-                majors_display = _esc(", ".join(str(m) for m in intended_majors if m))
-            else:
-                majors_display = _esc(str(intended_majors))
-            majors_html = f'<p><strong>Intended Major(s):</strong> {majors_display}</p>'
-
-        shap_html = _shap_section_html(result)
-
-        # Charts (embedded canvas + data scripts; init script collected in generate_html_plan)
-        charts_html = _charts_html_for_school(result, idx, student)
-
-        content += f"""
-        <div class="school-card">
-          <h3>{idx}. {school_name} {elig_badge}</h3>
-          <p><strong>Fit Score:</strong> {_pct(fit_score)}</p>
-          {majors_html}
-          <p><strong>Why this school fits:</strong> {rationale}</p>
-          {shap_html}
-          {charts_html}
-          {gap_table}
-          <h4>Recommended Actions</h4>
-          <ul>{actions}</ul>
-        </div>"""
-
-    if not top_schools:
-        content += "<p>No eligible school matches found. Consider broadening criteria.</p>"
-
-    content += "</section>"
-    return content, top_schools
-
-
-# ---------------------------------------------------------------------------
-# HIGH_SCHOOL plan sections
-# ---------------------------------------------------------------------------
-
-def _section_hs_subject_analysis(student: dict) -> str:
-    """Section 3 for HIGH_SCHOOL plan: subject-by-subject strength/weakness analysis."""
-    from app.modules.school_choice.services.hkdse_service import grade_to_int
-
+def _section_academic_profile(student: dict, colors: dict) -> str:
     grades = student.get("subject_grades") or []
     if not grades:
-        return '<section class="section"><h2>3. Subject Strength &amp; Weakness Analysis</h2><p>No grade records on file.</p></section>'
+        return '<div class="section"><h2>Your Academic Strengths</h2><p>No grade records on file yet.</p></div>'
 
     rows = ""
     for g in grades:
         subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        numeric = grade_to_int(raw)
-        raw_esc = _esc(raw)
-
-        if numeric >= 5:
-            status = "Strength"
-            status_style = "color:#155724; font-weight:bold;"
-            action = "Maintain performance; consider advanced extension work."
-        elif numeric < 4:
-            status = "Needs Improvement"
-            status_style = "color:#721c24; font-weight:bold;"
-            action = f"Focus on Grade 4+ target; seek teacher support and additional practice."
-        else:
-            status = "On Track"
-            status_style = "color:#856404; font-weight:bold;"
-            action = "Consolidate understanding; aim for Grade 5 in next sitting."
-
-        rows += (
-            f"<tr>"
-            f"<td>{subj}</td>"
-            f"<td>{raw_esc}</td>"
-            f"<td>{numeric}</td>"
-            f'<td><span style="{status_style}">{status}</span></td>'
-            f"<td>{action}</td>"
-            f"</tr>"
-        )
+        raw = g.get("raw_grade") or ""
+        predicted = g.get("predicted_grade") or ""
+        sitting = _esc(g.get("sitting") or "")
+        bg = _grade_color(raw, colors)
+        rows += f'<tr><td>{subj}</td><td>{_esc(sitting)}</td><td style="background:{bg};font-weight:600;">{_esc(raw)}</td><td>{_esc(predicted)}</td></tr>'
 
     return f"""
-    <section class="section">
-      <h2>3. Subject Strength &amp; Weakness Analysis</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Subject</th><th>Grade</th><th>Numeric</th>
-            <th>Assessment</th><th>Recommended Action</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-    </section>"""
+  <div class="section">
+    <h2>Your Academic Strengths</h2>
+    <table class="data-table">
+      <thead><tr><th>Subject</th><th>Sitting</th><th>Grade</th><th>Predicted</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </div>"""
 
 
-def _section_hs_action_plan(student: dict) -> str:
-    """Section 4 for HIGH_SCHOOL plan: grade improvement action items."""
-    from app.modules.school_choice.services.hkdse_service import grade_to_int
+def _section_target_schools(match_results: list, colors: dict, overrides: dict | None = None) -> str:
+    """Build target schools section. Framing: 'Your Target Schools' not 'Recommended Schools'."""
+    content = '<div class="section"><h2>Your Target Schools</h2>'
 
-    current_year = datetime.now(timezone.utc).year
-    grades = student.get("subject_grades") or []
-    items = []
+    top_schools = [r for r in match_results if (
+        r.get("eligibility_pass", True) if isinstance(r, dict) else getattr(r, "eligibility_pass", True)
+    )][:8]
 
-    for g in grades:
-        subj = _esc(g.get("subject_name") or g.get("subject_code") or "Subject")
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        numeric = grade_to_int(raw)
-        if numeric < 4:
-            items.append({
-                "task": f"Improve {subj} to Grade 4 or above",
-                "deadline": f"Next Mock Exam ({current_year})",
-                "priority": "High",
-            })
-        elif numeric < 5:
-            items.append({
-                "task": f"Aim for Grade 5 in {subj}",
-                "deadline": f"End of Term ({current_year})",
-                "priority": "Medium",
-            })
+    if not top_schools:
+        content += "<p>No target schools set yet. Ask your counselor to add schools to your list.</p>"
+        content += "</div>"
+        return content
 
-    items.append({
-        "task": "Meet regularly with form teacher to review academic progress",
-        "deadline": f"Monthly ({current_year})",
-        "priority": "High",
-    })
-    items.append({
-        "task": "Identify and join relevant extra-curricular activities",
-        "deadline": f"Q3 {current_year}",
-        "priority": "Medium",
-    })
+    for idx, result in enumerate(top_schools):
+        if isinstance(result, dict):
+            school_name = _esc(result.get("school_name", ""))
+            rationale = _esc(result.get("rationale", ""))
+            jupas = result.get("major_jupas_code") or result.get("jupas_code")
+            major = result.get("major_name")
+            fit_score = result.get("fit_score", 0)
+            action_items = result.get("action_items") or []
+        else:
+            school_name = _esc(getattr(result, "school_name", ""))
+            rationale = _esc(getattr(result, "rationale", ""))
+            jupas = getattr(result, "major_jupas_code", None)
+            major = getattr(result, "major_name", None)
+            fit_score = getattr(result, "fit_score", 0)
+            action_items = []
 
-    if not items:
-        return '<section class="section"><h2>4. Grade Improvement Action Plan</h2><p>No specific improvement actions needed. Keep up the excellent work!</p></section>'
+        # Override rationale if provided
+        override_key = f"school_{idx}_rationale"
+        if overrides and overrides.get(override_key):
+            rationale = _esc(overrides[override_key])
+
+        # Build display name: "School — Major" when major exists
+        if major:
+            display_name = f"{school_name} — {_esc(major)}"
+        else:
+            display_name = school_name
+
+        meta_parts = []
+        if jupas:
+            meta_parts.append(f"JUPAS: {_esc(jupas)}")
+        meta_str = " · ".join(meta_parts) if meta_parts else ""
+
+        # Counselor-only match badge
+        pct = round(fit_score * 100) if fit_score else 0
+        if pct >= 80:
+            badge_class = "badge-blue"
+        elif pct >= 60:
+            badge_class = "badge-green"
+        else:
+            badge_class = "badge-amber"
+
+        actions_html = ""
+        if action_items:
+            items = "".join(f"<li>{_esc(a)}</li>" for a in action_items)
+            actions_html = f"""
+        <div style="margin-top:8px;">
+          <div style="font-size:11px;font-weight:600;color:{colors['text-secondary']};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">What to focus on</div>
+          <ul class="school-actions">{items}</ul>
+        </div>"""
+
+        content += f"""
+    <div class="school-card">
+      <div class="school-header">
+        <div>
+          <div class="school-name">{display_name}</div>
+          <div class="school-meta">{meta_str}</div>
+        </div>
+        <span class="badge {badge_class} counselor-only-inline" style="display:none;">{pct}%</span>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:{colors['text-secondary']};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Why this works for you</div>
+      <div class="school-rationale">{rationale}</div>
+      {actions_html}
+    </div>"""
+
+    content += "</div>"
+    return content
+
+
+def _section_roadmap(action_items: list, colors: dict) -> str:
+    """Application Roadmap — month-by-month action table. This is the core of the plan."""
+    if not action_items:
+        return '<div class="section"><h2>Application Roadmap</h2><p>No action items generated yet.</p></div>'
 
     rows = ""
-    for item in items:
+    for item in action_items:
         task = _esc(item.get("task") or "")
-        deadline = _esc(item.get("deadline") or "")
-        priority = _esc(item.get("priority") or "Medium")
-        priority_class = f"priority-{priority.lower()}"
-        rows += (
-            f"<tr>"
-            f"<td>{deadline}</td>"
-            f"<td>{task}</td>"
-            f'<td><span class="{priority_class}">{priority}</span></td>'
-            f"</tr>"
-        )
+        deadline = _esc(item.get("deadline") or "General")
+        priority = item.get("priority") or "Medium"
+        school = _esc(item.get("related_school") or "")
+        pill_class = f"pill-{priority.lower()}"
+        rows += f"""<tr>
+      <td style="white-space:nowrap;font-weight:500;">{deadline}</td>
+      <td>{task}</td>
+      <td><span class="pill {pill_class}">{_esc(priority)}</span></td>
+      <td style="font-size:12px;color:{colors['text-secondary']};">{school}</td>
+    </tr>"""
 
     return f"""
-    <section class="section">
-      <h2>4. Grade Improvement Action Plan</h2>
-      <table class="data-table">
-        <thead>
-          <tr><th>Deadline</th><th>Task</th><th>Priority</th></tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-    </section>"""
+  <div class="section">
+    <h2>Application Roadmap</h2>
+    <p style="font-size:13px;color:{colors['text-secondary']};margin-bottom:14px;">Your month-by-month action plan to maximise your application strength.</p>
+    <table class="data-table">
+      <thead><tr><th>When</th><th>What To Do</th><th>Priority</th><th>School</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+  </div>"""
 
+
+def _section_growth_areas(student: dict, skill_gaps: list | None, colors: dict) -> str:
+    """Areas to strengthen — framed as growth opportunities."""
+    extra = student.get("extra_curricular") or []
+    awards = student.get("awards") or []
+
+    items = []
+    if skill_gaps:
+        for gap in skill_gaps:
+            items.append(_esc(gap) if isinstance(gap, str) else _esc(str(gap)))
+
+    if not extra and not awards and not items:
+        items.append("Build your extracurricular profile — join clubs, volunteer, or start a project related to your interests")
+
+    if not items:
+        items.append("Continue building on your current strengths and activities")
+
+    pills = "".join(f'<span class="gap-pill">{item}</span>' for item in items)
+
+    return f"""
+  <div class="section">
+    <h2>Areas to Strengthen</h2>
+    <p style="font-size:13px;color:{colors['text-secondary']};margin-bottom:12px;">Focus areas that will strengthen your applications across all target schools.</p>
+    <div>{pills}</div>
+  </div>"""
+
+
+def _section_language(student: dict, colors: dict) -> str:
+    ielts_raw = student.get("ielts_score")
+    ielts_overall = None
+    if isinstance(ielts_raw, dict):
+        ielts_overall = ielts_raw.get("overall")
+    elif ielts_raw is not None:
+        try:
+            ielts_overall = float(ielts_raw)
+        except (TypeError, ValueError):
+            pass
+
+    if ielts_overall:
+        status = f"Your IELTS overall band is <strong>{ielts_overall}</strong>."
+    else:
+        status = "IELTS score not yet on file. Check if your target schools require IELTS and plan accordingly."
+
+    return f"""
+  <div class="section">
+    <h2>Language Readiness</h2>
+    <p style="font-size:13px;">{status}</p>
+  </div>"""
+
+
+def _section_appendix(student: dict, best5: int, match_results: list, colors: dict) -> str:
+    # Raw grade table
+    grades = student.get("subject_grades") or []
+    grade_rows = ""
+    for g in grades:
+        subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
+        raw = _esc(g.get("raw_grade") or "")
+        sitting = _esc(g.get("sitting") or "")
+        year = _esc(g.get("year_of_exam") or "")
+        grade_rows += f"<tr><td>{subj}</td><td>{sitting}</td><td>{raw}</td><td>{year}</td></tr>"
+    if not grade_rows:
+        grade_rows = '<tr><td colspan="4">No grade records.</td></tr>'
+
+    # Counselor-only: match scores per school
+    counselor_rows = ""
+    for r in match_results[:10]:
+        if isinstance(r, dict):
+            name = _esc(r.get("school_name", ""))
+            score = round((r.get("fit_score") or 0) * 100)
+            eligible = r.get("eligibility_pass", True)
+        else:
+            name = _esc(getattr(r, "school_name", ""))
+            score = round((getattr(r, "fit_score", 0) or 0) * 100)
+            eligible = getattr(r, "eligibility_pass", True)
+        elig_str = "Yes" if eligible else "No"
+        counselor_rows += f"<tr><td>{name}</td><td>{score}%</td><td>{elig_str}</td></tr>"
+
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    return f"""
+  <div class="section">
+    <h2>Appendix</h2>
+    <h3 style="font-size:13px;margin-bottom:8px;">Grade Records</h3>
+    <table class="data-table">
+      <thead><tr><th>Subject</th><th>Sitting</th><th>Grade</th><th>Year</th></tr></thead>
+      <tbody>{grade_rows}</tbody>
+    </table>
+    <div class="counselor-only" style="margin-top:20px;">
+      <h3 style="font-size:13px;margin-bottom:8px;">Counselor Data — Match Scores</h3>
+      <p style="font-size:12px;color:{colors['text-secondary']};margin-bottom:8px;">Best-5 Aggregate: {best5}</p>
+      <table class="data-table">
+        <thead><tr><th>School</th><th>Match</th><th>Eligible</th></tr></thead>
+        <tbody>{counselor_rows}</tbody>
+      </table>
+    </div>
+    <p style="font-size:11px;color:{colors['text-secondary']};margin-top:16px;">Data sourced from HKEAA, JUPAS, and university admissions pages. Last updated: {_esc(generated)}.</p>
+  </div>"""
+
+
+# ---------------------------------------------------------------------------
+# Action item builder (deterministic fallback)
+# ---------------------------------------------------------------------------
+
+def _build_action_items(student: dict, match_results: list) -> list[dict]:
+    """Generate action items when AI doesn't provide them."""
+    items: list[dict] = []
+    current_year = datetime.now(timezone.utc).year
+
+    grades = student.get("subject_grades") or []
+    from app.modules.school_choice.services.hkdse_service import grade_to_int
+    for grade in grades:
+        raw = grade.get("raw_grade") or grade.get("predicted_grade") or ""
+        subject_name = grade.get("subject_name") or grade.get("subject_code") or "Subject"
+        if raw and grade_to_int(raw) < 4:
+            items.append({
+                "task": f"Improve {subject_name} to Grade 4 or above",
+                "deadline": f"March {current_year + 1}",
+                "related_school": "",
+                "priority": "High",
+            })
+
+    items.append({"task": "Finalise JUPAS programme preference list", "deadline": f"December {current_year}", "related_school": "", "priority": "High"})
+    items.append({"task": "Complete personal statement first draft", "deadline": f"November {current_year}", "related_school": "", "priority": "High"})
+    items.append({"task": "Request reference letters from teachers", "deadline": f"October {current_year}", "related_school": "", "priority": "Medium"})
+    items.append({"task": "Research application requirements for each target school", "deadline": f"September {current_year}", "related_school": "", "priority": "Medium"})
+
+    return items
+
+
+# ---------------------------------------------------------------------------
+# High school plan (kept simple)
+# ---------------------------------------------------------------------------
 
 def _generate_high_school_plan(student: dict, match_results: list, template_id: str = "professional", overrides: dict | None = None) -> str:
-    """
-    Generate a HIGH_SCHOOL academic plan HTML document.
-    Filters match results to HIGH_SCHOOL type schools only.
-    Shows subject strength/weakness analysis instead of university fit scores.
-    No IELTS section. No Chart.js charts.
-    """
+    colors = TEMPLATES.get(template_id) or TEMPLATES["professional"]
     from app.modules.school_choice.services.hkdse_service import compute_best5_aggregate, grade_to_int
 
     grades = student.get("subject_grades") or []
-    grade_dicts = []
-    for g in grades:
-        code = g.get("subject_code") or ""
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        category = g.get("category") or "ELECTIVE"
-        is_compulsory = g.get("is_compulsory") or False
-        grade_dicts.append({
-            "subject_code": code,
-            "numeric_value": grade_to_int(raw),
-            "is_compulsory": is_compulsory,
-            "category": category,
-        })
+    grade_dicts = [{
+        "subject_code": g.get("subject_code") or "",
+        "numeric_value": grade_to_int(g.get("raw_grade") or "U"),
+        "is_compulsory": g.get("is_compulsory") or False,
+        "category": g.get("category") or "ELECTIVE",
+    } for g in grades]
     best5 = compute_best5_aggregate(grade_dicts)
-
-    student_name = student.get("name") or student.get("full_name") or "Student"
+    name = _esc(student.get("name") or "Student")
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    # Filter match_results to high schools only
-    hs_results = []
-    for r in match_results:
-        school_type = getattr(r, "school_type", None) if not isinstance(r, dict) else r.get("school_type")
-        if school_type == "HIGH_SCHOOL":
-            hs_results.append(r)
+    css = _build_css(colors, template_id)
 
-    css = """
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      color: #1a1a2e;
-      background: #f8f9fa;
-      line-height: 1.6;
-      padding: 24px;
-    }
-    .header {
-      background: linear-gradient(135deg, #145a32, #1e8449);
-      color: white;
-      padding: 32px 40px;
-      border-radius: 8px;
-      margin-bottom: 32px;
-    }
-    .header h1 { font-size: 28px; margin-bottom: 4px; }
-    .header .subtitle { opacity: 0.8; font-size: 14px; }
-    .section {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    }
-    .section h2 {
-      font-size: 18px;
-      color: #145a32;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-    }
-    .section h3 { font-size: 15px; color: #333; margin: 16px 0 8px 0; }
-    .section h4 { font-size: 13px; color: #555; margin: 12px 0 6px 0; }
-    .summary-table, .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    .summary-table th, .data-table th {
-      background: #145a32;
-      color: white;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    .summary-table td, .data-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .summary-table tr:nth-child(even) td,
-    .data-table tr:nth-child(even) td { background: #f5f5f5; }
-    .school-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: bold;
-      margin-left: 8px;
-    }
-    .badge-pass { background: #d4edda; color: #155724; }
-    .badge-fail { background: #f8d7da; color: #721c24; }
-    ul { padding-left: 20px; }
-    li { margin: 4px 0; font-size: 14px; }
-    .priority-high { color: #c0392b; font-weight: bold; }
-    .priority-medium { color: #e67e22; }
-    .priority-low { color: #27ae60; }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-      margin-top: 24px;
-      padding: 16px;
-    }
-    @media print {
-      body { background: white; padding: 0; font-size: 12px; }
-      .header { background: #145a32 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-      .school-card { page-break-inside: avoid; }
-      .badge { border: 1px solid currentColor; }
-    }
-    """
-
-    # Apply overrides to sections
-    summary_html = overrides.get("student_summary") if overrides else None
-    if not summary_html:
-        summary_html = _section_student_summary(student, best5)
-
-    action_notes_html = overrides.get("action_plan_notes") if overrides else None
-
-    sections_list = [
-        summary_html,
-        _section_academic_profile(student),
-        _section_hs_subject_analysis(student),
-        _section_hs_action_plan(student),
-        _section_appendix(student),
-    ]
-    if action_notes_html:
-        sections_list.append(f'<section class="section">{action_notes_html}</section>')
-
-    sections = "".join(sections_list)
-
-    template_css = _get_template_css(template_id)
+    # Simple subject analysis
+    rows = ""
+    for g in grades:
+        subj = _esc(g.get("subject_name") or "")
+        raw = g.get("raw_grade") or "U"
+        num = grade_to_int(raw)
+        bg = _grade_color(raw, colors)
+        if num >= 5:
+            action = "Maintain — excellent performance"
+        elif num == 4:
+            action = "Aim for Grade 5 in next sitting"
+        else:
+            action = "Focus area — seek additional support"
+        rows += f'<tr><td>{subj}</td><td style="background:{bg};font-weight:600;">{_esc(raw)}</td><td>{action}</td></tr>'
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>High School Academic Plan — {_esc(student_name)}</title>
-  {template_css}
+  <title>Academic Progress Report — {name}</title>
   <style>{css}</style>
 </head>
 <body>
   <div class="header">
-    <h1>High School Academic Plan</h1>
-    <div class="subtitle">{_esc(student_name)} &mdash; Generated {_esc(generated_at)}</div>
+    <div class="header-label">Academic Progress Report</div>
+    <h1>{name}</h1>
+    <div class="subtitle">Prepared {_esc(generated_at)}</div>
   </div>
-  {sections}
-  <div class="footer">
-    Generated by Intelligent Academic Advisor &bull; {_esc(generated_at)}
+  <div class="section">
+    <h2>Subject Analysis</h2>
+    <table class="data-table">
+      <thead><tr><th>Subject</th><th>Grade</th><th>Action</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
   </div>
+  <div class="footer">Generated by Intelligent Academic Advisor</div>
 </body>
 </html>"""
-
-
-def _section_action_plan(action_items: list, current_year: int | None = None, overrides: dict | None = None) -> str:
-    if overrides and overrides.get("action_plan_notes"):
-        return f'<section class="section"><h2>4. Action Plan Timeline</h2>{overrides["action_plan_notes"]}</section>'
-
-    if not action_items:
-        return '<section class="section"><h2>4. Action Plan Timeline</h2><p>No action items generated.</p></section>'
-
-    if current_year is None:
-        current_year = datetime.now(timezone.utc).year
-
-    # Group by quarter extracted from deadline string
-    from collections import defaultdict
-    quarters: dict[str, list] = defaultdict(list)
-    for item in action_items:
-        deadline = item.get("deadline") or "General"
-        quarters[deadline].append(item)
-
-    rows = ""
-    for deadline, items in sorted(quarters.items()):
-        for item in items:
-            task = _esc(item.get("task") or "")
-            school = _esc(item.get("related_school") or "General")
-            priority = _esc(item.get("priority") or "Medium")
-            priority_class = f"priority-{priority.lower()}"
-            rows += (
-                f"<tr>"
-                f"<td>{_esc(deadline)}</td>"
-                f"<td>{task}</td>"
-                f'<td><span class="{priority_class}">{priority}</span></td>'
-                f"<td>{school}</td>"
-                f"</tr>"
-            )
-
-    # SVG Gantt
-    gantt = _gantt_svg(action_items, current_year)
-
-    return f"""
-    <section class="section">
-      <h2>4. Action Plan Timeline</h2>
-      <table class="data-table">
-        <thead>
-          <tr><th>Deadline</th><th>Task</th><th>Priority</th><th>Related School</th></tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-      <h4 style="margin-top:20px;">Timeline Overview</h4>
-      <div style="overflow-x:auto;margin-top:8px;">{gantt}</div>
-    </section>"""
-
-
-def _section_skill_gaps(student: dict, match_results: list) -> str:
-    extra = student.get("extra_curricular") or []
-    awards = student.get("awards") or []
-    student_activities = set()
-    for ec in extra:
-        if isinstance(ec, dict):
-            student_activities.add((ec.get("activity") or "").lower())
-        else:
-            student_activities.add(str(ec).lower())
-
-    gaps_content = ""
-    top_schools = [r for r in match_results if (
-        getattr(r, "eligibility_pass", False) if not isinstance(r, dict) else r.get("eligibility_pass", False)
-    )][:5]
-
-    for result in top_schools:
-        school_name = getattr(result, "school_name", "") if not isinstance(result, dict) else result.get("school_name", "")
-        notable = []  # Would be populated from school data
-        if notable:
-            gaps_content += f"<li><strong>{_esc(school_name)}:</strong> Consider joining relevant clubs or activities aligned with programs offered.</li>"
-
-    if not gaps_content:
-        if not extra and not awards:
-            gaps_content = "<li>No extracurricular activities recorded. Consider joining clubs, sports, or community service to strengthen your profile.</li>"
-        else:
-            gaps_content = "<li>Extracurricular profile looks solid. Continue building on existing activities.</li>"
-
-    return f"""
-    <section class="section">
-      <h2>5. Skill &amp; Activity Gaps</h2>
-      <ul>{gaps_content}</ul>
-    </section>"""
-
-
-def _section_language_readiness(student: dict, match_results: list) -> str:
-    student_ielts = student.get("ielts_score")
-    ielts_overall = None
-    if isinstance(student_ielts, dict):
-        ielts_overall = student_ielts.get("overall")
-    elif student_ielts is not None:
-        try:
-            ielts_overall = float(student_ielts)
-        except (TypeError, ValueError):
-            pass
-
-    ielts_display = f"{ielts_overall}" if ielts_overall is not None else "Not on file"
-
-    rows = ""
-    top_schools = [r for r in match_results if (
-        getattr(r, "eligibility_pass", False) if not isinstance(r, dict) else r.get("eligibility_pass", False)
-    )][:5]
-
-    for result in top_schools:
-        school_name = getattr(result, "school_name", "") if not isinstance(result, dict) else result.get("school_name", "")
-        comp = getattr(result, "component_scores", {}) if not isinstance(result, dict) else result.get("component_scores", {})
-        lang_fit = comp.get("language_fit", 1.0) if comp else 1.0
-        status = "Met" if lang_fit >= 1.0 else "Below Requirement"
-        status_class = "gap-ok" if lang_fit >= 1.0 else "gap-fail"
-        rows += f'<tr class="{status_class}"><td>{_esc(school_name)}</td><td>{_esc(status)}</td></tr>'
-
-    if not rows:
-        rows = '<tr><td colspan="2">No language requirement data available.</td></tr>'
-
-    return f"""
-    <section class="section">
-      <h2>6. Language Readiness</h2>
-      <p><strong>Your IELTS Overall Band:</strong> {_esc(ielts_display)}</p>
-      <table class="data-table">
-        <thead><tr><th>School</th><th>IELTS Status</th></tr></thead>
-        <tbody>{rows}</tbody>
-      </table>
-    </section>"""
-
-
-def _section_appendix(student: dict) -> str:
-    grades = student.get("subject_grades") or []
-    rows = ""
-    for g in grades:
-        subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
-        raw = _esc(g.get("raw_grade") or "")
-        sitting = _esc(g.get("sitting") or "")
-        year = _esc(g.get("year_of_exam") or "")
-        rows += f"<tr><td>{subj}</td><td>{sitting}</td><td>{raw}</td><td>{year}</td></tr>"
-    if not rows:
-        rows = '<tr><td colspan="4">No grade records.</td></tr>'
-
-    return f"""
-    <section class="section">
-      <h2>7. Appendix</h2>
-      <h3>Raw Grade Table</h3>
-      <table class="data-table">
-        <thead><tr><th>Subject</th><th>Sitting</th><th>Grade</th><th>Year</th></tr></thead>
-        <tbody>{rows}</tbody>
-      </table>
-      <h3>Data Sources</h3>
-      <p>School profile data sourced from HKEAA, JUPAS, and individual university admissions pages. Last refreshed: {_esc(str(datetime.now(timezone.utc).date()))}.</p>
-    </section>"""
 
 
 # ---------------------------------------------------------------------------
@@ -1161,13 +699,17 @@ def generate_html_plan(
     template_id: str = "professional",
     overrides: dict | None = None,
     ai_assessment: str | None = None,
+    skill_gaps: list | None = None,
+    counselor_notes: dict | None = None,
 ) -> str:
     """
-    Returns complete HTML string with inline CSS and @media print.
-    plan_type: "UNIVERSITY" (default) or "HIGH_SCHOOL".
-    template_id: "professional" (default), "modern", or "minimal".
-    overrides: dict of section_key -> html_content to override auto-generated sections.
-    REQ-077
+    Generate a complete HTML plan document.
+
+    The plan uses a dual-layer approach:
+    - Student view (default): encouraging, action-oriented, no match percentages
+    - Counselor view (toggle): adds match scores, Best-5, competitive positioning
+    Counselor-only elements use class="counselor-only" and are hidden by default.
+    The parent page toggles them via postMessage.
     """
     if overrides is None:
         overrides = {}
@@ -1178,177 +720,65 @@ def generate_html_plan(
     if not action_items:
         action_items = _build_action_items(student, match_results)
 
-    # Compute best-5 aggregate for display
+    colors = TEMPLATES.get(template_id) or TEMPLATES["professional"]
+
     from app.modules.school_choice.services.hkdse_service import compute_best5_aggregate, grade_to_int
     grades = student.get("subject_grades") or []
-    grade_dicts = []
-    for g in grades:
-        code = g.get("subject_code") or ""
-        raw = g.get("raw_grade") or g.get("predicted_grade") or "U"
-        category = g.get("category") or "ELECTIVE"
-        is_compulsory = g.get("is_compulsory") or False
-        grade_dicts.append({
-            "subject_code": code,
-            "numeric_value": grade_to_int(raw),
-            "is_compulsory": is_compulsory,
-            "category": category,
-        })
+    grade_dicts = [{
+        "subject_code": g.get("subject_code") or "",
+        "numeric_value": grade_to_int(g.get("raw_grade") or "U"),
+        "is_compulsory": g.get("is_compulsory") or False,
+        "category": g.get("category") or "ELECTIVE",
+    } for g in grades]
     best5 = compute_best5_aggregate(grade_dicts)
 
-    student_name = student.get("name") or student.get("full_name") or "Student"
+    name = _esc(student.get("name") or "Student")
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    current_year = datetime.now(timezone.utc).year
+    num_schools = len([r for r in match_results if (
+        r.get("eligibility_pass", True) if isinstance(r, dict) else getattr(r, "eligibility_pass", True)
+    )])
 
-    css = """
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: var(--plan-font-body, 'Segoe UI', Arial, sans-serif);
-      color: #1a1a2e;
-      background: #f8f9fa;
-      line-height: 1.6;
-      padding: 24px;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      font-family: var(--plan-font-heading, 'Segoe UI', Arial, sans-serif);
-    }
-    .header {
-      background: linear-gradient(135deg, #0f3460, #16213e);
-      color: white;
-      padding: 32px 40px;
-      border-radius: 8px;
-      margin-bottom: 32px;
-    }
-    .header h1 { font-size: 28px; margin-bottom: 4px; }
-    .header .subtitle { opacity: 0.8; font-size: 14px; }
-    .section {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    }
-    .section h2 {
-      font-size: 18px;
-      color: #0f3460;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
-    }
-    .section h3 { font-size: 15px; color: #333; margin: 16px 0 8px 0; }
-    .section h4 { font-size: 13px; color: #555; margin: 12px 0 6px 0; }
-    .summary-table, .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    .summary-table th, .data-table th {
-      background: #0f3460;
-      color: white;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    .summary-table td, .data-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .summary-table tr:nth-child(even) td,
-    .data-table tr:nth-child(even) td { background: #f5f5f5; }
-    .school-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .school-card h3 { color: #0f3460; font-size: 16px; margin-bottom: 8px; }
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: bold;
-      margin-left: 8px;
-    }
-    .badge-pass { background: #d4edda; color: #155724; }
-    .badge-fail { background: #f8d7da; color: #721c24; }
-    .gap-ok td { color: #155724; }
-    .gap-fail td { color: #721c24; }
-    .gap-table { margin-top: 8px; }
-    .action-item { margin: 4px 0; }
-    ul { padding-left: 20px; }
-    li { margin: 4px 0; font-size: 14px; }
-    .priority-high { color: #c0392b; font-weight: bold; }
-    .priority-medium { color: #e67e22; }
-    .priority-low { color: #27ae60; }
-    .footer {
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-      margin-top: 24px;
-      padding: 16px;
-    }
-    @media print {
-      body { background: white; padding: 0; font-size: 12px; }
-      .header { background: #0f3460 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .section { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-      .school-card { page-break-inside: avoid; }
-      .badge { border: 1px solid currentColor; }
-      canvas { max-width: 100% !important; }
-    }
-    """
-
-    # Build the recommended schools section (returns HTML + top_schools list)
-    recommended_section_html, top_schools = _section_recommended_schools(match_results, student, overrides=overrides)
-
-    # Build student summary (support override)
-    summary_html = overrides.get("student_summary") or _section_student_summary(student, best5)
-
-    # Build action plan section (support override)
-    action_plan_html = _section_action_plan(action_items, current_year=current_year, overrides=overrides)
-
-    # AI counselor assessment section (if available)
-    ai_section = ""
-    if ai_assessment:
-        ai_section = f"""
-    <section class="section" style="border-left: 4px solid #2563eb; background: #eff6ff;">
-      <h2>Counselor Assessment</h2>
-      <p style="font-style: italic; line-height: 1.8;">{_esc(ai_assessment)}</p>
-    </section>"""
+    css = _build_css(colors, template_id)
 
     sections = "".join([
-        summary_html,
-        ai_section,
-        _section_academic_profile(student),
-        recommended_section_html,
-        action_plan_html,
-        _section_skill_gaps(student, match_results),
-        _section_language_readiness(student, match_results),
-        _section_appendix(student),
+        _section_header(student, generated_at, best5),
+        _section_metrics(student, best5, min(num_schools, 8), colors),
+        _section_assessment(ai_assessment),
+        _section_academic_profile(student, colors),
+        _section_target_schools(match_results, colors, overrides=overrides),
+        _section_roadmap(action_items, colors),
+        _section_growth_areas(student, skill_gaps, colors),
+        _section_language(student, colors),
+        _section_appendix(student, best5, match_results, colors),
     ])
 
-    # Build Chart.js init script for all university school charts
-    charts_init_script = _all_charts_init_script(top_schools, student)
-
-    template_css = _get_template_css(template_id)
+    # PostMessage listener for counselor metrics toggle
+    toggle_script = """
+<script>
+window.addEventListener('message', function(e) {
+  if (e.data === 'toggle-counselor') {
+    document.body.classList.toggle('show-counselor');
+  } else if (e.data === 'show-counselor') {
+    document.body.classList.add('show-counselor');
+  } else if (e.data === 'hide-counselor') {
+    document.body.classList.remove('show-counselor');
+  }
+});
+</script>"""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>University Academic Plan — {_esc(student_name)}</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  {template_css}
+  <title>Application Strategy — {name}</title>
   <style>{css}</style>
 </head>
 <body>
-  <div class="header">
-    <h1>University Academic Plan</h1>
-    <div class="subtitle">{_esc(student_name)} &mdash; Generated {_esc(generated_at)}</div>
-  </div>
   {sections}
   <div class="footer">
     Generated by Intelligent Academic Advisor &bull; {_esc(generated_at)}
   </div>
-  {charts_init_script}
+  {toggle_script}
 </body>
 </html>"""

@@ -35,10 +35,29 @@ class SchoolV2Response(BaseModel):
     notes: Optional[str] = None
     is_custom: Optional[bool] = None
     major_requirements: Optional[Any] = None
+    key_strengths: Optional[Any] = None
+    min_academic_requirements: Optional[Any] = None
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class SchoolCreateRequest(BaseModel):
+    name: str = "Custom School"
+    name_zh: Optional[str] = None
+    type: str = "UNIVERSITY"
+    location: str = ""
+    description: Optional[str] = None
+    website: Optional[str] = None
+    minimum_entry_score: Optional[int] = None
+    notable_programs: Optional[list] = None
+    required_subjects: Optional[list] = None
+    language_requirements: Optional[dict] = None
+    notes: Optional[str] = None
+    major_requirements: Optional[Any] = None
+    key_strengths: Optional[list] = None
+    min_academic_requirements: Optional[dict] = None
 
 
 class SchoolSearchParams(BaseModel):

@@ -254,6 +254,8 @@ function Dashboard() {
                     : 'No plan yet'}
                 </p>
                 <Button
+                  className="w-full"
+                  variant="outline"
                   onClick={() => navigate(`/students/${student.id}/profile`)}
                 >View Profile</Button>
               </div>

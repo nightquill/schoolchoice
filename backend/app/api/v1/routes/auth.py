@@ -21,7 +21,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 # REQ-010, REQ-011, REQ-024
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit("3/minute")
+@limiter.limit("10/minute")
 def register(request: Request, payload: UserCreate, db: Session = Depends(get_db)):
     """Register a new counselor account. REQ-010, REQ-011, REQ-024"""
     user = auth_service.register_user(db, email=payload.email, password=payload.password)
@@ -30,7 +30,7 @@ def register(request: Request, payload: UserCreate, db: Session = Depends(get_db
 
 # REQ-010, REQ-011, REQ-031
 @router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
-@limiter.limit("5/minute")
+@limiter.limit("15/minute")
 def login(request: Request, payload: UserCreate, db: Session = Depends(get_db)):
     """Authenticate a counselor and return a JWT access token. REQ-010, REQ-011, REQ-031"""
     return auth_service.login_for_access_token(db, email=payload.email, password=payload.password)

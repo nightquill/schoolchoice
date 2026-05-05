@@ -49,7 +49,8 @@
           "upper_quartile": 39.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5102",
@@ -89,7 +90,8 @@
           "upper_quartile": 32.6,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5103",
@@ -131,7 +133,8 @@
           "upper_quartile": 33.56,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5118",
@@ -166,7 +169,8 @@
           "upper_quartile": 45.76,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5181",
@@ -208,7 +212,8 @@
           "upper_quartile": 40.76,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5212",
@@ -239,7 +244,8 @@
           "upper_quartile": 45.01,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5220",
@@ -270,7 +276,8 @@
           "upper_quartile": 43.39,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5230",
@@ -301,7 +308,8 @@
           "upper_quartile": 41.2,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5240",
@@ -332,7 +340,8 @@
           "upper_quartile": 50.45,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5250",
@@ -367,7 +376,8 @@
           "upper_quartile": 42.7,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5260",
@@ -402,7 +412,8 @@
           "upper_quartile": 37.46,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5270",
@@ -439,7 +450,8 @@
           "upper_quartile": 42.56,
           "source": "JUPAS 2025 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5282",
@@ -483,7 +495,8 @@
           "upper_quartile": 51.2,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5200",
@@ -516,7 +529,8 @@
           "upper_quartile": 41.35,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5411",
@@ -557,7 +571,8 @@
           "upper_quartile": 28.5,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS5412",
@@ -597,7 +612,8 @@
           "upper_quartile": 31.76,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5711",
@@ -640,7 +656,8 @@
           "upper_quartile": 45.32,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5812",
@@ -684,7 +701,8 @@
           "upper_quartile": 32.25,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5901",
@@ -728,7 +746,8 @@
           "upper_quartile": 64.77,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5811",
@@ -766,7 +785,8 @@
           "upper_quartile": 40.59,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5813",
@@ -804,7 +824,8 @@
           "upper_quartile": 46.0,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5300",
@@ -840,7 +861,8 @@
           "upper_quartile": 32.95,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5311",
@@ -876,7 +898,8 @@
           "upper_quartile": 35.96,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5312",
@@ -914,7 +937,8 @@
           "upper_quartile": 44.25,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5313",
@@ -950,7 +974,8 @@
           "upper_quartile": 56.82,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5314",
@@ -986,7 +1011,8 @@
           "upper_quartile": 36.8,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5315",
@@ -1022,7 +1048,8 @@
           "upper_quartile": 35.06,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5316",
@@ -1058,7 +1085,8 @@
           "upper_quartile": 32.95,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5317",
@@ -1094,7 +1122,8 @@
           "upper_quartile": 33.66,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5318",
@@ -1130,7 +1159,8 @@
           "upper_quartile": 32.87,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     },
     {
       "jupas_code": "JS5331",
@@ -1166,7 +1196,8 @@
           "upper_quartile": 51.56,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5332",
@@ -1204,7 +1235,8 @@
           "upper_quartile": 62.77,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5814",
@@ -1242,7 +1274,8 @@
           "upper_quartile": 47.12,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "elite"
     },
     {
       "jupas_code": "JS5822",
@@ -1280,7 +1313,8 @@
           "upper_quartile": 40.13,
           "source": "JUPAS 2024 Admissions Scores PDF"
         }
-      }
+      },
+      "tier": "competitive"
     }
   ]
 }

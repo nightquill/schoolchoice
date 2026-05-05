@@ -40,7 +40,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS2025",
@@ -71,7 +72,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2060",
@@ -102,7 +104,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2110",
@@ -133,7 +136,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2120",
@@ -164,7 +168,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2310",
@@ -195,7 +200,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2330",
@@ -226,7 +232,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2340",
@@ -257,7 +264,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2370",
@@ -288,7 +296,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2410",
@@ -319,7 +328,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS2420",
@@ -350,7 +360,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS2510",
@@ -381,7 +392,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2610",
@@ -412,7 +424,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS2620",
@@ -443,7 +456,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "moderate"
     },
     {
       "jupas_code": "JS2660",
@@ -474,7 +488,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2810",
@@ -505,7 +520,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2910",
@@ -536,7 +552,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2920",
@@ -567,7 +584,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2930",
@@ -598,7 +616,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2940",
@@ -629,7 +648,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2950",
@@ -660,7 +680,8 @@
           "source": "JUPAS 2024 Admissions Scores PDF",
           "note": "HKBU reports mean score of Best 5 (standard 7pt scale)"
         }
-      }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2960",
@@ -686,7 +707,8 @@
           "source": "JUPAS 2025 Admissions Scores PDF (HKBU)",
           "upper_quartile": 21
         }
-      }
+      },
+      "tier": "accessible"
     }
   ]
 }

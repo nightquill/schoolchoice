@@ -27,13 +27,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "MATH", "min_grade": "2"}
+          {
+            "code": "MATH",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 19.0,
+          "median": 16.5,
+          "lower_quartile": 14.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 18.5,
+          "median": 16.0,
+          "lower_quartile": 13.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2802",
@@ -52,13 +66,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "ENGL", "min_grade": "2"}
+          {
+            "code": "ENGL",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 19.0,
+          "median": 16.5,
+          "lower_quartile": 14.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 18.5,
+          "median": 16.0,
+          "lower_quartile": 13.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2815",
@@ -77,13 +105,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "ENGL", "min_grade": "2"}
+          {
+            "code": "ENGL",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2902",
@@ -102,13 +144,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "ENGL", "min_grade": "2"}
+          {
+            "code": "ENGL",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2911",
@@ -128,14 +184,31 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "ENGL", "min_grade": "3"},
-          {"code": "CHLA", "min_grade": "3"}
+          {
+            "code": "ENGL",
+            "min_grade": "3"
+          },
+          {
+            "code": "CHLA",
+            "min_grade": "3"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2801",
@@ -154,13 +227,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "MATH", "min_grade": "2"}
+          {
+            "code": "MATH",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2891",
@@ -172,20 +259,36 @@
         "subject_weights": {
           "MATH": 1.3
         },
-        "bonus_subjects": ["M1"],
+        "bonus_subjects": [
+          "M1"
+        ],
         "bonus_weight": 0.5,
         "notes": "Business analytics and machine learning tracks."
       },
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "MATH", "min_grade": "2"}
+          {
+            "code": "MATH",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2822",
@@ -204,13 +307,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "MATH", "min_grade": "2"}
+          {
+            "code": "MATH",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2813",
@@ -229,13 +346,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "MATH", "min_grade": "2"}
+          {
+            "code": "MATH",
+            "min_grade": "2"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 19.0, "median": 16.5, "lower_quartile": 14.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 18.5, "median": 16.0, "lower_quartile": 13.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 19.0,
+          "median": 16.5,
+          "lower_quartile": 14.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 18.5,
+          "median": 16.0,
+          "lower_quartile": 13.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     },
     {
       "jupas_code": "JS2921",
@@ -254,13 +385,27 @@
       "minimum_requirements": {
         "general": "222A",
         "subject_specific": [
-          {"code": "CHLA", "min_grade": "3"}
+          {
+            "code": "CHLA",
+            "min_grade": "3"
+          }
         ]
       },
       "admission_stats": {
-        "2024": {"upper_quartile": 18.0, "median": 15.5, "lower_quartile": 13.0, "source": "HSUHK 2024 admissions"},
-        "2023": {"upper_quartile": 17.5, "median": 15.0, "lower_quartile": 12.5, "source": "HSUHK 2023 admissions"}
-      }
+        "2024": {
+          "upper_quartile": 18.0,
+          "median": 15.5,
+          "lower_quartile": 13.0,
+          "source": "HSUHK 2024 admissions"
+        },
+        "2023": {
+          "upper_quartile": 17.5,
+          "median": 15.0,
+          "lower_quartile": 12.5,
+          "source": "HSUHK 2023 admissions"
+        }
+      },
+      "tier": "accessible"
     }
   ]
 }

@@ -314,8 +314,21 @@ def map_score_to_probability(
     stats: dict[str, Any],
 ) -> float:
     """
-    Map a weighted score to admission probability using a normal distribution
-    fitted to published admission statistics.
+    Map a weighted score to admission probability using piecewise linear
+    interpolation between known quantiles, with exponential decay tails.
+
+    This is purely data-driven — no normal distribution assumption.
+    Between published quantiles, probability changes linearly.
+    Beyond the known range, exponential tails provide smooth decay.
+
+    Known points from published data:
+        score = LQ  → P = 0.25
+        score = M   → P = 0.50
+        score = UQ  → P = 0.75
+
+    For competitive programmes (tight UQ-LQ band), the model is naturally
+    MORE sensitive to small score differences — a 1-point gap matters more
+    when the entire admitted range spans only 3 points.
 
     Parameters
     ----------
@@ -338,31 +351,61 @@ def map_score_to_probability(
 
     median = float(median)
 
-    if lq is not None and uq is not None:
+    if lq is not None:
         lq = float(lq)
-        uq = float(uq)
-        iqr = uq - lq
-    elif lq is not None:
-        lq = float(lq)
-        iqr = 2.0 * (median - lq)
     else:
-        return 0.5  # Not enough data
+        return 0.5  # Need at least median + LQ
 
-    if iqr <= 0:
-        # All quartiles equal — binary outcome based on score vs median
+    if uq is not None:
+        uq = float(uq)
+    else:
+        # Estimate UQ symmetrically from median and LQ
+        uq = median + (median - lq)
+
+    # Degenerate case: all quartiles equal
+    if uq <= lq:
         if score >= median:
             return 0.75
         return 0.25
 
-    sigma = iqr / 1.349
-    if sigma <= 0:
-        return 0.5
-
-    z = (score - median) / sigma
-    prob = _normal_cdf(z)
+    # Piecewise linear interpolation between known quantiles
+    if lq <= score <= median:
+        # Between LQ (25%) and Median (50%)
+        if median == lq:
+            prob = 0.375  # midpoint
+        else:
+            t = (score - lq) / (median - lq)
+            prob = 0.25 + t * 0.25
+    elif median < score <= uq:
+        # Between Median (50%) and UQ (75%)
+        if uq == median:
+            prob = 0.625  # midpoint
+        else:
+            t = (score - median) / (uq - median)
+            prob = 0.50 + t * 0.25
+    elif score > uq:
+        # Above UQ — exponential approach to 0.99
+        # Use half-life = (UQ - Median) so probability reaches ~95% at UQ + 2*(UQ-M)
+        half_range = uq - median
+        if half_range <= 0:
+            prob = 0.85
+        else:
+            excess = (score - uq) / half_range
+            # Asymptotic approach: 0.75 + 0.24 * (1 - e^(-excess))
+            prob = 0.75 + 0.24 * (1 - math.exp(-excess))
+    else:
+        # Below LQ — exponential decay toward 0.01
+        # Use half-life = (Median - LQ) so probability reaches ~5% at LQ - 2*(M-LQ)
+        half_range = median - lq
+        if half_range <= 0:
+            prob = 0.15
+        else:
+            deficit = (lq - score) / half_range
+            # Asymptotic decay: 0.25 * e^(-deficit)
+            prob = 0.25 * math.exp(-deficit)
 
     # Clamp to [0.01, 0.99]
-    return max(0.01, min(0.99, prob))
+    return max(0.01, min(0.99, round(prob, 4)))
 
 
 def _determine_risk_level(
@@ -471,6 +514,7 @@ def score_student_for_programme(
     return {
         "jupas_code": programme.get("jupas_code", ""),
         "programme_name": programme.get("name", ""),
+        "tier": programme.get("tier", "unclassified"),
         "eligible": eligible,
         "eligibility_failures": eligibility_failures,
         "weighted_score": score_result["weighted_score"],

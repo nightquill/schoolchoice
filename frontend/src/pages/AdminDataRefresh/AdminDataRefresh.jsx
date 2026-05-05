@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import Modal from '../../components/Modal/Modal';
 import Toast from '../../components/Toast/Toast';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '../../hooks/useToast';
 import { getAccount } from '../../api/account';
 import client from '../../api/client';
@@ -185,12 +185,9 @@ function AdminDataRefresh() {
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
             Running a data refresh will update school profiles, JUPAS entry scores, and subject lists from external sources. This may take several minutes.
           </p>
-          <Button
-            label={triggered ? 'Refresh Triggered' : 'Trigger Data Refresh'}
-            variant="primary"
-            disabled={triggered}
-            onClick={() => setConfirmModalOpen(true)}
-          />
+          <Button disabled={triggered} onClick={() => setConfirmModalOpen(true)}>
+            {triggered ? 'Refresh Triggered' : 'Trigger Data Refresh'}
+          </Button>
         </div>
 
         <div style={cardStyle}>

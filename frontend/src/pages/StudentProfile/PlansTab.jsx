@@ -41,7 +41,7 @@ export default function PlansTab({ studentId, showToast }) {
         <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>
           Saved Plans ({plans.length})
         </h2>
-        <Button onClick={() => navigate(`/students/${studentId}/plan`)}>Generate New Plan</Button>
+        <Button onClick={() => navigate(`/students/${studentId}/consultant?generate=true`)}>Generate New Plan</Button>
       </div>
 
       {plans.length === 0 && (
