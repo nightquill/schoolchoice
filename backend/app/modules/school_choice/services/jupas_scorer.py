@@ -193,8 +193,9 @@ def compute_weighted_score(
 # Minimum requirements check
 # ---------------------------------------------------------------------------
 
-# Standard "33222" parsing: positions map to CHIN, ENGL, MATH, elective1, elective2
-_GENERAL_REQ_SUBJECTS = ["CHIN", "ENGL", "MATH"]
+# Standard "33222" parsing: positions map to CHLA, ENGL, MATH, elective1, elective2
+# Note: "CHLA" is the subject code used in this system for Chinese Language
+_GENERAL_REQ_SUBJECTS = ["CHLA", "ENGL", "MATH"]
 
 
 def check_minimum_requirements(
@@ -227,7 +228,7 @@ def check_minimum_requirements(
     if not general:
         return True, []
 
-    # Parse "33222" — first 3 digits are CHIN, ENGL, MATH minimums;
+    # Parse "33222" — first 3 digits are CHLA, ENGL, MATH minimums;
     # remaining digits are elective minimums
     try:
         min_levels = [int(c) for c in general]
@@ -235,7 +236,7 @@ def check_minimum_requirements(
         return True, []  # Can't parse, assume met
 
     # Check core subjects (first 3)
-    core_codes = ["CHIN", "ENGL", "MATH"]
+    core_codes = ["CHLA", "ENGL", "MATH"]
     for i, code in enumerate(core_codes):
         if i >= len(min_levels):
             break

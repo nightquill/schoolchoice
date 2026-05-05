@@ -89,21 +89,36 @@ def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
     if not school_ids:
         return schools
 
+    # Use IN clause with placeholders (compatible with both PostgreSQL and SQLite)
+    placeholders = ", ".join(f":sid_{i}" for i in range(len(school_ids)))
+    params = {f"sid_{i}": sid for i, sid in enumerate(school_ids)}
+
     result = db.execute(
-        text("""
-            SELECT jupas_code, name, institution_code, school_id::text,
+        text(f"""
+            SELECT jupas_code, name, institution_code, school_id,
                    faculty, scoring_formula, minimum_requirements, admission_stats
             FROM jupas_programmes
-            WHERE school_id::text = ANY(:school_ids)
+            WHERE school_id IN ({placeholders})
             ORDER BY jupas_code
         """),
-        {"school_ids": school_ids},
+        params,
     )
     rows = result.fetchall()
 
+    import json as _json
+
+    def _parse_json(val):
+        """Parse JSON string or return dict as-is."""
+        if isinstance(val, str):
+            try:
+                return _json.loads(val)
+            except (ValueError, TypeError):
+                return {}
+        return val or {}
+
     prog_map: dict[str, list[dict]] = {}
     for row in rows:
-        sid = row.school_id
+        sid = str(row.school_id) if row.school_id else ""
         if sid not in prog_map:
             prog_map[sid] = []
         prog_map[sid].append({
@@ -111,9 +126,9 @@ def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
             "name": row.name,
             "institution_code": row.institution_code,
             "faculty": row.faculty,
-            "scoring_formula": row.scoring_formula or {},
-            "minimum_requirements": row.minimum_requirements or {},
-            "admission_stats": row.admission_stats or {},
+            "scoring_formula": _parse_json(row.scoring_formula),
+            "minimum_requirements": _parse_json(row.minimum_requirements),
+            "admission_stats": _parse_json(row.admission_stats),
         })
 
     for school in schools:

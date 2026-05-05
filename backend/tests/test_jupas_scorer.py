@@ -93,7 +93,7 @@ def simple_best5_programme():
 def strong_student_grades():
     """A strong student: mostly 5* and 5 grades."""
     return {
-        "CHIN": "5",
+        "CHLA": "5",
         "ENGL": "5*",
         "MATH": "5*",
         "CSD": "A",
@@ -107,7 +107,7 @@ def strong_student_grades():
 def weak_student_grades():
     """A weak student: mostly level 3-4."""
     return {
-        "CHIN": "3",
+        "CHLA": "3",
         "ENGL": "3",
         "MATH": "3",
         "CSD": "A",
@@ -293,7 +293,7 @@ class TestBonusSubject:
         assert result["bonus_points"] == 0.8
 
     def test_no_bonus_when_no_remaining(self):
-        grades = {"ENGL": "5", "MATH": "5", "CHIN": "4"}
+        grades = {"ENGL": "5", "MATH": "5", "CHLA": "4"}
         formula = {
             "scale": "hku_enhanced",
             "best_n": 5,
@@ -321,7 +321,7 @@ class TestEnhancedScale:
         assert standard_scale["5*"] == 6
 
     def test_score_with_enhanced_vs_standard(self):
-        grades = {"ENGL": "5**", "MATH": "5*", "CHIN": "5", "ECON": "4", "HIST": "3"}
+        grades = {"ENGL": "5**", "MATH": "5*", "CHLA": "5", "ECON": "4", "HIST": "3"}
         formula_enhanced = {
             "scale": "hku_enhanced",
             "best_n": 5,
@@ -409,7 +409,7 @@ class TestMinimumRequirements:
 
     def test_fails_english(self):
         grades = {
-            "CHIN": "3",
+            "CHLA": "3",
             "ENGL": "2",  # Below required 3
             "MATH": "3",
             "ECON": "3",
@@ -422,7 +422,7 @@ class TestMinimumRequirements:
         assert any("ENGL" in f for f in failures)
 
     def test_missing_subject(self):
-        grades = {"CHIN": "3", "MATH": "3", "ECON": "3"}
+        grades = {"CHLA": "3", "MATH": "3", "ECON": "3"}
         eligible, failures = check_minimum_requirements(
             grades, {"general": "33222"}
         )
@@ -431,7 +431,7 @@ class TestMinimumRequirements:
 
     def test_fails_elective(self):
         grades = {
-            "CHIN": "3",
+            "CHLA": "3",
             "ENGL": "3",
             "MATH": "3",
             "ECON": "1",  # Below required 2
@@ -514,7 +514,7 @@ class TestFullPipeline:
     def test_ineligible_student(self, hku_bba_programme):
         """Student who fails minimum requirements."""
         grades = {
-            "CHIN": "2",  # Below required 3
+            "CHLA": "2",  # Below required 3
             "ENGL": "2",  # Below required 3
             "MATH": "2",
             "CSD": "A",
@@ -622,7 +622,7 @@ class TestFullPipeline:
             },
         }
         grades = {
-            "CHIN": "5",    # 5.5 * 1 = 5.5
+            "CHLA": "5",    # 5.5 * 1 = 5.5
             "ENGL": "5",    # 5.5 * 2 = 11
             "MATH": "5",    # 5.5 * 2 = 11
             "CSD": "A",     # 2 * 1 = 2
