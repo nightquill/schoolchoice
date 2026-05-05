@@ -141,7 +141,8 @@
         "best_n": 5,
         "subject_weights": {
           "ENGL": 2,
-          "CHIN": 1.5
+          "CHIN": 1.5,
+          "CHLA": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -200,7 +201,8 @@
         "best_n": 5,
         "subject_weights": {
           "ENGL": 2,
-          "CHIN": 1.5
+          "CHIN": 1.5,
+          "CHLA": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -687,7 +689,12 @@
         "formula_text": "Eng + 1.5 x Math + 1.5 x Best Sci Subject + Best 2 Subjects with [1.5x STEM/M1-M2]",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 1.5
+          "MATH": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1227,7 +1234,12 @@
         "formula_text": "Eng + Math + Best 2 from Bio/Chem/Phys/M1-M2 + Best Subjects with [1.2x STEM/M1-M2]",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 1
+          "MATH": 1,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1292,7 +1304,12 @@
         "formula_text": "Eng + 1.5 x Math + 1.5 x Best Sci Subject + Best 2 Subjects with [1.5x STEM/M1-M2]",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 1.5
+          "MATH": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "PHYS": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1479,7 +1496,11 @@
           "ENGL": 2,
           "MATH": 2,
           "M1": 2,
-          "M2": 2
+          "M2": 2,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "ICT": 1.5,
+          "PHYS": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1602,7 +1623,14 @@
         "formula_text": "Eng + 1.5 x Math + Best 2 Subjects with [1.5x STEM/Econ/ICT/M1-M2] + Best Subjects",
         "best_n": 5,
         "subject_weights": {
-          "MATH": 1.5
+          "MATH": 1.5,
+          "BIOL": 1.5,
+          "CHEM": 1.5,
+          "ECON": 1.5,
+          "ICT": 1.5,
+          "PHYS": 1.5,
+          "M1": 1.5,
+          "M2": 1.5
         },
         "bonus_subjects": [],
         "bonus_weight": 0
@@ -1629,7 +1657,15 @@
         "best_n": 6,
         "subject_weights": {
           "ENGL": 2,
-          "MATH": 2
+          "MATH": 2,
+          "BIOL": 2.0,
+          "CHEM": 2.0,
+          "DAT": 2.0,
+          "ICT": 2.0,
+          "M1": 2.0,
+          "M2": 2.0,
+          "PHYS": 2.0,
+          "TL": 2.0
         },
         "bonus_subjects": [],
         "bonus_weight": 0
