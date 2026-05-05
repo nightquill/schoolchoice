@@ -1,6 +1,7 @@
 // REQ-092, REQ-093: Target Schools Page with reorder support
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import EligibilityBadge from '../../components/EligibilityBadge/EligibilityBadge';
 import StatusChip from '../../components/StatusChip/StatusChip';
@@ -10,7 +11,7 @@ import Toast from '../../components/Toast/Toast';
 import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
 import EmptyState from '../../components/EmptyState/EmptyState';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import Button from '../../components/Button/Button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '../../hooks/useToast';
 import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets } from '../../api/targets';
 import { searchSchools } from '../../api/schoolsV2';
@@ -89,7 +90,22 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
     <li style={rowStyle}>
       <span style={rankBadgeStyle} aria-label={`Rank ${rank}`}>{rank}</span>
       <div style={{ flex: 1, minWidth: '120px' }}>
-        <span style={schoolNameStyle}>{target.school_name}</span>
+        <span style={schoolNameStyle}>
+          {target.school_name}
+          {target.preference_confidence != null && (
+            <span style={{
+              marginLeft: '8px',
+              fontSize: '10px',
+              padding: '1px 6px',
+              borderRadius: '8px',
+              fontWeight: 500,
+              background: target.preference_confidence >= 4 ? '#dbeafe' : target.preference_confidence >= 3 ? '#f3f4f6' : '#fef3c7',
+              color: target.preference_confidence >= 4 ? '#1d4ed8' : target.preference_confidence >= 3 ? '#6b7280' : '#92400e',
+            }}>
+              {target.preference_confidence === 5 ? 'Decided' : target.preference_confidence === 4 ? 'Strong' : target.preference_confidence === 3 ? 'Interested' : target.preference_confidence === 2 ? 'Exploring' : 'Unsure'}
+            </span>
+          )}
+        </span>
         {target.intended_majors?.length > 0 && (
           <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', marginTop: '2px', fontWeight: 'var(--font-weight-medium)' }}>
             {target.intended_majors.join(' · ')}
@@ -100,6 +116,9 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
         )}
       </div>
       <EligibilityBadge pass={target.eligibility_pass} failingCriteria={target.failing_criteria} />
+      {target.at_risk && (
+        <span style={{fontSize:'10px',fontWeight:700,color:'#fff',background:'#dc2626',padding:'1px 6px',borderRadius:'8px',flexShrink:0}}>AT RISK</span>
+      )}
       {matchScore != null && (
         <span style={matchStyle} aria-label={`Match score: ${matchScore}%`}>
           {matchScore}%
@@ -114,7 +133,7 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
           disabled={isFirst}
           aria-label={`Move ${target.school_name} up`}
         >
-          ↑
+          <ChevronUp size={14} />
         </button>
         <button
           style={iconBtnStyle}
@@ -122,7 +141,7 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
           disabled={isLast}
           aria-label={`Move ${target.school_name} down`}
         >
-          ↓
+          <ChevronDown size={14} />
         </button>
         <button
           style={iconBtnStyle}
@@ -257,6 +276,7 @@ function TargetSchools() {
   const [editMajors, setEditMajors] = useState('');
   const [editYear, setEditYear] = useState('');
   const [editStatus, setEditStatus] = useState('');
+  const [editConfidence, setEditConfidence] = useState(3);
   const [editSaving, setEditSaving] = useState(false);
   const [newMajors, setNewMajors] = useState([]);
   const prevTargetsRef = useRef([]);
@@ -342,13 +362,14 @@ function TargetSchools() {
         .catch(() => setAutoRecs([]))
         .finally(() => setRecsLoading(false));
     }
-  }, [addModalOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [addModalOpen, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOpenEdit = (target) => {
     setEditTarget(target);
     setEditMajors(target.intended_majors?.join(', ') ?? '');
     setEditYear(target.year_of_entry ? String(target.year_of_entry) : '');
     setEditStatus(target.status ?? '');
+    setEditConfidence(target.preference_confidence ?? 3);
   };
 
   const handleEditSave = async () => {
@@ -362,6 +383,7 @@ function TargetSchools() {
         intended_majors: majorsList,
         year_of_entry: editYear ? parseInt(editYear, 10) : null,
         status: editStatus || null,
+        preference_confidence: editConfidence,
       });
       setTargets((prev) => prev.map((t) => (t.id === editTarget.id ? { ...t, ...updated } : t)));
       setEditTarget(null);
@@ -468,8 +490,20 @@ function TargetSchools() {
               </h1>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>Target Schools</p>
             </div>
-            <Button label="Add School" variant="primary" onClick={() => setAddModalOpen(true)} />
+            <Button onClick={() => setAddModalOpen(true)}>Add School</Button>
           </div>
+
+          {targets.some(t => t.at_risk) && (
+            <div style={{background:'#fef2f2',border:'1px solid #fca5a5',borderRadius:'var(--border-radius-sm)',padding:'var(--space-3) var(--space-4)',margin:'var(--space-4) var(--space-8)',display:'flex',alignItems:'flex-start',gap:'var(--space-3)'}}>
+              <span style={{color:'#dc2626',fontSize:'var(--font-size-lg)',lineHeight:1}}>&#9888;</span>
+              <div>
+                <div style={{fontWeight:'var(--font-weight-bold)',color:'#991b1b',fontSize:'var(--font-size-sm)'}}>At-Risk Targets Detected</div>
+                <div style={{color:'#7f1d1d',fontSize:'var(--font-size-xs)',marginTop:'2px'}}>
+                  {targets.filter(t => t.at_risk).length} target(s) where predicted score falls below the programme's lower quartile.
+                </div>
+              </div>
+            </div>
+          )}
 
           <div style={listContainerStyle}>
             {/* View mode toggle */}
@@ -604,7 +638,9 @@ function TargetSchools() {
               placeholder="School name…"
               style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
             />
-            <Button label="Search" onClick={() => handleSearchSchools(schoolSearch)} loading={searchLoading} />
+            <Button onClick={() => handleSearchSchools(schoolSearch)} disabled={searchLoading}>
+              {searchLoading ? 'Searching...' : 'Search'}
+            </Button>
           </div>
           {schoolResults.length > 0 && (
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: '240px', overflowY: 'auto' }}>
@@ -695,7 +731,7 @@ function TargetSchools() {
               style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', width: '100%', boxSizing: 'border-box' }}
             />
           </div>
-          <div>
+          <div style={{ marginBottom: 'var(--space-3)' }}>
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Application Status</label>
             <select
               value={editStatus}
@@ -709,6 +745,36 @@ function TargetSchools() {
               <option value="REJECTED">Rejected</option>
               <option value="WITHDRAWN">Withdrawn</option>
             </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
+              Student Confidence
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 'normal' }}> — how committed is the student to this choice?</span>
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <input
+                type="range"
+                min="1"
+                max="5"
+                value={editConfidence}
+                onChange={(e) => setEditConfidence(parseInt(e.target.value, 10))}
+                style={{ flex: 1, accentColor: 'var(--color-primary)' }}
+                aria-label="Student confidence level"
+              />
+              <span style={{
+                fontSize: 'var(--font-size-sm)',
+                fontWeight: 'var(--font-weight-medium)',
+                color: 'var(--color-text-primary)',
+                minWidth: '90px',
+                textAlign: 'right',
+              }}>
+                {editConfidence === 5 ? 'Decided' : editConfidence === 4 ? 'Strong' : editConfidence === 3 ? 'Interested' : editConfidence === 2 ? 'Exploring' : 'Unsure'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+              <span>Unsure</span>
+              <span>Decided</span>
+            </div>
           </div>
         </div>
       </Modal>

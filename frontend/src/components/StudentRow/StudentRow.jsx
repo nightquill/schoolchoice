@@ -13,7 +13,7 @@ function StudentRow({ student }) {
     cursor: 'pointer',
   };
 
-  const handleClick = () => navigate(`/students/${id}`);
+  const handleClick = () => navigate(`/students/${id}/profile`);
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleClick();
   };
@@ -44,7 +44,22 @@ function StudentRow({ student }) {
       role="row"
       aria-label={`View student ${name}`}
     >
-      <td style={tdName}>{name}</td>
+      <td style={tdName}>
+        {name}
+        {student.has_at_risk_targets && (
+          <span style={{
+            display: 'inline-block',
+            background: '#dc2626',
+            color: '#fff',
+            fontSize: '10px',
+            fontWeight: 700,
+            padding: '1px 6px',
+            borderRadius: '8px',
+            marginLeft: '8px',
+            verticalAlign: 'middle',
+          }}>AT RISK</span>
+        )}
+      </td>
       <td style={tdSecondary}>{regionDisplay}</td>
       <td style={tdSecondary}>{createdDisplay}</td>
       <td style={tdSecondary}>{'>'}</td>
