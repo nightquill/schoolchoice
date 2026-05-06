@@ -65,17 +65,20 @@ def _run_ai_enhancement(student, student_data: dict, match_results: list) -> dic
         interests_text = ", ".join(str(i) for i in student_data["interests"]) if student_data["interests"] else "None listed"
         personal_stmt = getattr(student, "personal_statement", "") or ""
 
+        # SECURITY: Do NOT send student real name or identifiable info to
+        # third-party AI provider. Use anonymised label. The real name is
+        # only used locally in the generated HTML plan.
         ai_prompt = f"""You are an experienced Hong Kong secondary school academic counselor. Generate personalized rationales and action items.
 
 STUDENT PROFILE:
-- Name: {student.name}, Year {getattr(student, 'year_of_study', '?')}
+- Student: Year {getattr(student, 'year_of_study', '?')} HKDSE candidate
 - HKDSE Grades: {grades_text}
 - Best-5 Aggregate: {student_data['best5_aggregate']}
 - IELTS: {student_data['ielts_score'] or 'Not taken'}
 - Interests: {interests_text}
 - Activities: {activities_text}
 - Awards: {awards_text}
-- Personal Statement: {personal_stmt[:300] if personal_stmt else 'Not written yet'}
+- Personal Statement Summary: {personal_stmt[:200] if personal_stmt else 'Not written yet'}
 - Strengths/Weaknesses: {student.strengths_weaknesses or 'Not specified'}
 
 MATCHED SCHOOLS (from scoring algorithm):

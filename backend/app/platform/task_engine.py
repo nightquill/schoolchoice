@@ -304,15 +304,19 @@ class TaskEngine:
                     "status": t.status or "CONSIDERING",
                 })
 
+        # SECURITY: Anonymise student identity before sending to third-party
+        # AI provider. Use generic label instead of real name. Truncate
+        # personal statement to limit data exposure.
+        personal_stmt = getattr(student, "personal_statement", None) or ""
         return {
-            "name": student.name,
+            "name": f"Year {getattr(student, 'year_of_study', '?')} HKDSE candidate",
             "grades_by_code": grades_by_code,
             "interests": student.interests or [],
             "strengths_weaknesses": student.strengths_weaknesses or "",
             "target_region": student.target_region or "local",
             "year_of_study": getattr(student, "year_of_study", None),
             "ielts_score": getattr(student, "ielts_score", None),
-            "personal_statement": getattr(student, "personal_statement", None),
+            "personal_statement": personal_stmt[:200] if personal_stmt else None,
             "extra_curricular": getattr(student, "extra_curricular", None) or [],
             "awards": getattr(student, "awards", None) or [],
             "teacher_evaluations": teacher_evals,
