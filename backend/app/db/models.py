@@ -15,7 +15,9 @@ from datetime import datetime, timezone
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Column,
+    ForeignKey,
     String,
     Text,
     TypeDecorator,
@@ -163,9 +165,135 @@ class User(Base):
         cascade="all, delete-orphan",
         lazy="select",
     )
+    org_memberships = relationship(
+        "OrganisationMembership",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
 
     def __repr__(self) -> str:
         return f"<User id={self.id!s} email={self.email!r}>"
+
+
+# ---------------------------------------------------------------------------
+# organisations
+# Multi-tenancy: organisations own data, users belong via membership
+# ---------------------------------------------------------------------------
+
+
+class Organisation(Base):
+    """An organisation (school, consultancy, etc.) that owns student data."""
+
+    __tablename__ = "organisations"
+
+    __table_args__ = (
+        UniqueConstraint("slug", name="uq_organisations_slug"),
+    )
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        server_default=func.gen_random_uuid(),
+        nullable=False,
+    )
+    name = Column(String(255), nullable=False, comment="Human-readable organisation name")
+    slug = Column(String(255), nullable=False, comment="URL-safe unique identifier")
+    is_active = Column(
+        Boolean, nullable=False, default=True,
+        server_default="true",
+        comment="Soft-delete flag; false disables the organisation",
+    )
+    metadata_ = Column(
+        "metadata", Text, nullable=True,
+        comment="Free-form metadata (JSON string or plain text)",
+    )
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        default=_utcnow,
+    )
+    updated_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+        default=_utcnow,
+    )
+
+    # Relationships
+    memberships = relationship(
+        "OrganisationMembership",
+        back_populates="organisation",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
+
+    def __repr__(self) -> str:
+        return f"<Organisation id={self.id!s} slug={self.slug!r}>"
+
+
+# ---------------------------------------------------------------------------
+# organisation_memberships
+# ---------------------------------------------------------------------------
+
+
+class OrganisationMembership(Base):
+    """Links a User to an Organisation with a role."""
+
+    __tablename__ = "organisation_memberships"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "organisation_id", "user_id",
+            name="uq_org_membership_org_user",
+        ),
+        CheckConstraint(
+            "role IN ('owner', 'admin', 'member')",
+            name="ck_org_membership_role",
+        ),
+    )
+
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        server_default=func.gen_random_uuid(),
+        nullable=False,
+    )
+    organisation_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("organisations.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    role = Column(
+        String(20), nullable=False, default="member",
+        server_default="'member'",
+        comment="owner | admin | member",
+    )
+    created_at = Column(
+        TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        default=_utcnow,
+    )
+
+    # Relationships
+    organisation = relationship("Organisation", back_populates="memberships")
+    user = relationship("User", back_populates="org_memberships")
+
+    def __repr__(self) -> str:
+        return (
+            f"<OrganisationMembership id={self.id!s} "
+            f"org={self.organisation_id!s} user={self.user_id!s} role={self.role!r}>"
+        )
 
 
 # ---------------------------------------------------------------------------
