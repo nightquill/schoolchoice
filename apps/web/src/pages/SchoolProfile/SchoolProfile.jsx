@@ -2,13 +2,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import { toast } from 'sonner';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { FormCard } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { getSchoolV2 } from '../../api/schoolsV2';
 import { addTarget } from '../../api/targets';
 import { getStudents } from '../../api/students';
@@ -17,7 +16,6 @@ import { getAccount } from '@schoolchoice/ui/api/account';
 function SchoolProfile() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const { toasts, showToast, removeToast } = useToast();
   const [school, setSchool] = useState(null);
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,12 +46,12 @@ function SchoolProfile() {
       await addTarget(studentId, { school_id: id });
       setAddedToTarget(true);
       setSelectStudentModalOpen(false);
-      showToast('School added to target list.', 'success');
+      toast.success('School added to target list.');
     } catch (err) {
       if (err?.response?.status === 409) {
-        showToast('This school is already in the target list.', 'info');
+        toast('This school is already in the target list.');
       } else {
-        showToast('Failed to add school to target list.', 'error');
+        toast.error('Failed to add school to target list.');
       }
     } finally {
       setAddingTarget(false);
@@ -405,7 +403,6 @@ function SchoolProfile() {
         </div>
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

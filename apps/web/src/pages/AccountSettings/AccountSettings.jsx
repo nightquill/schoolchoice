@@ -5,18 +5,16 @@ import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { FormCard } from '@schoolchoice/ui';
 import { TextInput } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
+import { toast } from 'sonner';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import { getAccount, updateAccount, changePassword, deleteAccount } from '@schoolchoice/ui/api/account';
 
 function AccountSettings() {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const { toasts, showToast, removeToast } = useToast();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -56,9 +54,9 @@ function AccountSettings() {
     try {
       const updated = await updateAccount({ display_name: displayName });
       setAccount(updated);
-      showToast('Display name saved.', 'success');
+      toast.success('Display name saved.');
     } catch {
-      showToast('Failed to save display name.', 'error');
+      toast.error('Failed to save display name.');
     } finally {
       setSavingName(false);
     }
@@ -81,14 +79,14 @@ function AccountSettings() {
         new_password: pwForm.new_password,
       });
       setPwForm({ current_password: '', new_password: '', confirm_new_password: '' });
-      showToast('Password changed successfully.', 'success');
+      toast.success('Password changed successfully.');
     } catch (err) {
       if (err?.response?.status === 401) {
         setPwErrors({ current_password: 'Incorrect current password.' });
       } else if (err?.response?.status === 422) {
         setPwErrors(err.response.data?.errors || { new_password: 'Password does not meet requirements.' });
       } else {
-        showToast('Failed to change password.', 'error');
+        toast.error('Failed to change password.');
       }
     } finally {
       setSavingPw(false);
@@ -100,9 +98,9 @@ function AccountSettings() {
     try {
       const updated = await updateAccount({ preferred_language: preferredLanguage });
       setAccount(updated);
-      showToast('Preferences saved.', 'success');
+      toast.success('Preferences saved.');
     } catch {
-      showToast('Failed to save preferences.', 'error');
+      toast.error('Failed to save preferences.');
     } finally {
       setSavingPrefs(false);
     }
@@ -325,7 +323,6 @@ function AccountSettings() {
         />
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

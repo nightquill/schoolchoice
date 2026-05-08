@@ -2,16 +2,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import { toast } from 'sonner';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import client from '@schoolchoice/ui/api/client';
 
 function AdminDataRefresh() {
   const navigate = useNavigate();
-  const { toasts, showToast, removeToast } = useToast();
   const [account, setAccount] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [triggering, setTriggering] = useState(false);
@@ -30,7 +28,7 @@ function AdminDataRefresh() {
       .then((data) => {
         setAccount(data);
         if (data.role !== 'admin') {
-          showToast('You do not have permission to access that page.', 'error');
+          toast.error('You do not have permission to access that page.');
           navigate('/dashboard');
         }
       })
@@ -49,12 +47,12 @@ function AdminDataRefresh() {
       setLastRefreshBy(triggeredBy);
       setSourceStatuses({ subjects: 'pending', schools: 'pending', jupas: 'pending' });
       setMessages((prev) => [...prev, `[${triggeredAt.slice(0, 19).replace('T', ' ')}] Triggered by ${triggeredBy}`]);
-      showToast('Data refresh triggered.', 'success');
+      toast.success('Data refresh triggered.');
     } catch (err) {
       if (err?.response?.status === 403) {
-        showToast('You do not have permission to trigger a data refresh.', 'error');
+        toast.error('You do not have permission to trigger a data refresh.');
       } else {
-        showToast('Failed to trigger data refresh.', 'error');
+        toast.error('Failed to trigger data refresh.');
       }
     } finally {
       setTriggering(false);
@@ -211,7 +209,6 @@ function AdminDataRefresh() {
         <p>This will queue a full data re-import. Continue?</p>
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

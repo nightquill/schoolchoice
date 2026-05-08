@@ -4,7 +4,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 
-export default function PlansTab({ studentId, showToast }) {
+export default function PlansTab({ studentId }) {
   const navigate = useNavigate();
   const {
     plans,
@@ -13,7 +13,7 @@ export default function PlansTab({ studentId, showToast }) {
     setSelected,
     deleting,
     handleDelete,
-  } = usePlansTab(studentId, showToast);
+  } = usePlansTab(studentId);
 
   const cardStyle = {
     background: 'var(--color-surface)',

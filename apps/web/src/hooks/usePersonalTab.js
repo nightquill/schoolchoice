@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import client from '@schoolchoice/ui/api/client';
 
-export function usePersonalTab(student, studentId, showToast, onSaved) {
+export function usePersonalTab(student, studentId, onSaved) {
+  const queryClient = useQueryClient();
+
   const [form, setForm] = useState({
     full_name: student?.full_name || '',
     preferred_name: student?.preferred_name || '',
@@ -17,7 +21,6 @@ export function usePersonalTab(student, studentId, showToast, onSaved) {
     preferred_language: student?.preferred_language || 'en',
     personal_statement: student?.personal_statement || '',
   });
-  const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -51,30 +54,34 @@ export function usePersonalTab(student, studentId, showToast, onSaved) {
     setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   }, []);
 
-  const handleSave = useCallback(async () => {
-    setSaving(true);
-    setErrors({});
-    try {
-      const payload = {
-        ...form,
-        year_of_study: form.year_of_study === '' || form.year_of_study === null ? null : parseInt(form.year_of_study, 10),
-        date_of_birth: form.date_of_birth === '' ? null : form.date_of_birth,
-        personal_statement: form.personal_statement === '' ? null : form.personal_statement,
-      };
-      const updated = await client.put(`/api/v1/students/${studentId}/profile`, payload).then((r) => r.data);
+  const mutation = useMutation({
+    mutationFn: (payload) =>
+      client.put(`/api/v1/students/${studentId}/profile`, payload).then((r) => r.data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['student', studentId] });
       onSaved(updated);
-      showToast('Profile saved successfully.', 'success');
-    } catch (err) {
+      toast.success('Profile saved successfully.');
+    },
+    onError: (err) => {
       const detail = err?.response?.data;
       if (err?.response?.status === 422) {
-        showToast(`Validation error: ${JSON.stringify(detail?.detail || detail)}`, 'error');
+        toast.error(`Validation error: ${JSON.stringify(detail?.detail || detail)}`);
       } else {
-        showToast('Failed to save profile.', 'error');
+        toast.error('Failed to save profile.');
       }
-    } finally {
-      setSaving(false);
-    }
-  }, [form, studentId, onSaved, showToast]);
+    },
+  });
 
-  return { form, saving, errors, handleChange, handleSave, calcAge };
+  const handleSave = useCallback(() => {
+    setErrors({});
+    const payload = {
+      ...form,
+      year_of_study: form.year_of_study === '' || form.year_of_study === null ? null : parseInt(form.year_of_study, 10),
+      date_of_birth: form.date_of_birth === '' ? null : form.date_of_birth,
+      personal_statement: form.personal_statement === '' ? null : form.personal_statement,
+    };
+    mutation.mutate(payload);
+  }, [form, mutation]);
+
+  return { form, saving: mutation.isPending, errors, handleChange, handleSave, calcAge };
 }

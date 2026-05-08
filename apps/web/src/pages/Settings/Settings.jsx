@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import { Toast } from '@schoolchoice/ui';
+import { toast } from 'sonner';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { listUsers, createUser, updateUser, deleteUser } from '../../api/admin';
@@ -47,7 +46,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@schoolchoice/ui/primi
 function Settings() {
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
-  const { toasts, showToast, removeToast } = useToast();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,14 +84,14 @@ function Settings() {
       setUsers(data);
     } catch (err) {
       if (err?.response?.status === 403) {
-        showToast('You do not have permission to perform this action.', 'error');
+        toast.error('You do not have permission to perform this action.');
       } else {
-        showToast('Failed to load users.', 'error');
+        toast.error('Failed to load users.');
       }
     } finally {
       setUsersLoading(false);
     }
-  }, [showToast]);
+  }, []);
 
   useEffect(() => {
     if (account?.role === 'admin') {
@@ -133,7 +131,7 @@ function Settings() {
           payload.password = formData.password;
         }
         await updateUser(editingUser.id, payload);
-        showToast('User updated successfully.', 'success');
+        toast.success('User updated successfully.');
       } else {
         await createUser({
           email: formData.email,
@@ -141,18 +139,18 @@ function Settings() {
           display_name: formData.display_name || undefined,
           role: formData.role,
         });
-        showToast('User created successfully.', 'success');
+        toast.success('User created successfully.');
       }
       setDialogOpen(false);
       await fetchUsers();
     } catch (err) {
       if (err?.response?.status === 409) {
-        showToast('A user with this email already exists.', 'error');
+        toast.error('A user with this email already exists.');
       } else if (err?.response?.status === 403) {
-        showToast('You do not have permission to perform this action.', 'error');
+        toast.error('You do not have permission to perform this action.');
       } else {
         const action = editingUser ? 'update' : 'create';
-        showToast(`Failed to ${action} user. Please try again.`, 'error');
+        toast.error(`Failed to ${action} user. Please try again.`);
       }
     } finally {
       setSaving(false);
@@ -169,15 +167,15 @@ function Settings() {
     setDeleting(true);
     try {
       await deleteUser(deletingUser.id);
-      showToast('User deleted.', 'success');
+      toast.success('User deleted.');
       setDeleteDialogOpen(false);
       setDeletingUser(null);
       await fetchUsers();
     } catch (err) {
       if (err?.response?.status === 403) {
-        showToast('You do not have permission to perform this action.', 'error');
+        toast.error('You do not have permission to perform this action.');
       } else {
-        showToast('Failed to delete user. Please try again.', 'error');
+        toast.error('Failed to delete user. Please try again.');
       }
     } finally {
       setDeleting(false);
@@ -370,10 +368,11 @@ function Settings() {
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <span role="button" tabIndex={0} className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent cursor-pointer" aria-label="Actions">
-                                  <MoreVertical size={16} />
-                                </span>
+                              <DropdownMenuTrigger
+                                className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent cursor-pointer border-0 bg-transparent"
+                                aria-label="Actions"
+                              >
+                                <MoreVertical size={16} />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openEditDialog(u)}>
@@ -547,7 +546,6 @@ function Settings() {
         </DialogContent>
       </Dialog>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

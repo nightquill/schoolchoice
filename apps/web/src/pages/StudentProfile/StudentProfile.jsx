@@ -1,19 +1,17 @@
 // REQ-089, REQ-090, REQ-091, REQ-100: Tabbed Student Profile Page
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@schoolchoice/ui/primitives/tabs';
-import { LoadingSpinner } from '@schoolchoice/ui';
-import { ErrorMessage } from '@schoolchoice/ui';
+import { QueryBoundary } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@schoolchoice/ui/primitives/dialog';
 import { Input } from '@schoolchoice/ui/primitives/input';
 import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getSubjects } from '../../api/grades';
-import { generatePlan } from '../../api/plan';
-import client from '@schoolchoice/ui/api/client';
 import PersonalTab from './PersonalTab';
 import GradesTab from './GradesTab';
 import LanguageTab from './LanguageTab';
@@ -32,52 +30,59 @@ const TABS = [
   { id: 'plans', label: 'Plans' },
 ];
 
-// Sonner-compatible showToast wrapper for hooks that still accept showToast(msg, type)
-function showToast(message, type) {
-  if (type === 'success') toast.success(message);
-  else if (type === 'error') toast.error(message);
-  else toast(message);
-}
-
 function StudentProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [student, setStudent] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [generatingPlan, setGeneratingPlan] = useState(false);
   const [showGraduateModal, setShowGraduateModal] = useState(false);
   const [graduateForm, setGraduateForm] = useState({ final_school_id: '', final_major: '', graduation_year: new Date().getFullYear() });
-  const [graduateLoading, setGraduateLoading] = useState(false);
   const [schoolOptions, setSchoolOptions] = useState([]);
-  const [subjects, setSubjects] = useState([]);
 
   const activeTab = searchParams.get('tab') || 'personal';
 
-  useEffect(() => {
-    Promise.all([
-      getStudent(id).catch(() => client.get(`/api/v1/students/${id}/profile`).then((r) => r.data)),
-      getAccount(),
-    ])
-      .then(([studentData, accountData]) => {
-        setStudent(studentData);
-        setAccount(accountData);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load student profile.');
-      })
-      .finally(() => setLoading(false));
-    getSubjects().then(setSubjects).catch(() => setSubjects([]));
-  }, [id]);
+  // Student data via useQuery (D-01: parent-fetches-all pattern)
+  const studentQuery = useQuery({
+    queryKey: ['student', id],
+    queryFn: () => getStudent(id),
+  });
+
+  const accountQuery = useQuery({
+    queryKey: ['account'],
+    queryFn: getAccount,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const subjectsQuery = useQuery({
+    queryKey: ['subjects'],
+    queryFn: getSubjects,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const student = studentQuery.data;
+  const account = accountQuery.data;
+  const subjects = subjectsQuery.data ?? [];
+
+  // Graduation mutation
+  const graduateMutation = useMutation({
+    mutationFn: (payload) => graduateStudent(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['student', id] });
+      setShowGraduateModal(false);
+      toast.success('Student marked as graduated. Data added to analytics.');
+    },
+    onError: () => {
+      toast.error('Failed to graduate student.');
+    },
+  });
 
   const handleTabChange = (tabId) => {
     setSearchParams({ tab: tabId });
   };
 
   const handleStudentSaved = (updated) => {
-    setStudent(updated);
+    // Optimistically update the query cache with the returned data
+    queryClient.setQueryData(['student', id], updated);
   };
 
   const handleOpenGraduate = async () => {
@@ -91,23 +96,12 @@ function StudentProfile() {
     }
   };
 
-  const handleGraduate = async () => {
-    setGraduateLoading(true);
-    try {
-      const payload = {
-        final_school_id: graduateForm.final_school_id || null,
-        final_major: graduateForm.final_major || null,
-        graduation_year: graduateForm.graduation_year ? parseInt(graduateForm.graduation_year, 10) : null,
-      };
-      const updated = await graduateStudent(id, payload);
-      setStudent(updated);
-      setShowGraduateModal(false);
-      toast.success('Student marked as graduated. Data added to analytics.');
-    } catch {
-      toast.error('Failed to graduate student.');
-    } finally {
-      setGraduateLoading(false);
-    }
+  const handleGraduate = () => {
+    graduateMutation.mutate({
+      final_school_id: graduateForm.final_school_id || null,
+      final_major: graduateForm.final_major || null,
+      graduation_year: graduateForm.graduation_year ? parseInt(graduateForm.graduation_year, 10) : null,
+    });
   };
 
   const handleGeneratePlan = () => {
@@ -115,84 +109,82 @@ function StudentProfile() {
   };
 
   return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)', overflowX: 'hidden' }}>
       <NavBarV2 account={account} />
       <Link to="/dashboard" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-block', padding: 'var(--space-3) var(--space-8)' }}>
         {'\u2190'} Back to Dashboard
       </Link>
 
-      {loading && <LoadingSpinner label="Loading student profile..." />}
-      {error && (
-        <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
-          <ErrorMessage message={error} />
-          <Link to="/dashboard" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>Back to Dashboard</Link>
-        </div>
-      )}
-
-      {!loading && !error && student && (
-        <>
-          <div className="px-4 md:px-8" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-              <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                {student.full_name || 'Student Profile'}
-              </h1>
-              {student.year_of_study && (
-                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
-                  Year {student.year_of_study}
-                </p>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
-              {student.is_graduated && (
-                <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-success)', color: '#fff', padding: '2px 10px', borderRadius: '10px', fontWeight: 'var(--font-weight-medium)' }}>
-                  Graduated {student.graduation_year || ''}
-                </span>
-              )}
-              {!student.is_graduated && (
-                <Button variant="secondary" onClick={handleOpenGraduate}>Mark as Graduated</Button>
-              )}
-              <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>Target Schools</Button>
-              <Button onClick={handleGeneratePlan} disabled={generatingPlan}>
-                {generatingPlan ? 'Loading…' : 'Generate Plan'}
-              </Button>
-            </div>
-          </div>
-
-          <Tabs value={activeTab} onValueChange={handleTabChange} style={{ flexDirection: 'column' }}>
-            <div className="overflow-x-auto whitespace-nowrap" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
-              <TabsList variant="line" className="w-full justify-start" aria-label="Student profile sections">
-                {TABS.map((tab) => (
-                  <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
-                ))}
-              </TabsList>
+      <QueryBoundary
+        isLoading={studentQuery.isLoading}
+        isError={studentQuery.isError}
+        error={studentQuery.error}
+        refetch={studentQuery.refetch}
+        resourceName="student"
+      >
+        {student && (
+          <>
+            <div className="px-4 md:px-8" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                  {student.full_name || 'Student Profile'}
+                </h1>
+                {student.year_of_study && (
+                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
+                    Year {student.year_of_study}
+                  </p>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+                {student.is_graduated && (
+                  <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-success)', color: '#fff', padding: '2px 10px', borderRadius: '10px', fontWeight: 'var(--font-weight-medium)' }}>
+                    Graduated {student.graduation_year || ''}
+                  </span>
+                )}
+                {!student.is_graduated && (
+                  <Button variant="secondary" onClick={handleOpenGraduate}>Mark as Graduated</Button>
+                )}
+                <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>Target Schools</Button>
+                <Button onClick={handleGeneratePlan}>Generate Plan</Button>
+              </div>
             </div>
 
-            <div className="px-4 md:px-8" style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
-              <TabsContent value="personal">
-                <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-              </TabsContent>
-              <TabsContent value="grades">
-                <GradesTab studentId={id} showToast={showToast} subjects={subjects} />
-              </TabsContent>
-              <TabsContent value="language">
-                <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-              </TabsContent>
-              <TabsContent value="evaluations">
-                <EvaluationsTab studentId={id} showToast={showToast} />
-              </TabsContent>
-              <TabsContent value="activities">
-                <ActivitiesTab studentId={id} student={student} showToast={showToast} />
-              </TabsContent>
-              <TabsContent value="notes">
-                <NotesTab studentId={id} student={student} onSaved={handleStudentSaved} showToast={showToast} />
-              </TabsContent>
-              <TabsContent value="plans">
-                <PlansTab studentId={id} showToast={showToast} />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </>
-      )}
+            <Tabs value={activeTab} onValueChange={handleTabChange} style={{ flexDirection: 'column' }}>
+              <div className="overflow-x-auto whitespace-nowrap" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', position: 'sticky', top: '56px', zIndex: 50 }}>
+                <TabsList variant="line" className="w-full justify-start" aria-label="Student profile sections">
+                  {TABS.map((tab) => (
+                    <TabsTrigger key={tab.id} value={tab.id}>{tab.label}</TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+
+              <div className="px-4 md:px-8" style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
+                <TabsContent value="personal">
+                  <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                </TabsContent>
+                <TabsContent value="grades">
+                  <GradesTab studentId={id} subjects={subjects} />
+                </TabsContent>
+                <TabsContent value="language">
+                  <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                </TabsContent>
+                <TabsContent value="evaluations">
+                  <EvaluationsTab studentId={id} />
+                </TabsContent>
+                <TabsContent value="activities">
+                  <ActivitiesTab studentId={id} student={student} />
+                </TabsContent>
+                <TabsContent value="notes">
+                  <NotesTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                </TabsContent>
+                <TabsContent value="plans">
+                  <PlansTab studentId={id} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </>
+        )}
+      </QueryBoundary>
 
       <Dialog open={showGraduateModal} onOpenChange={setShowGraduateModal}>
         <DialogContent>
@@ -232,9 +224,9 @@ function StudentProfile() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateLoading}>Cancel</Button>
-            <Button onClick={handleGraduate} disabled={graduateLoading}>
-              {graduateLoading ? 'Saving…' : 'Confirm Graduate'}
+            <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateMutation.isPending}>Cancel</Button>
+            <Button onClick={handleGraduate} disabled={graduateMutation.isPending}>
+              {graduateMutation.isPending ? 'Saving…' : 'Confirm Graduate'}
             </Button>
           </DialogFooter>
         </DialogContent>

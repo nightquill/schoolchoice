@@ -7,8 +7,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { toast } from 'sonner';
 import {
   getCohort,
   getCohortStats,
@@ -68,7 +67,6 @@ const tdStyle = {
 function CohortDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toasts, showToast, removeToast } = useToast();
   const [account, setAccount] = useState(null);
   const [cohort, setCohort] = useState(null);
   const [stats, setStats] = useState(null);
@@ -107,7 +105,7 @@ function CohortDetail() {
     setStatsLoading(true);
     getCohortStats(id, sitting || undefined)
       .then(setStats)
-      .catch(() => showToast('Failed to load stats.', 'error'))
+      .catch(() => toast.error('Failed to load stats.'))
       .finally(() => setStatsLoading(false));
   };
 
@@ -130,7 +128,7 @@ function CohortDetail() {
       const result = await searchStudents(params);
       setSearchResults(result.students ?? []);
     } catch {
-      showToast('Search failed.', 'error');
+      toast.error('Search failed.');
     } finally {
       setSearchLoading(false);
     }
@@ -154,10 +152,10 @@ function CohortDetail() {
       setAddModalOpen(false);
       setSelectedIds(new Set());
       setSearchResults([]);
-      showToast(`${selectedIds.size} student(s) added.`, 'success');
+      toast.success(`${selectedIds.size} student(s) added.`);
       loadStats(sittingFilter);
     } catch {
-      showToast('Failed to add students.', 'error');
+      toast.error('Failed to add students.');
     } finally {
       setAdding(false);
     }
@@ -173,10 +171,10 @@ function CohortDetail() {
         members: prev.members.filter((m) => m.id !== removeTarget.id),
       }));
       setRemoveTarget(null);
-      showToast('Student removed from cohort.', 'success');
+      toast.success('Student removed from cohort.');
       loadStats(sittingFilter);
     } catch {
-      showToast('Failed to remove student.', 'error');
+      toast.error('Failed to remove student.');
     } finally {
       setRemoving(false);
     }
@@ -480,7 +478,6 @@ function CohortDetail() {
         </p>
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

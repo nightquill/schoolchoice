@@ -1,7 +1,7 @@
 import { useNotesTab } from '../../hooks/useNotesTab';
 
-export default function NotesTab({ studentId, student, onSaved, showToast }) {
-  const { notes, saveStatus, handleChange } = useNotesTab(student, studentId, showToast, onSaved);
+export default function NotesTab({ studentId, student, onSaved }) {
+  const { notes, saveStatus, handleChange } = useNotesTab(student, studentId, onSaved);
 
   return (
     <div>

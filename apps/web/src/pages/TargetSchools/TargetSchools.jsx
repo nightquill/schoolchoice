@@ -7,12 +7,11 @@ import { EligibilityBadge } from '@schoolchoice/ui';
 import { StatusChip } from '@schoolchoice/ui';
 import ShapSummary from '../../components/ShapSummary/ShapSummary';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { toast } from 'sonner';
 import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets } from '../../api/targets';
 import { searchSchools } from '../../api/schoolsV2';
 import { getStudent } from '../../api/students';
@@ -255,7 +254,6 @@ function MajorView({ targets }) {
 // ---- Main TargetSchools ----
 function TargetSchools() {
   const { id } = useParams();
-  const { toasts, showToast, removeToast } = useToast();
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
   const [targets, setTargets] = useState([]);
@@ -308,10 +306,10 @@ function TargetSchools() {
     setTargets(newList);
     try {
       await reorderTargets(id, newList.map((t) => t.id));
-      showToast('Preference order saved.', 'success');
+      toast.success('Preference order saved.');
     } catch {
       setTargets(prevTargetsRef.current);
-      showToast('Failed to reorder targets.', 'error');
+      toast.error('Failed to reorder targets.');
     }
   };
 
@@ -323,10 +321,10 @@ function TargetSchools() {
     setTargets(newList);
     try {
       await reorderTargets(id, newList.map((t) => t.id));
-      showToast('Preference order saved.', 'success');
+      toast.success('Preference order saved.');
     } catch {
       setTargets(prevTargetsRef.current);
-      showToast('Failed to reorder targets.', 'error');
+      toast.error('Failed to reorder targets.');
     }
   };
 
@@ -334,9 +332,9 @@ function TargetSchools() {
     try {
       await deleteTarget(id, target.id);
       setTargets((prev) => prev.filter((t) => t.id !== target.id));
-      showToast('School removed from target list.', 'success');
+      toast.success('School removed from target list.');
     } catch {
-      showToast('Failed to remove school.', 'error');
+      toast.error('Failed to remove school.');
     }
   };
 
@@ -346,7 +344,7 @@ function TargetSchools() {
       const result = await searchSchools({ q: query, limit: 20 });
       setSchoolResults(Array.isArray(result) ? result : (result.items ?? []));
     } catch {
-      showToast('School search failed.', 'error');
+      toast.error('School search failed.');
     } finally {
       setSearchLoading(false);
     }
@@ -387,9 +385,9 @@ function TargetSchools() {
       });
       setTargets((prev) => prev.map((t) => (t.id === editTarget.id ? { ...t, ...updated } : t)));
       setEditTarget(null);
-      showToast('Target updated.', 'success');
+      toast.success('Target updated.');
     } catch {
-      showToast('Failed to update target.', 'error');
+      toast.error('Failed to update target.');
     } finally {
       setEditSaving(false);
     }
@@ -415,9 +413,9 @@ function TargetSchools() {
       setIntendedMajors('');
       setYearOfEntry('');
       setNewMajors([]);
-      showToast('School added to target list.', 'success');
+      toast.success('School added to target list.');
     } catch {
-      showToast('Failed to add school.', 'error');
+      toast.error('Failed to add school.');
     } finally {
       setAddingTarget(false);
     }
@@ -779,7 +777,6 @@ function TargetSchools() {
         </div>
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

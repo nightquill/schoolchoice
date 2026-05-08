@@ -42,7 +42,7 @@ const HKDSE_SUBJECTS = [
 
 const HKDSE_GRADES = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
 
-export default function GradesTab({ studentId, showToast, subjects }) {
+export default function GradesTab({ studentId, subjects }) {
   const {
     grades,
     loading,
@@ -57,7 +57,7 @@ export default function GradesTab({ studentId, showToast, subjects }) {
     handleDeleteGrade,
     handleSaveNewRow,
     dismissParsedGrade,
-  } = useGradesTab(studentId, showToast);
+  } = useGradesTab(studentId);
 
   if (loading) return <LoadingSpinner label="Loading grades..." />;
   if (error) return <ErrorMessage message={error} />;

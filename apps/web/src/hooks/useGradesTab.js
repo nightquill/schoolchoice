@@ -1,31 +1,55 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { getGrades, createGrade, deleteGrade } from '../api/grades';
 import { uploadTranscript, getTranscript } from '../api/transcripts';
 
-export function useGradesTab(studentId, showToast) {
-  const [grades, setGrades] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export function useGradesTab(studentId) {
+  const queryClient = useQueryClient();
+
+  // --- Grades query ---
+  const gradesQuery = useQuery({
+    queryKey: ['grades', studentId],
+    queryFn: () => getGrades(studentId),
+    enabled: !!studentId,
+  });
+
+  const grades = Array.isArray(gradesQuery.data)
+    ? gradesQuery.data
+    : (gradesQuery.data?.grades || []);
+  const loading = gradesQuery.isLoading;
+  const error = gradesQuery.error ? 'Failed to load grades.' : null;
+
+  // --- Local UI state ---
   const [newRow, setNewRow] = useState(null);
   const [transcriptState, setTranscriptState] = useState('idle'); // idle|parsing|complete|failed
   const [parsedGrades, setParsedGrades] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(null);
   const pollRef = useRef(null);
 
-  useEffect(() => {
-    getGrades(studentId)
-      .then((data) => setGrades(Array.isArray(data) ? data : (data.grades || [])))
-      .catch(() => setError('Failed to load grades.'))
-      .finally(() => setLoading(false));
-  }, [studentId]);
+  // --- Mutations ---
+  const createGradeMutation = useMutation({
+    mutationFn: (payload) => createGrade(studentId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grades', studentId] });
+    },
+  });
 
+  const deleteGradeMutation = useMutation({
+    mutationFn: (gradeId) => deleteGrade(studentId, gradeId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['grades', studentId] });
+    },
+  });
+
+  // --- Transcript upload with polling ---
   const handleUpload = useCallback(async (file) => {
     setUploadProgress(0);
     try {
       await uploadTranscript(studentId, file);
       setUploadProgress(100);
       setTranscriptState('parsing');
-      showToast('Transcript uploaded. Parsing in progress…', 'info');
+      toast.info('Transcript uploaded. Parsing in progress…');
       pollRef.current = setInterval(async () => {
         try {
           const result = await getTranscript(studentId);
@@ -33,11 +57,11 @@ export function useGradesTab(studentId, showToast) {
             clearInterval(pollRef.current);
             setTranscriptState('complete');
             setParsedGrades(result.parsed_data || []);
-            showToast('Transcript parsed. Review suggested grades below.', 'success');
+            toast.success('Transcript parsed. Review suggested grades below.');
           } else if (result.parse_status === 'failed') {
             clearInterval(pollRef.current);
             setTranscriptState('failed');
-            showToast('Transcript parsing failed. Please enter grades manually.', 'error');
+            toast.error('Transcript parsing failed. Please enter grades manually.');
           }
         } catch {
           clearInterval(pollRef.current);
@@ -46,50 +70,48 @@ export function useGradesTab(studentId, showToast) {
       }, 3000);
     } catch {
       setUploadProgress(null);
-      showToast('Upload failed.', 'error');
+      toast.error('Upload failed.');
     }
-  }, [studentId, showToast]);
+  }, [studentId]);
 
   // Cleanup polling on unmount
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
+  // --- Handlers ---
   const handleAcceptSuggestion = useCallback(async (suggestion) => {
     try {
-      const created = await createGrade(studentId, {
+      await createGradeMutation.mutateAsync({
         subject_name: suggestion.subject,
         raw_grade: suggestion.grade,
         sitting: 'OFFICIAL',
         transcript_uploaded: true,
       });
-      setGrades((prev) => [...prev, created]);
       setParsedGrades((prev) => prev.filter((g) => g !== suggestion));
-      showToast('Grade added.', 'success');
+      toast.success('Grade added.');
     } catch {
-      showToast('Failed to add grade.', 'error');
+      toast.error('Failed to add grade.');
     }
-  }, [studentId, showToast]);
+  }, [createGradeMutation]);
 
   const handleDeleteGrade = useCallback(async (gradeId) => {
     try {
-      await deleteGrade(studentId, gradeId);
-      setGrades((prev) => prev.filter((g) => g.id !== gradeId));
-      showToast('Grade deleted.', 'success');
+      await deleteGradeMutation.mutateAsync(gradeId);
+      toast.success('Grade deleted.');
     } catch {
-      showToast('Failed to delete grade.', 'error');
+      toast.error('Failed to delete grade.');
     }
-  }, [studentId, showToast]);
+  }, [deleteGradeMutation]);
 
   const handleSaveNewRow = useCallback(async () => {
     if (!newRow?.subject_name) return;
     try {
-      const created = await createGrade(studentId, newRow);
-      setGrades((prev) => [...prev, created]);
+      await createGradeMutation.mutateAsync(newRow);
       setNewRow(null);
-      showToast('Grade added.', 'success');
+      toast.success('Grade added.');
     } catch {
-      showToast('Failed to save grade.', 'error');
+      toast.error('Failed to save grade.');
     }
-  }, [newRow, studentId, showToast]);
+  }, [newRow, createGradeMutation]);
 
   const dismissParsedGrade = useCallback((index) => {
     setParsedGrades((prev) => prev.filter((_, idx) => idx !== index));

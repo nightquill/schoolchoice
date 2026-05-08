@@ -9,10 +9,9 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
 import { TemplateSelector } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { toast } from 'sonner';
 import {
   generatePlan,
   getPlanStatus,
@@ -52,8 +51,6 @@ function buildSectionList(plan) {
 
 function AcademicPlan() {
   const { id } = useParams();
-  const { toasts, showToast, removeToast } = useToast();
-
   // --- core state ---
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
@@ -74,13 +71,13 @@ function AcademicPlan() {
     setIsExportingHTML(true);
     try {
       await exportPlanHTML(plan.id);
-      showToast('Plan exported as HTML.', 'success');
+      toast.success('Plan exported as HTML.');
     } catch {
-      showToast('Failed to export HTML. Please try again.', 'error');
+      toast.error('Failed to export HTML. Please try again.');
     } finally {
       setIsExportingHTML(false);
     }
-  }, [plan?.id, showToast]);
+  }, [plan?.id]);
 
   // --- template state ---
   const [activeTemplate, setActiveTemplate] = useState('professional');
@@ -133,18 +130,18 @@ function AcademicPlan() {
           const planData = await getPlan(id);
           setPlan(planData);
           if (planData?.template_id) setActiveTemplate(planData.template_id);
-          showToast('Plan ready \u2014 view it here.', 'success');
+          toast.success('Plan ready \u2014 view it here.');
         } else if (statusValue === 'FAILED') {
           stopPolling();
           setError('Plan generation failed. Please try again.');
-          showToast('Plan generation failed.', 'error');
+          toast.error('Plan generation failed.');
         }
       } catch {
         stopPolling();
         setError('Failed to check plan status.');
       }
     }, POLL_INTERVAL_MS);
-  }, [id, showToast]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     Promise.all([
@@ -192,7 +189,7 @@ function AcademicPlan() {
       setPlan(null);
       startPolling();
     } catch {
-      showToast('Failed to start plan generation.', 'error');
+      toast.error('Failed to start plan generation.');
     } finally {
       setGenerating(false);
     }
@@ -211,7 +208,7 @@ function AcademicPlan() {
       setActiveTemplate(templateId);
       await loadPlan();
     } catch {
-      showToast('Failed to change template.', 'error');
+      toast.error('Failed to change template.');
     } finally {
       setTemplateLoading(false);
     }
@@ -274,9 +271,9 @@ function AcademicPlan() {
       await editPlanSection(id, editingSection.key, htmlContent);
       setEditingSection(null);
       await loadPlan();
-      showToast('Section saved.', 'success');
+      toast.success('Section saved.');
     } catch {
-      showToast('Failed to save section.', 'error');
+      toast.error('Failed to save section.');
     } finally {
       setSectionSaving(false);
     }
@@ -289,9 +286,9 @@ function AcademicPlan() {
       await resetPlanSection(id, editingSection.key);
       setEditingSection(null);
       await loadPlan();
-      showToast('Section reset to default.', 'success');
+      toast.success('Section reset to default.');
     } catch {
-      showToast('Failed to reset section.', 'error');
+      toast.error('Failed to reset section.');
     } finally {
       setSectionSaving(false);
     }
@@ -715,7 +712,6 @@ function AcademicPlan() {
         </div>
       )}
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

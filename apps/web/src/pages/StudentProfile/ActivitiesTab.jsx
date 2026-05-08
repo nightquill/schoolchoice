@@ -1,7 +1,7 @@
 import { useActivitiesTab } from '../../hooks/useActivitiesTab';
 import { Button } from '@schoolchoice/ui/primitives/button';
 
-export default function ActivitiesTab({ studentId, student, showToast }) {
+export default function ActivitiesTab({ studentId, student }) {
   const {
     activities,
     awards,
@@ -18,7 +18,7 @@ export default function ActivitiesTab({ studentId, student, showToast }) {
     addAward,
     updateAward,
     removeAward,
-  } = useActivitiesTab(student, studentId, showToast);
+  } = useActivitiesTab(student, studentId);
 
   const inputStyle = {
     padding: 'var(--space-2)',

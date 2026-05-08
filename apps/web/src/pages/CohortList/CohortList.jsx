@@ -6,15 +6,13 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
+import { toast } from 'sonner';
 import { Modal } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { getCohorts, createCohort, deleteCohort } from '../../api/cohorts';
 import { getAccount } from '@schoolchoice/ui/api/account';
 
 function CohortList() {
   const navigate = useNavigate();
-  const { toasts, showToast, removeToast } = useToast();
   const [account, setAccount] = useState(null);
   const [cohorts, setCohorts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,9 +45,9 @@ function CohortList() {
       setCreateModalOpen(false);
       setNewName('');
       setNewDesc('');
-      showToast('Cohort created.', 'success');
+      toast.success('Cohort created.');
     } catch {
-      showToast('Failed to create cohort.', 'error');
+      toast.error('Failed to create cohort.');
     } finally {
       setCreating(false);
     }
@@ -62,9 +60,9 @@ function CohortList() {
       await deleteCohort(deleteTarget.id);
       setCohorts((prev) => prev.filter((c) => c.id !== deleteTarget.id));
       setDeleteTarget(null);
-      showToast('Cohort deleted.', 'success');
+      toast.success('Cohort deleted.');
     } catch {
-      showToast('Failed to delete cohort.', 'error');
+      toast.error('Failed to delete cohort.');
     } finally {
       setDeleting(false);
     }
@@ -231,7 +229,6 @@ function CohortList() {
         </p>
       </Modal>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

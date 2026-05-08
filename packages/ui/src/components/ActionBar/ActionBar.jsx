@@ -44,15 +44,17 @@ export default function ActionBar({ entityName, onExportFiltered, onExportAll, i
 
       {/* Right: Export dropdown */}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" disabled={isExporting} aria-label="Export data">
-            {isExporting ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <Download size={16} />
-            )}
-            <span className="hidden sm:inline">Export</span>
-          </Button>
+        <DropdownMenuTrigger
+          disabled={isExporting}
+          aria-label="Export data"
+          className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-xs transition-[color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+        >
+          {isExporting ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Download size={16} />
+          )}
+          <span className="hidden sm:inline">Export</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={onExportFiltered}>

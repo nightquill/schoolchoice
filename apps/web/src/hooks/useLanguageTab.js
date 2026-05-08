@@ -1,7 +1,11 @@
 import { useState, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import client from '@schoolchoice/ui/api/client';
 
-export function useLanguageTab(student, studentId, showToast, onSaved) {
+export function useLanguageTab(student, studentId, onSaved) {
+  const queryClient = useQueryClient();
+
   const [ielts, setIelts] = useState({
     ielts_score: student?.ielts_score || '',
     ielts_listening: student?.ielts_listening || '',
@@ -11,30 +15,33 @@ export function useLanguageTab(student, studentId, showToast, onSaved) {
     ielts_date: student?.ielts_date || '',
   });
   const [otherScores, setOtherScores] = useState(student?.other_language_scores || []);
-  const [saving, setSaving] = useState(false);
 
-  const handleSave = useCallback(async () => {
-    setSaving(true);
-    try {
-      const toFloat = (v) => (v === '' || v === null || v === undefined) ? null : parseFloat(v);
-      const payload = {
-        ielts_score: toFloat(ielts.ielts_score),
-        ielts_listening: toFloat(ielts.ielts_listening),
-        ielts_reading: toFloat(ielts.ielts_reading),
-        ielts_writing: toFloat(ielts.ielts_writing),
-        ielts_speaking: toFloat(ielts.ielts_speaking),
-        ielts_date: ielts.ielts_date || null,
-        other_language_scores: otherScores,
-      };
-      const updated = await client.post(`/api/v1/students/${studentId}/language-scores`, payload).then((r) => r.data);
+  const mutation = useMutation({
+    mutationFn: (payload) =>
+      client.post(`/api/v1/students/${studentId}/language-scores`, payload).then((r) => r.data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ['student', studentId] });
       onSaved(updated);
-      showToast('Language scores saved.', 'success');
-    } catch {
-      showToast('Failed to save language scores.', 'error');
-    } finally {
-      setSaving(false);
-    }
-  }, [ielts, otherScores, studentId, onSaved, showToast]);
+      toast.success('Language scores saved.');
+    },
+    onError: () => {
+      toast.error('Failed to save language scores.');
+    },
+  });
+
+  const handleSave = useCallback(() => {
+    const toFloat = (v) => (v === '' || v === null || v === undefined) ? null : parseFloat(v);
+    const payload = {
+      ielts_score: toFloat(ielts.ielts_score),
+      ielts_listening: toFloat(ielts.ielts_listening),
+      ielts_reading: toFloat(ielts.ielts_reading),
+      ielts_writing: toFloat(ielts.ielts_writing),
+      ielts_speaking: toFloat(ielts.ielts_speaking),
+      ielts_date: ielts.ielts_date || null,
+      other_language_scores: otherScores,
+    };
+    mutation.mutate(payload);
+  }, [ielts, otherScores, mutation]);
 
   const addOtherScore = useCallback(() => {
     setOtherScores((prev) => [...prev, { label: '', score: '', date: '' }]);
@@ -55,7 +62,7 @@ export function useLanguageTab(student, studentId, showToast, onSaved) {
   return {
     ielts,
     otherScores,
-    saving,
+    saving: mutation.isPending,
     handleSave,
     addOtherScore,
     removeOtherScore,

@@ -1,17 +1,43 @@
 import { useState, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import client from '@schoolchoice/ui/api/client';
 
-export function useActivitiesTab(student, studentId, showToast) {
+export function useActivitiesTab(student, studentId) {
+  const queryClient = useQueryClient();
+
   const [activities, setActivities] = useState(student?.extra_curricular || []);
   const [awards, setAwards] = useState(student?.awards || []);
-  const [savingActivities, setSavingActivities] = useState(false);
-  const [savingAwards, setSavingAwards] = useState(false);
   const [activityOpen, setActivityOpen] = useState(() =>
     (student?.extra_curricular || []).map((a) => !a.activity)
   );
   const [awardOpen, setAwardOpen] = useState(() =>
     (student?.awards || []).map((a) => !a.title)
   );
+
+  const activitiesMutation = useMutation({
+    mutationFn: (data) =>
+      client.post(`/api/v1/students/${studentId}/extracurricular`, data).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['student', studentId] });
+      toast.success('Activities saved.');
+    },
+    onError: () => {
+      toast.error('Failed to save activities.');
+    },
+  });
+
+  const awardsMutation = useMutation({
+    mutationFn: (data) =>
+      client.post(`/api/v1/students/${studentId}/awards`, data).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['student', studentId] });
+      toast.success('Awards saved.');
+    },
+    onError: () => {
+      toast.error('Failed to save awards.');
+    },
+  });
 
   const toggleActivity = useCallback((index) => {
     setActivityOpen((prev) => prev.map((v, i) => (i === index ? !v : v)));
@@ -21,29 +47,13 @@ export function useActivitiesTab(student, studentId, showToast) {
     setAwardOpen((prev) => prev.map((v, i) => (i === index ? !v : v)));
   }, []);
 
-  const handleSaveActivities = useCallback(async () => {
-    setSavingActivities(true);
-    try {
-      await client.post(`/api/v1/students/${studentId}/extracurricular`, activities).then((r) => r.data);
-      showToast('Activities saved.', 'success');
-    } catch {
-      showToast('Failed to save activities.', 'error');
-    } finally {
-      setSavingActivities(false);
-    }
-  }, [activities, studentId, showToast]);
+  const handleSaveActivities = useCallback(() => {
+    activitiesMutation.mutate(activities);
+  }, [activities, activitiesMutation]);
 
-  const handleSaveAwards = useCallback(async () => {
-    setSavingAwards(true);
-    try {
-      await client.post(`/api/v1/students/${studentId}/awards`, awards).then((r) => r.data);
-      showToast('Awards saved.', 'success');
-    } catch {
-      showToast('Failed to save awards.', 'error');
-    } finally {
-      setSavingAwards(false);
-    }
-  }, [awards, studentId, showToast]);
+  const handleSaveAwards = useCallback(() => {
+    awardsMutation.mutate(awards);
+  }, [awards, awardsMutation]);
 
   const addActivity = useCallback(() => {
     setActivities((prev) => [...prev, { activity: '', role: '', years: '', achievement: '' }]);
@@ -76,9 +86,9 @@ export function useActivitiesTab(student, studentId, showToast) {
   return {
     activities,
     awards,
-    saving: savingActivities || savingAwards,
-    savingActivities,
-    savingAwards,
+    saving: activitiesMutation.isPending || awardsMutation.isPending,
+    savingActivities: activitiesMutation.isPending,
+    savingAwards: awardsMutation.isPending,
     activityOpen,
     awardOpen,
     toggleActivity,

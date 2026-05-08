@@ -1,40 +1,41 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { getPlanHistory, deletePlanHistory } from '../api/plan';
 
-export function usePlansTab(studentId, showToast) {
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function usePlansTab(studentId) {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ['plans', studentId],
+    queryFn: () => getPlanHistory(studentId).then((data) => data.plans ?? []),
+  });
+
   const [selected, setSelected] = useState(null);
-  const [deleting, setDeleting] = useState(null);
 
-  useEffect(() => {
-    getPlanHistory(studentId)
-      .then((data) => setPlans(data.plans ?? []))
-      .catch(() => showToast('Failed to load plan history.', 'error'))
-      .finally(() => setLoading(false));
-  }, [studentId]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleDelete = useCallback(async (e, planId) => {
-    e.stopPropagation();
-    setDeleting(planId);
-    try {
-      await deletePlanHistory(studentId, planId);
-      setPlans((prev) => prev.filter((p) => p.id !== planId));
+  const deleteMutation = useMutation({
+    mutationFn: (planId) => deletePlanHistory(studentId, planId),
+    onSuccess: (_data, planId) => {
+      queryClient.invalidateQueries({ queryKey: ['plans', studentId] });
       setSelected((prev) => (prev?.id === planId ? null : prev));
-      showToast('Plan deleted.', 'success');
-    } catch {
-      showToast('Failed to delete plan.', 'error');
-    } finally {
-      setDeleting(null);
-    }
-  }, [studentId, showToast]);
+      toast.success('Plan deleted.');
+    },
+    onError: () => {
+      toast.error('Failed to delete plan.');
+    },
+  });
+
+  const handleDelete = useCallback((e, planId) => {
+    e.stopPropagation();
+    deleteMutation.mutate(planId);
+  }, [deleteMutation]);
 
   return {
-    plans,
-    loading,
+    plans: query.data ?? [],
+    loading: query.isLoading,
     selected,
     setSelected,
-    deleting,
+    deleting: deleteMutation.isPending ? deleteMutation.variables : null,
     handleDelete,
   };
 }

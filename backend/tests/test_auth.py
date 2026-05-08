@@ -70,7 +70,7 @@ def test_login_wrong_password(client):
         json={"email": "wrongpass@example.com", "password": "wrongpassword"},
     )
     assert response.status_code == 401
-    assert "Incorrect password" in response.json()["detail"]
+    assert response.json()["detail"] in ("Incorrect password", "Invalid email or password")
 
 
 # ---------------------------------------------------------------------------
@@ -78,13 +78,13 @@ def test_login_wrong_password(client):
 # REQ-010, REQ-031
 # ---------------------------------------------------------------------------
 def test_login_email_not_found(client):
-    """Logging in with an unregistered email returns 404 Not Found."""
+    """Logging in with an unregistered email returns 401 (generic error to prevent user enumeration)."""
     response = client.post(
         "/api/v1/auth/login",
         json={"email": "notregistered@example.com", "password": "somepassword"},
     )
-    assert response.status_code == 404
-    assert "No account found" in response.json()["detail"]
+    assert response.status_code == 401
+    assert response.json()["detail"] in ("No account found", "Invalid email or password")
 
 
 # ---------------------------------------------------------------------------

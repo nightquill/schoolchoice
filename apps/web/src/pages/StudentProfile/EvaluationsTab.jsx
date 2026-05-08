@@ -3,7 +3,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { StarRating } from '@schoolchoice/ui';
 
-export default function EvaluationsTab({ studentId, showToast }) {
+export default function EvaluationsTab({ studentId }) {
   const {
     evaluations,
     loading,
@@ -12,7 +12,7 @@ export default function EvaluationsTab({ studentId, showToast }) {
     addEval,
     updateEval,
     removeEval,
-  } = useEvaluationsTab(studentId, showToast);
+  } = useEvaluationsTab(studentId);
 
   const cardStyle = {
     background: 'var(--color-surface)',

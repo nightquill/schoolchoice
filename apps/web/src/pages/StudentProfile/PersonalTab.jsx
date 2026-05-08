@@ -2,8 +2,8 @@ import { usePersonalTab } from '../../hooks/usePersonalTab';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { Input } from '@schoolchoice/ui/primitives/input';
 
-export default function PersonalTab({ studentId, student, onSaved, showToast }) {
-  const { form, saving, errors, handleChange, handleSave, calcAge } = usePersonalTab(student, studentId, showToast, onSaved);
+export default function PersonalTab({ studentId, student, onSaved }) {
+  const { form, saving, errors, handleChange, handleSave, calcAge } = usePersonalTab(student, studentId, onSaved);
 
   const gridStyle = {
     display: 'grid',

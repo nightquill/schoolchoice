@@ -11,8 +11,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import SSEStreamDisplay from '../../components/SSEStreamDisplay/SSEStreamDisplay';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
 import { TemplateSelector } from '@schoolchoice/ui';
-import { Toast } from '@schoolchoice/ui';
-import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { toast } from 'sonner';
 import { getStudent } from '../../api/students';
 import { saveConsultantTask, getConsultantTaskStatus, sendConsultantChat } from '../../api/consultant';
 import { getPlan, setPlanTemplate, editPlanSection, resetPlanSection } from '../../api/plan';
@@ -23,8 +22,6 @@ function ConsultantTask() {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const taskId = 'academic_plan'; // hardcoded for school choice; future: from route param
-  const { toasts, showToast, removeToast } = useToast();
-
   // --- core state ---
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
@@ -140,7 +137,7 @@ function ConsultantTask() {
       try {
         const result = await saveConsultantTask(taskId, id, accumulatedTokens);
         setPlan(result);
-        showToast('Plan ready - view it here.', 'success');
+        toast.success('Plan ready - view it here.');
       } catch (err) {
         setStreamError('Failed to save plan. Please try again.');
       }
@@ -155,7 +152,7 @@ function ConsultantTask() {
       setStreamError('Generation was interrupted. Please try again.');
       setStreaming(false);
     };
-  }, [id, taskId, showToast]);
+  }, [id, taskId]);
   // NOTE: streamTokens is NOT in the dependency array -- we use the ref instead
 
   // Auto-start generation when navigated with ?generate=true
@@ -186,13 +183,13 @@ function ConsultantTask() {
     setIsExportingHTML(true);
     try {
       await exportPlanHTML(plan.id);
-      showToast('Plan exported as HTML.', 'success');
+      toast.success('Plan exported as HTML.');
     } catch {
-      showToast('Failed to export HTML. Please try again.', 'error');
+      toast.error('Failed to export HTML. Please try again.');
     } finally {
       setIsExportingHTML(false);
     }
-  }, [plan?.id, showToast]);
+  }, [plan?.id]);
 
   // --- Template change ---
   const handleSetTemplate = async (templateId) => {
@@ -203,7 +200,7 @@ function ConsultantTask() {
       setActiveTemplate(templateId);
       await loadPlan();
     } catch {
-      showToast('Failed to change template.', 'error');
+      toast.error('Failed to change template.');
     } finally {
       setTemplateLoading(false);
     }
@@ -265,9 +262,9 @@ function ConsultantTask() {
       await editPlanSection(id, editingSection.key, htmlContent);
       setEditingSection(null);
       await loadPlan();
-      showToast('Section saved.', 'success');
+      toast.success('Section saved.');
     } catch {
-      showToast('Failed to save section.', 'error');
+      toast.error('Failed to save section.');
     } finally {
       setSectionSaving(false);
     }
@@ -280,9 +277,9 @@ function ConsultantTask() {
       await resetPlanSection(id, editingSection.key);
       setEditingSection(null);
       await loadPlan();
-      showToast('Section reset to default.', 'success');
+      toast.success('Section reset to default.');
     } catch {
-      showToast('Failed to reset section.', 'error');
+      toast.error('Failed to reset section.');
     } finally {
       setSectionSaving(false);
     }
@@ -793,7 +790,6 @@ function ConsultantTask() {
         }
       `}</style>
 
-      <Toast toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

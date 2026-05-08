@@ -1,7 +1,7 @@
 import { useLanguageTab } from '../../hooks/useLanguageTab';
 import { Button } from '@schoolchoice/ui/primitives/button';
 
-export default function LanguageTab({ studentId, student, onSaved, showToast }) {
+export default function LanguageTab({ studentId, student, onSaved }) {
   const {
     ielts,
     otherScores,
@@ -11,7 +11,7 @@ export default function LanguageTab({ studentId, student, onSaved, showToast }) 
     removeOtherScore,
     updateOtherScore,
     updateIelts,
-  } = useLanguageTab(student, studentId, showToast, onSaved);
+  } = useLanguageTab(student, studentId, onSaved);
 
   const sectionHeadingStyle = {
     fontSize: 'var(--font-size-lg)',

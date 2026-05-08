@@ -117,7 +117,11 @@ class TestAdminUsersEndpoints:
         """Admin role gets a 200 with a list of users."""
         resp = client.get("/api/v1/admin/users", headers=admin_auth_headers)
         assert resp.status_code == 200
-        assert isinstance(resp.json(), list)
+        data = resp.json()
+        # Endpoint returns paginated response {items: [...], total: N}
+        assert isinstance(data, dict)
+        assert "items" in data
+        assert isinstance(data["items"], list)
 
     def test_create_user(self, client, admin_auth_headers):
         """POST /admin/users with valid payload returns 201."""
