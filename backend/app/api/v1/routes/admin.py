@@ -166,6 +166,20 @@ def create_user(
             status_code=status.HTTP_409_CONFLICT,
             detail="A user with this email already exists",
         )
+
+    if payload.organisation_id:
+        from app.db.models import OrganisationMembership, Organisation
+
+        org = db.query(Organisation).filter(Organisation.id == payload.organisation_id).first()
+        if org:
+            membership = OrganisationMembership(
+                organisation_id=payload.organisation_id,
+                user_id=user.id,
+                role="member",
+            )
+            db.add(membership)
+            db.commit()
+
     return user
 
 

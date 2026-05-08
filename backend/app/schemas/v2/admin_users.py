@@ -18,6 +18,7 @@ class UserCreateAdmin(BaseModel):
     password: str
     display_name: Optional[str] = None
     role: str = "counsellor"
+    organisation_id: Optional[UUID] = None
 
     @field_validator("role")
     @classmethod
