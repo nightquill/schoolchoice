@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.core.security import get_password_hash, verify_password
-from app.db.models import User
+from app.db.models import Organisation, OrganisationMembership, User
 from app.db.session import get_db
 from app.schemas.v2.account import AccountResponse, AccountUpdate, PasswordChange
 
@@ -29,10 +29,40 @@ router = APIRouter(prefix="/account", tags=["account-v2"])
     status_code=status.HTTP_200_OK,
 )
 def get_account(
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Return current user account info. REQ-079"""
-    return current_user
+    user = db.merge(current_user)
+
+    membership = (
+        db.query(OrganisationMembership)
+        .filter(OrganisationMembership.user_id == user.id)
+        .first()
+    )
+
+    org_data: dict = {}
+    if membership:
+        org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
+        if org:
+            org_data = {
+                "organisation_id": str(org.id),
+                "organisation_name": org.name,
+                "organisation_slug": org.slug,
+                "org_role": membership.role,
+            }
+
+    return AccountResponse.model_validate({
+        "id": user.id,
+        "email": user.email,
+        "display_name": user.display_name,
+        "preferred_language": user.preferred_language,
+        "role": user.role,
+        "is_active": user.is_active,
+        "created_at": user.created_at,
+        "updated_at": user.updated_at,
+        **org_data,
+    })
 
 
 # ---------------------------------------------------------------------------

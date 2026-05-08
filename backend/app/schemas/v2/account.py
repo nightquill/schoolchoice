@@ -23,6 +23,10 @@ class AccountResponse(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    organisation_id: Optional[str] = None
+    organisation_name: Optional[str] = None
+    organisation_slug: Optional[str] = None
+    org_role: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

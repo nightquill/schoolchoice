@@ -167,7 +167,14 @@ function NavBarV2({ account }) {
 
       {!isMobile && (
         <div style={{ ...rightStyle, display: 'flex' }}>
-          {displayName && <span style={userStyle}>{displayName}</span>}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            {displayName && <span style={userStyle}>{displayName}</span>}
+            {account?.organisation_name && (
+              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-tertiary, var(--color-text-secondary))', lineHeight: 1.2 }}>
+                {account.organisation_name}
+              </span>
+            )}
+          </div>
           <Link
             to="/account/settings"
             style={{
@@ -222,6 +229,11 @@ function NavBarV2({ account }) {
           ))}
           <div style={{ borderTop: 'var(--border-width) solid var(--color-border)', margin: 'var(--space-2) 0' }} />
           {displayName && <span style={{ display: 'block', padding: '8px 24px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{displayName}</span>}
+          {account?.organisation_name && (
+            <span style={{ display: 'block', padding: '0 24px 8px', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+              {account.organisation_name}
+            </span>
+          )}
           <Link to="/account/settings" style={getMobileLinkStyle('/account/settings')} onClick={() => setMobileMenuOpen(false)}>Account Settings</Link>
           <button
             style={{ ...logoutStyle, display: 'block', padding: '12px 24px', minHeight: '44px', width: '100%', textAlign: 'left' }}
