@@ -1,6 +1,6 @@
 // REQ-032: Student Profile Management - Student list
 import { useState, useEffect, useCallback } from 'react';
-import NavBar from '../../components/NavBar/NavBar';
+import { NavBar } from '@schoolchoice/ui';
 import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
 import { LoadingSpinner } from '@schoolchoice/ui';

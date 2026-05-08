@@ -1,7 +1,7 @@
 // REQ-034: Recommendation output page
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import NavBar from '../../components/NavBar/NavBar';
+import { NavBar } from '@schoolchoice/ui';
 import RecommendationCard from '../../components/RecommendationCard/RecommendationCard';
 import ActionPlanDisplay from '../../components/ActionPlanDisplay/ActionPlanDisplay';
 import { LoadingSpinner } from '@schoolchoice/ui';
