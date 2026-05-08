@@ -29,7 +29,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.types import JSON
 
 # Import shared Base and User from platform models
-from app.db.models import Base, _utcnow, User  # noqa: F401
+from app.db.models import Base, _utcnow, User, Organisation  # noqa: F401
 
 __allow_unmapped__ = True
 
@@ -66,6 +66,13 @@ class Student(Base):
         nullable=False,
         index=True,
         comment="Owning counselor — FK to users.id, cascade delete",
+    )
+    organisation_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("organisations.id", ondelete="CASCADE", name="fk_students_org_id"),
+        nullable=True,  # nullable during migration; will be NOT NULL after backfill
+        index=True,
+        comment="Owning organisation — FK to organisations.id",
     )
     name = Column(
         String(255),
@@ -197,6 +204,7 @@ class Student(Base):
 
     # Relationships
     user = relationship("User", back_populates="students")
+    organisation = relationship("Organisation", backref="students", lazy="select")
     recommendations = relationship(
         "Recommendation",
         back_populates="student",
@@ -1379,6 +1387,13 @@ class StudentCohort(Base):
         nullable=False,
         index=True,
         comment="Owning counsellor — FK to users.id",
+    )
+    organisation_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("organisations.id", ondelete="CASCADE", name="fk_cohorts_org_id"),
+        nullable=True,  # nullable during migration; will be NOT NULL after backfill
+        index=True,
+        comment="Owning organisation — FK to organisations.id",
     )
     name = Column(
         String(255),

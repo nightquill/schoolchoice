@@ -22,6 +22,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.db.models import Base, Organisation, OrganisationMembership, User
+from app.modules.school_choice.models.models import Student, StudentCohort
 import app.db.models_v2  # noqa: F401 — register v2 models with Base.metadata
 
 
@@ -185,3 +186,59 @@ def test_membership_role_constraint(db):
     with pytest.raises(IntegrityError):
         db.commit()
     db.rollback()
+
+
+def test_student_has_organisation_id(db):
+    """Student must have an organisation_id FK."""
+    org = Organisation(
+        id=uuid.uuid4(),
+        name="Student Org",
+        slug=f"student-org-{uuid.uuid4().hex[:8]}",
+    )
+    user = User(
+        id=uuid.uuid4(),
+        email=f"student-test-{uuid.uuid4().hex[:8]}@example.com",
+        hashed_password="fakehash",
+    )
+    db.add_all([org, user])
+    db.flush()
+
+    student = Student(
+        user_id=user.id,
+        organisation_id=org.id,
+        name="Test Student",
+        grades={},
+        interests=[],
+        strengths_weaknesses="",
+        target_region="local",
+    )
+    db.add(student)
+    db.commit()
+    db.refresh(student)
+    assert student.organisation_id == org.id
+
+
+def test_cohort_has_organisation_id(db):
+    """StudentCohort must have an organisation_id FK."""
+    org = Organisation(
+        id=uuid.uuid4(),
+        name="Cohort Org",
+        slug=f"cohort-org-{uuid.uuid4().hex[:8]}",
+    )
+    user = User(
+        id=uuid.uuid4(),
+        email=f"cohort-test-{uuid.uuid4().hex[:8]}@example.com",
+        hashed_password="fakehash",
+    )
+    db.add_all([org, user])
+    db.flush()
+
+    cohort = StudentCohort(
+        user_id=user.id,
+        organisation_id=org.id,
+        name="5A 2026",
+    )
+    db.add(cohort)
+    db.commit()
+    db.refresh(cohort)
+    assert cohort.organisation_id == org.id
