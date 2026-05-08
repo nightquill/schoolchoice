@@ -23,7 +23,7 @@ function StudentListPage() {
     setError('');
     try {
       const data = await getStudents();
-      setStudents(data);
+      setStudents(Array.isArray(data) ? data : (data?.items ?? []));
     } catch {
       setError('Could not load students. Please refresh the page.');
     } finally {

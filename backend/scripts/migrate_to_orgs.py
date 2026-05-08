@@ -28,10 +28,26 @@ def slugify(name: str) -> str:
     return slug.strip("-") or "org"
 
 
+def _ensure_columns(db):
+    """Add organisation_id columns if missing (SQLite ALTER TABLE)."""
+    from sqlalchemy import text, inspect
+    insp = inspect(db.bind)
+    for table in ("students", "student_cohorts"):
+        cols = [c["name"] for c in insp.get_columns(table)]
+        if "organisation_id" not in cols:
+            db.execute(text(
+                f"ALTER TABLE {table} ADD COLUMN organisation_id VARCHAR(36) REFERENCES organisations(id)"
+            ))
+            print(f"Added organisation_id column to {table}")
+    db.commit()
+
+
 def migrate():
     db = SessionLocal()
     try:
-        # Find all users without an org membership
+        _ensure_columns(db)
+
+        # Phase 1: Create orgs for users without any membership
         users_without_org = (
             db.query(User)
             .outerjoin(OrganisationMembership)
@@ -40,8 +56,7 @@ def migrate():
         )
 
         if not users_without_org:
-            print("All users already have organisations. Nothing to migrate.")
-            return
+            print("All users already have organisations.")
 
         for user in users_without_org:
             # Create a personal org for each user
@@ -84,6 +99,32 @@ def migrate():
             print(f"Migrated user {user.email}: {len(students)} students, {len(cohorts)} cohorts -> org '{org.name}'")
 
         db.commit()
+
+        # Phase 2: Backfill org_id on students/cohorts for users who already
+        # have memberships but whose data rows are still NULL
+        memberships = db.query(OrganisationMembership).all()
+        backfill_count = 0
+        for m in memberships:
+            students = db.query(Student).filter(
+                Student.user_id == m.user_id,
+                Student.organisation_id.is_(None),
+            ).all()
+            for s in students:
+                s.organisation_id = m.organisation_id
+                backfill_count += 1
+
+            cohorts = db.query(StudentCohort).filter(
+                StudentCohort.user_id == m.user_id,
+                StudentCohort.organisation_id.is_(None),
+            ).all()
+            for c in cohorts:
+                c.organisation_id = m.organisation_id
+                backfill_count += 1
+
+        if backfill_count:
+            db.commit()
+            print(f"Backfilled organisation_id on {backfill_count} existing records.")
+
         print("Migration complete.")
     except Exception as e:
         db.rollback()
