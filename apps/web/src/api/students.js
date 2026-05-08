@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const getStudents = () =>
   client.get('/api/v1/students').then((r) => r.data);

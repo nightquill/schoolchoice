@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const getCohorts = () =>
   client.get('/api/v1/cohorts').then((r) => r.data);

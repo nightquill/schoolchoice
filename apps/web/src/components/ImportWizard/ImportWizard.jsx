@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
-import FileUpload from '../FileUpload/FileUpload';
-import ColumnMapper from '../ColumnMapper/ColumnMapper';
+import { Card, CardContent } from '@schoolchoice/ui/primitives/card';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { FileUpload } from '@schoolchoice/ui';
+import { ColumnMapper } from '@schoolchoice/ui';
 import ValidationSummary from '../ValidationSummary/ValidationSummary';
 import {
   Select,
@@ -13,7 +13,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
+} from '@schoolchoice/ui/primitives/select';
 import { importParse, importParseSheet, importValidate, importCommit } from '../../api/entities';
 
 const STEPS = [

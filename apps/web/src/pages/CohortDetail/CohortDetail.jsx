@@ -2,13 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import { Button } from '@/components/ui/button';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import Modal from '../../components/Modal/Modal';
-import Toast from '../../components/Toast/Toast';
-import { useToast } from '../../hooks/useToast';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Modal } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import {
   getCohort,
   getCohortStats,
@@ -16,7 +16,7 @@ import {
   removeCohortMember,
   searchStudents,
 } from '../../api/cohorts';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 // ---- Grade-numeric display helpers ----
 const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import client from '../api/client';
+import client from '@schoolchoice/ui/api/client';
 
 export function useLanguageTab(student, studentId, showToast, onSaved) {
   const [ielts, setIelts] = useState({

@@ -1,5 +1,5 @@
 import { useLanguageTab } from '../../hooks/useLanguageTab';
-import { Button } from '@/components/ui/button';
+import { Button } from '@schoolchoice/ui/primitives/button';
 
 export default function LanguageTab({ studentId, student, onSaved, showToast }) {
   const {

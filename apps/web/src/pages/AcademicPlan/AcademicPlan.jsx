@@ -5,14 +5,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { FileDown } from 'lucide-react';
 import { useParams, Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import Button from '../../components/Button/Button';
-import Toast from '../../components/Toast/Toast';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
-import TemplateSelector from '../../components/TemplateSelector/TemplateSelector';
-import { useToast } from '../../hooks/useToast';
+import { TemplateSelector } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import {
   generatePlan,
   getPlanStatus,
@@ -24,7 +24,7 @@ import {
 } from '../../api/plan';
 import { exportPlanHTML } from '../../api/entities';
 import { getStudent } from '../../api/students';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 const POLL_INTERVAL_MS = 2000;
 

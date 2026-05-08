@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const runMatch = (studentId) =>
   client.post(`/api/v1/students/${studentId}/match`).then((r) => r.data);

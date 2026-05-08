@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { getAccount } from '../../api/account';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { getAccount } from '@schoolchoice/ui/api/account';
 import { getHkdseTrends, getHkdsePopulationStats } from '../../api/analytics';
 import { getCohorts } from '../../api/cohorts';
 

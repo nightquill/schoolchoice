@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 const SAFE_TABLE_NAME = /^[a-z][a-z0-9_]*$/;
 

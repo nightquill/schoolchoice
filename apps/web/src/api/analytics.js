@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const getHkdseTrends = (sitting, cohortId) => {
   const params = {};

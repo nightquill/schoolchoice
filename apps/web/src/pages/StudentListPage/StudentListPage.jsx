@@ -3,10 +3,10 @@ import { useState, useEffect, useCallback } from 'react';
 import NavBar from '../../components/NavBar/NavBar';
 import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
 import { getStudents, createStudent } from '../../api/students';
 
 function StudentListPage() {

@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { usePlansTab } from '../../hooks/usePlansTab';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
 
 export default function PlansTab({ studentId, showToast }) {
   const navigate = useNavigate();

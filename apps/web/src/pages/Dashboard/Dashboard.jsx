@@ -2,14 +2,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useQueries } from '@tanstack/react-query';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@schoolchoice/ui/primitives/card';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
 import { getStudents, createStudent } from '../../api/students';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 import { getEntities, getEntityList } from '../../api/entities';
 
 function Dashboard() {

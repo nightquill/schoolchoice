@@ -45,7 +45,7 @@ vi.mock('../../api/students', () => ({
 }));
 
 const mockGetAccount = vi.fn();
-vi.mock('../../api/account', () => ({
+vi.mock('@schoolchoice/ui/api/account', () => ({
   getAccount: (...args) => mockGetAccount(...args),
 }));
 
@@ -71,7 +71,7 @@ vi.mock('../../api/plan', () => ({
   deletePlanHistory: vi.fn(),
 }));
 
-vi.mock('../../api/client', () => ({
+vi.mock('@schoolchoice/ui/api/client', () => ({
   default: {
     get: vi.fn().mockRejectedValue(new Error('not mocked')),
     post: vi.fn(),
@@ -86,7 +86,7 @@ vi.mock('../../api/schoolsV2', () => ({
 }));
 
 // Mock useAuth to return authenticated admin
-vi.mock('../../hooks/useAuth', () => ({
+vi.mock('@schoolchoice/ui/hooks/useAuth', () => ({
   useAuth: () => ({ isAuthenticated: true, user: { role: 'admin' }, token: 'test-token' }),
 }));
 

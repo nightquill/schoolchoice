@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const generatePlan = (studentId, planType = 'UNIVERSITY') =>
   client.post(`/api/v1/students/${studentId}/plan`, { plan_type: planType }).then((r) => r.data);

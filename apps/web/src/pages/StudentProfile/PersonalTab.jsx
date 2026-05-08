@@ -1,6 +1,6 @@
 import { usePersonalTab } from '../../hooks/usePersonalTab';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { Input } from '@schoolchoice/ui/primitives/input';
 
 export default function PersonalTab({ studentId, student, onSaved, showToast }) {
   const { form, saving, errors, handleChange, handleSave, calcAge } = usePersonalTab(student, studentId, showToast, onSaved);

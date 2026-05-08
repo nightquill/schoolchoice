@@ -1,12 +1,12 @@
 // REQ-031: Authentication - Login page
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { login as apiLogin } from '../../api/auth';
-import FormCard from '../../components/FormCard/FormCard';
-import TextInput from '../../components/TextInput/TextInput';
-import { Button } from '@/components/ui/button';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
+import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
+import { login as apiLogin } from '@schoolchoice/ui/api/auth';
+import { FormCard } from '@schoolchoice/ui';
+import { TextInput } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { ErrorMessage } from '@schoolchoice/ui';
 
 function LoginPage() {
   const { isAuthenticated, login } = useAuth();

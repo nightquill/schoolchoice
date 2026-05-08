@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Menu, X, Settings } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import { getEntities } from '../../api/entities';
 
 // NavBarV2 — extended navigation bar for v2 pages

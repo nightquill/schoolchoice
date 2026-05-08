@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Modal from '../../components/Modal/Modal';
-import Toast from '../../components/Toast/Toast';
-import { Button } from '@/components/ui/button';
-import { useToast } from '../../hooks/useToast';
-import { getAccount } from '../../api/account';
-import client from '../../api/client';
+import { Modal } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { getAccount } from '@schoolchoice/ui/api/account';
+import client from '@schoolchoice/ui/api/client';
 
 function AdminDataRefresh() {
   const navigate = useNavigate();

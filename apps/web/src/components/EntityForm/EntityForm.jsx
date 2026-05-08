@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FIELD_COMPONENT_MAP } from './fieldComponents.jsx';
-import Button from '../Button/Button';
+import { Button } from '@schoolchoice/ui';
 
 const inputStyle = {
   width: '100%',

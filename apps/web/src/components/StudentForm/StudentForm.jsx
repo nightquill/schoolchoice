@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import TextInput from '../TextInput/TextInput';
-import Button from '../Button/Button';
+import { TextInput } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui';
 
 function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, submitLabel = 'Save' }) {
   const parseGrades = (gradesObj) => {

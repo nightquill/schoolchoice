@@ -2,12 +2,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import SchoolCard from '../../components/SchoolCard/SchoolCard';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
 import { searchSchools, createSchool, deleteSchool } from '../../api/schoolsV2';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 const LIMIT = 20;
 

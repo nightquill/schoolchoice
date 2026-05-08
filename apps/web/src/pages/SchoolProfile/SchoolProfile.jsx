@@ -2,17 +2,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Modal from '../../components/Modal/Modal';
-import Toast from '../../components/Toast/Toast';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { Button } from '@/components/ui/button';
-import FormCard from '../../components/FormCard/FormCard';
-import { useToast } from '../../hooks/useToast';
+import { Modal } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { FormCard } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { getSchoolV2 } from '../../api/schoolsV2';
 import { addTarget } from '../../api/targets';
 import { getStudents } from '../../api/students';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 function SchoolProfile() {
   const { id } = useParams();

@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
+import { QueryBoundary } from '@schoolchoice/ui';
 import EntityListView from '../../components/EntityListView/EntityListView';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import ActionBar from '../../components/ActionBar/ActionBar';
-import SearchFilterBar from '../../components/SearchFilterBar/SearchFilterBar';
+import { EmptyState } from '@schoolchoice/ui';
+import { ActionBar } from '@schoolchoice/ui';
+import { SearchFilterBar } from '@schoolchoice/ui';
 import { getEntitySchema, getEntityList, exportEntityCSV } from '../../api/entities';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 const pageStyle = {
   background: 'var(--color-background)',

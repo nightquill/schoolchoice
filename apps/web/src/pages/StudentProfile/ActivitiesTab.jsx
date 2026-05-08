@@ -1,5 +1,5 @@
 import { useActivitiesTab } from '../../hooks/useActivitiesTab';
-import { Button } from '@/components/ui/button';
+import { Button } from '@schoolchoice/ui/primitives/button';
 
 export default function ActivitiesTab({ studentId, student, showToast }) {
   const {

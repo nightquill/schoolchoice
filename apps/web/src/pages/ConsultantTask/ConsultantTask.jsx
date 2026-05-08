@@ -4,20 +4,20 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { FileDown, StopCircle } from 'lucide-react';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
 import SSEStreamDisplay from '../../components/SSEStreamDisplay/SSEStreamDisplay';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
-import TemplateSelector from '../../components/TemplateSelector/TemplateSelector';
-import Toast from '../../components/Toast/Toast';
-import { useToast } from '../../hooks/useToast';
+import { TemplateSelector } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
 import { getStudent } from '../../api/students';
 import { saveConsultantTask, getConsultantTaskStatus, sendConsultantChat } from '../../api/consultant';
 import { getPlan, setPlanTemplate, editPlanSection, resetPlanSection } from '../../api/plan';
 import { exportPlanHTML } from '../../api/entities';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 function ConsultantTask() {
   const { id } = useParams();

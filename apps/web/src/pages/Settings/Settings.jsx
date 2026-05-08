@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import Toast from '../../components/Toast/Toast';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../hooks/useAuth';
-import { getAccount } from '../../api/account';
+import { Toast } from '@schoolchoice/ui';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
+import { getAccount } from '@schoolchoice/ui/api/account';
 import { listUsers, createUser, updateUser, deleteUser } from '../../api/admin';
 import { MoreVertical } from 'lucide-react';
 
@@ -17,7 +17,7 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@/components/ui/table';
+} from '@schoolchoice/ui/primitives/table';
 import {
   Dialog,
   DialogContent,
@@ -25,24 +25,24 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@schoolchoice/ui/primitives/dialog';
+import { Input } from '@schoolchoice/ui/primitives/input';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from '@schoolchoice/ui/primitives/select';
+import { Badge } from '@schoolchoice/ui/primitives/badge';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+} from '@schoolchoice/ui/primitives/dropdown-menu';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@schoolchoice/ui/primitives/tabs';
 
 function Settings() {
   const navigate = useNavigate();

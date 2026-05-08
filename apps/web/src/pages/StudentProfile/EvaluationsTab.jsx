@@ -1,7 +1,7 @@
 import { useEvaluationsTab } from '../../hooks/useEvaluationsTab';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import { Button } from '@/components/ui/button';
-import StarRating from '../../components/StarRating/StarRating';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { StarRating } from '@schoolchoice/ui';
 
 export default function EvaluationsTab({ studentId, showToast }) {
   const {

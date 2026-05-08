@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const uploadTranscript = (studentId, file) => {
   const formData = new FormData();

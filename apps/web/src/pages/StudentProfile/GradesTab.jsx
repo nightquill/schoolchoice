@@ -1,9 +1,9 @@
 import { useGradesTab } from '../../hooks/useGradesTab';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { Button } from '@/components/ui/button';
-import PredictedGradeBadge from '../../components/PredictedGradeBadge/PredictedGradeBadge';
-import FileUpload from '../../components/FileUpload/FileUpload';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { PredictedGradeBadge } from '@schoolchoice/ui';
+import { FileUpload } from '@schoolchoice/ui';
 
 const HKDSE_SUBJECTS = [
   { code: 'CHLA', name: 'Chinese Language' },

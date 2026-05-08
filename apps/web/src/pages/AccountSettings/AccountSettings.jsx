@@ -2,16 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import FormCard from '../../components/FormCard/FormCard';
-import TextInput from '../../components/TextInput/TextInput';
-import { Button } from '@/components/ui/button';
-import Modal from '../../components/Modal/Modal';
-import Toast from '../../components/Toast/Toast';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../hooks/useAuth';
-import { getAccount, updateAccount, changePassword, deleteAccount } from '../../api/account';
+import { FormCard } from '@schoolchoice/ui';
+import { TextInput } from '@schoolchoice/ui';
+import { Button } from '@schoolchoice/ui/primitives/button';
+import { Modal } from '@schoolchoice/ui';
+import { Toast } from '@schoolchoice/ui';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { useToast } from '@schoolchoice/ui/hooks/useToast';
+import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
+import { getAccount, updateAccount, changePassword, deleteAccount } from '@schoolchoice/ui/api/account';
 
 function AccountSettings() {
   const navigate = useNavigate();

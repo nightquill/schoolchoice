@@ -1,10 +1,10 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
+import { QueryBoundary } from '@schoolchoice/ui';
 import ImportWizard from '../../components/ImportWizard/ImportWizard';
 import { getEntitySchema } from '../../api/entities';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 const pageStyle = {
   background: 'var(--color-background)',

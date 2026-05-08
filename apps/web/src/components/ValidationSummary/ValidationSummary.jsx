@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Badge } from '@schoolchoice/ui/primitives/badge';
+import { Button } from '@schoolchoice/ui/primitives/button';
 import { exportErrorCSV } from '../../api/entities';
 
 const cardStyle = {

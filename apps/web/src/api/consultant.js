@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 // Save validated plan output (called after SSE stream completes)
 export const saveConsultantTask = (taskId, entityId, aiOutputJson) =>

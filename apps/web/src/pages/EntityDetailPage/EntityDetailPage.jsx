@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import QueryBoundary from '../../components/QueryBoundary/QueryBoundary';
+import { QueryBoundary } from '@schoolchoice/ui';
 import EntityForm from '../../components/EntityForm/EntityForm';
 import { toast } from 'sonner';
 import { getEntitySchema, getEntityDetail, updateEntity } from '../../api/entities';
-import { getAccount } from '../../api/account';
+import { getAccount } from '@schoolchoice/ui/api/account';
 
 const pageStyle = { background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' };
 const contentStyle = { paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)', maxWidth: '640px' };

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import client from '../api/client';
+import client from '@schoolchoice/ui/api/client';
 
 export function useActivitiesTab(student, studentId, showToast) {
   const [activities, setActivities] = useState(student?.extra_curricular || []);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import client from '../api/client';
+import client from '@schoolchoice/ui/api/client';
 
 export function useNotesTab(student, studentId, showToast, onSaved) {
   const [notes, setNotes] = useState(student?.notes || '');

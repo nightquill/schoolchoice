@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
-import EmptyState from '../../components/EmptyState/EmptyState';
-import { getAccount } from '../../api/account';
+import { LoadingSpinner } from '@schoolchoice/ui';
+import { ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState } from '@schoolchoice/ui';
+import { getAccount } from '@schoolchoice/ui/api/account';
 import { getHkdseTrends, getPopularMajors, getStudentDirectory, getHkdsePopulationStats } from '../../api/analytics';
 import { getCohorts } from '../../api/cohorts';
 

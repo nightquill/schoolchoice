@@ -1,4 +1,4 @@
-import EmptyState from '../EmptyState/EmptyState';
+import { EmptyState } from '@schoolchoice/ui';
 
 const tableStyle = {
   width: '100%',

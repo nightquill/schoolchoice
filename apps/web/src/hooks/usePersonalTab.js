@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import client from '../api/client';
+import client from '@schoolchoice/ui/api/client';
 
 export function usePersonalTab(student, studentId, showToast, onSaved) {
   const [form, setForm] = useState({

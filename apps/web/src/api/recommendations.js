@@ -1,4 +1,4 @@
-import client from './client';
+import client from '@schoolchoice/ui/api/client';
 
 export const generateRecommendations = (studentId) =>
   client.post(`/api/v1/students/${studentId}/recommendations`).then((r) => r.data);
