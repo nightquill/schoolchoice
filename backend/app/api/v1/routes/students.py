@@ -94,13 +94,14 @@ def _build_full_response(student: Student) -> dict:
 def list_students(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
+    q: str | None = Query(None, description="Text search across student name"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
     from sqlalchemy import select
 
-    all_students = student_service.get_students(db, user_id=current_user.id, organisation_id=_org_id(current_user))
+    all_students = student_service.get_students(db, user_id=current_user.id, organisation_id=_org_id(current_user), q=q)
     total = len(all_students)
     students = all_students[skip : skip + limit]
 

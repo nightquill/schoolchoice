@@ -17,16 +17,21 @@ from app.services.student_data_builder import build_student_data, build_student_
 
 
 def get_students(
-    db: Session, user_id: UUID, *, organisation_id: UUID | None = None
+    db: Session, user_id: UUID, *, organisation_id: UUID | None = None, q: str | None = None
 ) -> list[Student]:
     """
     Return all student profiles owned by the given counselor.
     When *organisation_id* is set, scope by organisation instead of user.
+    When *q* is provided, filter by student name (case-insensitive).
     REQ-015, REQ-032
     """
     if organisation_id is not None:
-        return db.query(Student).filter(Student.organisation_id == organisation_id).all()
-    return db.query(Student).filter(Student.user_id == user_id).all()
+        query = db.query(Student).filter(Student.organisation_id == organisation_id)
+    else:
+        query = db.query(Student).filter(Student.user_id == user_id)
+    if q:
+        query = query.filter(Student.name.ilike(f"%{q}%"))
+    return query.all()
 
 
 def get_student(
