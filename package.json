@@ -1,5 +1,12 @@
 {
-  "dependencies": {
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @schoolchoice/web dev",
+    "build": "pnpm --filter @schoolchoice/web build",
+    "lint": "pnpm --filter @schoolchoice/web lint",
+    "preview": "pnpm --filter @schoolchoice/web preview"
+  },
+  "devDependencies": {
     "playwright": "^1.59.1"
   }
 }

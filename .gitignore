@@ -30,3 +30,6 @@ backend/uploads/
 
 # Integration env
 integration/.env
+
+# Superpowers brainstorm sessions
+.superpowers/
