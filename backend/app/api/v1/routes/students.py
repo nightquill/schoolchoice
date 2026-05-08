@@ -35,6 +35,11 @@ from app.services import student_service
 router = APIRouter(prefix="/students", tags=["students"])
 
 
+def _org_id(user: User) -> UUID | None:
+    """Extract the active organisation ID from the user, if set."""
+    return getattr(user, "active_organisation_id", None)
+
+
 def _build_full_response(student: Student) -> dict:
     """Build a StudentFullResponse-compatible dict from a Student ORM object."""
     ielts = student.ielts_score or {}
@@ -95,7 +100,7 @@ def list_students(
     """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
     from sqlalchemy import select
 
-    all_students = student_service.get_students(db, user_id=current_user.id)
+    all_students = student_service.get_students(db, user_id=current_user.id, organisation_id=_org_id(current_user))
     total = len(all_students)
     students = all_students[skip : skip + limit]
 
@@ -140,7 +145,7 @@ def create_student(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new student profile. REQ-012, REQ-025, REQ-028, REQ-033"""
-    student = student_service.create_student(db, user_id=current_user.id, data=payload)
+    student = student_service.create_student(db, user_id=current_user.id, data=payload, organisation_id=_org_id(current_user))
     return _build_full_response(student)
 
 
@@ -152,7 +157,7 @@ def get_student(
     current_user: User = Depends(get_current_user),
 ):
     """Retrieve a full student profile by ID. REQ-014, REQ-033"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     return _build_full_response(student)
 
 
@@ -164,7 +169,7 @@ def get_student_profile(
     current_user: User = Depends(get_current_user),
 ):
     """Retrieve a full student profile. REQ-014, REQ-033"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     return _build_full_response(student)
 
 
@@ -178,7 +183,8 @@ def update_student(
 ):
     """Full update of a student profile (v1 fields). REQ-013, REQ-033"""
     return student_service.update_student(
-        db, student_id=student_id, user_id=current_user.id, data=payload
+        db, student_id=student_id, user_id=current_user.id, data=payload,
+        organisation_id=_org_id(current_user),
     )
 
 
@@ -191,7 +197,7 @@ def update_student_profile(
     current_user: User = Depends(get_current_user),
 ):
     """Update all v2 student profile fields. REQ-057"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
 
     update_fields: dict[str, Any] = {
         k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None
@@ -219,7 +225,7 @@ def update_language_scores(
     current_user: User = Depends(get_current_user),
 ):
     """Save IELTS and other language scores for a student."""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
 
     # Pack flat IELTS fields into the JSONB structure
     existing_ielts = student.ielts_score or {}
@@ -258,7 +264,7 @@ def get_teacher_evaluations(
     current_user: User = Depends(get_current_user),
 ):
     """Return teacher evaluation array for a student."""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     return student.teacher_evaluation or []
 
 
@@ -276,7 +282,7 @@ def update_teacher_evaluations(
     except Exception as exc:
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid teacher evaluation data: {exc}")
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     student.teacher_evaluation = validated
     db.commit()
     db.refresh(student)
@@ -298,7 +304,7 @@ def update_extracurricular(
     except Exception as exc:
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid extracurricular data: {exc}")
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     student.extra_curricular = validated
     db.commit()
     db.refresh(student)
@@ -320,7 +326,7 @@ def update_awards(
     except Exception as exc:
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid award data: {exc}")
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     student.awards = validated
     db.commit()
     db.refresh(student)
@@ -337,7 +343,7 @@ def graduate_student(
 ):
     """Mark a student as graduated with their final school and major. Feeds the analytics data store."""
     from datetime import date as _date
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
     student.is_graduated = True
     if payload.final_school_id is not None:
         student.final_school_id = payload.final_school_id
@@ -357,4 +363,4 @@ def delete_student(
     current_user: User = Depends(get_current_user),
 ):
     """Permanently delete a student profile and all associated data. REQ-025, REQ-028"""
-    student_service.delete_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.delete_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))

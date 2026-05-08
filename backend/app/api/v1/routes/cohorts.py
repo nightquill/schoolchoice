@@ -43,12 +43,20 @@ router = APIRouter(prefix="/cohorts", tags=["cohorts"])
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _get_cohort_or_404(db: Session, cohort_id: UUID, user_id: UUID) -> StudentCohort:
-    cohort = (
-        db.query(StudentCohort)
-        .filter(StudentCohort.id == cohort_id, StudentCohort.user_id == user_id)
-        .first()
-    )
+def _org_id(user: User) -> UUID | None:
+    """Extract the active organisation ID from the user, if set."""
+    return getattr(user, "active_organisation_id", None)
+
+
+def _get_cohort_or_404(
+    db: Session, cohort_id: UUID, user_id: UUID, *, organisation_id: UUID | None = None
+) -> StudentCohort:
+    query = db.query(StudentCohort).filter(StudentCohort.id == cohort_id)
+    if organisation_id is not None:
+        query = query.filter(StudentCohort.organisation_id == organisation_id)
+    else:
+        query = query.filter(StudentCohort.user_id == user_id)
+    cohort = query.first()
     if not cohort:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cohort not found")
     return cohort
@@ -84,12 +92,13 @@ def list_cohorts(
     current_user: User = Depends(get_current_user),
 ):
     """List all cohorts owned by the current counsellor."""
-    cohorts = (
-        db.query(StudentCohort)
-        .filter(StudentCohort.user_id == current_user.id)
-        .order_by(StudentCohort.created_at.desc())
-        .all()
-    )
+    org_id = _org_id(current_user)
+    q = db.query(StudentCohort)
+    if org_id is not None:
+        q = q.filter(StudentCohort.organisation_id == org_id)
+    else:
+        q = q.filter(StudentCohort.user_id == current_user.id)
+    cohorts = q.order_by(StudentCohort.created_at.desc()).all()
     return CohortListResponse(
         cohorts=[_cohort_to_response(c) for c in cohorts],
         total=len(cohorts),
@@ -109,6 +118,7 @@ def create_cohort(
     """Create a new student cohort."""
     cohort = StudentCohort(
         user_id=current_user.id,
+        organisation_id=_org_id(current_user),
         name=payload.name,
         description=payload.description,
     )
@@ -139,7 +149,11 @@ def search_students(
     Search students owned by the current counsellor.
     Filterable by name, class, and year of study.
     """
-    query = db.query(Student).filter(Student.user_id == current_user.id)
+    org_id = _org_id(current_user)
+    if org_id is not None:
+        query = db.query(Student).filter(Student.organisation_id == org_id)
+    else:
+        query = db.query(Student).filter(Student.user_id == current_user.id)
 
     if q:
         query = query.filter(Student.name.ilike(f"%{q}%"))
@@ -180,7 +194,7 @@ def get_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Get a cohort with its full member list."""
-    cohort = _get_cohort_or_404(db, cohort_id, current_user.id)
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     members = [_member_to_response(m.student) for m in cohort.memberships if m.student]
     return CohortDetailResponse(
         id=cohort.id,
@@ -208,7 +222,7 @@ def update_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Update cohort name or description."""
-    cohort = _get_cohort_or_404(db, cohort_id, current_user.id)
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     if payload.name is not None:
         cohort.name = payload.name
     if payload.description is not None:
@@ -229,7 +243,7 @@ def delete_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a cohort (members are unlinked, not deleted)."""
-    cohort = _get_cohort_or_404(db, cohort_id, current_user.id)
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     db.delete(cohort)
     db.commit()
 
@@ -250,17 +264,25 @@ def add_members(
     current_user: User = Depends(get_current_user),
 ):
     """Add one or more students to a cohort. Duplicates are silently ignored."""
-    cohort = _get_cohort_or_404(db, cohort_id, current_user.id)
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
 
     existing_ids = {m.student_id for m in cohort.memberships}
     for sid in payload.student_ids:
         if sid in existing_ids:
             continue
-        student = (
-            db.query(Student)
-            .filter(Student.id == sid, Student.user_id == current_user.id)
-            .first()
-        )
+        org_id = _org_id(current_user)
+        if org_id is not None:
+            student = (
+                db.query(Student)
+                .filter(Student.id == sid, Student.organisation_id == org_id)
+                .first()
+            )
+        else:
+            student = (
+                db.query(Student)
+                .filter(Student.id == sid, Student.user_id == current_user.id)
+                .first()
+            )
         if not student:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -293,7 +315,7 @@ def remove_member(
     current_user: User = Depends(get_current_user),
 ):
     """Remove a student from a cohort."""
-    _get_cohort_or_404(db, cohort_id, current_user.id)
+    _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     membership = (
         db.query(CohortMembership)
         .filter(
@@ -327,7 +349,7 @@ def get_cohort_stats(
     Compute per-subject aggregate statistics (mean, variance, distribution)
     across all students in the cohort.
     """
-    cohort = _get_cohort_or_404(db, cohort_id, current_user.id)
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     member_ids = [m.student_id for m in cohort.memberships]
 
     if not member_ids:
