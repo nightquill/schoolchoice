@@ -251,7 +251,11 @@ def get_student_directory(
     Graduated students also show final_school and final_major.
     Personal data (name, DOB, contact) is NOT included.
     """
-    query = db.query(Student).filter(Student.user_id == current_user.id)
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if org_id:
+        query = db.query(Student).filter(Student.organisation_id == org_id)
+    else:
+        query = db.query(Student).filter(Student.user_id == current_user.id)
     if graduated_only:
         query = query.filter(Student.is_graduated == True)  # noqa: E712
     students = query.all()

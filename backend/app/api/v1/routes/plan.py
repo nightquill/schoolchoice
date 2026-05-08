@@ -302,7 +302,10 @@ def create_plan(
     Accepts optional JSON body with plan_type: "UNIVERSITY" (default) or "HIGH_SCHOOL".
     Returns {job_id, status: 'PENDING'}. REQ-078
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     job = PlanGenerationJob(
         student_id=student_id,
@@ -332,7 +335,10 @@ def get_plan_status(
     current_user: User = Depends(get_current_user),
 ):
     """Return the latest PlanGenerationJob status for a student. REQ-078"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     job = (
         db.query(PlanGenerationJob)
@@ -367,7 +373,10 @@ def get_plan(
     Returns HTML if html_content is present (Content-Type: text/html),
     otherwise returns JSON with plan metadata. REQ-078
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     plan = (
         db.query(AcademicPlan)
@@ -398,7 +407,10 @@ def list_plan_history(
     current_user: User = Depends(get_current_user),
 ):
     """Return all historical plan snapshots for a student, newest first."""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     history = (
         db.query(PlanHistory)
@@ -422,7 +434,10 @@ def delete_plan_history(
 ):
     """Delete a saved plan from history."""
     from fastapi import HTTPException as _HTTPException
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     entry = (
         db.query(PlanHistory)
         .filter(PlanHistory.id == plan_id, PlanHistory.student_id == student_id)
@@ -450,7 +465,10 @@ def plan_chat(
     Requires AI_API_KEY env var; returns 503 if not configured.
     Rate-limited to 20 requests per counsellor per plan per day.
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -472,7 +490,10 @@ def set_plan_template(
     Change the visual template for the plan and regenerate HTML.
     template_id: 'professional' | 'modern' | 'minimal'
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -513,7 +534,10 @@ def edit_plan_section(
     Upsert a custom HTML override for a named section key, then regenerate.
     section_key examples: 'student_summary', 'school_0_rationale', 'action_plan_notes'
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -556,7 +580,10 @@ def reset_plan_section(
     Remove a section override, reverting that section to auto-generated content,
     then regenerate the plan HTML.
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")

@@ -43,7 +43,10 @@ def run_match(
     Saves/updates StudentSchoolTarget records with scores.
     Returns ordered MatchResult list. REQ-072–REQ-076
     """
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     student_data = build_student_data(student, db)
 
@@ -137,7 +140,10 @@ def get_match_results(
     current_user: User = Depends(get_current_user),
 ):
     """Return current StudentSchoolTarget records with stored scores. REQ-069"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     targets = (
         db.query(StudentSchoolTarget)
         .filter(StudentSchoolTarget.student_id == student_id)
@@ -167,7 +173,10 @@ def get_auto_recommendations(
     even before the student has added any target schools.
     Runs a full match against all schools and returns the top `limit` eligible ones.
     """
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     student_data = build_student_data(student, db)
 
     all_schools = db.query(School).all()

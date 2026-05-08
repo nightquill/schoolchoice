@@ -186,7 +186,10 @@ async def upload_transcript(
     Accept multipart transcript upload, save to disk, launch async parse.
     REQ-067
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     # Validate file type
     content_type = file.content_type or ""
@@ -252,7 +255,10 @@ def get_transcript(
     Return latest Transcript record with parse_status and parsed_data suggestions.
     REQ-067
     """
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     transcript = (
         db.query(Transcript)

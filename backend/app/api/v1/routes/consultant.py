@@ -58,11 +58,20 @@ def _verify_student_ownership(db: Session, entity_id: str, user: User) -> None:
     """
     Verify the current user owns the student identified by entity_id.
     Raises HTTP 403 if the student does not belong to the user.
+    Organisation-aware: if the user has an active_organisation_id, also
+    accept students belonging to that organisation.
     """
     from app.modules.school_choice.models.models import Student
 
     student = db.query(Student).filter(Student.id == _to_uuid(entity_id)).first()
-    if not student or student.user_id != user.id:
+    if not student:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    org_id = getattr(user, "active_organisation_id", None)
+    if org_id and getattr(student, "organisation_id", None) == org_id:
+        return  # Organisation-scoped access granted
+
+    if student.user_id != user.id:
         raise HTTPException(status_code=403, detail="Access denied")
 
 

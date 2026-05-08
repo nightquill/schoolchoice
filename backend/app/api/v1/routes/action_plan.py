@@ -35,7 +35,8 @@ def generate_action_plan(
     REQ-021, REQ-022, REQ-035, REQ-040
     """
     return action_plan_service.generate_action_plan(
-        db, student_id=student_id, user_id=current_user.id
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
     )
 
 
@@ -56,5 +57,6 @@ def get_action_plan(
     REQ-021, REQ-022, REQ-034, REQ-038
     """
     return action_plan_service.get_action_plan(
-        db, student_id=student_id, user_id=current_user.id
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
     )

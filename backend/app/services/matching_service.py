@@ -312,7 +312,8 @@ def _build_gaps(student: Student, school: School) -> str:
 
 
 def generate_recommendations(
-    db: Session, student_id: UUID, user_id: UUID
+    db: Session, student_id: UUID, user_id: UUID,
+    organisation_id: UUID | None = None,
 ) -> list[Recommendation]:
     """
     Run the full matching pipeline for a student.
@@ -320,7 +321,7 @@ def generate_recommendations(
 
     REQ-016, REQ-017, REQ-018, REQ-019, REQ-020, REQ-027, REQ-029
     """
-    student = get_student(db, student_id, user_id)
+    student = get_student(db, student_id, user_id, organisation_id=organisation_id)
 
     if not student.grades:
         raise HTTPException(
@@ -373,14 +374,15 @@ def generate_recommendations(
 
 
 def get_recommendations(
-    db: Session, student_id: UUID, user_id: UUID
+    db: Session, student_id: UUID, user_id: UUID,
+    organisation_id: UUID | None = None,
 ) -> list[Recommendation]:
     """
     Return existing recommendations for a student ordered by rank.
     Raises HTTP 404 if student not found or not owned by user.
     REQ-020, REQ-027, REQ-034, REQ-037
     """
-    get_student(db, student_id, user_id)  # ownership check + 404
+    get_student(db, student_id, user_id, organisation_id=organisation_id)  # ownership check + 404
     return (
         db.query(Recommendation)
         .filter(Recommendation.student_id == student_id)

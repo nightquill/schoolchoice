@@ -61,7 +61,10 @@ def list_targets(
     current_user: User = Depends(get_current_user),
 ):
     """List all target schools for a student with fresh eligibility/match scores. REQ-069"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     targets = (
         db.query(StudentSchoolTarget)
         .filter(StudentSchoolTarget.student_id == student_id)
@@ -128,7 +131,10 @@ def add_target(
     current_user: User = Depends(get_current_user),
 ):
     """Add a school to the student's target list. REQ-069"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     # Verify school exists
     school = db.query(School).filter(School.id == payload.school_id).first()
@@ -199,7 +205,10 @@ def update_target(
     current_user: User = Depends(get_current_user),
 ):
     """Update student_rank or status on a target. REQ-069"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     target = _get_target_or_404(db, target_id, student_id)
 
     if payload.student_rank is not None:
@@ -233,7 +242,10 @@ def delete_target(
     current_user: User = Depends(get_current_user),
 ):
     """Remove a school from the student's target list. REQ-069"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     target = _get_target_or_404(db, target_id, student_id)
     db.delete(target)
     db.commit()
@@ -254,7 +266,10 @@ def reorder_targets(
     current_user: User = Depends(get_current_user),
 ):
     """Atomically reassign student_rank 1..N for the given ordered target IDs. REQ-069"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     if not payload.ordered_ids:
         raise HTTPException(

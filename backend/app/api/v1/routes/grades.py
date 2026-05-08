@@ -127,7 +127,10 @@ def list_grades(
     current_user: User = Depends(get_current_user),
 ):
     """List all grade records for a student. REQ-068"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     grades = _get_student_grades(db, student_id)
     grade_dicts = [_grade_to_dict(db, g) for g in grades]
     return SubjectGradeListResponse(grades=grade_dicts, total=len(grade_dicts))
@@ -149,7 +152,10 @@ def create_grade(
     current_user: User = Depends(get_current_user),
 ):
     """Create a grade record and recompute predicted_grade. REQ-068"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     # Resolve subject_name → subject_id when subject_id not provided
     if payload.subject_id is None and payload.subject_name:
@@ -227,7 +233,10 @@ def update_grade(
     current_user: User = Depends(get_current_user),
 ):
     """Update a grade record and recompute predicted_grade. REQ-068"""
-    student = student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     grade = (
         db.query(StudentSubjectGrade)
@@ -274,7 +283,10 @@ def delete_grade(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a grade record. REQ-068"""
-    student_service.get_student(db, student_id=student_id, user_id=current_user.id)
+    student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
 
     grade = (
         db.query(StudentSubjectGrade)

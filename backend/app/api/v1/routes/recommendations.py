@@ -37,7 +37,8 @@ def generate_recommendations(
     REQ-016, REQ-017, REQ-018, REQ-019, REQ-020, REQ-027, REQ-029, REQ-035, REQ-040
     """
     recs = matching_service.generate_recommendations(
-        db, student_id=student_id, user_id=current_user.id
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
     )
     # Convert DB score (0–100) to API score (0.0–1.0)
     result = []
@@ -73,7 +74,10 @@ def get_recommendations(
     Returns empty array if none have been generated.
     REQ-020, REQ-027, REQ-034, REQ-037
     """
-    recs = matching_service.get_recommendations(db, student_id=student_id, user_id=current_user.id)
+    recs = matching_service.get_recommendations(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
     result = []
     for rec in recs:
         item = RecommendationResponse(

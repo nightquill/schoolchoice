@@ -105,13 +105,16 @@ from app.modules.school_choice.services.hkdse_service import letter_grade_to_num
 # ---------------------------------------------------------------------------
 
 
-def generate_action_plan(db: Session, student_id: UUID, user_id: UUID) -> ActionPlan:
+def generate_action_plan(
+    db: Session, student_id: UUID, user_id: UUID,
+    organisation_id: UUID | None = None,
+) -> ActionPlan:
     """
     Generate (or replace) an action plan for the student.
     Raises HTTP 404 / 403 via get_student; HTTP 422 if profile is incomplete.
     REQ-021, REQ-022, REQ-035, REQ-040
     """
-    student = get_student(db, student_id, user_id)
+    student = get_student(db, student_id, user_id, organisation_id=organisation_id)
 
     academic_targets = _build_academic_targets(student.grades or {})
     extracurricular_direction = _suggest_extracurriculars(student.interests or [])
@@ -142,13 +145,16 @@ def generate_action_plan(db: Session, student_id: UUID, user_id: UUID) -> Action
     return plan
 
 
-def get_action_plan(db: Session, student_id: UUID, user_id: UUID) -> ActionPlan:
+def get_action_plan(
+    db: Session, student_id: UUID, user_id: UUID,
+    organisation_id: UUID | None = None,
+) -> ActionPlan:
     """
     Return the existing action plan for a student.
     Raises HTTP 404 if none has been generated yet.
     REQ-021, REQ-022, REQ-034, REQ-038
     """
-    get_student(db, student_id, user_id)  # ownership check + 404
+    get_student(db, student_id, user_id, organisation_id=organisation_id)  # ownership check + 404
 
     plan: ActionPlan | None = (
         db.query(ActionPlan).filter(ActionPlan.student_id == student_id).first()
