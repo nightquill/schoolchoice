@@ -49,6 +49,16 @@ def _resolve_user_from_token(token_str: str, db: Session) -> User:
     if user is None:
         raise _unauthorized
 
+    # Attach org context from JWT claim
+    org_id_str = payload.get("org_id")
+    if org_id_str:
+        try:
+            user.active_organisation_id = UUID(org_id_str)
+        except (ValueError, AttributeError):
+            user.active_organisation_id = None
+    else:
+        user.active_organisation_id = None
+
     return user
 
 

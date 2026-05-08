@@ -218,6 +218,18 @@ def test_student_has_organisation_id(db):
     assert student.organisation_id == org.id
 
 
+def test_jwt_contains_org_id():
+    """JWT access token must include org_id claim."""
+    from app.core.security import create_access_token, verify_token
+    token = create_access_token(data={
+        "sub": str(uuid.uuid4()),
+        "org_id": str(uuid.uuid4()),
+    })
+    payload = verify_token(token)
+    assert "org_id" in payload
+    assert payload["org_id"] is not None
+
+
 def test_cohort_has_organisation_id(db):
     """StudentCohort must have an organisation_id FK."""
     org = Organisation(

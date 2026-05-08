@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import create_access_token, get_password_hash, verify_password
-from app.db.models import User
+from app.db.models import OrganisationMembership, User
 
 
 def authenticate_user(db: Session, email: str, password: str) -> tuple[User | None, str | None]:
@@ -65,9 +65,19 @@ def login_for_access_token(db: Session, email: str, password: str) -> dict:
             detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    # Look up the user's organisation membership (first match)
+    membership = (
+        db.query(OrganisationMembership)
+        .filter(OrganisationMembership.user_id == user.id)
+        .first()
+    )
+    token_data: dict = {"sub": str(user.id)}
+    if membership is not None:
+        token_data["org_id"] = str(membership.organisation_id)
+
     expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": str(user.id)},
+        data=token_data,
         expires_delta=expires_delta,
     )
     return {
