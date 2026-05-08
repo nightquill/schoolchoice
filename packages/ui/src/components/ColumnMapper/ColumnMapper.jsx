@@ -5,8 +5,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select';
-import { Separator } from '../ui/separator';
+} from '../../primitives/select';
+import { Separator } from '../../primitives/separator';
 
 const tableStyle = {
   width: '100%',

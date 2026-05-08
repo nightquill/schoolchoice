@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { Upload, Download, Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../../primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '../../primitives/dropdown-menu';
 
 const barStyle = {
   display: 'flex',

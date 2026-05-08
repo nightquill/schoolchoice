@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Popover } from "@base-ui/react/popover"
-import { cn } from "@/lib/utils"
+import { cn } from "../lib/utils"
 
 function PopoverRoot({ ...props }) {
   return <Popover.Root data-slot="popover" {...props} />;

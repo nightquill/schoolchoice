@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '../../primitives/button';
 
 const DEFAULT_TEMPLATES = [
   { id: 'professional', label: 'Professional' },

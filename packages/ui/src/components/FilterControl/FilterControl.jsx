@@ -1,4 +1,4 @@
-import { Input } from '../ui/input';
+import { Input } from '../../primitives/input';
 
 const selectStyle = {
   height: '44px',

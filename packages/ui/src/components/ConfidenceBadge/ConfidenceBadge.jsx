@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../../primitives/popover';
 
 const TIER_STYLES = {
   HIGH: {

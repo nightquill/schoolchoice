@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import { Input } from '../ui/input';
+import { Input } from '../../primitives/input';
 import FilterControl from '../FilterControl/FilterControl';
 
 const FILTERABLE_TYPES = ['enum', 'date', 'int', 'decimal'];

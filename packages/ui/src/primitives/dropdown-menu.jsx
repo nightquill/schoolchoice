@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Menu } from "@base-ui/react/menu"
-import { cn } from "@/lib/utils"
+import { cn } from "../lib/utils"
 
 function DropdownMenu({ ...props }) {
   return <Menu.Root data-slot="dropdown-menu" {...props} />;
