@@ -22,6 +22,7 @@ import EntityListPage from './pages/EntityListPage/EntityListPage';
 import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
+import BulkEdit from './pages/BulkEdit/BulkEdit';
 import Settings from './pages/Settings/Settings';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
 import Onboarding from './pages/Onboarding/Onboarding';
@@ -74,6 +75,7 @@ export default function App() {
         <Route path="/admin/data-refresh" element={<ProtectedRoute><AdminDataRefresh /></ProtectedRoute>} />
         <Route path="/cohorts" element={<ProtectedRoute><CohortList /></ProtectedRoute>} />
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
+        <Route path="/cohorts/:cohortId/bulk-edit" element={<ProtectedRoute><BulkEdit /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
 
