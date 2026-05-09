@@ -23,6 +23,12 @@ function AdminDataRefresh() {
     jupas: null,
   });
 
+  // Diff preview state
+  const [csvFile, setCsvFile] = useState(null);
+  const [entityType, setEntityType] = useState('schools');
+  const [previewing, setPreviewing] = useState(false);
+  const [previewResult, setPreviewResult] = useState(null);
+
   useEffect(() => {
     getAccount()
       .then((data) => {
@@ -56,6 +62,34 @@ function AdminDataRefresh() {
       }
     } finally {
       setTriggering(false);
+    }
+  };
+
+  const handlePreview = async () => {
+    if (!csvFile) {
+      toast.error('Please select a CSV file first.');
+      return;
+    }
+    setPreviewing(true);
+    setPreviewResult(null);
+    try {
+      const formData = new FormData();
+      formData.append('file', csvFile);
+      const response = await client.post(
+        `/api/v1/admin/data-refresh/preview?entity_type=${entityType}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      ).then((r) => r.data);
+      setPreviewResult(response);
+      toast.success('Preview generated.');
+    } catch (err) {
+      if (err?.response?.status === 403) {
+        toast.error('You do not have permission to preview data.');
+      } else {
+        toast.error('Failed to generate preview.');
+      }
+    } finally {
+      setPreviewing(false);
     }
   };
 
@@ -176,6 +210,138 @@ function AdminDataRefresh() {
               </div>
             );
           })}
+        </div>
+
+        <div style={cardStyle}>
+          <h2 style={cardTitleStyle}>CSV Diff Preview</h2>
+          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
+            Upload a CSV file to preview changes before publishing. Compare against existing school or subject records.
+          </p>
+
+          <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-end', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px' }}>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
+                Entity Type
+              </label>
+              <select
+                value={entityType}
+                onChange={(e) => { setEntityType(e.target.value); setPreviewResult(null); }}
+                style={{
+                  width: '100%',
+                  padding: 'var(--space-2) var(--space-3)',
+                  border: 'var(--border-width) solid var(--color-border)',
+                  borderRadius: 'var(--border-radius-sm)',
+                  fontSize: 'var(--font-size-sm)',
+                  background: 'var(--color-surface)',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                <option value="schools">Schools</option>
+                <option value="subjects">Subjects</option>
+              </select>
+            </div>
+            <div style={{ flex: '2 1 300px' }}>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
+                CSV File
+              </label>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => { setCsvFile(e.target.files[0] || null); setPreviewResult(null); }}
+                style={{ fontSize: 'var(--font-size-sm)' }}
+              />
+            </div>
+            <Button onClick={handlePreview} disabled={previewing || !csvFile}>
+              {previewing ? 'Previewing...' : 'Preview Changes'}
+            </Button>
+          </div>
+
+          {previewResult && (
+            <div style={{ marginTop: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
+                <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                  + {previewResult.added} added
+                </div>
+                <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#fef3c7', color: '#92400e', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                  ~ {previewResult.updated} updated
+                </div>
+                <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#f3f4f6', color: '#6b7280', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
+                  = {previewResult.unchanged} unchanged
+                </div>
+                <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  Total rows: {previewResult.total_rows}
+                </div>
+              </div>
+
+              {previewResult.added_preview.length > 0 && (
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', color: '#166534', marginBottom: 'var(--space-2)' }}>
+                    New Records (showing up to 20)
+                  </h3>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--font-size-xs)' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Key</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Fields</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewResult.added_preview.map((item, i) => (
+                          <tr key={i}>
+                            <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)', fontWeight: 'var(--font-weight-medium)' }}>{item.key}</td>
+                            <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)', color: 'var(--color-text-secondary)' }}>
+                              {Object.entries(item.fields).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {previewResult.updated_preview.length > 0 && (
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', color: '#92400e', marginBottom: 'var(--space-2)' }}>
+                    Updated Records (showing up to 20)
+                  </h3>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--font-size-xs)' }}>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Key</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Field</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Old</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>New</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {previewResult.updated_preview.map((item, i) =>
+                          Object.entries(item.changes).map(([field, diff], j) => (
+                            <tr key={`${i}-${j}`}>
+                              {j === 0 && (
+                                <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)', fontWeight: 'var(--font-weight-medium)', verticalAlign: 'top' }} rowSpan={Object.keys(item.changes).length}>
+                                  {item.key}
+                                </td>
+                              )}
+                              <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)' }}>{field}</td>
+                              <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)', color: '#dc2626', textDecoration: 'line-through' }}>{diff.old}</td>
+                              <td style={{ padding: 'var(--space-2)', borderBottom: 'var(--border-width) solid var(--color-border)', color: '#16a34a' }}>{diff.new}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              <Button onClick={() => setConfirmModalOpen(true)}>
+                Publish Changes
+              </Button>
+            </div>
+          )}
         </div>
 
         <div style={cardStyle}>

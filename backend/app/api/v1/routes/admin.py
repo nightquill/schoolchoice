@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from sqlalchemy.exc import IntegrityError
@@ -226,3 +226,63 @@ def delete_user(
         )
     user.is_active = False
     db.commit()
+
+
+# ---------------------------------------------------------------------------
+# POST /admin/data-refresh/preview
+# ---------------------------------------------------------------------------
+
+@router.post("/data-refresh/preview", status_code=200)
+def preview_data_refresh(
+    file: UploadFile = File(...),
+    entity_type: str = Query(..., description="schools | subjects"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(_require_admin),
+):
+    """Preview diff between uploaded CSV and existing records before publishing."""
+    import csv
+    import io
+
+    content = file.file.read().decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(content))
+    new_rows = list(reader)
+
+    if entity_type == "schools":
+        from app.modules.school_choice.models.models import School
+        existing = {s.name: s for s in db.query(School).all()}
+        key_field = "name"
+    elif entity_type == "subjects":
+        from app.modules.school_choice.models.models import Subject
+        existing = {s.code: s for s in db.query(Subject).all()}
+        key_field = "code"
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown entity_type: {entity_type}")
+
+    added, updated, unchanged = [], [], 0
+    for row in new_rows:
+        key = row.get(key_field, "").strip()
+        if not key:
+            continue
+        if key in existing:
+            changes = {}
+            for col, val in row.items():
+                if hasattr(existing[key], col):
+                    old_val = str(getattr(existing[key], col) or "")
+                    if old_val != val:
+                        changes[col] = {"old": old_val, "new": val}
+            if changes:
+                updated.append({"key": key, "changes": changes})
+            else:
+                unchanged += 1
+        else:
+            added.append({"key": key, "fields": dict(row)})
+
+    return {
+        "entity_type": entity_type,
+        "total_rows": len(new_rows),
+        "added": len(added),
+        "updated": len(updated),
+        "unchanged": unchanged,
+        "added_preview": added[:20],
+        "updated_preview": updated[:20],
+    }
