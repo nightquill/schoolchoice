@@ -11,6 +11,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { getStudents, createStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getEntities, getEntityList } from '../../api/entities';
+import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -156,6 +157,8 @@ function Dashboard() {
           </Card>
         ))}
       </div>
+
+      <AlertsPanel />
 
       <main id="main-content" className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         <div style={headerRowStyle}>
