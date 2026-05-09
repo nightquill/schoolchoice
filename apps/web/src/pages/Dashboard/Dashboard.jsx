@@ -15,13 +15,6 @@ import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
 
 function Dashboard() {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const onboardingDone = localStorage.getItem('onboarding_complete');
-    if (!onboardingDone) {
-      navigate('/onboarding', { replace: true });
-    }
-  }, [navigate]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [formLoading, setFormLoading] = useState(false);
@@ -36,6 +29,21 @@ function Dashboard() {
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
 
   const students = Array.isArray(studentsQuery.data) ? studentsQuery.data : (studentsQuery.data?.items ?? []);
+
+  // First-login redirect: only show onboarding for truly new users (no students yet)
+  const studentsLoaded = studentsQuery.isSuccess;
+  const studentCount = students.length || (studentsQuery.data?.total ?? 0);
+  useEffect(() => {
+    if (!studentsLoaded) return;
+    const onboardingDone = localStorage.getItem('onboarding_complete');
+    if (!onboardingDone) {
+      if (studentCount === 0) {
+        navigate('/onboarding', { replace: true });
+      } else {
+        localStorage.setItem('onboarding_complete', 'true');
+      }
+    }
+  }, [navigate, studentsLoaded, studentCount]);
   const account = accountQuery.data ?? null;
   const loading = studentsQuery.isLoading || accountQuery.isLoading;
   const error = studentsQuery.error || accountQuery.error;

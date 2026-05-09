@@ -16,7 +16,7 @@ from app.services.alert_service import generate_alerts
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
 
-@router.get("/alerts")
+@router.get("")
 def get_alerts(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
