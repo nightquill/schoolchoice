@@ -287,6 +287,9 @@ app.include_router(methodology_router, prefix="/api/v1")
 app.include_router(alerts_router, prefix="/api/v1")
 app.include_router(consent_router, prefix="/api/v1")
 
+from app.api.v1.routes.reports import router as reports_router
+app.include_router(reports_router, prefix="/api/v1")
+
 # ---------------------------------------------------------------------------
 # Task YAML validation at startup (Pitfall 4 prevention)
 # ---------------------------------------------------------------------------

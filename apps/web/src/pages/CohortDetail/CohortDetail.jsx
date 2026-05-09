@@ -264,6 +264,7 @@ function CohortDetail() {
               )}
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <Button onClick={() => navigate(`/cohorts/${id}/report`)}>View Report</Button>
               <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>Bulk Edit Grades</Button>
               <Button onClick={() => setAddModalOpen(true)}>Add Students</Button>
             </div>

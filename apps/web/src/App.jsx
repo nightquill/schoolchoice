@@ -16,6 +16,7 @@ import AccountSettings from './pages/AccountSettings/AccountSettings';
 import AdminDataRefresh from './pages/AdminDataRefresh/AdminDataRefresh';
 import CohortList from './pages/CohortList/CohortList';
 import CohortDetail from './pages/CohortDetail/CohortDetail';
+import CohortReport from './pages/CohortReport/CohortReport';
 import DataAnalysis from './pages/DataAnalysis/DataAnalysis';
 import SubjectDetail from './pages/SubjectDetail/SubjectDetail';
 import EntityListPage from './pages/EntityListPage/EntityListPage';
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="/admin/data-refresh" element={<ProtectedRoute><AdminDataRefresh /></ProtectedRoute>} />
         <Route path="/cohorts" element={<ProtectedRoute><CohortList /></ProtectedRoute>} />
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
+        <Route path="/cohorts/:cohortId/report" element={<ProtectedRoute><CohortReport /></ProtectedRoute>} />
         <Route path="/cohorts/:cohortId/bulk-edit" element={<ProtectedRoute><BulkEdit /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
