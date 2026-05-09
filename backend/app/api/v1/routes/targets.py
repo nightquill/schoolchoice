@@ -11,8 +11,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from pydantic import BaseModel
+
 from app.core.dependencies import get_current_user
-from app.db.models import School, User
+from app.db.models import School, Student, User
 from app.db.models_v2 import StudentSchoolTarget
 from app.db.session import get_db
 from app.schemas.v2.targets import (
@@ -28,6 +30,9 @@ from app.services.student_data_builder import build_school_dict, build_student_d
 from app.modules.school_choice.services.matchmaker_v2 import compute_weighted_score, run_eligibility_filter
 
 router = APIRouter(prefix="/students", tags=["targets-v2"])
+
+# Secondary router for flat /targets/{target_id} endpoints (counselor agency)
+targets_flat_router = APIRouter(prefix="/targets", tags=["targets-v2"])
 
 
 def _get_target_or_404(
@@ -305,3 +310,60 @@ def reorder_targets(
 
     db.commit()
     return {"reordered": len(payload.ordered_ids)}
+
+
+# ---------------------------------------------------------------------------
+# Pydantic model for counselor target updates
+# ---------------------------------------------------------------------------
+
+class TargetCounselorUpdate(BaseModel):
+    is_pinned: bool | None = None
+    is_dismissed: bool | None = None
+    counselor_notes: str | None = None
+    status: str | None = None
+    preference_confidence: int | None = None
+
+
+# ---------------------------------------------------------------------------
+# PATCH /targets/{target_id}  (counselor pin / dismiss / notes)
+# ---------------------------------------------------------------------------
+
+@targets_flat_router.patch("/{target_id}", status_code=200)
+def update_target_counselor(
+    target_id: UUID,
+    payload: TargetCounselorUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update counselor-specific fields on a target (pin, dismiss, notes). Decision #11."""
+    target = (
+        db.query(StudentSchoolTarget)
+        .filter(StudentSchoolTarget.id == target_id)
+        .first()
+    )
+    if not target:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Target not found")
+
+    # Verify the current user owns the student
+    student = db.query(Student).filter(Student.id == target.student_id).first()
+    if not student:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+    user_owns = str(student.user_id) == str(current_user.id)
+    org_owns = (
+        getattr(current_user, "active_organisation_id", None) is not None
+        and getattr(student, "organisation_id", None) is not None
+        and str(student.organisation_id) == str(current_user.active_organisation_id)
+    )
+    if not user_owns and not org_owns:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorised to modify this target")
+
+    # Apply only the fields that were explicitly sent
+    updates = payload.model_dump(exclude_unset=True)
+    for field, value in updates.items():
+        setattr(target, field, value)
+
+    db.commit()
+    db.refresh(target)
+
+    return TargetResponse.model_validate(target)

@@ -266,6 +266,7 @@ app.include_router(action_plan.router, prefix="/api/v1")
 app.include_router(grades.router, prefix="/api/v1")
 app.include_router(subjects_route.router, prefix="/api/v1")
 app.include_router(targets.router, prefix="/api/v1")
+app.include_router(targets.targets_flat_router, prefix="/api/v1")
 app.include_router(schools_v2.router, prefix="/api/v1")
 # NOTE: schools.py (v1) removed — its routes were shadowed by schools_v2.
 # schools_v2 provides: GET/POST /schools, GET/DELETE /schools/{id}

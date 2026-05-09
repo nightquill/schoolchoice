@@ -82,6 +82,9 @@ class TargetResponse(BaseModel):
     preference_confidence: int = 3
     at_risk: Optional[bool] = False
     risk_reasons: Optional[list[str]] = None
+    is_pinned: bool = False
+    is_dismissed: bool = False
+    counselor_notes: Optional[str] = None
     status: str
     created_at: datetime
     updated_at: datetime
