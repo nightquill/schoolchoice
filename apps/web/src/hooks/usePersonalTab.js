@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import client from '@schoolchoice/ui/api/client';
+import { useAutosave, loadDraft, clearDraft } from './useAutosave';
 
 export function usePersonalTab(student, studentId, onSaved) {
   const queryClient = useQueryClient();
@@ -22,6 +23,16 @@ export function usePersonalTab(student, studentId, onSaved) {
     personal_statement: student?.personal_statement || '',
   });
   const [errors, setErrors] = useState({});
+
+  const draftKey = studentId ? `draft:personal:${studentId}` : null;
+  useAutosave(draftKey, form);
+
+  useEffect(() => {
+    if (draftKey) {
+      const draft = loadDraft(draftKey);
+      if (draft) setForm((prev) => ({ ...prev, ...draft }));
+    }
+  }, [draftKey]);
 
   useEffect(() => {
     if (student) {
@@ -58,6 +69,7 @@ export function usePersonalTab(student, studentId, onSaved) {
     mutationFn: (payload) =>
       client.put(`/api/v1/students/${studentId}/profile`, payload).then((r) => r.data),
     onSuccess: (updated) => {
+      clearDraft(draftKey);
       queryClient.invalidateQueries({ queryKey: ['student', studentId] });
       onSaved(updated);
       toast.success('Profile saved successfully.');
