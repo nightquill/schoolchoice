@@ -16,3 +16,4 @@ from app.modules.school_choice.models.models import (  # noqa: F401
     StudentSchoolTarget, PlanGenerationJob, AcademicPlan,
     StudentCohort, CohortMembership, PlanHistory,
 )
+from app.modules.school_choice.models.consent import ConsentRecord  # noqa: F401
