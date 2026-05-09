@@ -67,6 +67,7 @@ def _cohort_to_response(cohort: StudentCohort) -> CohortResponse:
         id=cohort.id,
         name=cohort.name,
         description=cohort.description,
+        academic_year=cohort.academic_year,
         member_count=len(cohort.memberships),
         created_at=cohort.created_at,
         updated_at=cohort.updated_at,
@@ -121,6 +122,7 @@ def create_cohort(
         organisation_id=_org_id(current_user),
         name=payload.name,
         description=payload.description,
+        academic_year=payload.academic_year,
     )
     db.add(cohort)
     db.commit()
@@ -227,6 +229,8 @@ def update_cohort(
         cohort.name = payload.name
     if payload.description is not None:
         cohort.description = payload.description
+    if payload.academic_year is not None:
+        cohort.academic_year = payload.academic_year
     db.commit()
     db.refresh(cohort)
     return _cohort_to_response(cohort)

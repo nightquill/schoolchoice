@@ -19,11 +19,13 @@ from pydantic import BaseModel
 class CohortCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    academic_year: str | None = None
 
 
 class CohortUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    academic_year: str | None = None
 
 
 class CohortAddMembers(BaseModel):
@@ -50,6 +52,7 @@ class CohortResponse(BaseModel):
     id: UUID
     name: str
     description: Optional[str] = None
+    academic_year: str | None = None
     member_count: int
     created_at: datetime
     updated_at: datetime

@@ -431,6 +431,11 @@ class JupasProgramme(Base):
     notes = Column(Text, nullable=True)
     data_source = Column(Text, nullable=True)
     data_confidence = Column(String(50), nullable=True, server_default="'estimated'", comment="verified | estimated")
+    admission_year = Column(
+        Integer,
+        nullable=True,
+        comment="Admission year e.g. 2025; used for year-over-year trend tracking",
+    )
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
     updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now(), default=_utcnow)
 
@@ -1123,6 +1128,25 @@ class StudentSchoolTarget(Base):
     year_of_entry = Column(Integer, nullable=True)
     at_risk = Column(Boolean, nullable=True, default=False, comment="True if score below programme LQ")
     risk_reasons = Column(JSONB, nullable=True, server_default="[]", comment="Array of risk reason strings")
+    is_pinned = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+        comment="Counselor force-includes this target regardless of score",
+    )
+    is_dismissed = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+        comment="Counselor force-excludes this target from recommendations",
+    )
+    counselor_notes = Column(
+        Text,
+        nullable=True,
+        comment="Free-text counselor assessment alongside algorithmic score",
+    )
     created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,
@@ -1404,6 +1428,11 @@ class StudentCohort(Base):
         Text,
         nullable=True,
         comment="Optional free-text description",
+    )
+    academic_year = Column(
+        String(20),
+        nullable=True,
+        comment="Academic year e.g. '2025-26'; used for grade snapshot context",
     )
     created_at = Column(
         TIMESTAMP(timezone=True),
