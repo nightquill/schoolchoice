@@ -299,10 +299,18 @@ def _build_css(colors: dict, template_id: str) -> str:
       padding: 16px;
     }}
     @media print {{
-      body {{ background: white; padding: 0; font-size: 12px; }}
+      body {{ margin: 0; padding: 0; font-size: 11pt; color: #000; background: white; }}
+      .no-print, nav, .chat-panel, button {{ display: none !important; }}
       .section {{ box-shadow: none; page-break-inside: avoid; }}
-      .school-card {{ page-break-inside: avoid; }}
+      table {{ page-break-inside: avoid; border-collapse: collapse; }}
+      table td, table th {{ border: 1px solid #ccc; padding: 4px 8px; }}
+      h2, h3 {{ page-break-after: avoid; }}
+      .school-card, .section-card {{ page-break-inside: avoid; }}
       .counselor-only {{ display: none !important; }}
+      @page {{ margin: 1.5cm; size: A4; }}
+      a {{ text-decoration: none; color: inherit; }}
+      .score-badge {{ border: 1px solid #333; }}
+      * {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
     }}
     """
 
