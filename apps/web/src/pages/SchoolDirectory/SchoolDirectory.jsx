@@ -2,11 +2,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import SchoolCard from '../../components/SchoolCard/SchoolCard';
-import { LoadingSpinner } from '@schoolchoice/ui';
+import { LoadingSpinner, ActionBar } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
+import { toast } from 'sonner';
 import { searchSchools, createSchool, deleteSchool } from '../../api/schoolsV2';
+import { exportEntityCSV } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
 
 const LIMIT = 20;
@@ -26,6 +28,34 @@ function SchoolDirectory() {
   const [addError, setAddError] = useState('');
   const [deletingId, setDeletingId] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportFiltered = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      const params = {};
+      if (filters.q) params.q = filters.q;
+      if (filters.type) params.filters = JSON.stringify({ type: filters.type });
+      await exportEntityCSV('school', params);
+      toast.success('Export downloaded.');
+    } catch {
+      toast.error('Export failed. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [filters]);
+
+  const handleExportAll = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      await exportEntityCSV('school', {});
+      toast.success('Export downloaded.');
+    } catch {
+      toast.error('Export failed. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  }, []);
 
   useEffect(() => {
     getAccount().then(setAccount).catch(() => {});
@@ -185,6 +215,13 @@ function SchoolDirectory() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
+
+      <ActionBar
+        entityName="school"
+        onExportFiltered={handleExportFiltered}
+        onExportAll={handleExportAll}
+        isExporting={isExporting}
+      />
 
       <div style={filterBarStyle} role="search" aria-label="School search filters">
         <div style={fieldGroupStyle}>
