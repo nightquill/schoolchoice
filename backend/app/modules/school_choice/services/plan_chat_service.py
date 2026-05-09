@@ -24,6 +24,7 @@ from app.db.models_v2 import AcademicPlan
 from app.schemas.v2.plan_chat import PlanChatResponse
 from app.modules.school_choice.services.plan_generator import generate_html_plan
 from app.core.ai_service import call_ai
+from app.modules.school_choice.prompts.reporter import REPORTER_SYSTEM_PROMPT, build_reporter_context
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,9 @@ logger = logging.getLogger(__name__)
 # System prompt
 # ---------------------------------------------------------------------------
 
-SYSTEM_PROMPT = """You are an academic advisor assistant helping a counsellor edit a student's academic plan.
+_PATCH_INSTRUCTIONS = """
+## Task
+You are helping a counsellor edit a student's academic plan.
 You will receive the current plan data as JSON and the counsellor's instruction.
 You must respond with ONLY a valid JSON object specifying the exact changes to make.
 The patch object may contain any of these keys:
@@ -44,6 +47,8 @@ The patch object may contain any of these keys:
   - "action_items[N].deadline": new deadline string
   - "action_items": full replacement array if items are added/removed
 Respond with ONLY the JSON object. No explanation, no markdown, no code fences."""
+
+SYSTEM_PROMPT = REPORTER_SYSTEM_PROMPT + _PATCH_INSTRUCTIONS
 
 
 # ---------------------------------------------------------------------------
