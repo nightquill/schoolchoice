@@ -1,5 +1,5 @@
 // REQ-088: Dashboard Page
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent } from '@schoolchoice/ui/primitives/card';
@@ -15,6 +15,13 @@ import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
 
 function Dashboard() {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const onboardingDone = localStorage.getItem('onboarding_complete');
+    if (!onboardingDone) {
+      navigate('/onboarding', { replace: true });
+    }
+  }, [navigate]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [formLoading, setFormLoading] = useState(false);

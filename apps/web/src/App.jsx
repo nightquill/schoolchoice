@@ -24,6 +24,7 @@ import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
 import Settings from './pages/Settings/Settings';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
+import Onboarding from './pages/Onboarding/Onboarding';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/students/:id/recommendations" element={<ProtectedRoute><RecommendationPage /></ProtectedRoute>} />
 
         {/* v2 protected routes */}
+        <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/students/:id/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
         <Route path="/students/:id/targets" element={<ProtectedRoute><TargetSchools /></ProtectedRoute>} />
