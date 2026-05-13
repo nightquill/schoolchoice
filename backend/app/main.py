@@ -298,6 +298,9 @@ app.include_router(reports_router, prefix="/api/v1")
 from app.api.v1.routes.student_portal import router as student_portal_router
 app.include_router(student_portal_router, prefix="/api/v1")
 
+from app.api.v1.routes.submissions import router as submissions_router
+app.include_router(submissions_router, prefix="/api/v1")
+
 # ---------------------------------------------------------------------------
 # Task YAML validation at startup (Pitfall 4 prevention)
 # ---------------------------------------------------------------------------

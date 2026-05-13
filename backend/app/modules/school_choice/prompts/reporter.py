@@ -1,4 +1,5 @@
 """LLM Reporter persona configuration (Decision #21)."""
+from __future__ import annotations
 
 REPORTER_SYSTEM_PROMPT = """You are an Academic Data Reporter for a Hong Kong secondary school counselling platform.
 
