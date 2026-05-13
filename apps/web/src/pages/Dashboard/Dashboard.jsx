@@ -12,8 +12,10 @@ import { getStudents, createStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getEntities, getEntityList } from '../../api/entities';
 import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function Dashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
@@ -25,7 +27,7 @@ function Dashboard() {
 
   // Config-driven: fetch entity registry for dynamic metrics
   const entitiesQuery = useQuery({ queryKey: ['entities'], queryFn: getEntities });
-  const studentsQuery = useQuery({ queryKey: ['students'], queryFn: getStudents });
+  const studentsQuery = useQuery({ queryKey: ['students'], queryFn: () => getStudents({ limit: 500 }) });
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
 
   const students = Array.isArray(studentsQuery.data) ? studentsQuery.data : (studentsQuery.data?.items ?? []);
@@ -67,8 +69,8 @@ function Dashboard() {
 
   // Combine domain-specific + config-driven metrics
   const metrics = [
-    { label: 'Total Students', value: loading ? '--' : students.length },
-    { label: 'Plans Generated', value: loading ? '--' : students.filter((s) => s.has_plan).length },
+    { label: t('dashboard.totalStudents'), value: loading ? '--' : students.length },
+    { label: t('dashboard.plansGenerated'), value: loading ? '--' : students.filter((s) => s.has_plan).length },
     ...entityMetrics.map((m, i) => ({
       label: m.label,
       value: entityCountQueries[i]?.data?.length ?? '--',
@@ -90,7 +92,7 @@ function Dashboard() {
 
   const handleCreateStudent = async (e) => {
     e.preventDefault();
-    if (!newName.trim()) { setFormError('Student name is required.'); return; }
+    if (!newName.trim()) { setFormError(t('dashboard.nameRequired')); return; }
     setFormLoading(true);
     setFormError('');
     try {
@@ -99,7 +101,7 @@ function Dashboard() {
       setNewName('');
       navigate(`/students/${newStudent.id}/profile`);
     } catch {
-      setFormError('Could not create student. Please try again.');
+      setFormError(t('dashboard.createFailed'));
     } finally {
       setFormLoading(false);
     }
@@ -176,14 +178,35 @@ function Dashboard() {
       <AlertsPanel />
 
       <main id="main-content" className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
-        <div style={headerRowStyle}>
-          <h1 style={headingStyle}>Students</h1>
+        {/* Quick actions toolbar */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', padding: 'var(--space-3)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)' }}>
           {!showAddForm && (
-            <Button
-              variant="secondary"
-              onClick={() => setShowAddForm(true)}
-            >Add Student</Button>
+            <Button variant="secondary" onClick={() => setShowAddForm(true)}>{t('dashboard.addStudent')}</Button>
           )}
+          <Button variant="outline" onClick={() => navigate('/import/students')}>
+            Import (CSV / Excel)
+          </Button>
+          <Button variant="outline" onClick={async () => {
+            try {
+              const { default: client } = await import('@schoolchoice/ui/api/client');
+              const resp = await client.get('/api/v1/entities/student/export', { responseType: 'blob' });
+              const url = URL.createObjectURL(resp.data);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            } catch { /* ignore */ }
+          }}>
+            Export Students (CSV)
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/cohorts')}>
+            Cohorts &amp; Bulk Edit
+          </Button>
+        </div>
+
+        <div style={headerRowStyle}>
+          <h1 style={headingStyle}>{t('dashboard.students')}</h1>
         </div>
 
         {/* Search and filter bar */}
@@ -192,9 +215,9 @@ function Dashboard() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name…"
+              placeholder={t('dashboard.searchByName')}
               style={{ flex: '2 1 160px', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-              aria-label="Search students by name"
+              aria-label={t('dashboard.searchByName')}
             />
             <select
               value={filterClass}
@@ -202,7 +225,7 @@ function Dashboard() {
               style={{ flex: '1 1 100px', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
               aria-label="Filter by class"
             >
-              <option value="">All Classes</option>
+              <option value="">{t('dashboard.allClasses')}</option>
               {uniqueClasses.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             <select
@@ -211,7 +234,7 @@ function Dashboard() {
               style={{ flex: '1 1 100px', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
               aria-label="Filter by year"
             >
-              <option value="">All Years</option>
+              <option value="">{t('dashboard.allYears')}</option>
               {uniqueYears.map((y) => <option key={y} value={String(y)}>Year {y}</option>)}
             </select>
             {(searchQuery || filterClass || filterYear) && (
@@ -219,7 +242,7 @@ function Dashboard() {
                 onClick={() => { setSearchQuery(''); setFilterClass(''); setFilterYear(''); }}
                 style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
               >
-                Clear filters
+                {t('dashboard.clearFilters')}
               </button>
             )}
           </div>
@@ -231,7 +254,7 @@ function Dashboard() {
               <input
                 autoFocus
                 type="text"
-                placeholder="Student full name"
+                placeholder={t('dashboard.studentFullName')}
                 value={newName}
                 onChange={(e) => { setNewName(e.target.value); setFormError(''); }}
                 disabled={formLoading}
@@ -240,18 +263,18 @@ function Dashboard() {
               />
               {formError && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)' }}>{formError}</span>}
             </div>
-            <Button type="submit" disabled={formLoading}>{formLoading ? 'Creating…' : 'Create'}</Button>
-            <Button variant="secondary" onClick={() => { setShowAddForm(false); setNewName(''); setFormError(''); }} disabled={formLoading}>Cancel</Button>
+            <Button type="submit" disabled={formLoading}>{formLoading ? t('dashboard.creating') : t('dashboard.create')}</Button>
+            <Button variant="secondary" onClick={() => { setShowAddForm(false); setNewName(''); setFormError(''); }} disabled={formLoading}>{t('dashboard.cancel')}</Button>
           </form>
         )}
 
-        {loading && <LoadingSpinner label="Loading students..." />}
+        {loading && <LoadingSpinner label={t('dashboard.loadingStudents')} />}
         {error && <ErrorMessage message={error} />}
         {!loading && !error && students.length === 0 && (
-          <EmptyState message="No students yet. Add a student to get started." />
+          <EmptyState message={t('dashboard.noStudents')} />
         )}
         {!loading && !error && students.length > 0 && filteredStudents.length === 0 && (
-          <EmptyState message="No students match the current filters." />
+          <EmptyState message={t('dashboard.noMatch')} />
         )}
         {!loading && !error && filteredStudents.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ marginTop: 'var(--space-6)' }} role="list" aria-label="Student cards">
@@ -260,22 +283,22 @@ function Dashboard() {
                 <p style={cardNameStyle}>{student.full_name || student.name || 'Unnamed Student'}</p>
                 {(student.year_of_study || student.class_name) && (
                   <p style={cardMetaStyle}>
-                    {student.class_name && `Class ${student.class_name}`}
+                    {student.class_name && `${t('dashboard.class')} ${student.class_name}`}
                     {student.class_name && student.year_of_study && ' · '}
-                    {student.year_of_study && `Year ${student.year_of_study}`}
+                    {student.year_of_study && `${t('dashboard.year')} ${student.year_of_study}`}
                   </p>
                 )}
                 <p style={cardMetaStyle}>
-                  Last plan:{' '}
+                  {t('dashboard.lastPlan')}{' '}
                   {student.plan_generated_at
                     ? student.plan_generated_at.slice(0, 10)
-                    : 'No plan yet'}
+                    : t('dashboard.noPlanYet')}
                 </p>
                 <Button
                   className="w-full"
                   variant="outline"
                   onClick={() => navigate(`/students/${student.id}/profile`)}
-                >View Profile</Button>
+                >{t('dashboard.viewProfile')}</Button>
               </div>
             ))}
           </div>

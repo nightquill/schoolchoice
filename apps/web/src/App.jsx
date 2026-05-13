@@ -24,6 +24,7 @@ import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
 import BulkEdit from './pages/BulkEdit/BulkEdit';
+import StudentImport from './pages/StudentImport/StudentImport';
 import Settings from './pages/Settings/Settings';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
 import Onboarding from './pages/Onboarding/Onboarding';
@@ -83,6 +84,7 @@ export default function App() {
 
         <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
         <Route path="/methodology" element={<ProtectedRoute><MethodologyReport /></ProtectedRoute>} />
+        <Route path="/import/students" element={<ProtectedRoute><StudentImport /></ProtectedRoute>} />
 
         {/* Entity routes (PLAT-03) */}
         <Route path="/entities/:name" element={<ProtectedRoute><EntityListPage /></ProtectedRoute>} />
