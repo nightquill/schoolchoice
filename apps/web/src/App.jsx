@@ -24,6 +24,8 @@ import EntityDetailPage from './pages/EntityDetailPage/EntityDetailPage';
 import ImportWizardPage from './pages/ImportWizardPage/ImportWizardPage';
 import ConsultantTask from './pages/ConsultantTask/ConsultantTask';
 import BulkEdit from './pages/BulkEdit/BulkEdit';
+import SubmissionList from './pages/Submissions/SubmissionList';
+import SubmissionDetail from './pages/Submissions/SubmissionDetail';
 import StudentImport from './pages/StudentImport/StudentImport';
 import Settings from './pages/Settings/Settings';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
@@ -81,6 +83,9 @@ export default function App() {
         <Route path="/cohorts/:cohortId/bulk-edit" element={<ProtectedRoute><BulkEdit /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
+
+        <Route path="/submissions" element={<ProtectedRoute><SubmissionList /></ProtectedRoute>} />
+        <Route path="/submissions/:id" element={<ProtectedRoute><SubmissionDetail /></ProtectedRoute>} />
 
         <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
         <Route path="/methodology" element={<ProtectedRoute><MethodologyReport /></ProtectedRoute>} />

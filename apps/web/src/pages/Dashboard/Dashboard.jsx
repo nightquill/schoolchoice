@@ -9,6 +9,7 @@ import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { getStudents, createStudent } from '../../api/students';
+import { getSubmissions } from '../../api/submissions';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getEntities, getEntityList } from '../../api/entities';
 import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
@@ -28,6 +29,7 @@ function Dashboard() {
   // Config-driven: fetch entity registry for dynamic metrics
   const entitiesQuery = useQuery({ queryKey: ['entities'], queryFn: getEntities });
   const studentsQuery = useQuery({ queryKey: ['students'], queryFn: () => getStudents({ limit: 500 }) });
+  const submissionsQuery = useQuery({ queryKey: ['submissions'], queryFn: getSubmissions });
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
 
   const students = Array.isArray(studentsQuery.data) ? studentsQuery.data : (studentsQuery.data?.items ?? []);
@@ -71,6 +73,7 @@ function Dashboard() {
   const metrics = [
     { label: t('dashboard.totalStudents'), value: loading ? '--' : students.length },
     { label: t('dashboard.plansGenerated'), value: loading ? '--' : students.filter((s) => s.has_plan).length },
+    { label: 'Pending Submissions', value: submissionsQuery.isLoading ? '--' : (submissionsQuery.data?.length ?? 0) },
     ...entityMetrics.map((m, i) => ({
       label: m.label,
       value: entityCountQueries[i]?.data?.length ?? '--',

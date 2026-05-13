@@ -3,12 +3,14 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Menu, X, Settings } from 'lucide-react';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getEntities } from '../../api/entities';
 
 // NavBarV2 — extended navigation bar for v2 pages
 // Adds Dashboard, School Directory, Account Settings links; Data Refresh for admin
 function NavBarV2({ account }) {
   const { logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -117,14 +119,14 @@ function NavBarV2({ account }) {
   return (
     <nav style={{ ...navStyle, position: 'relative' }} role="navigation" aria-label="Main navigation">
       <Link to="/dashboard" style={brandStyle}>
-        Academic Advisor
+        {t('nav.appName')}
       </Link>
 
       {/* Hamburger button — visible only on mobile */}
       {isMobile && (
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--color-text-primary)' }}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -135,26 +137,29 @@ function NavBarV2({ account }) {
       {!isMobile && (
         <div style={{ ...centreLinksStyle, display: 'flex' }}>
           <Link to="/dashboard" style={getLinkStyle('/dashboard')}>
-            Dashboard
+            {t('nav.dashboard')}
           </Link>
           <Link to="/schools" style={getLinkStyle('/schools')}>
-            School Directory
+            {t('nav.schoolDirectory')}
           </Link>
           <Link to="/cohorts" style={getLinkStyle('/cohorts')}>
-            Cohorts
+            {t('nav.cohorts')}
           </Link>
           <Link to="/data-analysis" style={getLinkStyle('/data-analysis')}>
-            Data Analysis
+            {t('nav.dataAnalysis')}
+          </Link>
+          <Link to="/submissions" style={getLinkStyle('/submissions')}>
+            Submissions
           </Link>
           {isAdmin && (
             <Link to="/admin/data-refresh" style={getLinkStyle('/admin/data-refresh')}>
-              Data Refresh
+              {t('nav.dataRefresh')}
             </Link>
           )}
           {isAdmin && (
             <Link to="/settings" style={{ ...getLinkStyle('/settings'), display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               <Settings size={18} />
-              Settings
+              {t('nav.settings')}
             </Link>
           )}
           {entityLinks.map((entity) => (
@@ -184,14 +189,14 @@ function NavBarV2({ account }) {
               fontFamily: 'var(--font-family-base)',
             }}
           >
-            Account Settings
+            {t('nav.accountSettings')}
           </Link>
           <button
             style={logoutStyle}
             onClick={handleLogout}
             aria-label="Log out"
           >
-            Logout
+            {t('nav.logout')}
           </button>
         </div>
       )}
@@ -209,17 +214,18 @@ function NavBarV2({ account }) {
           zIndex: 50,
           boxShadow: 'var(--shadow-md)',
         }}>
-          <Link to="/dashboard" style={getMobileLinkStyle('/dashboard')} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-          <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>School Directory</Link>
-          <Link to="/cohorts" style={getMobileLinkStyle('/cohorts')} onClick={() => setMobileMenuOpen(false)}>Cohorts</Link>
-          <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>Data Analysis</Link>
+          <Link to="/dashboard" style={getMobileLinkStyle('/dashboard')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dashboard')}</Link>
+          <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>{t('nav.schoolDirectory')}</Link>
+          <Link to="/cohorts" style={getMobileLinkStyle('/cohorts')} onClick={() => setMobileMenuOpen(false)}>{t('nav.cohorts')}</Link>
+          <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataAnalysis')}</Link>
+          <Link to="/submissions" style={getMobileLinkStyle('/submissions')} onClick={() => setMobileMenuOpen(false)}>Submissions</Link>
           {isAdmin && (
-            <Link to="/admin/data-refresh" style={getMobileLinkStyle('/admin/data-refresh')} onClick={() => setMobileMenuOpen(false)}>Data Refresh</Link>
+            <Link to="/admin/data-refresh" style={getMobileLinkStyle('/admin/data-refresh')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataRefresh')}</Link>
           )}
           {isAdmin && (
             <Link to="/settings" style={{ ...getMobileLinkStyle('/settings'), display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setMobileMenuOpen(false)}>
               <Settings size={18} />
-              Settings
+              {t('nav.settings')}
             </Link>
           )}
           {entityLinks.map((entity) => (
@@ -234,13 +240,13 @@ function NavBarV2({ account }) {
               {account.organisation_name}
             </span>
           )}
-          <Link to="/account/settings" style={getMobileLinkStyle('/account/settings')} onClick={() => setMobileMenuOpen(false)}>Account Settings</Link>
+          <Link to="/account/settings" style={getMobileLinkStyle('/account/settings')} onClick={() => setMobileMenuOpen(false)}>{t('nav.accountSettings')}</Link>
           <button
             style={{ ...logoutStyle, display: 'block', padding: '12px 24px', minHeight: '44px', width: '100%', textAlign: 'left' }}
             onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
             aria-label="Log out"
           >
-            Logout
+            {t('nav.logout')}
           </button>
         </div>
       )}
