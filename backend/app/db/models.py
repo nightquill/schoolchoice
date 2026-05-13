@@ -141,7 +141,7 @@ class User(Base):
     role = Column(
         String(20), nullable=False, default="counsellor",
         server_default="'counsellor'",
-        comment="Enum: counsellor | admin. Default: counsellor",
+        comment="Enum: counsellor | admin | student. Default: counsellor",
     )
     display_name = Column(
         String(255), nullable=True,
@@ -157,6 +157,17 @@ class User(Base):
         server_default="true",
         comment="true until soft-deleted; row is retained for audit",
     )
+    student_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("students.id", ondelete="SET NULL", name="fk_user_student_id"),
+        nullable=True,
+        comment="FK to students.id — links student user to their student record",
+    )
+    must_change_password = Column(
+        Boolean, nullable=False, default=False,
+        server_default="false",
+        comment="Force password change on next login",
+    )
 
     # Relationships
     students = relationship(
@@ -164,6 +175,7 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="select",
+        foreign_keys="[Student.user_id]",
     )
     org_memberships = relationship(
         "OrganisationMembership",

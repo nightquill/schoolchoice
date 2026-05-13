@@ -44,6 +44,8 @@ from app.platform.health import check_orm_schema_parity, run_health_check
 # Import models_v2 to register all v2 ORM classes with Base.metadata
 # (safety net — module loader also imports models, but create_all runs before discovery)
 import app.db.models_v2  # noqa: F401
+from app.modules.school_choice.models.submissions import StudentChoiceSubmission  # noqa: F401
+from app.api.v1.routes.jupas_search import router as jupas_search_router
 
 _startup_logger = _logging.getLogger("app.startup")
 
@@ -288,6 +290,7 @@ app.include_router(methodology_router, prefix="/api/v1")
 app.include_router(alerts_router, prefix="/api/v1")
 app.include_router(consent_router, prefix="/api/v1")
 app.include_router(student_import_router, prefix="/api/v1")
+app.include_router(jupas_search_router, prefix="/api/v1")
 
 from app.api.v1.routes.reports import router as reports_router
 app.include_router(reports_router, prefix="/api/v1")

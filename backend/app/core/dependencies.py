@@ -112,6 +112,21 @@ def get_current_user_or_query_token(
         raise _unauthorized
 
 
+def get_current_student(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User:
+    """Validate JWT and return User with role='student'. Raises 401/403."""
+    if not credentials:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing authentication token")
+    user = _resolve_user_from_token(credentials.credentials, db)
+    if user.role != "student":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student access required")
+    if not user.student_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No student record linked")
+    return user
+
+
 def require_role(role: str):
     """Factory: returns a FastAPI dependency that enforces a specific role.
 

@@ -203,7 +203,7 @@ class Student(Base):
     final_major = Column(String(255), nullable=True)
 
     # Relationships
-    user = relationship("User", back_populates="students")
+    user = relationship("User", back_populates="students", foreign_keys=[user_id])
     organisation = relationship("Organisation", backref="students", lazy="select")
     recommendations = relationship(
         "Recommendation",
@@ -1045,8 +1045,8 @@ class StudentSchoolTarget(Base):
 
     __table_args__ = (
         UniqueConstraint(
-            "student_id", "school_id",
-            name="uq_sst_student_school",
+            "student_id", "school_id", "jupas_code",
+            name="uq_sst_student_school_programme",
         ),
         CheckConstraint(
             "status IN ('CONSIDERING', 'APPLIED', 'ADMITTED', 'REJECTED', 'WITHDRAWN')",
@@ -1124,6 +1124,8 @@ class StudentSchoolTarget(Base):
         comment="Counselor confidence in student preference 1-5 (1=unsure, 5=decided)",
     )
     # Added via ALTER TABLE
+    jupas_code = Column(String(20), nullable=True, comment="JUPAS programme code e.g. JS6456 — links to jupas_programmes.jupas_code")
+    programme_name = Column(String(255), nullable=True, comment="Programme name from JupasProgramme at time of scoring")
     intended_majors = Column(JSON, nullable=True)
     year_of_entry = Column(Integer, nullable=True)
     at_risk = Column(Boolean, nullable=True, default=False, comment="True if score below programme LQ")
