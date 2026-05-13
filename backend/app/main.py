@@ -18,6 +18,7 @@ from slowapi.errors import RateLimitExceeded
 from app.api.v1.routes import action_plan, auth, consultant, recommendations, students
 from app.api.v1.routes.alerts import router as alerts_router
 from app.api.v1.routes.consent import router as consent_router
+from app.api.v1.routes.student_import import router as student_import_router
 from app.api.v1.routes.methodology import router as methodology_router
 from app.api.v1.routes.organisations import router as organisations_router
 from app.api.v1.routes import (
@@ -286,6 +287,7 @@ app.include_router(organisations_router, prefix="/api/v1")
 app.include_router(methodology_router, prefix="/api/v1")
 app.include_router(alerts_router, prefix="/api/v1")
 app.include_router(consent_router, prefix="/api/v1")
+app.include_router(student_import_router, prefix="/api/v1")
 
 from app.api.v1.routes.reports import router as reports_router
 app.include_router(reports_router, prefix="/api/v1")

@@ -204,6 +204,11 @@ def parse_student_csv(content: bytes) -> dict:
                         profile[field] = int(val)
                     except ValueError:
                         warnings.append(f"Invalid year_of_study '{val}'; skipped")
+                elif field == "date_of_birth":
+                    try:
+                        profile[field] = datetime.strptime(val, "%Y-%m-%d").date()
+                    except ValueError:
+                        warnings.append(f"Invalid date_of_birth '{val}'; skipped")
                 else:
                     profile[field] = val
 
