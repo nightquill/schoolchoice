@@ -75,8 +75,10 @@ def _get_submission_or_404(db: Session, submission_id: UUID) -> StudentChoiceSub
 
 
 def _build_student_grades(student: Student, db: Session) -> dict[str, str]:
-    """Build student grades dict from the JSON grades column."""
-    return dict(student.grades) if student.grades else {}
+    """Build {subject_code: grade} dict for JUPAS scoring. Uses best grade per subject."""
+    from app.services.student_data_builder import build_student_data
+    data = build_student_data(student, db)
+    return data.get("grades_by_code", {})
 
 
 # ---------------------------------------------------------------------------
@@ -159,7 +161,7 @@ def get_submission_detail(
             }
             try:
                 result = score_student_for_programme(student_grades, prog_dict)
-                match_score = result.get("probability")
+                match_score = result.get("admission_probability")
                 risk_level = result.get("risk_level", "unknown")
             except Exception:
                 logger.warning("Scoring failed for %s / %s", jupas_code, student.id, exc_info=True)
@@ -252,9 +254,9 @@ def approve_submission(
         if student_grades:
             try:
                 result = score_student_for_programme(student_grades, prog_dict)
-                match_score_val = result.get("probability")
+                match_score_val = result.get("admission_probability")
                 eligibility = result.get("eligible", True)
-                at_risk = result.get("risk_level") in ("high", "very_high")
+                at_risk = result.get("risk_level") == "at_risk"
             except Exception:
                 logger.warning("Scoring failed for %s during approve", jupas_code, exc_info=True)
 

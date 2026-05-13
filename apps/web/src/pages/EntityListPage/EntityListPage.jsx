@@ -137,6 +137,7 @@ export default function EntityListPage() {
           onExportFiltered={handleExportFiltered}
           onExportAll={handleExportAll}
           isExporting={isExporting}
+          hideImport={name === 'school'}
         />
 
         {/* Search + filter bar */}

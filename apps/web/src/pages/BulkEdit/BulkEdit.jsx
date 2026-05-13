@@ -26,7 +26,7 @@ function BulkEdit() {
 
   const { data: subjectsData, isLoading: subjectsLoading } = useQuery({
     queryKey: ['subjects'],
-    queryFn: () => client.get('/api/v1/subjects').then((r) => r.data),
+    queryFn: () => client.get('/api/v1/grades/subjects').then((r) => r.data),
   });
 
   const members = cohort?.members ?? [];

@@ -95,22 +95,51 @@ def list_targets(
 
         if school is not None:
             resp.school_name = school.name
+            resp.jupas_code = t.jupas_code
+            resp.programme_name = t.programme_name
             school_dict = school_dict_map.get(str(t.school_id), build_school_dict(school))
-            passes, failing = run_eligibility_filter(student_data, school_dict)
-            comp_scores = compute_weighted_score(student_data, school_dict)
-            match_score = comp_scores.get("weighted_score", 0.0)
 
-            # Persist fresh values
-            t.eligibility_pass = passes
-            t.match_score = match_score
+            # If target has a JUPAS programme, use programme-level scoring
+            if t.jupas_code and school_dict.get("jupas_programmes"):
+                from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+                from app.modules.school_choice.services.hkdse_service import compute_best5_aggregate
+                prog = next((p for p in school_dict["jupas_programmes"] if p.get("jupas_code") == t.jupas_code), None)
+                if prog:
+                    student_grades = student_data.get("subject_grades_detail", [])
+                    result = score_student_for_programme(student_grades, prog)
+                    match_score = result.get("admission_probability", 0.0)
+                    passes = result.get("eligible", True)
+                    failing = result.get("failures", [])
+                    t.eligibility_pass = passes
+                    t.match_score = match_score
+                    t.at_risk = result.get("risk_level") == "at_risk"
+                    t.risk_reasons = [result.get("risk_level", "")] if t.at_risk else []
+                else:
+                    # Programme not found — fallback to heuristic
+                    passes, failing = run_eligibility_filter(student_data, school_dict)
+                    comp_scores = compute_weighted_score(student_data, school_dict)
+                    match_score = comp_scores.get("weighted_score", 0.0)
+                    t.eligibility_pass = passes
+                    t.match_score = match_score
+            else:
+                # No JUPAS code — use heuristic scoring
+                passes, failing = run_eligibility_filter(student_data, school_dict)
+                comp_scores = compute_weighted_score(student_data, school_dict)
+                match_score = comp_scores.get("weighted_score", 0.0)
+                t.eligibility_pass = passes
+                t.match_score = match_score
+                failing = failing
+
             t.shap_explanation = {
                 **(t.shap_explanation or {}),
-                "failing_criteria": failing,
+                "failing_criteria": failing if 'failing' in dir() else [],
             }
 
-            resp.eligibility_pass = passes
-            resp.match_score = match_score
-            resp.failing_criteria = failing
+            resp.eligibility_pass = t.eligibility_pass
+            resp.match_score = float(t.match_score) if t.match_score else 0.0
+            resp.failing_criteria = failing if 'failing' in dir() else []
+            resp.at_risk = t.at_risk
+            resp.risk_reasons = t.risk_reasons or []
             resp.intended_majors = t.intended_majors
             resp.year_of_entry = t.year_of_entry
 
@@ -146,36 +175,62 @@ def add_target(
     if not school:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="School not found")
 
-    # Check for duplicate
-    existing = (
-        db.query(StudentSchoolTarget)
-        .filter(
-            StudentSchoolTarget.student_id == student_id,
-            StudentSchoolTarget.school_id == payload.school_id,
-        )
-        .first()
-    )
+    # Check for duplicate (same school + same programme)
+    dup_filter = [
+        StudentSchoolTarget.student_id == student_id,
+        StudentSchoolTarget.school_id == payload.school_id,
+    ]
+    if payload.jupas_code:
+        dup_filter.append(StudentSchoolTarget.jupas_code == payload.jupas_code)
+    else:
+        dup_filter.append(StudentSchoolTarget.jupas_code.is_(None))
+    existing = db.query(StudentSchoolTarget).filter(*dup_filter).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="School is already in the student's target list",
+            detail="This programme is already in the student's target list",
         )
 
     # Run eligibility and matching immediately
     student_data = build_student_data(student, db)
     school_dict = build_school_dict(school)
     attach_jupas_programmes(db, [school_dict])
-    passes, failing = run_eligibility_filter(student_data, school_dict)
-    comp_scores = compute_weighted_score(student_data, school_dict)
-    match_score = comp_scores.get("weighted_score", 0.0)
+
+    at_risk = False
+    risk_reasons = []
+
+    # Use JUPAS programme-level scoring if jupas_code provided
+    if payload.jupas_code and school_dict.get("jupas_programmes"):
+        from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+        prog = next((p for p in school_dict["jupas_programmes"] if p.get("jupas_code") == payload.jupas_code), None)
+        if prog:
+            student_grades = student_data.get("subject_grades_detail", [])
+            result = score_student_for_programme(student_grades, prog)
+            match_score = result.get("admission_probability", 0.0)
+            passes = result.get("eligible", True)
+            failing = result.get("failures", [])
+            at_risk = result.get("risk_level") == "at_risk"
+            risk_reasons = [result.get("risk_level", "")] if at_risk else []
+        else:
+            passes, failing = run_eligibility_filter(student_data, school_dict)
+            comp_scores = compute_weighted_score(student_data, school_dict)
+            match_score = comp_scores.get("weighted_score", 0.0)
+    else:
+        passes, failing = run_eligibility_filter(student_data, school_dict)
+        comp_scores = compute_weighted_score(student_data, school_dict)
+        match_score = comp_scores.get("weighted_score", 0.0)
 
     target = StudentSchoolTarget(
         student_id=student_id,
         school_id=payload.school_id,
+        jupas_code=payload.jupas_code,
+        programme_name=payload.programme_name,
         student_rank=payload.student_rank,
         status=payload.status,
         eligibility_pass=passes,
         match_score=match_score,
+        at_risk=at_risk,
+        risk_reasons=risk_reasons,
         shap_explanation={"failing_criteria": failing},
         intended_majors=payload.intended_majors,
         year_of_entry=payload.year_of_entry,
@@ -187,6 +242,8 @@ def add_target(
 
     resp = TargetResponse.model_validate(target)
     resp.school_name = school.name
+    resp.jupas_code = payload.jupas_code
+    resp.programme_name = payload.programme_name
     resp.eligibility_pass = passes
     resp.match_score = match_score
     resp.failing_criteria = failing

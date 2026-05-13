@@ -1,0 +1,11 @@
+candidate_number,name,class_name,year_of_study,gender,target_region,date_of_birth,preferred_language,CHLA,ENGL,MATH,CSD,PHYS,CHEM,BIOL,ECON,sitting,year_of_exam
+HKDSE-2026-A001,"Chan Ka Wai",5A,5,Male,local,2008-03-15,en,4,5*,5**,A,5,4,,3,MOCK,2025
+HKDSE-2026-A002,"Wong Mei Yi",5A,5,Female,local,2008-07-22,zh-HK,5*,5,4,A,,,5,4,MOCK,2025
+HKDSE-2026-B001,"Lee Tsz Him",5B,5,Male,local,2008-11-08,en,3,4,4,A,3,3,,,MOCK,2025
+HKDSE-2026-B002,"Cheung Wing Sze",5B,5,Female,international,2009-01-14,en,5,5*,5,A,,5,5,,MOCK,2025
+HKDSE-2026-C001,"Ho Siu Ming",5C,5,Male,local,2008-05-30,zh-HK,4,3,5,A,5,,4,,MOCK,2025
+HKDSE-2026-C002,"Ng Ka Yan",5C,5,Female,local,2008-09-19,en,5,5,4,AD,,,4,5*,MOCK,2025
+HKDSE-2026-D001,"Tam Hoi Lam",5D,5,Male,local,2008-12-03,zh-HK,3,3,3,A,,,3,3,MOCK,2025
+HKDSE-2026-D002,"Yuen Pui Shan",5D,5,Female,international,2009-02-28,en,5*,5**,5,A,,4,5,,TRIAL,2025
+HKDSE-2026-E001,"Kwok Chi Kin",5E,5,Male,local,2008-06-11,en,4,4,5*,A,5*,5,,,MOCK,2025
+HKDSE-2026-E002,"Fung Wing Lam",5E,5,Female,local,2008-08-25,zh-HK,5,4,3,A,,,4,5,MOCK,2025

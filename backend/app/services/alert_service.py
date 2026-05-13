@@ -86,6 +86,17 @@ def generate_alerts(
     for row in simple_target_rows:
         target_counts[row.student_id] = row.cnt
 
+    # Pre-fetch all targets with scores for dubious choice detection
+    all_targets = (
+        db.query(StudentSchoolTarget)
+        .filter(StudentSchoolTarget.match_score.isnot(None))
+        .all()
+    )
+    # Group targets by student
+    targets_by_student: dict[UUID, list] = {}
+    for t in all_targets:
+        targets_by_student.setdefault(t.student_id, []).append(t)
+
     now = datetime.now(timezone.utc)
     stale_threshold = now - timedelta(days=30)
 
@@ -122,6 +133,36 @@ def generate_alerts(
                 "student_name": sname,
                 "message": f"{sname} has at-risk target school(s) below admission threshold.",
             })
+
+        # Dubious choice detection — per-choice, not per-student
+        student_targets = targets_by_student.get(sid, [])
+        for tgt in student_targets:
+            score = float(tgt.match_score) if tgt.match_score is not None else None
+            if score is None:
+                continue
+            prog_label = tgt.programme_name or (tgt.intended_majors[0] if tgt.intended_majors else None)
+            school_obj = tgt.school
+            school_label = getattr(school_obj, "name", "Unknown") if school_obj else "Unknown"
+            choice_label = f"{school_label} — {prog_label}" if prog_label else school_label
+
+            # Too conservative: this choice is very safe (>85%)
+            if score > 0.85:
+                alerts.append({
+                    "type": "dubious_conservative",
+                    "severity": "info",
+                    "student_id": str(sid),
+                    "student_name": sname,
+                    "message": f"{sname}: {choice_label} ({int(score*100)}% match) — may be too conservative. Consider a more competitive option.",
+                })
+            # Too ambitious: this choice is a significant reach (<25%)
+            if score < 0.25:
+                alerts.append({
+                    "type": "dubious_ambitious",
+                    "severity": "warning",
+                    "student_id": str(sid),
+                    "student_name": sname,
+                    "message": f"{sname}: {choice_label} ({int(score*100)}% match) — may be too ambitious. Consider a safer alternative.",
+                })
 
         # Stale data
         latest = grade_latest.get(sid)

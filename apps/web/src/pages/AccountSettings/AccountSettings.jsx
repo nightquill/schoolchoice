@@ -10,9 +10,11 @@ import { Modal } from '@schoolchoice/ui';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getAccount, updateAccount, changePassword, deleteAccount } from '@schoolchoice/ui/api/account';
 
 function AccountSettings() {
+  const { t, setLocale } = useTranslation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [account, setAccount] = useState(null);
@@ -44,6 +46,9 @@ function AccountSettings() {
         setAccount(data);
         setDisplayName(data.display_name || '');
         setPreferredLanguage(data.preferred_language || 'en');
+        const loc = data.preferred_language === 'zh-HK' ? 'zh-HK' : 'en';
+        setLocale(loc);
+        localStorage.setItem('locale', loc);
       })
       .catch(() => setError('Failed to load account settings.'))
       .finally(() => setLoading(false));
@@ -98,7 +103,9 @@ function AccountSettings() {
     try {
       const updated = await updateAccount({ preferred_language: preferredLanguage });
       setAccount(updated);
-      toast.success('Preferences saved.');
+      setLocale(preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en');
+      localStorage.setItem('locale', preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en');
+      toast.success(t('account.prefsSaved'));
     } catch {
       toast.error('Failed to save preferences.');
     } finally {

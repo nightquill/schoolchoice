@@ -326,7 +326,7 @@ class TaskEngine:
 
     def _load_matchmaker_results(self, student_id: str, db: Session) -> list:
         """Run matchmaker and convert results to dicts for Jinja2 template rendering."""
-        from app.api.v1.routes.match import _build_student_data, _build_school_dict
+        from app.services.student_data_builder import build_student_data, build_school_dict
         from app.modules.school_choice.models.models import Student
         from app.db.models import School
         from app.db.models_v2 import StudentSchoolTarget
@@ -336,9 +336,9 @@ class TaskEngine:
         if not student:
             raise ValueError(f"Student {student_id} not found")
 
-        student_data = _build_student_data(student, db)
+        student_data = build_student_data(student, db)
         all_schools = db.query(School).all()
-        school_dicts = [_build_school_dict(s) for s in all_schools]
+        school_dicts = [build_school_dict(s) for s in all_schools]
 
         existing_targets = (
             db.query(StudentSchoolTarget)

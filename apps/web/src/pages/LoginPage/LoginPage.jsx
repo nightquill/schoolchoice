@@ -7,9 +7,11 @@ import { FormCard } from '@schoolchoice/ui';
 import { TextInput } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { ErrorMessage } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function LoginPage() {
   const { isAuthenticated, login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -41,12 +43,12 @@ function LoginPage() {
 
     const newFieldErrors = {};
     if (!email.trim()) {
-      newFieldErrors.email = 'Email is required.';
+      newFieldErrors.email = t('auth.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newFieldErrors.email = 'Please enter a valid email address.';
+      newFieldErrors.email = t('auth.invalidEmail');
     }
     if (!password) {
-      newFieldErrors.password = 'Password is required.';
+      newFieldErrors.password = t('auth.passwordRequired');
     }
     if (Object.keys(newFieldErrors).length > 0) {
       setFieldErrors(newFieldErrors);
@@ -63,13 +65,13 @@ function LoginPage() {
       const status = err.response?.status;
       const detail = err.response?.data?.detail;
       if (status === 404) {
-        setError('No account found with this email address. Please register.');
+        setError(t('auth.noAccountFound'));
       } else if (status === 401) {
-        setError(typeof detail === 'string' ? detail : 'Incorrect password. Please try again.');
+        setError(typeof detail === 'string' ? detail : t('auth.incorrectPassword'));
       } else if (status === 422) {
-        setError('Please check your input and try again.');
+        setError(t('auth.checkInput'));
       } else {
-        setError(typeof detail === 'string' ? detail : 'Login failed. Please try again.');
+        setError(typeof detail === 'string' ? detail : t('auth.loginFailed'));
       }
     } finally {
       setLoading(false);
@@ -87,10 +89,10 @@ function LoginPage() {
 
   return (
     <div style={pageStyle}>
-      <FormCard title="Login">
+      <FormCard title={t('auth.login')}>
         <form onSubmit={handleSubmit} noValidate>
           <TextInput
-            label="Email"
+            label={t('auth.email')}
             name="email"
             type="email"
             value={email}
@@ -99,7 +101,7 @@ function LoginPage() {
             error={fieldErrors.email}
           />
           <TextInput
-            label="Password"
+            label={t('auth.password')}
             name="password"
             type="password"
             value={password}
@@ -110,12 +112,12 @@ function LoginPage() {
           {error && <ErrorMessage message={error} />}
           <div style={{ marginTop: 'var(--space-4)' }}>
             <Button className="w-full text-base py-5" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Logging in...' : 'Log In'}
+              {loading ? t('auth.loggingIn') : t('auth.logIn')}
             </Button>
           </div>
           <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
-            No account?{' '}
-            <a href="/register" style={{ color: 'var(--color-primary)' }}>Register</a>
+            {t('auth.noAccount')}{' '}
+            <a href="/register" style={{ color: 'var(--color-primary)' }}>{t('auth.register')}</a>
           </p>
         </form>
       </FormCard>

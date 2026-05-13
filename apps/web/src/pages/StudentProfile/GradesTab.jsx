@@ -129,6 +129,7 @@ export default function GradesTab({ studentId, subjects }) {
             <tr>
               <th style={thStyle}>Subject</th>
               <th style={thStyle}>Sitting</th>
+              <th style={thStyle}>Year</th>
               <th style={thStyle}>Grade</th>
               <th style={thStyle}>Predicted Grade</th>
               <th style={thStyle}>Transcript</th>
@@ -141,6 +142,7 @@ export default function GradesTab({ studentId, subjects }) {
               <tr key={g.id}>
                 <td style={{ ...tdStyle, position: 'sticky', left: 0, background: 'var(--color-surface)' }}>{g.subject_name || g.subject_code}</td>
                 <td style={tdStyle}>{g.sitting}</td>
+                <td style={tdStyle}>{g.year_of_exam || '\u2014'}</td>
                 <td style={tdStyle}>{g.raw_grade}</td>
                 <td style={tdStyle}>
                   {g.predicted_grade && g.sitting !== 'OFFICIAL' ? (
@@ -199,6 +201,17 @@ export default function GradesTab({ studentId, subjects }) {
                 <option value="TRIAL">TRIAL</option>
                 <option value="OFFICIAL">OFFICIAL</option>
               </select>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '1 1 80px' }}>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Year</label>
+              <input
+                type="number"
+                value={newRow.year_of_exam || ''}
+                onChange={(e) => setNewRow((r) => ({ ...r, year_of_exam: e.target.value ? parseInt(e.target.value, 10) : null }))}
+                placeholder={new Date().getFullYear()}
+                style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '100%' }}
+                aria-label="Year of exam"
+              />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '1 1 100px' }}>
               <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Grade</label>

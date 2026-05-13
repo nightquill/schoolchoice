@@ -163,13 +163,13 @@ async def stream_consultant_task(
         ).first()
         if existing_plan and existing_plan.html_content and existing_plan.generated_at:
             # Compute a fingerprint of the student's current grade data
-            from app.api.v1.routes.match import _build_student_data
+            from app.services.student_data_builder import build_student_data
             from app.modules.school_choice.models.models import Student
             import hashlib
 
             student = db.query(Student).filter(Student.id == _to_uuid(entity_id)).first()
             if student:
-                student_data = _build_student_data(student, db)
+                student_data = build_student_data(student, db)
                 # Hash the grade + interest data to detect changes
                 fingerprint_src = json.dumps({
                     "grades": student_data.get("grades_by_code", {}),
@@ -455,12 +455,12 @@ def save_consultant_task(
 
     # Store data fingerprint so the staleness guard can detect unchanged data
     import hashlib
-    from app.api.v1.routes.match import _build_student_data
+    from app.services.student_data_builder import build_student_data
     from app.modules.school_choice.models.models import Student
 
     student = db.query(Student).filter(Student.id == _to_uuid(body.entity_id)).first()
     if student:
-        student_data = _build_student_data(student, db)
+        student_data = build_student_data(student, db)
         fingerprint_src = json.dumps({
             "grades": student_data.get("grades_by_code", {}),
             "best5": student_data.get("best5_aggregate", 0),

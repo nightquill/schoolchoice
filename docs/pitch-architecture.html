@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolChoice — Product Architecture</title>
+<style>
+  :root {
+    --bg: #fafbfc;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #0d9488;
+    --accent-light: #f0fdfa;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --green: #059669;
+    --green-light: #ecfdf5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; padding: 3rem 2rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.03em; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.25rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; font-size: 0.92rem; }
+  .subtitle { color: var(--muted); font-size: 0.92rem; margin-bottom: 2rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+  .card h3 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .stat-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+  .stat-num { font-size: 1.75rem; font-weight: 800; color: var(--accent); }
+  .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: var(--bg); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+  .flow { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+  .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; }
+  .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .badge.green { background: var(--green-light); color: var(--green); }
+  .badge.blue { background: var(--blue-light); color: var(--blue); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+
+  .note { background: var(--accent-light); border: 1px solid #99f6e4; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; margin: 1rem 0; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>SchoolChoice</h1>
+<p class="subtitle">Intelligent academic advising platform for Hong Kong secondary schools</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>What It Does</h2>
+
+<p>SchoolChoice gives school counsellors a single workspace to manage student academic data, evaluate university fit using real JUPAS admission formulas, and generate personalised academic plans — replacing spreadsheets, guesswork, and manual cross-referencing with an integrated, data-driven workflow.</p>
+
+<div class="stat-row">
+  <div class="stat"><div class="stat-num">370+</div><div class="stat-label">JUPAS programmes scored</div></div>
+  <div class="stat"><div class="stat-num">9</div><div class="stat-label">UGC institutions covered</div></div>
+  <div class="stat"><div class="stat-num">96%</div><div class="stat-label">programme data verified from official PDFs</div></div>
+  <div class="stat"><div class="stat-num">150</div><div class="stat-label">students per counsellor (tested)</div></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Core Capabilities</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>Student Data Management</h3>
+    <p>Complete academic profiles: HKDSE grades across multiple sittings (mock, trial, official), IELTS scores, teacher evaluations, extracurricular activities, awards. Supports CSV/Excel bulk import for class-level data entry.</p>
+  </div>
+  <div class="card">
+    <h3>University Matching</h3>
+    <p>Computes admission probability for each JUPAS programme using the exact published scoring formula. Each programme has its own subject weightings, best-N selection rules, and grade scale. Results are calibrated against real published admission statistics (median, lower quartile).</p>
+  </div>
+  <div class="card">
+    <h3>Academic Plan Generation</h3>
+    <p>Produces personalised HTML plan documents combining quantitative match data with AI-generated advisory language. Three template styles. Section-by-section editing. AI chat for refinements. Print-ready output.</p>
+  </div>
+  <div class="card">
+    <h3>Cohort Analytics</h3>
+    <p>Class-level grade distributions, target school popularity, at-risk student identification. Filter by exam sitting to track improvement from mock to official. Bulk grade entry grid for efficient data management.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>How It Works</h2>
+
+<h3>The counsellor workflow</h3>
+
+<div class="flow">
+  <div class="flow-step">Enter grades</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">Pick target schools</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">Review match scores</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">Generate plan</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">Print &amp; advise</div>
+</div>
+
+<p>When a counsellor selects target universities for a student, the system runs the matching engine in real time. Each target school shows a colour-coded match percentage, eligibility status (pass/fail with specific failing criteria), and an at-risk flag when the student's predicted score falls below the programme's lower quartile of admitted students.</p>
+
+<p>The matching engine uses programme-specific formulas published by each university — not a generic algorithm. A student applying to HKU Engineering is scored differently from the same student applying to CUHK Business, because the programmes weight subjects differently.</p>
+
+<h3>Multi-year grade tracking</h3>
+
+<p>Students typically sit mock exams in Form 5 and official HKDSE in Form 6. The system tracks grades across multiple sittings and years, computes predicted grades from the most recent data, and uses the best available scores for university matching. Counsellors can see grade progression over time and adjust advice accordingly.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>System Design</h2>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+  <tr><td>Frontend</td><td>React, Vite, TailwindCSS</td><td>Single-page application. Responsive. Real-time streaming for plan generation.</td></tr>
+  <tr><td>Backend</td><td>Python (FastAPI)</td><td>105+ API endpoints. JWT authentication. Rate limiting.</td></tr>
+  <tr><td>Database</td><td>SQLite (dev) / PostgreSQL (prod)</td><td>12 tables. Portable UUID type works on both. JSONB for flexible fields.</td></tr>
+  <tr><td>AI Integration</td><td>LiteLLM (provider-agnostic)</td><td>Used for plan advisory text and chat. Not used for scoring — scoring is deterministic.</td></tr>
+  <tr><td>Deployment</td><td>Vercel (frontend) + Railway (backend)</td><td>Standard cloud hosting. No GPU or specialist infrastructure required.</td></tr>
+</table>
+
+<div class="note">
+  <strong>Key design decision:</strong> The scoring engine is fully deterministic — no machine learning, no training data, no black-box models. Every score traces to a published university formula and verified admission statistics. AI is used only for generating advisory language in academic plans, where it adds value without affecting the accuracy of quantitative recommendations.
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Data Architecture</h2>
+
+<h3>What the system stores</h3>
+
+<table>
+  <tr><th>Data</th><th>Source</th><th>Purpose</th></tr>
+  <tr><td>Student profiles</td><td>Counsellor input / CSV import</td><td>Name, class, year, contact info, interests, personal statement</td></tr>
+  <tr><td>HKDSE grades</td><td>Counsellor input / transcript upload</td><td>Per-subject grades across mock, trial, and official sittings</td></tr>
+  <tr><td>IELTS scores</td><td>Counsellor input</td><td>Language proficiency for programmes with English requirements</td></tr>
+  <tr><td>Target schools</td><td>Counsellor selection + system recommendations</td><td>Preferred universities with match scores, eligibility, and status tracking</td></tr>
+  <tr><td>JUPAS programme data</td><td>Official university publications</td><td>370+ programmes with scoring formulas, subject weights, admission statistics</td></tr>
+  <tr><td>Academic plans</td><td>System-generated (AI-enhanced)</td><td>HTML documents with recommendations, action items, counsellor notes</td></tr>
+</table>
+
+<h3>Multi-tenancy</h3>
+
+<p>Each school operates in its own isolated data space. A counsellor at School A cannot see students from School B. Isolation is enforced at the API layer through organisation-scoped JWT tokens — every database query is automatically filtered by the counsellor's organisation.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Privacy &amp; Compliance</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>PDPO Compliance</h3>
+    <p>Per-student consent tracking (data processing, AI analysis, export, sharing). Consent can be granted and revoked with full audit trail. Student names are anonymised before being sent to third-party AI providers.</p>
+  </div>
+  <div class="card">
+    <h3>Data Protection</h3>
+    <p>PII blocklist prevents sensitive fields (medical notes, disciplinary records, SSN, date of birth) from being included in AI prompts. All AI output is sanitised for injection attacks. Passwords hashed with bcrypt. JWT tokens expire after 60 minutes.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>What Makes It Different</h2>
+
+<table>
+  <tr><th></th><th>SchoolChoice</th><th>Spreadsheets / Manual</th></tr>
+  <tr><td><strong>Scoring accuracy</strong></td><td>Uses each programme's published formula with verified subject weights</td><td>Counsellors estimate based on experience and general cutoff awareness</td></tr>
+  <tr><td><strong>Coverage</strong></td><td>370+ programmes across 9 institutions, updated annually</td><td>Counsellors typically know 20-30 programmes well</td></tr>
+  <tr><td><strong>Speed</strong></td><td>Match scores computed in real time as grades are entered</td><td>Manual comparison against PDF tables takes 15-30 minutes per student</td></tr>
+  <tr><td><strong>Grade tracking</strong></td><td>Multi-sitting, multi-year, with predicted grades and progression analysis</td><td>Separate spreadsheets per exam session, manual merging</td></tr>
+  <tr><td><strong>Risk detection</strong></td><td>Automatic at-risk flags when scores fall below programme lower quartile</td><td>Counsellor must manually check each target against admission stats</td></tr>
+  <tr><td><strong>Plan output</strong></td><td>Professionally formatted, personalised document in minutes</td><td>Hours of manual writing per student</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Current State</h2>
+
+<div class="card">
+  <p><span class="badge green">BUILT</span> Full student lifecycle: onboarding → data entry → grade tracking → university matching → plan generation → graduation tracking</p>
+  <p><span class="badge green">BUILT</span> 370+ JUPAS programmes with verified scoring formulas and 2024/2025 admission statistics</p>
+  <p><span class="badge green">BUILT</span> Multi-tenancy with organisation-scoped data isolation</p>
+  <p><span class="badge green">BUILT</span> Cohort management with bulk grade entry, class-level analytics, and reports</p>
+  <p><span class="badge green">BUILT</span> AI-powered academic plan generation with streaming, templates, section editing, and chat refinement</p>
+  <p><span class="badge green">BUILT</span> CSV/Excel import, PDF transcript parsing, HTML plan export</p>
+  <p><span class="badge blue">TESTED</span> 29 backend test suites, 22+ Playwright end-to-end tests, verified with 155 seeded students</p>
+</div>
+
+<footer>
+  SchoolChoice &mdash; May 2026<br>
+  Contact for demo access
+</footer>
+
+</div>
+</body>
+</html>

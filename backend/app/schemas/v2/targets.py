@@ -16,6 +16,8 @@ from pydantic import BaseModel, field_validator
 
 class TargetCreate(BaseModel):
     school_id: UUID
+    jupas_code: Optional[str] = None
+    programme_name: Optional[str] = None
     student_rank: Optional[int] = None
     status: str = "CONSIDERING"
     intended_majors: Optional[list[str]] = None
@@ -72,6 +74,8 @@ class TargetResponse(BaseModel):
     student_id: UUID
     school_id: UUID
     school_name: Optional[str] = None
+    jupas_code: Optional[str] = None
+    programme_name: Optional[str] = None
     student_rank: Optional[int] = None
     match_score: Optional[float] = None
     eligibility_pass: Optional[bool] = None

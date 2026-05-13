@@ -90,7 +90,7 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
       <span style={rankBadgeStyle} aria-label={`Rank ${rank}`}>{rank}</span>
       <div style={{ flex: 1, minWidth: '120px' }}>
         <span style={schoolNameStyle}>
-          {target.school_name}
+          {target.school_name}{target.programme_name ? ` — ${target.programme_name}` : ''}{target.jupas_code ? ` (${target.jupas_code})` : ''}
           {target.preference_confidence != null && (
             <span style={{
               marginLeft: '8px',
@@ -277,6 +277,8 @@ function TargetSchools() {
   const [editConfidence, setEditConfidence] = useState(3);
   const [editSaving, setEditSaving] = useState(false);
   const [newMajors, setNewMajors] = useState([]);
+  const [selectedJupasCode, setSelectedJupasCode] = useState(null);
+  const [selectedProgrammeName, setSelectedProgrammeName] = useState(null);
   const prevTargetsRef = useRef([]);
 
   useEffect(() => {
@@ -356,7 +358,12 @@ function TargetSchools() {
       if (schoolResults.length === 0) handleSearchSchools('');
       setRecsLoading(true);
       getAutoRecommendations(id, 5)
-        .then((data) => setAutoRecs(Array.isArray(data) ? data : (data.recommendations ?? [])))
+        .then((data) => {
+          const recs = Array.isArray(data) ? data : (data.recommendations ?? []);
+          // Filter out schools already in target list
+          const targetSchoolIds = new Set(targets.map(t => t.school_id));
+          setAutoRecs(recs.filter(r => !targetSchoolIds.has(r.school_id ?? r.id)));
+        })
         .catch(() => setAutoRecs([]))
         .finally(() => setRecsLoading(false));
     }
@@ -387,7 +394,9 @@ function TargetSchools() {
       setEditTarget(null);
       toast.success('Target updated.');
     } catch {
-      toast.error('Failed to update target.');
+      const detail = err?.response?.data?.detail;
+      const msg = Array.isArray(detail) ? detail[0]?.msg : (typeof detail === 'string' ? detail : 'Failed to update target.');
+      toast.error(msg);
     } finally {
       setEditSaving(false);
     }
@@ -402,6 +411,8 @@ function TargetSchools() {
         : null;
       const created = await addTarget(id, {
         school_id: selectedSchool.id,
+        jupas_code: selectedJupasCode || undefined,
+        programme_name: selectedProgrammeName || undefined,
         intended_majors: majorsList,
         year_of_entry: yearOfEntry ? parseInt(yearOfEntry, 10) : null,
       });
@@ -413,9 +424,12 @@ function TargetSchools() {
       setIntendedMajors('');
       setYearOfEntry('');
       setNewMajors([]);
+      setSelectedJupasCode(null);
+      setSelectedProgrammeName(null);
       toast.success('School added to target list.');
     } catch {
-      toast.error('Failed to add school.');
+      const detail = err?.response?.data?.detail;
+      toast.error(typeof detail === 'string' ? detail : 'Failed to add school.');
     } finally {
       setAddingTarget(false);
     }
@@ -585,9 +599,11 @@ function TargetSchools() {
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                   {autoRecs.map((rec) => (
                     <li
-                      key={rec.school_id ?? rec.id}
+                      key={`${rec.school_id ?? rec.id}-${rec.major_jupas_code ?? rec.major_name ?? ''}`}
                       onClick={() => {
                         setSelectedSchool({ id: rec.school_id ?? rec.id, name: rec.school_name ?? rec.name });
+                        setSelectedJupasCode(rec.major_jupas_code || null);
+                        setSelectedProgrammeName(rec.major_name || null);
                         setNewMajors(rec.major_name ? [rec.major_name] : []);
                         setIntendedMajors(rec.major_name ? rec.major_name : '');
                       }}
@@ -737,9 +753,9 @@ function TargetSchools() {
               style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', width: '100%', boxSizing: 'border-box' }}
             >
               <option value="">— Not set —</option>
-              <option value="PLANNING">Planning</option>
+              <option value="CONSIDERING">Considering</option>
               <option value="APPLIED">Applied</option>
-              <option value="ACCEPTED">Accepted</option>
+              <option value="ADMITTED">Admitted</option>
               <option value="REJECTED">Rejected</option>
               <option value="WITHDRAWN">Withdrawn</option>
             </select>

@@ -27,20 +27,23 @@ const barStyle = {
  *   onExportAll      — callback() for "Export all"
  *   isExporting      — bool: show spinner on export button when true
  */
-export default function ActionBar({ entityName, onExportFiltered, onExportAll, isExporting }) {
+export default function ActionBar({ entityName, onExportFiltered, onExportAll, isExporting, hideImport }) {
   const navigate = useNavigate();
 
   return (
     <div style={barStyle}>
-      {/* Left: Import button */}
-      <Button
-        variant="default"
-        onClick={() => navigate(`/entities/${entityName}/import`)}
-        aria-label={`Import ${entityName} data`}
-      >
-        <Upload size={16} />
-        <span className="hidden sm:inline">Import Data</span>
-      </Button>
+      {/* Left: Import button (hidden for some entities like school) */}
+      {!hideImport && (
+        <Button
+          variant="default"
+          onClick={() => navigate(`/entities/${entityName}/import`)}
+          aria-label={`Import ${entityName} data`}
+        >
+          <Upload size={16} />
+          <span className="hidden sm:inline">Import Data</span>
+        </Button>
+      )}
+      {hideImport && <div />}
 
       {/* Right: Export dropdown */}
       <DropdownMenu>

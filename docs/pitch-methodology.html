@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolChoice — Scoring Methodology</title>
+<style>
+  :root {
+    --bg: #fafbfc;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #0d9488;
+    --accent-light: #f0fdfa;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --green: #059669;
+    --green-light: #ecfdf5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; padding: 3rem 2rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.03em; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.25rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; font-size: 0.92rem; }
+  .subtitle { color: var(--muted); font-size: 0.92rem; margin-bottom: 2rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+  .card h3 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: var(--bg); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+  .note { border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; margin: 1rem 0; }
+  .note.green { background: var(--green-light); border: 1px solid #a7f3d0; }
+  .note.amber { background: var(--amber-light); border: 1px solid #fde68a; }
+  .note.blue { background: var(--blue-light); border: 1px solid #bfdbfe; }
+
+  .step-box { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; }
+  .step-body { flex: 1; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  .example { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .example-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.5rem; color: var(--accent); }
+
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; vertical-align: middle; }
+  .badge.green { background: var(--green-light); color: var(--green); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+  .badge.red { background: var(--red-light); color: var(--red); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Scoring Methodology</h1>
+<p class="subtitle">How SchoolChoice computes university admission probability — and why the numbers can be trusted</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>The Core Principle</h2>
+
+<p>Every admission probability in the system is computed from two things:</p>
+
+<ol style="margin: 0.5rem 0 1rem 1.5rem; font-size: 0.92rem;">
+  <li><strong>The exact scoring formula</strong> published by each university for each programme</li>
+  <li><strong>The actual admission statistics</strong> (median and lower quartile scores) of students who were admitted in the most recent cycle</li>
+</ol>
+
+<p>There is no machine learning, no training data, and no black-box model. The system applies each programme's published rules to the student's grades, computes a weighted score, and compares it against the real distribution of admitted students. The result is a statistical position — "where does this student sit relative to people who actually got in?"</p>
+
+<div class="note green">
+  <strong>Traceability:</strong> Every number in the system links to a specific official source — a JUPAS PDF, a university score calculator page, or a programme requirements document. The methodology report in the app cites these sources directly.
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>How Scoring Works</h2>
+
+<div class="step-box">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>Convert grades to points</h3>
+    <p>The student's HKDSE grades are converted to numerical points using the standard enhanced 8.5-point scale adopted by all JUPAS institutions from 2025. For example, a grade of 5** converts to 8.5 points, a grade of 4 converts to 4.0 points.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>Apply programme-specific weights</h3>
+    <p>Each programme specifies which subjects matter most. HKU Engineering weights Mathematics at 1.5x. CityU Biomedical Engineering weights Physics, Chemistry, and Biology at 2x. CUHK Computer Science weights M1/M2 at 1.75x. The system applies the exact published multiplier for each subject.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>Select best subjects</h3>
+    <p>Most programmes use a "best N" formula — select the N subjects with the highest weighted scores. Some add a fractional bonus for the next-best subject (e.g., HKU BBA adds 0.2x the 6th best subject). The system handles all published formula patterns.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>Compare against admitted students</h3>
+    <p>The student's total weighted score is compared against the published admission statistics for that programme — specifically the median and lower quartile of actually admitted students. This comparison produces an admission probability using piecewise interpolation between the known quantile points.</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h3>Flag risk level</h3>
+    <p>Students scoring below the lower quartile are flagged as "at risk" — their grades put them below most students who were admitted to that programme. Students above the median are in a strong competitive position.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Worked Example</h2>
+
+<div class="example">
+  <div class="example-title">Student applying to HKU Business Administration (JS6755)</div>
+
+  <p><strong>Published formula:</strong> 1.5 &times; English + 1.5 &times; Mathematics + Best 3 Subjects + 0.2 &times; 6th Best</p>
+
+  <table>
+    <tr><th>Subject</th><th>Grade</th><th>Points</th><th>Weight</th><th>Weighted</th></tr>
+    <tr><td>Mathematics</td><td>5**</td><td>8.5</td><td>&times;1.5</td><td>12.75</td></tr>
+    <tr><td>English</td><td>5*</td><td>7.0</td><td>&times;1.5</td><td>10.50</td></tr>
+    <tr><td>Chinese Language</td><td>5</td><td>5.5</td><td>&times;1.0</td><td>5.50</td></tr>
+    <tr><td>Physics</td><td>5</td><td>5.5</td><td>&times;1.0</td><td>5.50</td></tr>
+    <tr><td>Chemistry</td><td>4</td><td>4.0</td><td>&times;1.0</td><td>4.00</td></tr>
+    <tr style="font-weight:700;"><td colspan="4">Best 5 Total</td><td>38.25</td></tr>
+    <tr><td>CSD</td><td>Attained</td><td>1.0</td><td>&times;0.2</td><td>0.20</td></tr>
+    <tr style="font-weight:700;background:var(--accent-light);"><td colspan="4">Final Score</td><td>38.45</td></tr>
+  </table>
+
+  <p><strong>2025 admission statistics:</strong> Median = 37, Lower Quartile = 36</p>
+  <p><strong>Result:</strong> Score 38.45 exceeds the median &rarr; <span class="badge green">97% probability &mdash; SAFE</span></p>
+</div>
+
+<div class="example">
+  <div class="example-title">Same student, different programme: CityU Biomedical Engineering (JS1211)</div>
+
+  <p><strong>Published formula:</strong> Best 5 with 2&times; weight for English, Mathematics, Biology, Chemistry, Physics</p>
+  <p>Different weights change the score entirely. This student's Physics and Chemistry get doubled, producing a total of 55.5 against a median of 39.</p>
+  <p><strong>Result:</strong> <span class="badge green">99% probability &mdash; SAFE</span></p>
+</div>
+
+<div class="example">
+  <div class="example-title">Weaker student (all 3s and 4s) applying to HKU BBA</div>
+  <p>Total score: 22.2 against a median of 37 and LQ of 36.</p>
+  <p><strong>Result:</strong> <span class="badge red">1% probability &mdash; AT RISK</span></p>
+  <p>The system flags this target with a red "AT RISK" badge and alerts the counsellor to discuss alternatives.</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Data Sources</h2>
+
+<table>
+  <tr><th>Source</th><th>What It Provides</th><th>Coverage</th></tr>
+  <tr><td>JUPAS 2025 Admissions Scores PDF</td><td>Median and lower quartile admission scores for all 9 UGC institutions</td><td>357 of 370 programmes (96%)</td></tr>
+  <tr><td>JUPAS 2024 Admissions Scores PDF</td><td>Previous year statistics for trend comparison</td><td>Same coverage</td></tr>
+  <tr><td>HKU Score Calculator</td><td>Exact subject weights and formula per programme</td><td>29 of 54 programmes have published weights</td></tr>
+  <tr><td>CUHK Score Calculator</td><td>Subject multipliers (e.g., 2x Math, 1.75x M1/M2)</td><td>46 of 70 programmes</td></tr>
+  <tr><td>CityU Scoring Formula PDF</td><td>Group multipliers for relevant subjects</td><td>39 of 58 programmes</td></tr>
+  <tr><td>PolyU Programme PDFs</td><td>Absolute subject weights</td><td>3 verified, 41 estimated from programme type</td></tr>
+  <tr><td>EdUHK Programme Requirements</td><td>Subject weights for education programmes</td><td>24 of 26 programmes</td></tr>
+</table>
+
+<p>Programmes without published weights are scored using a standard unweighted best-5 formula. This is conservative — it will slightly underestimate the advantage a student has in their strong subjects, but it will never overstate competitiveness.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Programme Coverage</h2>
+
+<table>
+  <tr><th>Institution</th><th>Programmes</th><th>Scores Verified</th><th>Weights Verified</th></tr>
+  <tr><td>HKU</td><td>54</td><td>100%</td><td>29 published + 25 unweighted</td></tr>
+  <tr><td>CUHK</td><td>70</td><td>100%</td><td>46 published + 24 unweighted</td></tr>
+  <tr><td>HKUST</td><td>34</td><td>97%</td><td>Conservative 1.2x for preferred subjects</td></tr>
+  <tr><td>CityU</td><td>58</td><td>98%</td><td>39 published + 19 unweighted</td></tr>
+  <tr><td>PolyU</td><td>44</td><td>100%</td><td>3 published + 41 estimated</td></tr>
+  <tr><td>HKBU</td><td>22</td><td>100%</td><td>Confirmed unweighted</td></tr>
+  <tr><td>Lingnan</td><td>24</td><td>96%</td><td>Confirmed unweighted</td></tr>
+  <tr><td>EdUHK</td><td>26</td><td>100%</td><td>24 published + 2 unweighted</td></tr>
+  <tr><td>HKMU</td><td>28</td><td>100%</td><td>9 published + 19 unweighted</td></tr>
+  <tr style="font-weight:700;"><td>Total</td><td>370</td><td>96%</td><td>235 with verified weights</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>How Probability Is Computed</h2>
+
+<p>The raw weighted score needs to be converted into a meaningful probability. We use piecewise interpolation between known quantile points — the published median and lower quartile of admitted students.</p>
+
+<table>
+  <tr><th>Student Score Position</th><th>Probability</th><th>What It Means</th></tr>
+  <tr><td>Above upper quartile</td><td>75%+</td><td>Stronger than most admitted students</td></tr>
+  <tr><td>At median</td><td>~50%</td><td>In line with the typical admitted student</td></tr>
+  <tr><td>At lower quartile</td><td>~25%</td><td>At the bottom of the admitted range</td></tr>
+  <tr><td>Below lower quartile</td><td>&lt;25%</td><td>Below most admitted students — at risk</td></tr>
+</table>
+
+<p>Between known quantile points, the system interpolates linearly. Above and below the known range, it uses exponential decay to approach (but never reach) 99% or 1%. The probability is always clamped to [1%, 99%] — the system never claims certainty in either direction.</p>
+
+<div class="note amber">
+  <strong>What the probability means:</strong> "Based on grades alone, this is where the student sits in the distribution of previously admitted students." It is not a guarantee. Non-academic factors (interviews, portfolios, personal statements, band preference) also influence admission but are not modelled quantitatively because they have no published statistical weight.
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Risk Classification</h2>
+
+<p>Each target school is classified into one of three risk levels:</p>
+
+<table>
+  <tr><th>Level</th><th>Condition</th><th>What the Counsellor Sees</th></tr>
+  <tr><td><span class="badge green">Safe</span></td><td>Score &ge; programme median</td><td>Green match percentage. Normal display.</td></tr>
+  <tr><td><span class="badge amber">Borderline</span></td><td>Score between LQ and median</td><td>Yellow/amber match percentage. Within admitted range but below average.</td></tr>
+  <tr><td><span class="badge red">At Risk</span></td><td>Score &lt; programme LQ</td><td>Red "AT RISK" badge. Warning banner on the student's target page. Dashboard alert for the counsellor.</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Where AI Is Used (and Where It Isn't)</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>AI is NOT used for</h3>
+    <p>Grade-to-score conversion. Subject weighting. Probability computation. Eligibility checking. Risk classification. Any quantitative recommendation.</p>
+    <p>These are all deterministic calculations using published formulas and verified data.</p>
+  </div>
+  <div class="card">
+    <h3>AI IS used for</h3>
+    <p>Generating advisory language in academic plans — explaining why a programme is a good fit, suggesting preparation strategies, writing action items. The AI sees the quantitative results and writes human-readable commentary around them.</p>
+    <p>AI-generated text can be edited by the counsellor before sharing with students.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Known Limitations</h2>
+
+<table>
+  <tr><th>Limitation</th><th>Impact</th><th>Mitigation</th></tr>
+  <tr><td>Interviews and portfolios are not modelled</td><td>Programmes requiring interviews (Medicine, Law, Film) have an additional selection layer</td><td>Advisory text flags interview requirements. Counsellor applies professional judgment.</td></tr>
+  <tr><td>HKUST weights are estimated</td><td>HKUST publishes "preferred subjects" but not exact multipliers</td><td>Conservative 1.2x applied — will slightly underestimate advantage, never overstate.</td></tr>
+  <tr><td>Year-to-year variation</td><td>A programme's median can shift 2-5 points between years</td><td>Uses most recent available data. Counsellors advised to treat probabilities as ranges, not precise predictions.</td></tr>
+  <tr><td>Band choice effects</td><td>JUPAS preference band ranking affects admission priority</td><td>Not modelled. Acknowledged in methodology documentation.</td></tr>
+  <tr><td>Non-academic factors</td><td>Extracurriculars, awards, and personal statements have real but unquantifiable effects</td><td>Surfaced in AI-generated advisory text. Probability labelled as "based on grades alone."</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Annual Maintenance</h2>
+
+<p>The system requires one update per year, after JUPAS publishes new admission statistics (typically August):</p>
+
+<ol style="margin: 0.5rem 0 1rem 1.5rem; font-size: 0.92rem;">
+  <li>Download the new JUPAS Admissions Scores PDF</li>
+  <li>Extract median and lower quartile per programme (automated script)</li>
+  <li>Update programme data files</li>
+  <li>Run validation tests (46 unit tests for the scoring engine)</li>
+  <li>Check university websites for any formula changes (rare — typically stable year-to-year)</li>
+</ol>
+
+<p>The entire update process takes approximately 2 hours. Scoring formulas change infrequently; admission statistics are the primary annual update.</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>Programme Competitiveness Tiers</h2>
+
+<p>Each programme is classified by the median admission score of its most recent cohort. This gives counsellors instant context for interpreting match scores.</p>
+
+<table>
+  <tr><th>Tier</th><th>Median Score</th><th>Count</th><th>Examples</th></tr>
+  <tr><td><strong>Elite</strong></td><td>&ge; 40</td><td>94</td><td>HKU Medicine (44), HKU BBA Law (46), CUHK Medicine (40.5)</td></tr>
+  <tr><td><strong>Competitive</strong></td><td>30&ndash;39</td><td>85</td><td>HKU BBA (37), CUHK Computer Science (36), HKUST Data Science (36)</td></tr>
+  <tr><td><strong>Moderate</strong></td><td>22&ndash;29</td><td>123</td><td>CityU BBA (22), HKBU Communication (23), EdUHK Primary Ed (25)</td></tr>
+  <tr><td><strong>Accessible</strong></td><td>&lt; 22</td><td>67</td><td>HKMU Social Work (16), Lingnan Philosophy (20)</td></tr>
+</table>
+
+<p>A 50% probability at an elite programme (median 44) represents a much stronger student than 50% at an accessible programme (median 16). Tier context helps counsellors and students interpret results correctly.</p>
+
+<footer>
+  SchoolChoice Scoring Methodology &mdash; May 2026<br>
+  Sources: JUPAS 2024/2025 Admissions Scores PDFs, university programme requirements
+</footer>
+
+</div>
+</body>
+</html>

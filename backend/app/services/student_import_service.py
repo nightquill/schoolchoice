@@ -339,6 +339,35 @@ def commit_import(
                 )
                 db.add(student)
                 db.flush()  # get student.id
+
+                # Auto-create student user account
+                from app.core.security import get_password_hash
+                from app.db.models import User as UserModel, OrganisationMembership
+                existing_user = db.query(UserModel).filter(
+                    UserModel.student_id == student.id
+                ).first()
+                if not existing_user:
+                    student_user = UserModel(
+                        email=f"{row['candidate_number']}@student.local",
+                        hashed_password=get_password_hash(row["candidate_number"]),
+                        role="student",
+                        student_id=student.id,
+                        display_name=row["name"],
+                        is_active=True,
+                        must_change_password=True,
+                    )
+                    db.add(student_user)
+                    db.flush()
+                    # Add org membership
+                    if org_id:
+                        mem = OrganisationMembership(
+                            user_id=student_user.id,
+                            organisation_id=org_id,
+                            role="member",
+                        )
+                        db.add(mem)
+                        db.flush()
+
                 created += 1
 
             elif row["status"] == "update":
@@ -353,6 +382,34 @@ def commit_import(
                 for field, val in profile.items():
                     if val and hasattr(student, field):
                         setattr(student, field, val)
+
+                # Ensure student user account exists (may have been created before this feature)
+                from app.core.security import get_password_hash
+                from app.db.models import User as UserModel, OrganisationMembership
+                existing_user = db.query(UserModel).filter(
+                    UserModel.student_id == student.id
+                ).first()
+                if not existing_user:
+                    student_user = UserModel(
+                        email=f"{row['candidate_number']}@student.local",
+                        hashed_password=get_password_hash(row["candidate_number"]),
+                        role="student",
+                        student_id=student.id,
+                        display_name=row["name"],
+                        is_active=True,
+                        must_change_password=True,
+                    )
+                    db.add(student_user)
+                    db.flush()
+                    if org_id:
+                        mem = OrganisationMembership(
+                            user_id=student_user.id,
+                            organisation_id=org_id,
+                            role="member",
+                        )
+                        db.add(mem)
+                        db.flush()
+
                 updated += 1
             else:
                 skipped += 1

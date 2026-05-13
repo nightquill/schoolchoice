@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolChoice — Project Architecture</title>
+<style>
+  :root {
+    --bg: #f8fafb;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --muted: #64748b;
+    --frontend: #2563eb;
+    --frontend-bg: #eff6ff;
+    --backend: #059669;
+    --backend-bg: #ecfdf5;
+    --data: #7c3aed;
+    --data-bg: #f5f3ff;
+    --infra: #dc2626;
+    --infra-bg: #fef2f2;
+    --ai: #d97706;
+    --ai-bg: #fffbeb;
+    --accent: #0f766e;
+    --arrow: #94a3b8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 2rem; }
+  h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.3rem; font-weight: 700; margin: 2.5rem 0 1rem; color: var(--accent); border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.5rem; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .meta { color: var(--muted); font-size: 0.8rem; margin-bottom: 2rem; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Legend */
+  .legend { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; padding: 1rem 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+  .legend-dot.frontend { background: var(--frontend); }
+  .legend-dot.backend { background: var(--backend); }
+  .legend-dot.data { background: var(--data); }
+  .legend-dot.infra { background: var(--infra); }
+  .legend-dot.ai { background: var(--ai); }
+
+  /* Cards */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 0.75rem; }
+  .card.frontend-card { border-left: 4px solid var(--frontend); }
+  .card.backend-card { border-left: 4px solid var(--backend); }
+  .card.data-card { border-left: 4px solid var(--data); }
+  .card.infra-card { border-left: 4px solid var(--infra); }
+  .card.ai-card { border-left: 4px solid var(--ai); }
+  .card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.25rem; }
+  .card-file { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .card-desc { font-size: 0.85rem; color: var(--text); }
+  .card-io { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+  .io-box { background: var(--bg); border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.8rem; }
+  .io-label { font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 0.25rem; }
+  .io-items { font-family: monospace; font-size: 0.75rem; line-height: 1.6; }
+
+  /* Components grid */
+  .components { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem; }
+  .components-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 0.75rem; }
+
+  /* Pipeline */
+  .pipeline { display: flex; flex-direction: column; gap: 0; }
+  .stage { position: relative; }
+  .stage-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .stage-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; }
+  .stage-title { font-size: 1.1rem; font-weight: 700; }
+  .stage-type { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 4px; }
+  .stage-type.frontend { color: var(--frontend); background: var(--frontend-bg); }
+  .stage-type.backend { color: var(--backend); background: var(--backend-bg); }
+  .stage-type.data { color: var(--data); background: var(--data-bg); }
+  .stage-type.ai { color: var(--ai); background: var(--ai-bg); }
+  .stage-type.infra { color: var(--infra); background: var(--infra-bg); }
+  .stage-body { margin-left: 18px; padding-left: 30px; border-left: 3px solid var(--border); padding-bottom: 2rem; }
+  .stage:last-child .stage-body { border-left-color: transparent; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.5rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: var(--bg); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td code { font-family: monospace; font-size: 0.8rem; background: var(--bg); padding: 1px 4px; border-radius: 3px; }
+
+  .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 1px 6px; border-radius: 3px; margin-left: 0.25rem; }
+  .tag.fe { background: var(--frontend-bg); color: var(--frontend); }
+  .tag.be { background: var(--backend-bg); color: var(--backend); }
+  .tag.db { background: var(--data-bg); color: var(--data); }
+
+  /* Info boxes */
+  .info { margin-top: 0.5rem; padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; }
+  .info.warn { background: #fffbeb; border: 1px solid #fde68a; }
+  .info.note { background: #eff6ff; border: 1px solid #bfdbfe; }
+  .info.success { background: #ecfdf5; border: 1px solid #a7f3d0; }
+
+  /* Tree */
+  .tree { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.7; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; overflow-x: auto; white-space: pre; }
+  .tree .dir { color: var(--frontend); font-weight: 700; }
+  .tree .file { color: var(--text); }
+  .tree .desc { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>SchoolChoice — Project Architecture</h1>
+<p class="subtitle">Intelligent academic advisor for Hong Kong school counsellors</p>
+<p class="meta">pnpm monorepo &bull; React 19 + FastAPI &bull; HKDSE &amp; JUPAS scoring &bull; AI-generated academic plans &bull; As of 2026-05-12</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot frontend"></div> Frontend (React/Vite)</div>
+  <div class="legend-item"><div class="legend-dot backend"></div> Backend (FastAPI/Python)</div>
+  <div class="legend-item"><div class="legend-dot data"></div> Data / Database</div>
+  <div class="legend-item"><div class="legend-dot ai"></div> AI / LLM Integration</div>
+  <div class="legend-item"><div class="legend-dot infra"></div> Infrastructure</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Monorepo Structure</h2>
+
+<div class="tree"><span class="dir">schoolchoice/</span>
+├── <span class="dir">apps/web/</span>             <span class="desc">— React 19 SPA (Vite, TailwindCSS, TanStack Query)</span>
+│   ├── <span class="dir">src/pages/</span>        <span class="desc">— 28 page components</span>
+│   ├── <span class="dir">src/components/</span>   <span class="desc">— 17 reusable components (NavBar, GradeGrid, SSEStreamDisplay, ...)</span>
+│   ├── <span class="dir">src/api/</span>          <span class="desc">— 19 API client modules (axios-based)</span>
+│   └── <span class="dir">src/hooks/</span>        <span class="desc">— 10 custom hooks (useAutosave, useGradesTab, ...)</span>
+├── <span class="dir">packages/ui/</span>           <span class="desc">— @schoolchoice/ui shared library</span>
+│   ├── <span class="dir">src/components/</span>   <span class="desc">— 24 UI components (Modal, StatusChip, EligibilityBadge, ...)</span>
+│   ├── <span class="dir">src/primitives/</span>   <span class="desc">— 13 shadcn-style primitives (button, card, dialog, table, ...)</span>
+│   ├── <span class="dir">src/api/</span>          <span class="desc">— Shared API client (auth, account, axios config)</span>
+│   └── <span class="dir">src/context/</span>      <span class="desc">— AuthContext provider</span>
+├── <span class="dir">backend/</span>               <span class="desc">— FastAPI + SQLAlchemy (Python 3.10+)</span>
+│   ├── <span class="dir">app/core/</span>         <span class="desc">— Config, security (JWT/bcrypt), AI service (LiteLLM)</span>
+│   ├── <span class="dir">app/db/</span>           <span class="desc">— ORM models, session, portable UUID type</span>
+│   ├── <span class="dir">app/api/v1/routes/</span><span class="desc">— 27 route files, 105+ endpoints</span>
+│   ├── <span class="dir">app/services/</span>     <span class="desc">— 10 business logic services</span>
+│   ├── <span class="dir">app/platform/</span>     <span class="desc">— Module loader, task engine, health checks, CRUD generator</span>
+│   ├── <span class="dir">app/modules/</span>      <span class="desc">— Domain modules (school_choice)</span>
+│   ├── <span class="dir">app/schemas/</span>      <span class="desc">— Pydantic v1 + v2 schemas</span>
+│   └── <span class="dir">tests/</span>            <span class="desc">— 29 pytest test suites</span>
+├── <span class="file">pnpm-workspace.yaml</span>   <span class="desc">— Workspace: apps/*, packages/*</span>
+├── <span class="file">vercel.json</span>           <span class="desc">— Vercel deploy config</span>
+└── <span class="file">backend/.env</span>          <span class="desc">— DATABASE_URL, SECRET_KEY, AI_PROVIDER, CORS_ORIGINS</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>System Architecture</h2>
+
+<div class="card" style="padding: 1.5rem;">
+<pre style="font-family: monospace; font-size: 0.78rem; line-height: 1.8; overflow-x: auto;">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            <span style="color:var(--frontend);font-weight:700">FRONTEND (React 19 + Vite)</span>                       │
+│                                                                              │
+│  ┌─────────┐  ┌───────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐  │
+│  │Dashboard │  │ Student   │  │ Target   │  │ School   │  │  Consultant  │  │
+│  │ (cards,  │  │ Profile   │  │ Schools  │  │Directory │  │  Task (SSE)  │  │
+│  │ filters) │  │ (7 tabs)  │  │(add/edit │  │(search,  │  │  (streaming  │  │
+│  │          │  │           │  │ reorder) │  │ filter)  │  │   AI plan)   │  │
+│  └────┬─────┘  └─────┬─────┘  └────┬─────┘  └────┬─────┘  └──────┬───────┘  │
+│       └──────────────┴─────────────┴──────────────┴───────────────┘          │
+│                                    │                                         │
+│  ┌─────────────────────────────────┴────────────────────────────────────┐    │
+│  │  @schoolchoice/ui  (AuthContext, Modal, StatusChip, primitives)      │    │
+│  │  axios client → baseURL: VITE_API_BASE_URL → Bearer token from      │    │
+│  │  localStorage → 401 interceptor → redirect /login                   │    │
+│  └─────────────────────────────────┬────────────────────────────────────┘    │
+└────────────────────────────────────┼────────────────────────────────────────┘
+                                     │ HTTP / SSE
+                                     ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           <span style="color:var(--backend);font-weight:700">BACKEND (FastAPI + SQLAlchemy)</span>                     │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  <span style="font-weight:700">Middleware</span>: CORS · Rate Limiting (slowapi) · JWT Auth (HTTPBearer)  │    │
+│  │  get_current_user() → verify JWT → attach org_id (multi-tenancy)   │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+│  ┌─ <span style="font-weight:700">API Routes</span> (27 files, 105+ endpoints) ──────────────────────────────┐  │
+│  │  auth · students · grades · subjects · targets · schools · match    │  │
+│  │  plan · consultant · cohorts · analytics · reports · entities       │  │
+│  │  admin · organisations · account · consent · alerts · methodology   │  │
+│  └────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+│  ┌─ <span style="font-weight:700">Services</span> ────────────────────────────────────────────────────────────┐│
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               ││
+│  │  │ matchmaker_v2│  │plan_generator│  │ jupas_scorer │               ││
+│  │  │ (eligibility │  │(HTML plans,  │  │(parametric   │               ││
+│  │  │  + scoring)  │  │ AI enhance)  │  │ JUPAS score) │               ││
+│  │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘               ││
+│  │         │                 │                  │                        ││
+│  │  ┌──────┴─────────────────┴──────────────────┴───────────────────┐   ││
+│  │  │  hkdse_service (grade scale, best-5 aggregate, predicted)     │   ││
+│  │  │  student_data_builder · alert_service · pii_filter            │   ││
+│  │  └──────────────────────────────────────────────────────────────┘   ││
+│  └──────────────────────────────────────────────────────────────────────┘│
+│                                                                              │
+│  ┌─ <span style="font-weight:700">Platform</span> ────────────────────────────────────────────────────────────┐│
+│  │  module_loader (YAML manifest → auto-discover)                       ││
+│  │  task_engine (YAML task defs → prompt render → PII scan → execute)   ││
+│  │  crud_generator (YAML entity defs → auto CRUD endpoints)             ││
+│  │  health (DB + ORM parity + module health)                            ││
+│  └──────────────────────────────────────────────────────────────────────┘│
+│                                     │                                        │
+└─────────────────────────────────────┼────────────────────────────────────────┘
+                                      │
+                        ┌─────────────┼─────────────┐
+                        ▼             ▼             ▼
+                  ┌──────────┐ ┌──────────┐ ┌──────────────┐
+                  │<span style="color:var(--data)"> SQLite   </span>│ │<span style="color:var(--data)"> PostgreSQL</span>│ │<span style="color:var(--ai)"> LiteLLM AI  </span>│
+                  │<span style="color:var(--data)"> (dev)    </span>│ │<span style="color:var(--data)"> (prod)    </span>│ │<span style="color:var(--ai)"> (plan gen,  </span>│
+                  │<span style="color:var(--data)"> app.db   </span>│ │<span style="color:var(--data)">           </span>│ │<span style="color:var(--ai)">  plan chat) </span>│
+                  └──────────┘ └──────────┘ └──────────────┘
+</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Database Schema (12 tables)</h2>
+
+<table>
+  <tr><th>Table</th><th>Key Fields</th><th>Purpose</th><th>Relationships</th></tr>
+  <tr><td><code>users</code></td><td>email, hashed_password, role (counsellor|admin), display_name, is_active</td><td>Authenticated counsellor accounts</td><td>→ students, → org_memberships</td></tr>
+  <tr><td><code>organisations</code></td><td>name, slug (unique), is_active</td><td>School/institution multi-tenancy</td><td>→ memberships</td></tr>
+  <tr><td><code>organisation_memberships</code></td><td>user_id, organisation_id, role (owner|admin|member)</td><td>User ↔ Org pivot</td><td>→ User, → Organisation</td></tr>
+  <tr><td><code>students</code></td><td>name, user_id, organisation_id, grades (JSON), interests (JSON), ielts_score (JSON), extra_curricular (JSON), class_name, year_of_study, is_graduated</td><td>Student profiles with v1+v2 fields</td><td>→ User, → grades, → targets, → plans</td></tr>
+  <tr><td><code>subjects</code></td><td>code, name, category (CORE|ELECTIVE), is_compulsory</td><td>HKDSE subject catalog (39 subjects)</td><td>→ grades</td></tr>
+  <tr><td><code>student_subject_grades</code></td><td>student_id, subject_id, raw_grade, predicted_grade, sitting (MOCK|TRIAL|OFFICIAL), year_of_exam</td><td>Per-subject grade tracking</td><td>→ Student, → Subject</td></tr>
+  <tr><td><code>schools</code></td><td>name, type, location, min_academic_requirements (JSON), key_strengths (JSON), acceptance_rate, is_custom</td><td>University/school records (15 seeded)</td><td>→ targets</td></tr>
+  <tr><td><code>student_school_targets</code></td><td>student_id, school_id, student_rank, match_score, eligibility_pass, intended_majors (JSON), status, at_risk, preference_confidence</td><td>Target school selection with match scoring</td><td>→ Student, → School</td></tr>
+  <tr><td><code>academic_plans</code></td><td>student_id, html_content, recommended_schools (JSON), action_items (JSON), template_id, overrides (JSON), version</td><td>AI-generated academic plans</td><td>→ Student</td></tr>
+  <tr><td><code>plan_generation_jobs</code></td><td>student_id, status (PENDING|RUNNING|DONE|FAILED), error_message</td><td>Async plan generation tracking</td><td>→ Student</td></tr>
+  <tr><td><code>student_cohorts</code></td><td>user_id, organisation_id, name, academic_year</td><td>Class/group management</td><td>→ memberships</td></tr>
+  <tr><td><code>consent_records</code></td><td>student_id, consent_type, granted_at, revoked_at</td><td>PDPO compliance</td><td>→ Student</td></tr>
+</table>
+
+<div class="info note">
+  <strong>Portable UUID:</strong> Custom <code>TypeDecorator</code> — native UUID on PostgreSQL, CHAR(32) hex on SQLite. All IDs are UUIDs.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Matching Pipeline</h2>
+
+<p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;">
+  <code>POST /api/v1/students/{id}/match</code> — triggered from Target Schools page or profile
+</p>
+
+<div class="pipeline">
+
+<div class="stage">
+  <div class="stage-header">
+    <div class="stage-num">1</div>
+    <span class="stage-title">Data Assembly</span>
+    <span class="stage-type backend">Backend</span>
+  </div>
+  <div class="stage-body">
+    <div class="card backend-card">
+      <div class="card-title">build_student_data()</div>
+      <div class="card-file">app/services/student_data_builder.py</div>
+      <div class="card-desc">Loads student ORM + grades + IELTS + activities + awards. Computes <code>best5_aggregate</code> via hkdse_service (4 compulsory + best elective, ApL excluded). Builds canonical dict for scoring.</div>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-header">
+    <div class="stage-num">2</div>
+    <span class="stage-title">Eligibility Filter</span>
+    <span class="stage-type backend">Backend</span>
+  </div>
+  <div class="stage-body">
+    <div class="card backend-card">
+      <div class="card-title">run_eligibility_filter()</div>
+      <div class="card-file">app/modules/school_choice/services/matchmaker_v2.py</div>
+      <div class="card-desc">Hard pass/fail: <strong>(1)</strong> best5 &ge; school minimum entry score, <strong>(2)</strong> each required subject meets min grade, <strong>(3)</strong> IELTS &ge; school requirement. Failing criteria returned as human-readable strings.</div>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-header">
+    <div class="stage-num">3</div>
+    <span class="stage-title">Scoring</span>
+    <span class="stage-type backend">Backend</span>
+  </div>
+  <div class="stage-body">
+    <div class="components-2">
+      <div class="card backend-card">
+        <div class="card-title">JUPAS Parametric Path (primary)</div>
+        <div class="card-file">app/modules/school_choice/services/jupas_scorer.py</div>
+        <div class="card-desc">370+ real JUPAS programmes. Per-programme published formula: <code>best_n</code> subjects, per-subject weights, bonus weights. Grade &rarr; points via scale. Piecewise probability mapping (LQ&rarr;0.25, Med&rarr;0.50, UQ&rarr;0.75, exponential tails). Final: <code>0.8&times;admission_prob + 0.2&times;interest_alignment</code>.</div>
+      </div>
+      <div class="card backend-card">
+        <div class="card-title">Heuristic Fallback Path</div>
+        <div class="card-file">app/modules/school_choice/services/matchmaker_v2.py</div>
+        <div class="card-desc">For schools without JUPAS data. Weighted score: academic fit (50%) + subject alignment (20%) + language fit (15%) + interest alignment (15%). Optional XGBoost ML blend: <code>0.6&times;heuristic + 0.4&times;ml_prob</code>.</div>
+      </div>
+    </div>
+    <div class="info warn">
+      <strong>Data completeness indicator (BUG-02):</strong> Computes fraction of expected grades present. <code>compulsory_present/4 &times; 0.7 + min(elective_present/2, 1.0) &times; 0.3</code>. Returned with every MatchResult.
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="stage-header">
+    <div class="stage-num">4</div>
+    <span class="stage-title">Persist &amp; Return</span>
+    <span class="stage-type data">Database</span>
+  </div>
+  <div class="stage-body">
+    <div class="card data-card">
+      <div class="card-title">Upsert StudentSchoolTarget</div>
+      <div class="card-desc">Scores saved to <code>student_school_targets</code> table. Ranked by <code>final_score</code> descending, eligible first. At-risk flag set when score &lt; programme lower quartile. SHAP explanations (top 3 features) stored as JSON.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pipeline -->
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Scoring Formulas</h2>
+
+<h3>HKDSE Grade Scale</h3>
+<table>
+  <tr><th>Grade</th><th>5**</th><th>5*</th><th>5</th><th>4</th><th>3</th><th>2</th><th>1</th><th>U/X</th></tr>
+  <tr><td>Points</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+</table>
+<p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;">CSD (Citizenship): Attained=1pt, Attained with Distinction=2pts. Best-5 = 4 compulsory (CHLA+ENGL+MATH+CSD) + best elective. ApL excluded.</p>
+
+<h3>JUPAS Parametric Scoring (primary path)</h3>
+<table>
+  <tr><th>Step</th><th>Calculation</th></tr>
+  <tr><td>1. Grade → Points</td><td>Per-programme grade scale (e.g. <code>jupas_2025_enhanced</code>). Each grade maps to a float.</td></tr>
+  <tr><td>2. Subject Weighting</td><td>Points &times; subject_weight (e.g. ENGL &times; 1.5, MATH &times; 1.5). Select best_n by weighted value.</td></tr>
+  <tr><td>3. Bonus</td><td>Best remaining subject &times; bonus_weight (e.g. 0.5 for 6th subject)</td></tr>
+  <tr><td>4. Probability</td><td>Piecewise interpolation: LQ→0.25, Median→0.50, UQ→0.75. Exponential tails above/below.</td></tr>
+  <tr><td>5. Final Score</td><td><code>0.8 &times; admission_probability + 0.2 &times; interest_alignment</code></td></tr>
+</table>
+
+<h3>Heuristic Scoring (fallback path)</h3>
+<table>
+  <tr><th>Component</th><th>Weight</th><th>Calculation</th></tr>
+  <tr><td>Academic fit</td><td>50%</td><td><code>best5 / avg_admitted_score</code> (fallback: min&times;1.2, or 35 max)</td></tr>
+  <tr><td>Subject alignment</td><td>20%</td><td>Matched elective keywords / total electives (neutral 0.3)</td></tr>
+  <tr><td>Language fit</td><td>15%</td><td>IELTS ratio or ENGL grade/7 (neutral 0.65)</td></tr>
+  <tr><td>Interest alignment</td><td>15%</td><td>Keyword overlap (activities+awards vs programs) with synonym expansion</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Plan Generation Flow</h2>
+
+<div class="card" style="padding: 1.5rem;">
+<pre style="font-family: monospace; font-size: 0.78rem; line-height: 1.8; overflow-x: auto;">
+<span style="color:var(--frontend)">FRONTEND</span>    POST /students/{id}/plan  (plan_type=UNIVERSITY)
+              │
+              ▼
+<span style="color:var(--backend)">BACKEND</span>     Create PlanGenerationJob(status="pending")
+              │
+              ├─ BackgroundTask:
+              │    ├─ build_student_data() → grades, IELTS, activities, awards
+              │    ├─ run_matching() → compute all MatchResult scores
+              │    │
+              │    ├─ <span style="color:var(--ai)">_run_ai_enhancement()</span> (optional, non-blocking)
+              │    │   └─ LiteLLM call → school rationales + action items
+              │    │
+              │    ├─ generate_html_plan() → render with template (professional|modern|minimal)
+              │    │   ├─ Header: student name, year, best-5 aggregate
+              │    │   ├─ Metrics row: key stats
+              │    │   ├─ Assessment: plain-English fit summary
+              │    │   ├─ Top 5 schools: score, rationale, SHAP features
+              │    │   ├─ Action items: task, priority, deadline
+              │    │   └─ Counselor-only section (CSS hidden by default)
+              │    │
+              │    └─ Upsert AcademicPlan(html_content, ...)
+              │       Update PlanGenerationJob(status="completed")
+              │
+              ▼
+<span style="color:var(--frontend)">FRONTEND</span>    Poll GET /plan/status every 2s until status=completed
+              │
+              ▼
+<span style="color:var(--frontend)">FRONTEND</span>    GET /plan → render HTML in iframe / section editor
+              │
+              ▼
+<span style="color:var(--ai)">AI CHAT</span>     POST /plan/chat → natural language plan edits
+              (rate limited: 20 req / counsellor / plan / 24h)
+              AI returns JSON patch → _apply_patch() mutates plan
+</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Consultant Task (SSE Streaming)</h2>
+
+<div class="card" style="padding: 1.5rem;">
+<pre style="font-family: monospace; font-size: 0.78rem; line-height: 1.8; overflow-x: auto;">
+<span style="color:var(--frontend)">FRONTEND</span>    EventSource → GET /consultant/tasks/academic_plan/stream?entity_id={id}&amp;token={jwt}
+              │
+<span style="color:var(--backend)">BACKEND</span>     task_engine.py:
+              │  1. Load task YAML definition (academic_plan.yaml)
+              │  2. Resolve data slots → student data, grades, targets
+              │  3. Render Jinja2 system/user prompts
+              │  4. PII scan (blocklist: medical_notes, ssn, dob, ...)
+              │  5. Token guard (truncate if over max_context_tokens)
+              │
+              ▼
+<span style="color:var(--ai)">AI</span>          call_ai_stream(messages) → LiteLLM streaming
+              │  Yields SSE chunks: data: {"token": "..."}
+              │  On complete: data: {"done": true, "plan_html": "..."}
+              │
+<span style="color:var(--frontend)">FRONTEND</span>    SSEStreamDisplay component renders tokens in real-time
+              PlanSectionEditor allows per-section HTML editing (TipTap)
+              TemplateSelector switches professional|modern|minimal
+</pre>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Frontend Pages &amp; Routes</h2>
+
+<table>
+  <tr><th>Route</th><th>Component</th><th>Key Features</th></tr>
+  <tr><td><code>/login</code></td><td>LoginPage</td><td>Email/password auth, field validation, error messages</td></tr>
+  <tr><td><code>/register</code></td><td>RegisterPage</td><td>Registration + auto-login</td></tr>
+  <tr><td><code>/onboarding</code></td><td>Onboarding</td><td>4-step wizard: Welcome → School Info → Import → Ready</td></tr>
+  <tr><td><code>/dashboard</code></td><td>Dashboard</td><td>Student cards, metrics, search/filter, config-driven entity counts</td></tr>
+  <tr><td><code>/students/:id/profile</code></td><td>StudentProfile</td><td>7 tabs: Personal, Grades, Language, Evaluations, Activities, Notes, Plans</td></tr>
+  <tr><td><code>/students/:id/targets</code></td><td>TargetSchools</td><td>Ranked list, add/edit/reorder/remove, match scores, eligibility badges, SHAP, By School/By Major views</td></tr>
+  <tr><td><code>/students/:id/plan</code></td><td>AcademicPlan</td><td>Polling-based generation, template selector, per-section editing, plan history, AI chat</td></tr>
+  <tr><td><code>/students/:id/consultant</code></td><td>ConsultantTask</td><td>SSE streaming, real-time tokens, template switch, section editor, mobile chat toggle</td></tr>
+  <tr><td><code>/schools</code></td><td>SchoolDirectory</td><td>Search, type/location filters, pagination, add custom school, CSV export</td></tr>
+  <tr><td><code>/schools/:id</code></td><td>SchoolProfile</td><td>School details, programmes, add-to-targets with student picker</td></tr>
+  <tr><td><code>/cohorts</code></td><td>CohortList</td><td>Create/delete cohorts</td></tr>
+  <tr><td><code>/cohorts/:id</code></td><td>CohortDetail</td><td>Member list, add/remove students, links to report + bulk edit</td></tr>
+  <tr><td><code>/cohorts/:id/report</code></td><td>CohortReport</td><td>Grade distributions, stats by sitting (MOCK/TRIAL/OFFICIAL)</td></tr>
+  <tr><td><code>/cohorts/:id/bulk-edit</code></td><td>BulkEdit</td><td>Grid: all students × all subjects, direct grade editing</td></tr>
+  <tr><td><code>/data-analysis</code></td><td>DataAnalysis</td><td>HKDSE trends, subject combinations, popular majors, student directory</td></tr>
+  <tr><td><code>/entities/:name</code></td><td>EntityListPage</td><td>Dynamic CRUD list with search, filters, CSV export</td></tr>
+  <tr><td><code>/entities/:name/import</code></td><td>ImportWizardPage</td><td>3-step: parse CSV/XLSX → validate → commit</td></tr>
+  <tr><td><code>/admin/data-refresh</code></td><td>AdminDataRefresh</td><td>Admin-only: trigger refresh, preview CSV diff</td></tr>
+  <tr><td><code>/account/settings</code></td><td>AccountSettings</td><td>User info, change password</td></tr>
+  <tr><td><code>/methodology</code></td><td>MethodologyReport</td><td>Matching algorithm documentation</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Multi-Tenancy &amp; Auth</h2>
+
+<div class="components-2">
+  <div class="card infra-card">
+    <div class="card-title">Authentication</div>
+    <div class="card-desc">
+      <strong>JWT (HS256)</strong> with claims: <code>sub</code> (user UUID), <code>org_id</code> (organisation UUID), <code>exp</code>, <code>iat</code>.<br>
+      Passwords hashed with bcrypt. Token stored in <code>localStorage</code>.<br>
+      Axios interceptor: auto-inject <code>Authorization: Bearer {token}</code>. 401 &rarr; clear token &rarr; redirect <code>/login</code>.<br>
+      Rate limits: register (10/min), login (15/min), plan chat (20/plan/24h).
+    </div>
+  </div>
+  <div class="card infra-card">
+    <div class="card-title">Organisation Isolation</div>
+    <div class="card-desc">
+      <strong>User → OrganisationMembership → Organisation</strong><br>
+      JWT carries <code>org_id</code>. <code>get_current_user()</code> attaches <code>active_organisation_id</code> to User object.<br>
+      All student queries filtered: <code>Student.organisation_id == user.active_organisation_id</code>.<br>
+      Roles: owner, admin, member. Enforced at service layer.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Platform Module System</h2>
+
+<div class="card backend-card">
+  <div class="card-title">Manifest-Based Auto-Discovery</div>
+  <div class="card-file">app/platform/module_loader.py → discover_and_register_modules()</div>
+  <div class="card-desc">
+    Scans <code>app/modules/&lt;domain&gt;/config.yaml</code> for each module.<br>
+    <strong>Load order:</strong> Import ORM models FIRST (populates <code>Base.metadata</code>), then routes.<br>
+    Each module can define: <code>models_import</code>, <code>routes</code>, <code>health_callback</code>, <code>entities</code> (YAML-driven auto-CRUD).
+  </div>
+  <div class="card-io">
+    <div class="io-box">
+      <div class="io-label">Module: school_choice</div>
+      <div class="io-items">models: Student, School, Subject, ...<br>services: matchmaker_v2, jupas_scorer, ...<br>entities: school.yaml, student.yaml<br>templates: professional, modern, minimal<br>tasks: academic_plan.yaml<br>prompts: reporter.py</div>
+    </div>
+    <div class="io-box">
+      <div class="io-label">Platform Services</div>
+      <div class="io-items">crud_generator → auto CRUD from YAML<br>entity_registry → entity type catalog<br>task_engine → YAML task → prompt → AI<br>health → DB + ORM parity + modules</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>API Endpoint Summary</h2>
+
+<table>
+  <tr><th>Category</th><th>Count</th><th>Key Endpoints</th></tr>
+  <tr><td>Auth</td><td>2</td><td><code>POST /auth/register</code>, <code>POST /auth/login</code></td></tr>
+  <tr><td>Students</td><td>13</td><td>CRUD + profile + language/evaluations/extracurricular/awards/graduate</td></tr>
+  <tr><td>Grades</td><td>5</td><td>List/Create/Update/Delete + subject lookup</td></tr>
+  <tr><td>Schools &amp; Targets</td><td>11</td><td>School CRUD + Target CRUD + reorder + pin/dismiss</td></tr>
+  <tr><td>Matching</td><td>5</td><td><code>POST /match</code> (run), <code>GET /match</code> (cached), <code>GET /recommendations/auto</code></td></tr>
+  <tr><td>Plans</td><td>11</td><td>Generate (async) + status + get + history + chat + template + section edit</td></tr>
+  <tr><td>Consultant</td><td>4</td><td>SSE stream + save + status + chat</td></tr>
+  <tr><td>Cohorts</td><td>9</td><td>CRUD + members + search + stats</td></tr>
+  <tr><td>Analytics</td><td>8</td><td>HKDSE trends + population + majors + directory + combinations + reports</td></tr>
+  <tr><td>Entities</td><td>9</td><td>Auto-CRUD + import (parse/validate/commit) + export CSV/HTML</td></tr>
+  <tr><td>Admin</td><td>7</td><td>User CRUD + data refresh + preview</td></tr>
+  <tr><td>Other</td><td>21</td><td>Account, organisations, consent, alerts, methodology, transcripts</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>105+</strong></td><td></td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Security &amp; Privacy</h2>
+
+<div class="components">
+  <div class="card infra-card">
+    <div class="card-title">Authentication &amp; Authorization</div>
+    <div class="card-desc">JWT + bcrypt. Role-based access (counsellor, admin). Rate limiting on auth + AI endpoints. Secrets in .env (gitignored).</div>
+  </div>
+  <div class="card infra-card">
+    <div class="card-title">PII Protection (PDPO)</div>
+    <div class="card-desc">PII blocklist scanned before AI calls: <code>medical_notes, disciplinary_record, sibling_data, ssn, dob</code>. Student names anonymized for third-party AI. Consent tracking per student.</div>
+  </div>
+  <div class="card infra-card">
+    <div class="card-title">Output Sanitization</div>
+    <div class="card-desc">AI output: control chars stripped, <code>&lt;script&gt;</code> / <code>onerror=</code> / <code>javascript:</code> flagged. HTML plan values escaped via <code>_esc()</code>. Plan sections sanitized with <code>nh3</code>.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Technology Stack</h2>
+
+<div class="components-2">
+  <div class="card frontend-card">
+    <div class="card-title">Frontend</div>
+    <div class="card-desc">
+      <strong>React 19</strong> + <strong>Vite</strong> (dev server + build)<br>
+      <strong>TailwindCSS</strong> (utility-first CSS)<br>
+      <strong>TanStack Query</strong> (data fetching + cache)<br>
+      <strong>React Router 7</strong> (client-side routing)<br>
+      <strong>Axios</strong> (HTTP client with interceptors)<br>
+      <strong>Sonner</strong> (toast notifications)<br>
+      <strong>Lucide React</strong> (icons)<br>
+      <strong>@base-ui/react</strong> (shadcn primitives)<br>
+      Deploy: <strong>Vercel</strong>
+    </div>
+  </div>
+  <div class="card backend-card">
+    <div class="card-title">Backend</div>
+    <div class="card-desc">
+      <strong>FastAPI</strong> (async Python web framework)<br>
+      <strong>SQLAlchemy 2.0</strong> (ORM, PostgreSQL + SQLite)<br>
+      <strong>Pydantic</strong> (schema validation)<br>
+      <strong>LiteLLM</strong> (unified AI provider: OpenAI, Anthropic, Gemini)<br>
+      <strong>python-jose</strong> (JWT), <strong>passlib</strong> (bcrypt)<br>
+      <strong>slowapi</strong> (rate limiting)<br>
+      <strong>Jinja2</strong> (HTML plan templates)<br>
+      <strong>nh3</strong> (HTML sanitization)<br>
+      Deploy: <strong>Railway</strong> (or any Python host)
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Key Data Files</h2>
+
+<table>
+  <tr><th>File</th><th>Purpose</th><th>Size</th></tr>
+  <tr><td><code>backend/scripts/seed_test_data.py</code></td><td>Bootstrap dev DB: 3 students + 18 subjects + 8 universities</td><td>18 KB</td></tr>
+  <tr><td><code>backend/scripts/seed_demo_school.py</code></td><td>150-student demo school with cohorts, grades, targets</td><td>13 KB</td></tr>
+  <tr><td><code>data/jupas/grade_scales.json</code></td><td>JUPAS grade-to-points conversion tables</td><td>—</td></tr>
+  <tr><td><code>data/jupas/programmes.json</code></td><td>370+ JUPAS programmes with formulas + admission stats</td><td>—</td></tr>
+  <tr><td><code>backend/app/modules/school_choice/rules/matching_rules.yaml</code></td><td>Eligibility criteria and scoring weights</td><td>—</td></tr>
+  <tr><td><code>backend/app/modules/school_choice/tasks/academic_plan.yaml</code></td><td>Task definition for AI plan generation</td><td>6 KB</td></tr>
+  <tr><td><code>backend/app/modules/school_choice/templates/*.html.j2</code></td><td>3 plan HTML templates (professional, modern, minimal)</td><td>—</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Test Infrastructure</h2>
+
+<div class="components-2">
+  <div class="card backend-card">
+    <div class="card-title">Backend: 29 Pytest Suites</div>
+    <div class="card-desc">
+      <strong>Key test areas:</strong> auth, tenant isolation, JUPAS scoring (22 KB), v2 routes, v2 services (37 KB), organisation, admin users, alerts, entities, import/export, reports, task engine, PDPO compliance, schema gaps, startup validation, AI service.<br>
+      Uses in-memory SQLite test DB. Rate limiting disabled in tests.
+    </div>
+  </div>
+  <div class="card frontend-card">
+    <div class="card-title">Frontend: Playwright E2E</div>
+    <div class="card-desc">
+      <strong>22+ Playwright specs</strong> covering: login, dashboard, student CRUD, profile tabs, target schools (add/edit/reorder/remove), school directory, cohorts, data analysis, plan generation, account settings.<br>
+      Vitest for unit tests. Scripts in <code>scripts/verify_*.mjs</code>.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Architectural Decisions</h2>
+
+<table>
+  <tr><th>#</th><th>Decision</th><th>Rationale</th></tr>
+  <tr><td>D-01</td><td>Organisation-based multi-tenancy (not row-level)</td><td>Schools are separate institutions; org_id on JWT keeps queries simple</td></tr>
+  <tr><td>D-02</td><td>pnpm monorepo (apps + packages)</td><td>Shared UI library, single lockfile, workspace-level scripts</td></tr>
+  <tr><td>D-07</td><td>Manifest-based module discovery</td><td>Domain modules self-declare via config.yaml; platform auto-registers</td></tr>
+  <tr><td>D-08</td><td>Plugin directory structure</td><td>Each module owns: models, services, routes, entities, templates, tasks</td></tr>
+  <tr><td>D-09</td><td>JUPAS parametric scoring over ML</td><td>Published formulas are deterministic and auditable; ML is optional fallback</td></tr>
+  <tr><td>D-10</td><td>JSONB for flexible fields</td><td>grades, interests, ielts_score, etc. evolve without schema migrations</td></tr>
+  <tr><td>D-14</td><td>@media print CSS on plan templates</td><td>Plans print cleanly without separate PDF generation</td></tr>
+  <tr><td>D-15</td><td>Cohort reports (target distribution, risk, subject performance)</td><td>Counsellors need class-level analytics, not just per-student</td></tr>
+  <tr><td>D-19</td><td>Annual data refresh with diff preview</td><td>Admin can preview CSV changes before committing to DB</td></tr>
+  <tr><td>D-20</td><td>PDPO consent management</td><td>Hong Kong privacy law requires explicit consent tracking</td></tr>
+  <tr><td>D-21</td><td>LLM reporter persona with grounding rules</td><td>AI generates rationales grounded in actual student data, not hallucinated</td></tr>
+</table>
+
+<p style="margin-top: 2rem; font-size: 0.85rem; color: var(--muted); text-align: center;">
+  Generated from codebase analysis &mdash; reflects project state as of 2026-05-12<br>
+  SchoolChoice v2.0 &bull; 150 students seeded &bull; 105+ API endpoints &bull; 29 backend test suites
+</p>
+
+</div>
+</body>
+</html>
