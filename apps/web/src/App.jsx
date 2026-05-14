@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import LoginPage from './pages/LoginPage/LoginPage';
@@ -8,13 +8,11 @@ import RecommendationPage from './pages/RecommendationPage/RecommendationPage';
 // v2 pages
 import Dashboard from './pages/Dashboard/Dashboard';
 import StudentProfile from './pages/StudentProfile/StudentProfile';
-import TargetSchools from './pages/TargetSchools/TargetSchools';
 import AcademicPlan from './pages/AcademicPlan/AcademicPlan';
 import SchoolDirectory from './pages/SchoolDirectory/SchoolDirectory';
 import SchoolProfile from './pages/SchoolProfile/SchoolProfile';
 import AccountSettings from './pages/AccountSettings/AccountSettings';
 import AdminDataRefresh from './pages/AdminDataRefresh/AdminDataRefresh';
-import CohortList from './pages/CohortList/CohortList';
 import CohortDetail from './pages/CohortDetail/CohortDetail';
 import CohortReport from './pages/CohortReport/CohortReport';
 import DataAnalysis from './pages/DataAnalysis/DataAnalysis';
@@ -27,9 +25,12 @@ import BulkEdit from './pages/BulkEdit/BulkEdit';
 import SubmissionList from './pages/Submissions/SubmissionList';
 import SubmissionDetail from './pages/Submissions/SubmissionDetail';
 import StudentImport from './pages/StudentImport/StudentImport';
-import Settings from './pages/Settings/Settings';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
 import Onboarding from './pages/Onboarding/Onboarding';
+import AdminManage from './pages/AdminManage/AdminManage';
+import StudentDashboard from './pages/StudentDashboard/StudentDashboard';
+import StudentSubmissions from './pages/Submissions/StudentSubmissions';
+import ProgrammeDetail from './pages/ProgrammeDetail/ProgrammeDetail';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,9 +38,22 @@ const queryClient = new QueryClient({
   },
 });
 
+function TargetsRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/students/${id}/profile?tab=programmes`} replace />;
+}
+
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+function DashboardRouter() {
+  const { user, token } = useAuth();
+  // While user is loading (token exists but user not yet fetched), show nothing
+  if (token && !user) return null;
+  if (user && user.role === 'student') return <StudentDashboard />;
+  return <Dashboard />;
 }
 
 function AdminRoute({ children }) {
@@ -68,26 +82,31 @@ export default function App() {
 
         {/* v2 protected routes */}
         <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardRouter /></ProtectedRoute>} />
         <Route path="/students/:id/profile" element={<ProtectedRoute><StudentProfile /></ProtectedRoute>} />
-        <Route path="/students/:id/targets" element={<ProtectedRoute><TargetSchools /></ProtectedRoute>} />
+        {/* TargetSchools now inline as Programme Choices tab — redirect old URL */}
+        <Route path="/students/:id/targets" element={<TargetsRedirect />} />
         <Route path="/students/:id/plan" element={<ProtectedRoute><AcademicPlan /></ProtectedRoute>} />
         <Route path="/students/:id/consultant" element={<ProtectedRoute><ConsultantTask /></ProtectedRoute>} />
         <Route path="/schools" element={<ProtectedRoute><SchoolDirectory /></ProtectedRoute>} />
         <Route path="/schools/:id" element={<ProtectedRoute><SchoolProfile /></ProtectedRoute>} />
+        <Route path="/schools/:schoolId/programmes/:code" element={<ProtectedRoute><ProgrammeDetail /></ProtectedRoute>} />
         <Route path="/account/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
         <Route path="/admin/data-refresh" element={<ProtectedRoute><AdminDataRefresh /></ProtectedRoute>} />
-        <Route path="/cohorts" element={<ProtectedRoute><CohortList /></ProtectedRoute>} />
+        {/* Cohort list now on dashboard — redirect old URL */}
+        <Route path="/cohorts" element={<Navigate to="/dashboard" replace />} />
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
         <Route path="/cohorts/:cohortId/report" element={<ProtectedRoute><CohortReport /></ProtectedRoute>} />
         <Route path="/cohorts/:cohortId/bulk-edit" element={<ProtectedRoute><BulkEdit /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
 
+        <Route path="/my-submissions" element={<ProtectedRoute><StudentSubmissions /></ProtectedRoute>} />
         <Route path="/submissions" element={<ProtectedRoute><SubmissionList /></ProtectedRoute>} />
         <Route path="/submissions/:id" element={<ProtectedRoute><SubmissionDetail /></ProtectedRoute>} />
 
-        <Route path="/settings" element={<AdminRoute><Settings /></AdminRoute>} />
+        <Route path="/admin/manage" element={<AdminRoute><AdminManage /></AdminRoute>} />
+        <Route path="/settings" element={<Navigate to="/admin/manage" replace />} />
         <Route path="/methodology" element={<ProtectedRoute><MethodologyReport /></ProtectedRoute>} />
         <Route path="/import/students" element={<ProtectedRoute><StudentImport /></ProtectedRoute>} />
 
