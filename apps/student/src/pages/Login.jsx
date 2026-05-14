@@ -9,7 +9,7 @@ export default function Login() {
   const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
+  const [candidateNumber, setCandidateNumber] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,21 +22,21 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      setError('Please enter your email and password.');
+    if (!candidateNumber.trim() || !password) {
+      setError('Please enter your candidate number and password.');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const data = await studentLogin(email, password);
+      const data = await studentLogin(candidateNumber.trim(), password);
       login(data.access_token);
       navigate('/', { replace: true });
     } catch (err) {
       const status = err.response?.status;
       const detail = err.response?.data?.detail;
       if (status === 404) {
-        setError('No account found with that email.');
+        setError('No account found with this candidate number. Contact your counsellor.');
       } else if (status === 401) {
         setError(typeof detail === 'string' ? detail : 'Incorrect password.');
       } else {
@@ -56,13 +56,13 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">Email</label>
+              <label htmlFor="candidate-number" className="block text-sm font-medium text-foreground mb-1">Candidate Number</label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); if (error) setError(''); }}
-                placeholder="student@school.edu.hk"
+                id="candidate-number"
+                type="text"
+                value={candidateNumber}
+                onChange={(e) => { setCandidateNumber(e.target.value); if (error) setError(''); }}
+                placeholder="e.g. HKDSE-2026-A001"
                 required
               />
             </div>
@@ -83,7 +83,7 @@ export default function Login() {
               </div>
             )}
 
-            <Button className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>

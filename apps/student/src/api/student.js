@@ -1,7 +1,7 @@
 import client from '@schoolchoice/ui/api/client';
 
-export const studentLogin = (email, password) =>
-  client.post('/api/v1/auth/login', { email, password }).then(r => r.data);
+export const studentLogin = (candidate_number, password) =>
+  client.post('/api/v1/auth/student-login', { candidate_number, password }).then(r => r.data);
 
 export const getMyGrades = () =>
   client.get('/api/v1/student/grades').then(r => r.data);
