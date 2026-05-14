@@ -212,6 +212,11 @@ def parse_student_csv(content: bytes) -> dict:
                 else:
                     profile[field] = val
 
+        # --- cohort (optional) ---
+        cohort_name = cleaned.get("cohort", "").strip()
+        if cohort_name:
+            profile["cohort"] = cohort_name
+
         rows.append({
             "row_number": row_idx,
             "candidate_number": cand,
@@ -452,6 +457,34 @@ def commit_import(
                     db.add(ssg)
 
                 grades_imported += 1
+
+            # --- Cohort assignment (optional) ---
+            cohort_name = row.get("profile", {}).get("cohort")
+            if cohort_name:
+                from app.db.models_v2 import StudentCohort, CohortMembership
+                # Look up or create cohort within org
+                cohort = db.query(StudentCohort).filter(
+                    StudentCohort.name == cohort_name,
+                    StudentCohort.organisation_id == org_id,
+                ).first()
+                if not cohort:
+                    cohort = StudentCohort(
+                        user_id=user_id,
+                        organisation_id=org_id,
+                        name=cohort_name,
+                        description=f"Auto-created from CSV import",
+                    )
+                    db.add(cohort)
+                    db.flush()
+
+                # Check if membership exists
+                existing_cm = db.query(CohortMembership).filter(
+                    CohortMembership.cohort_id == cohort.id,
+                    CohortMembership.student_id == student.id,
+                ).first()
+                if not existing_cm:
+                    cm = CohortMembership(cohort_id=cohort.id, student_id=student.id)
+                    db.add(cm)
 
             # Collect per-row warnings
             all_warnings.extend(

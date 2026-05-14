@@ -290,6 +290,11 @@ class OrganisationMembership(Base):
         server_default="'member'",
         comment="owner | admin | member",
     )
+    permission = Column(
+        String(20), nullable=False, default="read_write",
+        server_default="'read_write'",
+        comment="Global permission: read_write | read_only. Counsellors default read_write.",
+    )
     created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,
@@ -304,8 +309,34 @@ class OrganisationMembership(Base):
     def __repr__(self) -> str:
         return (
             f"<OrganisationMembership id={self.id!s} "
-            f"org={self.organisation_id!s} user={self.user_id!s} role={self.role!r}>"
+            f"org={self.organisation_id!s} user={self.user_id!s} role={self.role!r} perm={self.permission!r}>"
         )
+
+
+# ---------------------------------------------------------------------------
+# cohort_permissions — per-cohort access overrides
+# ---------------------------------------------------------------------------
+
+
+class CohortPermission(Base):
+    """Per-cohort permission override. A viewer with global read_only
+    can be granted read_write on specific cohorts."""
+
+    __tablename__ = "cohort_permissions"
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "cohort_id", name="uq_cohort_perm_user_cohort"),
+    )
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid(), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    cohort_id = Column(UUID(as_uuid=True), ForeignKey("student_cohorts.id", ondelete="CASCADE"), nullable=False)
+    permission = Column(
+        String(20), nullable=False, default="read_write",
+        server_default="'read_write'",
+        comment="Cohort-level permission: read_write | read_only",
+    )
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
 
 
 # ---------------------------------------------------------------------------

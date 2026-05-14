@@ -127,6 +127,86 @@ def get_current_student(
     return user
 
 
+def check_write_permission(
+    user: User,
+    db: Session,
+    student_id: Optional[UUID] = None,
+) -> bool:
+    """Check if user has write permission. Returns True if allowed.
+
+    Hybrid model:
+    - role=admin or role=counsellor with permission=read_write → always True
+    - role=counsellor with permission=read_only → check cohort overrides
+    - If student_id provided, check if student is in a cohort where user has read_write
+    """
+    if user.role == "admin":
+        return True
+
+    org_id = getattr(user, "active_organisation_id", None)
+    if not org_id:
+        return False
+
+    from app.db.models import OrganisationMembership, CohortPermission
+    membership = db.query(OrganisationMembership).filter(
+        OrganisationMembership.user_id == user.id,
+        OrganisationMembership.organisation_id == org_id,
+    ).first()
+
+    if not membership:
+        return False
+
+    # Global read_write → always allowed
+    global_perm = getattr(membership, "permission", "read_write")
+    if global_perm == "read_write":
+        return True
+
+    # Global read_only — check cohort overrides
+    if student_id is None:
+        return False  # No student context → no write
+
+    from app.db.models_v2 import CohortMembership
+    # Find cohorts this student belongs to
+    student_cohort_ids = [
+        cm.cohort_id for cm in db.query(CohortMembership).filter(
+            CohortMembership.student_id == student_id
+        ).all()
+    ]
+    if not student_cohort_ids:
+        return False  # Student not in any cohort → no override possible
+
+    # Check if user has read_write on any of those cohorts
+    override = db.query(CohortPermission).filter(
+        CohortPermission.user_id == user.id,
+        CohortPermission.cohort_id.in_(student_cohort_ids),
+        CohortPermission.permission == "read_write",
+    ).first()
+
+    return override is not None
+
+
+def require_write_permission(student_id_param: str = "student_id"):
+    """FastAPI dependency factory: raises 403 if user lacks write permission for the student."""
+    def _check(
+        request: "Request",
+        current_user: User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ) -> User:
+        from fastapi import Request
+        sid = request.path_params.get(student_id_param)
+        if sid:
+            try:
+                sid = UUID(sid)
+            except (ValueError, AttributeError):
+                sid = None
+        if not check_write_permission(current_user, db, student_id=sid):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You have read-only access. Write permission required for this student.",
+            )
+        return current_user
+    return _check
+
+
 def require_role(role: str):
     """Factory: returns a FastAPI dependency that enforces a specific role.
 
