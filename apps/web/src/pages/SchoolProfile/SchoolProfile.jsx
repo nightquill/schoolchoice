@@ -1,75 +1,63 @@
 // REQ-095: School Profile Page
-import { useState, useEffect } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
-import { toast } from 'sonner';
-import { Modal } from '@schoolchoice/ui';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
-import { Button } from '@schoolchoice/ui/primitives/button';
-import { FormCard } from '@schoolchoice/ui';
 import { getSchoolV2 } from '../../api/schoolsV2';
-import { addTarget } from '../../api/targets';
-import { getStudents } from '../../api/students';
+import { getAllProgrammes } from '../../api/jupas';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { getCompetitivenessTier } from '../../utils/competitiveness';
 
 function SchoolProfile() {
-  const { t } = useTranslation();  const { id } = useParams();
-  const [searchParams] = useSearchParams();
-  const [school, setSchool] = useState(null);
-  const [account, setAccount] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [addedToTarget, setAddedToTarget] = useState(false);
-  const [selectStudentModalOpen, setSelectStudentModalOpen] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [selectedStudentId, setSelectedStudentId] = useState('');
-  const [addingTarget, setAddingTarget] = useState(false);
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const [search, setSearch] = useState('');
+  const [faculty, setFaculty] = useState('');
 
-  const fromStudentId = searchParams.get('from_student');
+  const { data: account } = useQuery({
+    queryKey: ['account'],
+    queryFn: getAccount,
+  });
 
-  useEffect(() => {
-    Promise.all([getSchoolV2(id), getAccount()])
-      .then(([schoolData, accountData]) => {
-        setSchool(schoolData);
-        setAccount(accountData);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.detail || t('schoolProfile.loadFailed'));
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+  const { data: school, isLoading: schoolLoading, error: schoolError } = useQuery({
+    queryKey: ['school', id],
+    queryFn: () => getSchoolV2(id),
+    enabled: !!id,
+  });
 
-  const handleAddToTargetWithStudent = async (studentId) => {
-    setAddingTarget(true);
-    try {
-      await addTarget(studentId, { school_id: id });
-      setAddedToTarget(true);
-      setSelectStudentModalOpen(false);
-      toast.success(t('schoolProfile.addSuccess'));
-    } catch (err) {
-      if (err?.response?.status === 409) {
-        toast(t('schoolProfile.alreadyExists'));
-      } else {
-        toast.error(t('schoolProfile.addFailed'));
-      }
-    } finally {
-      setAddingTarget(false);
-    }
-  };
+  const { data: programmesData, isLoading: programmesLoading } = useQuery({
+    queryKey: ['jupas-all'],
+    queryFn: getAllProgrammes,
+    enabled: !!id,
+  });
 
-  const handleAddToTarget = async () => {
-    if (fromStudentId) {
-      await handleAddToTargetWithStudent(fromStudentId);
-    } else {
-      const result = await getStudents();
-      const list = Array.isArray(result) ? result : (result.items ?? []);
-      setStudents(list);
-      setSelectStudentModalOpen(true);
-    }
-  };
+  const isLoading = schoolLoading || programmesLoading;
+  const error = schoolError?.response?.data?.detail || (schoolError ? t('schoolProfile.loadFailed') : null);
 
+  // Filter programmes for this school
+  const allProgrammes = programmesData?.programmes ?? [];
+  const schoolProgrammes = allProgrammes.filter((p) => p.school_id === id);
+
+  // Unique faculties from school's programmes
+  const faculties = [...new Set(schoolProgrammes.map((p) => p.faculty).filter(Boolean))].sort();
+
+  // Apply search + faculty filters, then sort by jupas_code
+  const filtered = schoolProgrammes
+    .filter((p) => {
+      const q = search.toLowerCase();
+      const matchesSearch =
+        !q ||
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.jupas_code && p.jupas_code.toLowerCase().includes(q));
+      const matchesFaculty = !faculty || p.faculty === faculty;
+      return matchesSearch && matchesFaculty;
+    })
+    .sort((a, b) => (a.jupas_code ?? '').localeCompare(b.jupas_code ?? ''));
+
+  // Styles
   const pageStyle = {
     background: 'var(--color-background)',
     minHeight: '100vh',
@@ -80,6 +68,14 @@ function SchoolProfile() {
     background: 'var(--color-surface)',
     borderBottom: 'var(--border-width) solid var(--color-border)',
     padding: 'var(--space-6) var(--space-8)',
+  };
+
+  const backLinkStyle = {
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-primary)',
+    textDecoration: 'none',
+    display: 'inline-block',
+    marginBottom: 'var(--space-4)',
   };
 
   const schoolNameStyle = {
@@ -96,6 +92,22 @@ function SchoolProfile() {
     margin: '0 0 var(--space-3) 0',
   };
 
+  const heroRowStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 'var(--space-4)',
+    marginTop: 'var(--space-3)',
+  };
+
+  const metaRowStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-3)',
+    flexWrap: 'wrap',
+  };
+
   const typeBadgeStyle = {
     display: 'inline-block',
     background: 'var(--color-background)',
@@ -104,306 +116,305 @@ function SchoolProfile() {
     padding: 'var(--space-1) var(--space-2)',
     fontSize: 'var(--font-size-xs)',
     color: 'var(--color-text-secondary)',
-    marginRight: 'var(--space-2)',
   };
 
-  const metaStyle = {
+  const metaTextStyle = {
     fontSize: 'var(--font-size-sm)',
     color: 'var(--color-text-secondary)',
-    display: 'inline',
-    marginRight: 'var(--space-4)',
+  };
+
+  const statsRowStyle = {
+    display: 'flex',
+    gap: 'var(--space-3)',
+    flexWrap: 'wrap',
+  };
+
+  const statCardBase = {
+    borderRadius: 'var(--border-radius-md)',
+    padding: 'var(--space-3) var(--space-4)',
+    minWidth: '100px',
+    textAlign: 'center',
   };
 
   const contentStyle = {
     padding: 'var(--space-6) var(--space-8)',
-    display: 'grid',
-    gridTemplateColumns: '60% 1fr',
-    gap: 'var(--space-8)',
-    maxWidth: '1200px',
+    maxWidth: '960px',
   };
 
-  const sectionHeadingStyle = {
-    fontSize: 'var(--font-size-lg)',
-    fontWeight: 'var(--font-weight-medium)',
-    color: 'var(--color-text-primary)',
-    marginTop: 0,
-    marginBottom: 'var(--space-4)',
-  };
-
-  const tableStyle = {
-    width: '100%',
-    borderCollapse: 'collapse',
-    fontSize: 'var(--font-size-sm)',
-    marginBottom: 'var(--space-4)',
-  };
-
-  const thStyle = {
-    textAlign: 'left',
-    padding: 'var(--space-2)',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
-    fontWeight: 'var(--font-weight-medium)',
-    color: 'var(--color-text-secondary)',
-  };
-
-  const tdStyle = {
-    padding: 'var(--space-2)',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
-    color: 'var(--color-text-primary)',
-  };
-
-  const statRowStyle = {
+  const headerRowStyle = {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: 'var(--space-3) 0',
-    borderBottom: 'var(--border-width) solid var(--color-border)',
-    fontSize: 'var(--font-size-sm)',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 'var(--space-3)',
+    marginBottom: 'var(--space-4)',
   };
 
-  const provenanceStyle = {
-    background: 'var(--color-background)',
-    borderTop: 'var(--border-width) solid var(--color-border)',
-    padding: 'var(--space-4) var(--space-8)',
+  const h2Style = {
+    fontSize: 'var(--font-size-lg)',
+    fontWeight: 'var(--font-weight-bold)',
+    color: 'var(--color-text-primary)',
+    margin: 0,
+  };
+
+  const filterRowStyle = {
+    display: 'flex',
+    gap: 'var(--space-3)',
+    flexWrap: 'wrap',
+  };
+
+  const inputStyle = {
+    padding: 'var(--space-2) var(--space-3)',
+    border: 'var(--border-width) solid var(--color-border)',
+    borderRadius: 'var(--border-radius-md)',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    color: 'var(--color-text-primary)',
+    background: 'var(--color-surface)',
+    width: '220px',
+    outline: 'none',
+  };
+
+  const selectStyle = {
+    padding: 'var(--space-2) var(--space-3)',
+    border: 'var(--border-width) solid var(--color-border)',
+    borderRadius: 'var(--border-radius-md)',
+    fontSize: 'var(--font-size-sm)',
+    fontFamily: 'var(--font-family-base)',
+    color: 'var(--color-text-primary)',
+    background: 'var(--color-surface)',
+    outline: 'none',
+  };
+
+  const cardStackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--space-2)',
+  };
+
+  const cardLinkStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--space-4)',
+    background: 'var(--color-surface)',
+    border: '1px solid var(--color-border)',
+    borderRadius: '8px',
+    padding: 'var(--space-3) var(--space-4)',
+    textDecoration: 'none',
+    color: 'inherit',
+    transition: 'border-color 0.15s',
+  };
+
+  const jupasCodeStyle = {
+    fontFamily: 'monospace',
+    fontSize: 'var(--font-size-xs)',
+    background: '#f1f5f9',
+    borderRadius: '4px',
+    padding: '2px 8px',
+    color: 'var(--color-text-secondary)',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    minWidth: '64px',
+    textAlign: 'center',
+  };
+
+  const progNameColStyle = {
+    flex: 1,
+    minWidth: 0,
+  };
+
+  const progNameStyle = {
+    fontWeight: 'var(--font-weight-bold)',
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-text-primary)',
+    display: 'block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  };
+
+  const facultyStyle = {
+    fontSize: 'var(--font-size-xs)',
+    color: 'var(--color-text-secondary)',
+    display: 'block',
+    marginTop: '2px',
+  };
+
+  const medianColStyle = {
+    textAlign: 'center',
+    minWidth: '64px',
+    flexShrink: 0,
+  };
+
+  const medianValueStyle = {
+    fontWeight: 'var(--font-weight-bold)',
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-text-primary)',
+    display: 'block',
+  };
+
+  const medianLabelStyle = {
     fontSize: 'var(--font-size-xs)',
     color: 'var(--color-text-secondary)',
   };
 
-  const backLinkStyle = {
-    fontSize: 'var(--font-size-sm)',
-    color: 'var(--color-primary)',
-    textDecoration: 'none',
+  const tierBadgeBase = {
     display: 'inline-block',
-    padding: 'var(--space-3) var(--space-8)',
+    borderRadius: '999px',
+    padding: '2px 10px',
+    fontSize: 'var(--font-size-xs)',
+    fontWeight: 'var(--font-weight-medium)',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   };
 
-  const selectStyle = {
-    width: '100%',
-    padding: 'var(--space-2)',
-    border: 'var(--border-width) solid var(--color-border)',
-    borderRadius: 'var(--border-radius-sm)',
-    fontSize: 'var(--font-size-md)',
-    fontFamily: 'var(--font-family-base)',
-    marginBottom: 'var(--space-4)',
+  const arrowStyle = {
+    color: 'var(--color-text-secondary)',
+    fontSize: 'var(--font-size-sm)',
+    flexShrink: 0,
+    marginLeft: 'auto',
+  };
+
+  const emptyStyle = {
+    fontSize: 'var(--font-size-sm)',
+    color: 'var(--color-text-secondary)',
+    padding: 'var(--space-6) 0',
+    textAlign: 'center',
   };
 
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to="/schools" style={backLinkStyle}>{t('schoolProfile.backToDirectory')}</Link>
 
-      {loading && <LoadingSpinner label={t("schoolProfile.loading")} />}
+      {isLoading && <LoadingSpinner label={t('schoolProfile.loading')} />}
       {error && (
         <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
           <ErrorMessage message={error} />
-          <Link to="/schools" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>{t('schoolProfile.backToDirectory')}</Link>
+          <Link to="/schools" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>
+            {t('schoolProfile.backToDirectory')}
+          </Link>
         </div>
       )}
 
-      {!loading && !error && school && (
+      {!isLoading && !error && school && (
         <>
+          {/* Hero */}
           <div style={heroStyle}>
+            <Link to="/schools" style={backLinkStyle}>← {t('schoolProfile.backToDirectory')}</Link>
             <h1 style={schoolNameStyle}>{school.name}</h1>
             {school.name_zh && <p style={schoolNameZhStyle}>{school.name_zh}</p>}
-            <div style={{ marginBottom: 'var(--space-3)' }}>
-              <span style={typeBadgeStyle}>{school.type}</span>
-              {school.location && <span style={metaStyle}>{'\u{1F4CD}'} {school.location}</span>}
-              {school.website && (
-                <a
-                  href={school.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ ...metaStyle, color: 'var(--color-primary)', textDecoration: 'none' }}
-                  aria-label={`Visit ${school.name} website (opens in new tab)`}
-                >
-                  {t('schoolProfile.website')}
-                </a>
-              )}
-            </div>
-            {school.description && (
-              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', maxWidth: '720px', lineHeight: 'var(--line-height-normal)' }}>
-                {school.description}
-              </p>
-            )}
-          </div>
 
-          <div style={contentStyle}>
-            <div>
-              <section aria-label="Admission Requirements" style={{ marginBottom: 'var(--space-8)' }}>
-                <h2 style={sectionHeadingStyle}>{t('schoolProfile.admissionRequirements')}</h2>
-                <p style={{ fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-3)' }}>
-                  <strong>{t('schoolProfile.minAggregate')}</strong>{' '}
-                  {school.minimum_entry_score != null ? school.minimum_entry_score : t('schoolProfile.notSpecified')}
-                </p>
-                {school.required_subjects && school.required_subjects.length > 0 ? (
-                  <table style={tableStyle} aria-label="Required subjects">
-                    <thead>
-                      <tr>
-                        <th style={thStyle}>{t('schoolProfile.subjectCode')}</th>
-                        <th style={thStyle}>{t('schoolProfile.minGrade')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {school.required_subjects.map((req, i) => (
-                        <tr key={i}>
-                          <td style={tdStyle}>{req.subject_code}</td>
-                          <td style={tdStyle}>{req.minimum_grade}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.noSubjectReqs')}</p>
+            <div style={heroRowStyle}>
+              <div style={metaRowStyle}>
+                {school.type && <span style={typeBadgeStyle}>{school.type}</span>}
+                {school.location && <span style={metaTextStyle}>📍 {school.location}</span>}
+                {school.website && (
+                  <a
+                    href={school.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', textDecoration: 'none' }}
+                  >
+                    {t('schoolProfile.website')}
+                  </a>
                 )}
-                <p style={{ fontSize: 'var(--font-size-sm)' }}>
-                  <strong>{t('schoolProfile.ieltsReq')}</strong>{' '}
-                  {school.language_requirements?.ielts_minimum != null
-                    ? school.language_requirements.ielts_minimum
-                    : t('schoolProfile.noIeltsReq')}
-                </p>
-              </section>
+              </div>
 
-              <section aria-label="Programs">
-                <h2 style={sectionHeadingStyle}>{t('schoolProfile.programs')}</h2>
-                {school.faculties && school.faculties.length > 0 && (
-                  <>
-                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>{t('schoolProfile.faculties')}</h3>
-                    <ul style={{ fontSize: 'var(--font-size-sm)', paddingLeft: 'var(--space-5)', marginBottom: 'var(--space-4)' }}>
-                      {school.faculties.map((f, i) => <li key={i}>{f}</li>)}
-                    </ul>
-                  </>
-                )}
-                {school.notable_programs && school.notable_programs.length > 0 && (
-                  <>
-                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>{t('schoolProfile.notablePrograms')}</h3>
-                    <ul style={{ fontSize: 'var(--font-size-sm)', paddingLeft: 'var(--space-5)' }}>
-                      {school.notable_programs.map((p, i) => <li key={i}>{p}</li>)}
-                    </ul>
-                  </>
-                )}
-              </section>
-
-              <section aria-label="Requirements by Major" style={{ marginTop: 'var(--space-6)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-                  <h2 style={{ ...sectionHeadingStyle, marginBottom: 0 }}>{t('schoolProfile.reqsByMajor')}</h2>
-                </div>
-                {Array.isArray(school.major_requirements) && school.major_requirements.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                    {school.major_requirements.map((req) => (
-                      <div key={req.major} style={{ background: 'var(--color-background)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-3)', border: 'var(--border-width) solid var(--color-border)' }}>
-                        <div style={{ fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)', color: 'var(--color-text-primary)' }}>
-                          {req.major}
-                          {req.jupas_code && <span style={{ marginLeft: 'var(--space-2)', fontWeight: 'var(--font-weight-normal)', color: 'var(--color-text-secondary)' }}>{req.jupas_code}</span>}
-                        </div>
-                        {req.minimum_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.minAgg')} {req.minimum_score}</div>}
-                        {req.average_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t('schoolProfile.avgAdmitted')} {req.average_score}</div>}
-                        {req.required_subjects && req.required_subjects.length > 0 && (
-                          <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
-                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>{t('schoolProfile.required')}</span>
-                            <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
-                              {req.required_subjects.map((s, si) => (
-                                <span key={si} style={{ background: 'rgba(220,38,38,0.08)', border: 'var(--border-width) solid rgba(220,38,38,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-error)' }}>
-                                  {s.subject_code}{s.min_grade ? ` ≥${s.min_grade}` : ''}
-                                </span>
-                              ))}
-                            </span>
-                          </div>
-                        )}
-                        {req.preferred_subjects && req.preferred_subjects.length > 0 && (
-                          <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
-                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>{t('schoolProfile.preferred')}</span>
-                            <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
-                              {req.preferred_subjects.map((s, si) => (
-                                <span key={si} style={{ background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
-                                  {typeof s === 'string' ? s : s.subject_code}
-                                </span>
-                              ))}
-                            </span>
-                          </div>
-                        )}
-                        {req.notes && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)', fontStyle: 'italic' }}>{req.notes}</div>}
-                      </div>
-                    ))}
+              <div style={statsRowStyle}>
+                <div style={{ ...statCardBase, background: '#d1fae5' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#065f46' }}>
+                    {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : 'N/A'}
                   </div>
-                ) : (
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.noMajorReqData')}</p>
-                )}
-              </section>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <FormCard title={t('schoolProfile.statistics')}>
-                <div style={statRowStyle}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.acceptanceRate')}</span>
-                  <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
-                    {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : t('schoolProfile.na')}
-                  </span>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#065f46', marginTop: '2px' }}>Accept Rate</div>
                 </div>
-                <div style={statRowStyle}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.avgAdmittedScore')}</span>
-                  <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
-                    {school.average_admitted_score != null ? school.average_admitted_score : t('schoolProfile.na')}
-                  </span>
+                <div style={{ ...statCardBase, background: '#dbeafe' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#1e40af' }}>
+                    {school.average_admitted_score != null ? school.average_admitted_score : 'N/A'}
+                  </div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#1e40af', marginTop: '2px' }}>Avg Score</div>
                 </div>
-                <div style={{ ...statRowStyle, borderBottom: 'none' }}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.scholarshipAvailable')}</span>
-                  <span style={{ fontWeight: 'var(--font-weight-medium)', color: school.scholarship_available ? 'var(--color-success)' : 'inherit' }}>
-                    {school.scholarship_available ? t('common.yes') : t('common.no')}
-                  </span>
+                <div style={{ ...statCardBase, background: '#ede9fe' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#6b21a8' }}>
+                    {filtered.length}
+                  </div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#6b21a8', marginTop: '2px' }}>Programmes</div>
                 </div>
-              </FormCard>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                {addedToTarget ? (
-                  <Button disabled variant="outline">{t('schoolProfile.alreadyInTargets')}</Button>
-                ) : (
-                  <Button onClick={handleAddToTarget} disabled={addingTarget}>
-                    {addingTarget ? t('common.loading') : (fromStudentId ? t('schoolProfile.addToTargets') : t('schoolProfile.selectAndAdd'))}
-                  </Button>
-                )}
-                <Link to="/schools">
-                  <Button variant="outline">{t('schoolProfile.backToDirectory')}</Button>
-                </Link>
               </div>
             </div>
           </div>
 
-          {(school.data_source || school.data_last_updated) && (
-            <div style={provenanceStyle}>
-              {school.data_source && <span>{t('schoolProfile.source')} {school.data_source}</span>}
-              {school.data_source && school.data_last_updated && <span> &middot; </span>}
-              {school.data_last_updated && (
-                <span>{t('schoolProfile.lastUpdated')} {school.data_last_updated.slice(0, 10)}</span>
-              )}
+          {/* Programme list */}
+          <div style={contentStyle}>
+            <div style={headerRowStyle}>
+              <h2 style={h2Style}>Programmes</h2>
+              <div style={filterRowStyle}>
+                <input
+                  type="text"
+                  placeholder="Search programmes..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={inputStyle}
+                  aria-label="Search programmes"
+                />
+                <select
+                  value={faculty}
+                  onChange={(e) => setFaculty(e.target.value)}
+                  style={selectStyle}
+                  aria-label="Filter by faculty"
+                >
+                  <option value="">All Faculties</option>
+                  {faculties.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
+
+            {filtered.length === 0 ? (
+              <p style={emptyStyle}>No programmes found.</p>
+            ) : (
+              <div style={cardStackStyle}>
+                {filtered.map((prog) => {
+                  const tier = getCompetitivenessTier(prog.admission_stats);
+                  return (
+                    <Link
+                      key={prog.jupas_code}
+                      to={`/schools/${id}/programmes/${prog.jupas_code}`}
+                      style={cardLinkStyle}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                    >
+                      <span style={jupasCodeStyle}>{prog.jupas_code}</span>
+
+                      <div style={progNameColStyle}>
+                        <span style={progNameStyle}>{prog.name}</span>
+                        {prog.faculty && <span style={facultyStyle}>{prog.faculty}</span>}
+                      </div>
+
+                      <div style={medianColStyle}>
+                        <span style={medianValueStyle}>{tier.median ?? '—'}</span>
+                        <span style={medianLabelStyle}>Median</span>
+                      </div>
+
+                      <span
+                        style={{
+                          ...tierBadgeBase,
+                          background: tier.bg,
+                          color: tier.color,
+                        }}
+                      >
+                        {tier.label}
+                      </span>
+
+                      <span style={arrowStyle}>→</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </>
       )}
-
-      <Modal
-        isOpen={selectStudentModalOpen}
-        title={t('schoolProfile.selectStudentTitle')}
-        onClose={() => setSelectStudentModalOpen(false)}
-        onConfirm={() => selectedStudentId && handleAddToTargetWithStudent(selectedStudentId)}
-        confirmLabel={t('schoolProfile.addToTargets')}
-      >
-        <div>
-          <label htmlFor="student-select" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)' }}>
-            {t('schoolProfile.selectStudent', { school: school?.name })}
-          </label>
-          <select
-            id="student-select"
-            value={selectedStudentId}
-            onChange={(e) => setSelectedStudentId(e.target.value)}
-            style={selectStyle}
-            aria-label="Select student"
-          >
-            <option value="">{t('schoolProfile.chooseStudent')}</option>
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>{s.full_name || s.name}</option>
-            ))}
-          </select>
-        </div>
-      </Modal>
-
     </div>
   );
 }
