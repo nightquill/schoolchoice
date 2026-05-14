@@ -16,6 +16,7 @@ import {
   searchStudents,
 } from '../../api/cohorts';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 // ---- Grade-numeric display helpers ----
 const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
@@ -65,7 +66,7 @@ const tdStyle = {
 
 // ---- Main ----
 function CohortDetail() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [cohort, setCohort] = useState(null);
@@ -155,7 +156,7 @@ function CohortDetail() {
       toast.success(`${selectedIds.size} student(s) added.`);
       loadStats(sittingFilter);
     } catch {
-      toast.error('Failed to add students.');
+      toast.error(t('cohortDetail.addFailed'));
     } finally {
       setAdding(false);
     }
@@ -171,10 +172,10 @@ function CohortDetail() {
         members: prev.members.filter((m) => m.id !== removeTarget.id),
       }));
       setRemoveTarget(null);
-      toast.success('Student removed from cohort.');
+      toast.success(t('cohortDetail.removeSuccess'));
       loadStats(sittingFilter);
     } catch {
-      toast.error('Failed to remove student.');
+      toast.error(t('cohortDetail.removeFailed'));
     } finally {
       setRemoving(false);
     }
@@ -245,7 +246,7 @@ function CohortDetail() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to="/cohorts" style={backLinkStyle}>← Back to Cohorts</Link>
+      <Link to="/cohorts" style={backLinkStyle}>{t('cohortDetail.backToCohorts')}</Link>
 
       {loading && <LoadingSpinner label="Loading cohort…" />}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}
@@ -264,9 +265,9 @@ function CohortDetail() {
               )}
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-              <Button onClick={() => navigate(`/cohorts/${id}/report`)}>View Report</Button>
-              <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>Bulk Edit Grades</Button>
-              <Button onClick={() => setAddModalOpen(true)}>Add Students</Button>
+              <Button onClick={() => navigate(`/cohorts/${id}/report`)}>{t('cohortDetail.viewReport')}</Button>
+              <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>{t('cohortDetail.bulkEditGrades')}</Button>
+              <Button onClick={() => setAddModalOpen(true)}>{t('cohortDetail.addStudents')}</Button>
             </div>
           </div>
 
@@ -274,7 +275,7 @@ function CohortDetail() {
             {/* Members section */}
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Members ({cohort.members.length})</span>
+                <span>{t('cohortDetail.members')} ({cohort.members.length})</span>
               </div>
               {cohort.members.length === 0 ? (
                 <div style={{ padding: 'var(--space-5)' }}>
@@ -285,10 +286,10 @@ function CohortDetail() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={thStyle}>Name</th>
-                        <th style={thStyle}>Class</th>
-                        <th style={thStyle}>Year</th>
-                        <th style={thStyle}>Actions</th>
+                        <th style={thStyle}>{t('cohortDetail.name')}</th>
+                        <th style={thStyle}>{t('cohortDetail.class')}</th>
+                        <th style={thStyle}>{t('cohortDetail.year')}</th>
+                        <th style={thStyle}>{t('cohortDetail.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -333,7 +334,7 @@ function CohortDetail() {
             {/* Stats section */}
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Subject Statistics</span>
+                <span>{t('cohortDetail.subjectStats')}</span>
                 <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
                   <label htmlFor="sitting-filter" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
                     Sitting:
@@ -344,7 +345,7 @@ function CohortDetail() {
                     onChange={(e) => setSittingFilter(e.target.value)}
                     style={{ ...inputStyle, minWidth: '120px' }}
                   >
-                    <option value="">All</option>
+                    <option value="">{t('cohortDetail.all')}</option>
                     <option value="MOCK">MOCK</option>
                     <option value="TRIAL">TRIAL</option>
                     <option value="OFFICIAL">OFFICIAL</option>
@@ -362,13 +363,13 @@ function CohortDetail() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={thStyle}>Subject Code</th>
-                        <th style={thStyle}>Subject Name</th>
-                        <th style={thStyle}>Sitting</th>
-                        <th style={thStyle}>Students</th>
-                        <th style={thStyle}>Mean Grade</th>
-                        <th style={thStyle}>Variance</th>
-                        <th style={thStyle}>Distribution</th>
+                        <th style={thStyle}>{t('cohortDetail.subjectCode')}</th>
+                        <th style={thStyle}>{t('cohortDetail.subjectName')}</th>
+                        <th style={thStyle}>{t('cohortDetail.sitting')}</th>
+                        <th style={thStyle}>{t('cohortDetail.students')}</th>
+                        <th style={thStyle}>{t('cohortDetail.meanGrade')}</th>
+                        <th style={thStyle}>{t('cohortDetail.variance')}</th>
+                        <th style={thStyle}>{t('cohortDetail.distribution')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -387,7 +388,7 @@ function CohortDetail() {
       {/* Add students modal */}
       <Modal
         isOpen={addModalOpen}
-        title="Add Students to Cohort"
+        title={t('cohortDetail.addStudentsTitle')}
         onClose={() => { setAddModalOpen(false); setSelectedIds(new Set()); setSearchResults([]); setSearchQuery(''); setSearchClass(''); setSearchYear(''); }}
         onConfirm={handleAddMembers}
         confirmLabel={adding ? 'Adding…' : `Add Selected (${selectedIds.size})`}
@@ -399,27 +400,27 @@ function CohortDetail() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Name…"
+              placeholder={t("cohortDetail.namePlaceholder")}
               style={{ ...inputStyle, flex: '2 1 120px' }}
               aria-label="Search by name"
             />
             <input
               value={searchClass}
               onChange={(e) => setSearchClass(e.target.value)}
-              placeholder="Class (e.g. 5A)"
+              placeholder={t("cohortDetail.classPlaceholder")}
               style={{ ...inputStyle, flex: '1 1 80px' }}
               aria-label="Filter by class"
             />
             <input
               value={searchYear}
               onChange={(e) => setSearchYear(e.target.value)}
-              placeholder="Year"
+              placeholder={t("cohortDetail.yearPlaceholder")}
               type="number"
               style={{ ...inputStyle, flex: '1 1 60px' }}
               aria-label="Filter by year"
             />
             <Button onClick={handleSearch} disabled={searchLoading}>
-              {searchLoading ? 'Searching...' : 'Search'}
+              {searchLoading ? t('schools.searching') : t('cohortDetail.searchBtn')}
             </Button>
           </div>
 
@@ -459,7 +460,7 @@ function CohortDetail() {
                       {s.class_name && <span style={{ color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>{s.class_name}</span>}
                       {s.year_of_study && <span style={{ color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>Y{s.year_of_study}</span>}
                     </span>
-                    {alreadyMember && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>already in cohort</span>}
+                    {alreadyMember && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('cohortDetail.alreadyInCohort')}</span>}
                   </li>
                 );
               })}
@@ -471,10 +472,10 @@ function CohortDetail() {
       {/* Remove confirmation modal */}
       <Modal
         isOpen={!!removeTarget}
-        title="Remove Student"
+        title={t('cohortDetail.removeStudent')}
         onClose={() => setRemoveTarget(null)}
         onConfirm={handleRemoveMember}
-        confirmLabel={removing ? 'Removing…' : 'Remove'}
+        confirmLabel={removing ? t('cohortDetail.removing') : t('cohortDetail.remove')}
         confirmVariant="danger"
       >
         <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>

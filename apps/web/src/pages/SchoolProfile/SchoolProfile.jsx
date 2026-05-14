@@ -12,9 +12,10 @@ import { getSchoolV2 } from '../../api/schoolsV2';
 import { addTarget } from '../../api/targets';
 import { getStudents } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function SchoolProfile() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   const [searchParams] = useSearchParams();
   const [school, setSchool] = useState(null);
   const [account, setAccount] = useState(null);
@@ -46,12 +47,12 @@ function SchoolProfile() {
       await addTarget(studentId, { school_id: id });
       setAddedToTarget(true);
       setSelectStudentModalOpen(false);
-      toast.success('School added to target list.');
+      toast.success(t('schoolProfile.addSuccess'));
     } catch (err) {
       if (err?.response?.status === 409) {
-        toast('This school is already in the target list.');
+        toast(t('schoolProfile.alreadyExists'));
       } else {
-        toast.error('Failed to add school to target list.');
+        toast.error(t('schoolProfile.addFailed'));
       }
     } finally {
       setAddingTarget(false);
@@ -187,9 +188,9 @@ function SchoolProfile() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to="/schools" style={backLinkStyle}>← Back to Directory</Link>
+      <Link to="/schools" style={backLinkStyle}>{t('schoolProfile.backToDirectory')}</Link>
 
-      {loading && <LoadingSpinner label="Loading school profile..." />}
+      {loading && <LoadingSpinner label={t("schoolProfile.loading")} />}
       {error && (
         <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
           <ErrorMessage message={error} />
@@ -213,7 +214,7 @@ function SchoolProfile() {
                   style={{ ...metaStyle, color: 'var(--color-primary)', textDecoration: 'none' }}
                   aria-label={`Visit ${school.name} website (opens in new tab)`}
                 >
-                  Website ↗
+                  {t('schoolProfile.website')}
                 </a>
               )}
             </div>
@@ -227,17 +228,17 @@ function SchoolProfile() {
           <div style={contentStyle}>
             <div>
               <section aria-label="Admission Requirements" style={{ marginBottom: 'var(--space-8)' }}>
-                <h2 style={sectionHeadingStyle}>Admission Requirements</h2>
+                <h2 style={sectionHeadingStyle}>{t('schoolProfile.admissionRequirements')}</h2>
                 <p style={{ fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-3)' }}>
-                  <strong>Minimum HKDSE Aggregate:</strong>{' '}
-                  {school.minimum_entry_score != null ? school.minimum_entry_score : 'Not specified.'}
+                  <strong>{t('schoolProfile.minAggregate')}</strong>{' '}
+                  {school.minimum_entry_score != null ? school.minimum_entry_score : t('schoolProfile.notSpecified')}
                 </p>
                 {school.required_subjects && school.required_subjects.length > 0 ? (
                   <table style={tableStyle} aria-label="Required subjects">
                     <thead>
                       <tr>
-                        <th style={thStyle}>Subject Code</th>
-                        <th style={thStyle}>Minimum Grade</th>
+                        <th style={thStyle}>{t('schoolProfile.subjectCode')}</th>
+                        <th style={thStyle}>{t('schoolProfile.minGrade')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -250,21 +251,21 @@ function SchoolProfile() {
                     </tbody>
                   </table>
                 ) : (
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>No specific subject requirements listed.</p>
+                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.noSubjectReqs')}</p>
                 )}
                 <p style={{ fontSize: 'var(--font-size-sm)' }}>
-                  <strong>IELTS Requirement:</strong>{' '}
+                  <strong>{t('schoolProfile.ieltsReq')}</strong>{' '}
                   {school.language_requirements?.ielts_minimum != null
                     ? school.language_requirements.ielts_minimum
-                    : 'No IELTS requirement listed.'}
+                    : t('schoolProfile.noIeltsReq')}
                 </p>
               </section>
 
               <section aria-label="Programs">
-                <h2 style={sectionHeadingStyle}>Programs</h2>
+                <h2 style={sectionHeadingStyle}>{t('schoolProfile.programs')}</h2>
                 {school.faculties && school.faculties.length > 0 && (
                   <>
-                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>Faculties</h3>
+                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>{t('schoolProfile.faculties')}</h3>
                     <ul style={{ fontSize: 'var(--font-size-sm)', paddingLeft: 'var(--space-5)', marginBottom: 'var(--space-4)' }}>
                       {school.faculties.map((f, i) => <li key={i}>{f}</li>)}
                     </ul>
@@ -272,7 +273,7 @@ function SchoolProfile() {
                 )}
                 {school.notable_programs && school.notable_programs.length > 0 && (
                   <>
-                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>Notable Programs</h3>
+                    <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-2)' }}>{t('schoolProfile.notablePrograms')}</h3>
                     <ul style={{ fontSize: 'var(--font-size-sm)', paddingLeft: 'var(--space-5)' }}>
                       {school.notable_programs.map((p, i) => <li key={i}>{p}</li>)}
                     </ul>
@@ -282,7 +283,7 @@ function SchoolProfile() {
 
               <section aria-label="Requirements by Major" style={{ marginTop: 'var(--space-6)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
-                  <h2 style={{ ...sectionHeadingStyle, marginBottom: 0 }}>Requirements by Major</h2>
+                  <h2 style={{ ...sectionHeadingStyle, marginBottom: 0 }}>{t('schoolProfile.reqsByMajor')}</h2>
                 </div>
                 {Array.isArray(school.major_requirements) && school.major_requirements.length > 0 ? (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
@@ -292,11 +293,11 @@ function SchoolProfile() {
                           {req.major}
                           {req.jupas_code && <span style={{ marginLeft: 'var(--space-2)', fontWeight: 'var(--font-weight-normal)', color: 'var(--color-text-secondary)' }}>{req.jupas_code}</span>}
                         </div>
-                        {req.minimum_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Min. aggregate: {req.minimum_score}</div>}
-                        {req.average_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>Avg. admitted: {req.average_score}</div>}
+                        {req.minimum_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.minAgg')} {req.minimum_score}</div>}
+                        {req.average_score != null && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{t('schoolProfile.avgAdmitted')} {req.average_score}</div>}
                         {req.required_subjects && req.required_subjects.length > 0 && (
                           <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
-                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>Required:</span>
+                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>{t('schoolProfile.required')}</span>
                             <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
                               {req.required_subjects.map((s, si) => (
                                 <span key={si} style={{ background: 'rgba(220,38,38,0.08)', border: 'var(--border-width) solid rgba(220,38,38,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-error)' }}>
@@ -308,7 +309,7 @@ function SchoolProfile() {
                         )}
                         {req.preferred_subjects && req.preferred_subjects.length > 0 && (
                           <div style={{ fontSize: 'var(--font-size-xs)', marginTop: 'var(--space-2)' }}>
-                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>Preferred:</span>
+                            <span style={{ color: 'var(--color-text-secondary)', marginRight: 'var(--space-1)' }}>{t('schoolProfile.preferred')}</span>
                             <span style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap' }}>
                               {req.preferred_subjects.map((s, si) => (
                                 <span key={si} style={{ background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
@@ -329,21 +330,21 @@ function SchoolProfile() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              <FormCard title="Statistics">
+              <FormCard title={t('schoolProfile.statistics')}>
                 <div style={statRowStyle}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>Acceptance Rate</span>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.acceptanceRate')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
                     {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : 'N/A'}
                   </span>
                 </div>
                 <div style={statRowStyle}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>Avg. Admitted Score</span>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.avgAdmittedScore')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
                     {school.average_admitted_score != null ? school.average_admitted_score : 'N/A'}
                   </span>
                 </div>
                 <div style={{ ...statRowStyle, borderBottom: 'none' }}>
-                  <span style={{ color: 'var(--color-text-secondary)' }}>Scholarship Available</span>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.scholarshipAvailable')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)', color: school.scholarship_available ? 'var(--color-success)' : 'inherit' }}>
                     {school.scholarship_available ? 'Yes' : 'No'}
                   </span>
@@ -352,14 +353,14 @@ function SchoolProfile() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                 {addedToTarget ? (
-                  <Button disabled variant="outline">Already in Target List</Button>
+                  <Button disabled variant="outline">{t('schoolProfile.alreadyInTargets')}</Button>
                 ) : (
                   <Button onClick={handleAddToTarget} disabled={addingTarget}>
-                    {addingTarget ? 'Adding...' : (fromStudentId ? 'Add to Target List' : 'Select Student & Add')}
+                    {addingTarget ? t('common.loading') : (fromStudentId ? t('schoolProfile.addToTargets') : t('schoolProfile.selectAndAdd'))}
                   </Button>
                 )}
                 <Link to="/schools">
-                  <Button variant="outline">Back to Directory</Button>
+                  <Button variant="outline">{t('schoolProfile.backToDirectory')}</Button>
                 </Link>
               </div>
             </div>
@@ -382,7 +383,7 @@ function SchoolProfile() {
         title="Select Student"
         onClose={() => setSelectStudentModalOpen(false)}
         onConfirm={() => selectedStudentId && handleAddToTargetWithStudent(selectedStudentId)}
-        confirmLabel="Add to Target List"
+        confirmLabel={t('schoolProfile.addToTargets')}
       >
         <div>
           <label htmlFor="student-select" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)' }}>
@@ -395,7 +396,7 @@ function SchoolProfile() {
             style={selectStyle}
             aria-label="Select student"
           >
-            <option value="">Choose a student…</option>
+            <option value="">{t('schoolProfile.chooseStudent')}</option>
             {students.map((s) => (
               <option key={s.id} value={s.id}>{s.full_name || s.name}</option>
             ))}

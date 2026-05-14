@@ -1,8 +1,10 @@
 import { usePersonalTab } from '../../hooks/usePersonalTab';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { Input } from '@schoolchoice/ui/primitives/input';
 
 export default function PersonalTab({ studentId, student, onSaved }) {
+  const { t } = useTranslation();
   const { form, saving, errors, handleChange, handleSave, calcAge } = usePersonalTab(student, studentId, onSaved);
 
   const gridStyle = {
@@ -33,7 +35,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
       <div style={gridStyle}>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-full_name" style={labelStyle}>
-            Full Name
+            {t('personal.fullName')}
           </label>
           <Input
             id="input-full_name"
@@ -50,7 +52,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-preferred_name" style={labelStyle}>
-            Preferred Name
+            {t('personal.preferredName')}
           </label>
           <Input
             id="input-preferred_name"
@@ -60,7 +62,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
           />
         </div>
         <div>
-          <label style={labelStyle}>Date of Birth</label>
+          <label style={labelStyle}>{t('personal.dateOfBirth')}</label>
           <input
             type="date"
             name="date_of_birth"
@@ -70,12 +72,12 @@ export default function PersonalTab({ studentId, student, onSaved }) {
             aria-label="Date of birth"
           />
           {age !== null && (
-            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '0' }}>Age: {age}</p>
+            <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '0' }}>{t('personal.age', { age })}</p>
           )}
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-gender" style={labelStyle}>
-            Gender
+            {t('personal.gender')}
           </label>
           <Input
             id="input-gender"
@@ -86,7 +88,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ gridColumn: '1 / -1', marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-address" style={labelStyle}>
-            Address
+            {t('personal.address')}
           </label>
           <Input
             id="input-address"
@@ -97,7 +99,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-phone" style={labelStyle}>
-            Phone
+            {t('personal.phone')}
           </label>
           <Input
             id="input-phone"
@@ -108,7 +110,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-email" style={labelStyle}>
-            Email
+            {t('personal.email')}
           </label>
           <Input
             id="input-email"
@@ -126,7 +128,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-class_name" style={labelStyle}>
-            Class
+            {t('personal.class')}
           </label>
           <Input
             id="input-class_name"
@@ -137,7 +139,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-year_of_study" style={labelStyle}>
-            Year of Study
+            {t('personal.yearOfStudy')}
           </label>
           <Input
             id="input-year_of_study"
@@ -149,7 +151,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-candidate_number" style={labelStyle}>
-            Candidate Number
+            {t('personal.candidateNumber')}
           </label>
           <Input
             id="input-candidate_number"
@@ -159,15 +161,15 @@ export default function PersonalTab({ studentId, student, onSaved }) {
           />
         </div>
         <div>
-          <label style={labelStyle}>Preferred Language</label>
+          <label style={labelStyle}>{t('personal.preferredLanguage')}</label>
           <select
             name="preferred_language"
             value={form.preferred_language}
             onChange={handleChange}
             style={{ padding: 'var(--space-2)', borderRadius: 'var(--border-radius-sm)', border: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', width: '100%' }}
           >
-            <option value="en">English</option>
-            <option value="zh">Chinese ({'\u4E2D\u6587'})</option>
+            <option value="en">{t('personal.english')}</option>
+            <option value="zh">{t('personal.chinese')}</option>
           </select>
         </div>
       </div>
@@ -180,17 +182,17 @@ export default function PersonalTab({ studentId, student, onSaved }) {
           onChange={handleChange}
         />
         <label htmlFor="financial_aid_flag" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>
-          Financial Aid Applicant
+          {t('personal.financialAid')}
         </label>
       </div>
       <div style={{ marginBottom: 'var(--space-4)' }}>
-        <label htmlFor="personal_statement" style={labelStyle}>Personal Statement</label>
+        <label htmlFor="personal_statement" style={labelStyle}>{t('personal.personalStatement')}</label>
         <textarea
           id="personal_statement"
           name="personal_statement"
           value={form.personal_statement}
           onChange={handleChange}
-          placeholder="Write a personal statement for university applications…"
+          placeholder={t('personal.personalStatementPlaceholder')}
           rows={6}
           style={{
             width: '100%',
@@ -206,7 +208,7 @@ export default function PersonalTab({ studentId, student, onSaved }) {
         />
       </div>
       <Button onClick={handleSave} disabled={saving}>
-        {saving ? 'Loading…' : 'Save'}
+        {saving ? t('personal.loading') : t('personal.save')}
       </Button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useLanguageTab } from '../../hooks/useLanguageTab';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { Button } from '@schoolchoice/ui/primitives/button';
 
 export default function LanguageTab({ studentId, student, onSaved }) {
@@ -12,7 +13,7 @@ export default function LanguageTab({ studentId, student, onSaved }) {
     updateOtherScore,
     updateIelts,
   } = useLanguageTab(student, studentId, onSaved);
-
+  const { t } = useTranslation();
   const sectionHeadingStyle = {
     fontSize: 'var(--font-size-lg)',
     fontWeight: 'var(--font-weight-medium)',
@@ -40,15 +41,15 @@ export default function LanguageTab({ studentId, student, onSaved }) {
 
   return (
     <div>
-      <h3 style={sectionHeadingStyle}>IELTS</h3>
+      <h3 style={sectionHeadingStyle}>{t('language.ielts')}</h3>
       <div style={gridStyle}>
         {[
-          ['Overall Band', 'ielts_score'],
-          ['Listening', 'ielts_listening'],
-          ['Reading', 'ielts_reading'],
-          ['Writing', 'ielts_writing'],
-          ['Speaking', 'ielts_speaking'],
-          ['Test Date', 'ielts_date'],
+          [t('language.overallBand'), 'ielts_score'],
+          [t('language.listening'), 'ielts_listening'],
+          [t('language.reading'), 'ielts_reading'],
+          [t('language.writing'), 'ielts_writing'],
+          [t('language.speaking'), 'ielts_speaking'],
+          [t('language.testDate'), 'ielts_date'],
         ].map(([label, field]) => (
           <div key={field}>
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }} htmlFor={`ielts-${field}`}>{label}</label>
@@ -66,19 +67,19 @@ export default function LanguageTab({ studentId, student, onSaved }) {
         ))}
       </div>
 
-      <h3 style={sectionHeadingStyle}>Other Language Scores</h3>
+      <h3 style={sectionHeadingStyle}>{t('language.otherScores')}</h3>
       {otherScores.map((score, index) => (
         <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--space-3)', marginBottom: 'var(--space-3)', alignItems: 'end' }}>
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Label</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('language.label')}</label>
             <input value={score.label} onChange={(e) => updateOtherScore(index, 'label', e.target.value)} style={inputStyle} aria-label="Score label" />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Score</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('language.score')}</label>
             <input value={score.score} onChange={(e) => updateOtherScore(index, 'score', e.target.value)} style={inputStyle} aria-label="Score value" />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Date</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('language.date')}</label>
             <input type="date" value={score.date} onChange={(e) => updateOtherScore(index, 'date', e.target.value)} style={inputStyle} aria-label="Score date" />
           </div>
           <button
@@ -91,10 +92,10 @@ export default function LanguageTab({ studentId, student, onSaved }) {
         </div>
       ))}
       <div style={{ marginBottom: 'var(--space-4)' }}>
-        <Button variant="secondary" onClick={addOtherScore}>Add Score</Button>
+        <Button variant="secondary" onClick={addOtherScore}>{t('language.addScore')}</Button>
       </div>
       <Button onClick={handleSave} disabled={saving}>
-        {saving ? 'Loading…' : 'Save'}
+        {saving ? t('common.loading') : t('language.save')}
       </Button>
     </div>
   );

@@ -7,6 +7,7 @@ import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import client from '@schoolchoice/ui/api/client';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 // API helpers
 const getTargetDistribution = (cohortId) =>
@@ -24,7 +25,7 @@ function numericToGrade(n) {
 }
 
 function CohortReport() {
-  const { cohortId } = useParams();
+  const { t } = useTranslation();  const { cohortId } = useParams();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -136,7 +137,7 @@ function CohortReport() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
       <Link to={`/cohorts/${cohortId}`} style={backLinkStyle}>
-        &larr; Back to Cohort
+        {t('cohortDetail.backToCohorts')}
       </Link>
 
       {loading && <LoadingSpinner label="Loading report..." />}

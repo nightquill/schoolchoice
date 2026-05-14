@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { usePlansTab } from '../../hooks/usePlansTab';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
@@ -14,7 +15,7 @@ export default function PlansTab({ studentId }) {
     deleting,
     handleDelete,
   } = usePlansTab(studentId);
-
+  const { t } = useTranslation();
   const cardStyle = {
     background: 'var(--color-surface)',
     border: 'var(--border-width) solid var(--color-border)',
@@ -39,9 +40,9 @@ export default function PlansTab({ studentId }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
         <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>
-          Saved Plans ({plans.length})
+          {t('plans.savedPlans')} ({plans.length})
         </h2>
-        <Button onClick={() => navigate(`/students/${studentId}/consultant?generate=true`)}>Generate New Plan</Button>
+        <Button onClick={() => navigate(`/students/${studentId}/consultant?generate=true`)}>{t('plans.generateNew')}</Button>
       </div>
 
       {plans.length === 0 && (
@@ -54,7 +55,7 @@ export default function PlansTab({ studentId }) {
             onClick={() => setSelected(null)}
             style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-3)', fontFamily: 'var(--font-family-base)' }}
           >
-            {'\u2190'} Back to plan list
+            {'\u2190'} {t('plans.backToList')}
           </button>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
             <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>{selected.plan_label}</h3>
@@ -63,7 +64,7 @@ export default function PlansTab({ studentId }) {
               onClick={(e) => handleDelete(e, selected.id)}
               disabled={deleting === selected.id}
             >
-              {deleting === selected.id ? 'Deleting…' : 'Delete Plan'}
+              {deleting === selected.id ? t('plans.deleting') : t('plans.deletePlan')}
             </Button>
           </div>
           {selected.snapshot_data && (
@@ -115,7 +116,7 @@ export default function PlansTab({ studentId }) {
               disabled={deleting === plan.id}
               style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)' }}
             >
-              {deleting === plan.id ? '…' : 'Delete'}
+              {deleting === plan.id ? '…' : t('common.delete')}
             </button>
           </div>
         </div>

@@ -17,9 +17,10 @@ import { saveConsultantTask, getConsultantTaskStatus, sendConsultantChat } from 
 import { getPlan, setPlanTemplate, editPlanSection, resetPlanSection } from '../../api/plan';
 import { exportPlanHTML } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function ConsultantTask() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const taskId = 'academic_plan'; // hardcoded for school choice; future: from route param
   // --- core state ---
@@ -137,7 +138,7 @@ function ConsultantTask() {
       try {
         const result = await saveConsultantTask(taskId, id, accumulatedTokens);
         setPlan(result);
-        toast.success('Plan ready - view it here.');
+        toast.success(t('plan.planGenerated'));
       } catch (err) {
         setStreamError('Failed to save plan. Please try again.');
       }
@@ -165,7 +166,7 @@ function ConsultantTask() {
     }
   }, [loading, student, searchParams, setSearchParams, handleGenerate]);
 
-  // --- Stop Generation handler ---
+  // --- {t('consultant.stopGeneration')} handler ---
   const handleStopGeneration = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -200,7 +201,7 @@ function ConsultantTask() {
       setActiveTemplate(templateId);
       await loadPlan();
     } catch {
-      toast.error('Failed to change template.');
+      toast.error(t('plan.templateFailed'));
     } finally {
       setTemplateLoading(false);
     }
@@ -262,9 +263,9 @@ function ConsultantTask() {
       await editPlanSection(id, editingSection.key, htmlContent);
       setEditingSection(null);
       await loadPlan();
-      toast.success('Section saved.');
+      toast.success(t('plan.sectionSaved'));
     } catch {
-      toast.error('Failed to save section.');
+      toast.error(t('plan.sectionSaveFailed'));
     } finally {
       setSectionSaving(false);
     }
@@ -277,9 +278,9 @@ function ConsultantTask() {
       await resetPlanSection(id, editingSection.key);
       setEditingSection(null);
       await loadPlan();
-      toast.success('Section reset to default.');
+      toast.success(t('plan.sectionReset'));
     } catch {
-      toast.error('Failed to reset section.');
+      toast.error(t('plan.sectionResetFailed'));
     } finally {
       setSectionSaving(false);
     }
@@ -484,7 +485,7 @@ function ConsultantTask() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
       <Link to={`/students/${id}/profile`} style={backLinkStyle}>
-        {'\u2190'} Back to {student?.full_name || 'Profile'}
+        {'\u2190'} {t('consultant.backTo')} {student?.full_name || 'Profile'}
       </Link>
 
       {/* Main toolbar */}
@@ -499,13 +500,13 @@ function ConsultantTask() {
             onClick={handleGenerate}
             disabled={streaming}
           >
-            {streaming ? 'Generating...' : 'Generate Plan'}
+            {streaming ? t('plan.generating') : t('plan.generatePlan')}
           </Button>
 
           {streaming && (
             <button onClick={handleStopGeneration} style={stopBtnStyle}>
               <StopCircle size={16} />
-              Stop Generation
+              {t('consultant.stopGeneration')}
             </button>
           )}
 
@@ -516,13 +517,13 @@ function ConsultantTask() {
               style={exportBtnStyle}
             >
               <FileDown size={16} />
-              {isExportingHTML ? 'Exporting...' : 'Export HTML'}
+              {isExportingHTML ? t('plan.exporting') : t('plan.exportHtml')}
             </button>
           )}
 
           {plan?.generated_at && (
             <span style={timestampStyle}>
-              Generated: {plan.generated_at.replace('T', ' ').slice(0, 16)}
+              {t('plan.generated')} {plan.generated_at.replace('T', ' ').slice(0, 16)}
             </span>
           )}
         </div>
@@ -568,7 +569,7 @@ function ConsultantTask() {
                 }}
                 style={{ accentColor: 'var(--color-primary)' }}
               />
-              Counselor View
+              {t('consultant.counselorView')}
             </label>
             <button
               onClick={() => setEditMode((v) => !v)}
@@ -584,7 +585,7 @@ function ConsultantTask() {
                 fontWeight: 'var(--font-weight-medium)',
               }}
             >
-              {editMode ? 'Done Editing' : 'Edit Sections'}
+              {editMode ? t('plan.doneEditing') : t('plan.editSections')}
             </button>
           </div>
         </div>
@@ -594,7 +595,7 @@ function ConsultantTask() {
       {hasPlan && editMode && (
         <div style={sectionListStyle}>
           <p style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
-            Select a section to edit:
+            {t('plan.selectSection')}
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             {sectionList.map((sec) => (
@@ -619,7 +620,7 @@ function ConsultantTask() {
         </div>
       )}
 
-      {loading && <div style={contentZoneStyle}><LoadingSpinner label="Loading plan..." /></div>}
+      {loading && <div style={contentZoneStyle}><LoadingSpinner label={t("plan.loading")} /></div>}
 
       {!loading && (
         <>
@@ -656,7 +657,7 @@ function ConsultantTask() {
           {!streaming && error && (
             <div style={{ ...contentZoneStyle, padding: 'var(--space-8)' }}>
               <ErrorMessage message={error} />
-              <Button onClick={handleGenerate}>Try Again</Button>
+              <Button onClick={handleGenerate}>{t('consultant.tryAgain')}</Button>
             </div>
           )}
 
@@ -717,7 +718,7 @@ function ConsultantTask() {
           {(hasPlan || streaming) && (
             <div className="consultant-chat-mobile">
               <button onClick={() => setShowChat((v) => !v)} style={chatToggleStyle}>
-                {showChat ? 'Hide AI Chat' : 'Show AI Chat'}
+                {showChat ? t('plan.aiAssistant') : t('consultant.showChat')}
               </button>
               {showChat && (
                 <div style={{ borderTop: '1px solid var(--color-border)', minHeight: '300px' }}>
@@ -746,7 +747,7 @@ function ConsultantTask() {
           <div style={modalDialogStyle} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
               <h2 style={{ margin: 0, fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-family-base)' }}>
-                Edit: {editingSection.label}
+                {t('plan.editLabel')} {editingSection.label}
               </h2>
               {!sectionSaving && (
                 <button
@@ -760,7 +761,7 @@ function ConsultantTask() {
                     fontFamily: 'var(--font-family-base)',
                     lineHeight: 1,
                   }}
-                  aria-label="Close editor"
+                  aria-label={t('plan.closeEditor')}
                 >
                   &times;
                 </button>
@@ -918,8 +919,8 @@ function ChatPanel({
   return (
     <div style={panelStyle}>
       <div style={headerStyle}>
-        <p style={headerTitleStyle}>AI Assistant</p>
-        <span style={betaBadgeStyle}>beta</span>
+        <p style={headerTitleStyle}>{t('plan.aiAssistant')}</p>
+        <span style={betaBadgeStyle}>{t('plan.beta')}</span>
       </div>
 
       {chatDisabled && (
@@ -958,7 +959,7 @@ function ChatPanel({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Type a message..."
+            placeholder={t("plan.typeMessage")}
             rows={2}
             style={textareaStyle}
             disabled={chatLoading}
@@ -968,9 +969,9 @@ function ChatPanel({
             onClick={onSend}
             disabled={chatLoading || !chatInput.trim()}
             style={sendBtnStyle}
-            aria-label="Send message"
+            aria-label={t('plan.sendMessage')}
           >
-            {chatLoading ? '...' : 'Send'}
+            {chatLoading ? '...' : t('plan.send')}
           </button>
         </div>
       )}

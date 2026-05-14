@@ -24,6 +24,7 @@ import {
 import { exportPlanHTML } from '../../api/entities';
 import { getStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -50,7 +51,7 @@ function buildSectionList(plan) {
 }
 
 function AcademicPlan() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   // --- core state ---
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
@@ -130,11 +131,11 @@ function AcademicPlan() {
           const planData = await getPlan(id);
           setPlan(planData);
           if (planData?.template_id) setActiveTemplate(planData.template_id);
-          toast.success('Plan ready \u2014 view it here.');
+          toast.success(t('plan.planReady'));
         } else if (statusValue === 'FAILED') {
           stopPolling();
           setError('Plan generation failed. Please try again.');
-          toast.error('Plan generation failed.');
+          toast.error(t('plan.saveFailed'));
         }
       } catch {
         stopPolling();
@@ -208,7 +209,7 @@ function AcademicPlan() {
       setActiveTemplate(templateId);
       await loadPlan();
     } catch {
-      toast.error('Failed to change template.');
+      toast.error(t('plan.templateFailed'));
     } finally {
       setTemplateLoading(false);
     }
@@ -271,9 +272,9 @@ function AcademicPlan() {
       await editPlanSection(id, editingSection.key, htmlContent);
       setEditingSection(null);
       await loadPlan();
-      toast.success('Section saved.');
+      toast.success(t('plan.sectionSaved'));
     } catch {
-      toast.error('Failed to save section.');
+      toast.error(t('plan.sectionSaveFailed'));
     } finally {
       setSectionSaving(false);
     }
@@ -286,9 +287,9 @@ function AcademicPlan() {
       await resetPlanSection(id, editingSection.key);
       setEditingSection(null);
       await loadPlan();
-      toast.success('Section reset to default.');
+      toast.success(t('plan.sectionReset'));
     } catch {
-      toast.error('Failed to reset section.');
+      toast.error(t('plan.sectionResetFailed'));
     } finally {
       setSectionSaving(false);
     }
@@ -475,7 +476,7 @@ function AcademicPlan() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to={`/students/${id}/profile`} style={backLinkStyle}>← Back to Profile</Link>
+      <Link to={`/students/${id}/profile`} style={backLinkStyle}>{t('plan.backToProfile')}</Link>
 
       {/* Main toolbar */}
       <div style={toolbarStyle}>
@@ -495,13 +496,13 @@ function AcademicPlan() {
               disabled={isGenerating}
               style={planTypeBtnStyle(planType === type)}
             >
-              {type === 'UNIVERSITY' ? 'University Plan' : 'High School Plan'}
+              {type === 'UNIVERSITY' ? t('plan.universityPlan') : t('plan.highSchoolPlan')}
             </button>
           ))}
         </div>
 
         <Button
-          label="Generate Plan"
+          label={t('plan.generatePlan')}
           variant="primary"
           onClick={handleGeneratePlan}
           loading={generating || isGenerating}
@@ -510,7 +511,7 @@ function AcademicPlan() {
 
         <div style={toolbarRightStyle}>
           {plan?.html_content && (
-            <Button label="Print" variant="secondary" onClick={() => window.print()} />
+            <Button label={t('plan.print')} variant="secondary" onClick={() => window.print()} />
           )}
           {plan?.id && (
             <button
@@ -531,12 +532,12 @@ function AcademicPlan() {
               }}
             >
               <FileDown size={16} />
-              {isExportingHTML ? 'Exporting...' : 'Export HTML'}
+              {isExportingHTML ? t('plan.exporting') : t('plan.exportHtml')}
             </button>
           )}
           {plan?.generated_at && (
             <span style={timestampStyle}>
-              Generated: {plan.generated_at.replace('T', ' ').slice(0, 16)}
+              {t('plan.generated')} {plan.generated_at.replace('T', ' ').slice(0, 16)}
             </span>
           )}
         </div>
@@ -573,7 +574,7 @@ function AcademicPlan() {
                 fontWeight: 'var(--font-weight-medium)',
               }}
             >
-              {editMode ? 'Done Editing' : 'Edit Sections'}
+              {editMode ? t('plan.doneEditing') : t('plan.editSections')}
             </button>
           </div>
         </div>
@@ -583,7 +584,7 @@ function AcademicPlan() {
       {hasPlan && editMode && (
         <div style={sectionListStyle}>
           <p style={{ margin: '0 0 var(--space-2) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)' }}>
-            Select a section to edit:
+            {t('plan.selectSection')}
           </p>
           <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
             {sectionList.map((sec) => (
@@ -608,29 +609,29 @@ function AcademicPlan() {
         </div>
       )}
 
-      {loading && <div style={contentZoneStyle}><LoadingSpinner label="Loading plan..." /></div>}
+      {loading && <div style={contentZoneStyle}><LoadingSpinner label={t("plan.loading")} /></div>}
 
       {!loading && (
         <>
           {isGenerating && (
             <div style={{ ...contentZoneStyle, gap: 'var(--space-4)', padding: 'var(--space-8)' }}>
-              <LoadingSpinner label="Generating plan..." />
+              <LoadingSpinner label={t("plan.generatingPlan")} />
               <div role="status" aria-live="polite">
                 <p style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', textAlign: 'center', margin: '0 0 var(--space-2) 0' }}>
-                  Generating plan…
+                  {t('plan.generatingPlan')}
                 </p>
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center', margin: 0 }}>
-                  This usually takes up to 10 seconds.
+                  {t('plan.generatingDesc')}
                 </p>
               </div>
-              <Button label="Cancel" variant="secondary" onClick={handleCancelPolling} />
+              <Button label={t('plan.cancel')} variant="secondary" onClick={handleCancelPolling} />
             </div>
           )}
 
           {!isGenerating && error && (
             <div style={{ ...contentZoneStyle, padding: 'var(--space-8)' }}>
               <ErrorMessage message={error} />
-              <Button label="Try Again" variant="primary" onClick={handleGeneratePlan} />
+              <Button label={t('plan.generatePlan')} variant="primary" onClick={handleGeneratePlan} />
             </div>
           )}
 
@@ -668,7 +669,7 @@ function AcademicPlan() {
           {!isGenerating && !error && !plan?.html_content && (
             <div style={contentZoneStyle}>
               <EmptyState message="No plan has been generated yet." />
-              <Button label="Generate Plan" variant="primary" onClick={handleGeneratePlan} loading={generating} />
+              <Button label={t('plan.generatePlan')} variant="primary" onClick={handleGeneratePlan} loading={generating} />
             </div>
           )}
         </>
@@ -680,7 +681,7 @@ function AcademicPlan() {
           <div style={modalDialogStyle} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)' }}>
               <h2 style={{ margin: 0, fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', fontFamily: 'var(--font-family-base)' }}>
-                Edit: {editingSection.label}
+                {t('plan.editLabel')} {editingSection.label}
               </h2>
               {!sectionSaving && (
                 <button
@@ -694,7 +695,7 @@ function AcademicPlan() {
                     fontFamily: 'var(--font-family-base)',
                     lineHeight: 1,
                   }}
-                  aria-label="Close editor"
+                  aria-label={t('plan.closeEditor')}
                 >
                   &times;
                 </button>
@@ -841,8 +842,8 @@ function ChatPanel({
     <div style={panelStyle}>
       {/* Header */}
       <div style={headerStyle}>
-        <p style={headerTitleStyle}>AI Assistant</p>
-        <span style={betaBadgeStyle}>beta</span>
+        <p style={headerTitleStyle}>{t('plan.aiAssistant')}</p>
+        <span style={betaBadgeStyle}>{t('plan.beta')}</span>
       </div>
 
       {/* No API key persistent notice */}
@@ -885,7 +886,7 @@ function ChatPanel({
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Type a message…"
+            placeholder={t("plan.typeMessage")}
             rows={2}
             style={textareaStyle}
             disabled={chatLoading}
@@ -895,9 +896,9 @@ function ChatPanel({
             onClick={onSend}
             disabled={chatLoading || !chatInput.trim()}
             style={sendBtnStyle}
-            aria-label="Send message"
+            aria-label={t('plan.sendMessage')}
           >
-            {chatLoading ? '…' : 'Send'}
+            {chatLoading ? '…' : t('plan.send')}
           </button>
         </div>
       )}

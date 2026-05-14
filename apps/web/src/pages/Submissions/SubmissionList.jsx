@@ -6,9 +6,10 @@ import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getSubmissions } from '../../api/submissions';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function SubmissionList() {
-  const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
+  const { t } = useTranslation();  const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const submissionsQuery = useQuery({ queryKey: ['submissions'], queryFn: getSubmissions });
 
   const account = accountQuery.data ?? null;

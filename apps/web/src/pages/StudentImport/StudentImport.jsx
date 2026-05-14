@@ -7,6 +7,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { toast } from 'sonner';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { previewImport, commitImport } from '../../api/studentImport';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const pageStyle = {
   background: 'var(--color-background)',
@@ -61,7 +62,7 @@ const badges = {
 };
 
 export default function StudentImport() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();  const navigate = useNavigate();
   const fileRef = useRef(null);
   const [step, setStep] = useState(1);
   const [file, setFile] = useState(null);
@@ -120,7 +121,7 @@ export default function StudentImport() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
       <main id="main-content" className="px-4 md:px-8" style={contentStyle}>
-        <h1 style={headingStyle}>Import Students</h1>
+        <h1 style={headingStyle}>{t('onboarding.importStudents')}</h1>
 
         {/* Step indicator */}
         <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-5)', fontSize: 'var(--font-size-sm)' }}>

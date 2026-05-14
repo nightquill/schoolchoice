@@ -17,6 +17,7 @@ import { searchSchools } from '../../api/schoolsV2';
 import { getStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getAutoRecommendations } from '../../api/match';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 // ---- TargetSchoolRow ----
 function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, onRemove, onEdit }) {
@@ -253,7 +254,7 @@ function MajorView({ targets }) {
 
 // ---- Main TargetSchools ----
 function TargetSchools() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   const [student, setStudent] = useState(null);
   const [account, setAccount] = useState(null);
   const [targets, setTargets] = useState([]);
@@ -308,10 +309,10 @@ function TargetSchools() {
     setTargets(newList);
     try {
       await reorderTargets(id, newList.map((t) => t.id));
-      toast.success('Preference order saved.');
+      toast.success(t('targets.reorderSuccess'));
     } catch {
       setTargets(prevTargetsRef.current);
-      toast.error('Failed to reorder targets.');
+      toast.error(t('targets.reorderFailed'));
     }
   };
 
@@ -323,10 +324,10 @@ function TargetSchools() {
     setTargets(newList);
     try {
       await reorderTargets(id, newList.map((t) => t.id));
-      toast.success('Preference order saved.');
+      toast.success(t('targets.reorderSuccess'));
     } catch {
       setTargets(prevTargetsRef.current);
-      toast.error('Failed to reorder targets.');
+      toast.error(t('targets.reorderFailed'));
     }
   };
 
@@ -334,9 +335,9 @@ function TargetSchools() {
     try {
       await deleteTarget(id, target.id);
       setTargets((prev) => prev.filter((t) => t.id !== target.id));
-      toast.success('School removed from target list.');
+      toast.success(t('targets.removeSuccess'));
     } catch {
-      toast.error('Failed to remove school.');
+      toast.error(t('targets.removeFailed'));
     }
   };
 
@@ -346,7 +347,7 @@ function TargetSchools() {
       const result = await searchSchools({ q: query, limit: 20 });
       setSchoolResults(Array.isArray(result) ? result : (result.items ?? []));
     } catch {
-      toast.error('School search failed.');
+      toast.error(t('targets.searchFailed'));
     } finally {
       setSearchLoading(false);
     }
@@ -392,7 +393,7 @@ function TargetSchools() {
       });
       setTargets((prev) => prev.map((t) => (t.id === editTarget.id ? { ...t, ...updated } : t)));
       setEditTarget(null);
-      toast.success('Target updated.');
+      toast.success(t('targets.updateSuccess'));
     } catch {
       const detail = err?.response?.data?.detail;
       const msg = Array.isArray(detail) ? detail[0]?.msg : (typeof detail === 'string' ? detail : 'Failed to update target.');
@@ -426,7 +427,7 @@ function TargetSchools() {
       setNewMajors([]);
       setSelectedJupasCode(null);
       setSelectedProgrammeName(null);
-      toast.success('School added to target list.');
+      toast.success(t('targets.addSuccess'));
     } catch {
       const detail = err?.response?.data?.detail;
       toast.error(typeof detail === 'string' ? detail : 'Failed to add school.');
@@ -488,9 +489,9 @@ function TargetSchools() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to={`/students/${id}/profile`} style={backLinkStyle}>← Back to Profile</Link>
+      <Link to={`/students/${id}/profile`} style={backLinkStyle}>{t('targets.backToProfile')}</Link>
 
-      {loading && <LoadingSpinner label="Loading target schools..." />}
+      {loading && <LoadingSpinner label={t("targets.loading")} />}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}
 
       {!loading && !error && (
@@ -500,16 +501,16 @@ function TargetSchools() {
               <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
                 {student?.full_name || 'Student'}
               </h1>
-              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>Target Schools</p>
+              <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>{t('targets.title')}</p>
             </div>
-            <Button onClick={() => setAddModalOpen(true)}>Add School</Button>
+            <Button onClick={() => setAddModalOpen(true)}>{t('targets.addSchool')}</Button>
           </div>
 
           {targets.some(t => t.at_risk) && (
             <div style={{background:'#fef2f2',border:'1px solid #fca5a5',borderRadius:'var(--border-radius-sm)',padding:'var(--space-3) var(--space-4)',margin:'var(--space-4) var(--space-8)',display:'flex',alignItems:'flex-start',gap:'var(--space-3)'}}>
               <span style={{color:'#dc2626',fontSize:'var(--font-size-lg)',lineHeight:1}}>&#9888;</span>
               <div>
-                <div style={{fontWeight:'var(--font-weight-bold)',color:'#991b1b',fontSize:'var(--font-size-sm)'}}>At-Risk Targets Detected</div>
+                <div style={{fontWeight:'var(--font-weight-bold)',color:'#991b1b',fontSize:'var(--font-size-sm)'}}>{t('targets.atRiskTitle')}</div>
                 <div style={{color:'#7f1d1d',fontSize:'var(--font-size-xs)',marginTop:'2px'}}>
                   {targets.filter(t => t.at_risk).length} target(s) where predicted score falls below the programme's lower quartile.
                 </div>
@@ -536,7 +537,7 @@ function TargetSchools() {
                     fontWeight: viewMode === mode ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
                   }}
                 >
-                  {mode === 'school' ? 'By School' : 'By Major'}
+                  {mode === 'school' ? t('targets.bySchool') : t('targets.byMajor')}
                 </button>
               ))}
             </div>
@@ -572,7 +573,7 @@ function TargetSchools() {
 
       <Modal
         isOpen={addModalOpen}
-        title="Add School to Target List"
+        title={t('targets.addTitle')}
         onClose={() => {
           setAddModalOpen(false);
           setSelectedSchool(null);
@@ -584,17 +585,17 @@ function TargetSchools() {
           setNewMajors([]);
         }}
         onConfirm={handleAddTarget}
-        confirmLabel={addingTarget ? 'Adding…' : 'Add School'}
+        confirmLabel={addingTarget ? t('targets.adding') : t('targets.addSchoolBtn')}
         confirmVariant="primary"
       >
         <div>
           {(recsLoading || autoRecs.length > 0) && (
             <div style={{ marginBottom: 'var(--space-4)', padding: 'var(--space-3)', background: 'rgba(37,99,235,0.04)', borderRadius: 'var(--border-radius-sm)', border: 'var(--border-width) solid rgba(37,99,235,0.15)' }}>
               <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', marginBottom: 'var(--space-2)' }}>
-                Recommended for this student
+                {t('targets.recommended')}
               </div>
               {recsLoading ? (
-                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Loading recommendations…</div>
+                <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('targets.loadingRecs')}</div>
               ) : (
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                   {autoRecs.map((rec) => (
@@ -642,18 +643,18 @@ function TargetSchools() {
               )}
             </div>
           )}
-          <label htmlFor="school-search-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Search Schools</label>
+          <label htmlFor="school-search-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('targets.searchSchools')}</label>
           <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
             <input
               id="school-search-input"
               value={schoolSearch}
               onChange={(e) => setSchoolSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearchSchools(schoolSearch)}
-              placeholder="School name…"
+              placeholder={t('targets.schoolName')}
               style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
             />
             <Button onClick={() => handleSearchSchools(schoolSearch)} disabled={searchLoading}>
-              {searchLoading ? 'Searching...' : 'Search'}
+              {searchLoading ? t('targets.searching') : t('targets.search')}
             </Button>
           </div>
           {schoolResults.length > 0 && (
@@ -682,19 +683,19 @@ function TargetSchools() {
           )}
           {selectedSchool && (
             <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-              Selected: <strong>{selectedSchool.name}</strong>
+              {t('targets.selected')} <strong>{selectedSchool.name}</strong>
             </p>
           )}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}>
             <div style={{ flex: '2 1 180px' }}>
               <label htmlFor="intended-majors-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-                Intended Major(s) <span style={{ color: 'var(--color-text-secondary)' }}>(comma-separated)</span>
+                {t('targets.intendedMajors')} <span style={{ color: 'var(--color-text-secondary)' }}>{t('targets.commaSeparated')}</span>
               </label>
               <input
                 id="intended-majors-input"
                 value={intendedMajors}
                 onChange={(e) => setIntendedMajors(e.target.value)}
-                placeholder="e.g. Computer Science, Data Science"
+                placeholder={t('targets.majorsPlaceholder')}
                 style={{ ...inputStyle, marginBottom: 0 }}
               />
             </div>
@@ -717,26 +718,26 @@ function TargetSchools() {
 
       <Modal
         isOpen={!!editTarget}
-        title={`Edit: ${editTarget?.school_name ?? ''}`}
+        title={`${t('targets.editTitle')} ${editTarget?.school_name ?? ''}`}
         onClose={() => setEditTarget(null)}
         onConfirm={handleEditSave}
-        confirmLabel={editSaving ? 'Saving…' : 'Save'}
+        confirmLabel={editSaving ? t('profile.saving') : t('targets.save')}
         confirmVariant="primary"
       >
         <div>
           <div style={{ marginBottom: 'var(--space-3)' }}>
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-              Intended Major(s) <span style={{ color: 'var(--color-text-secondary)' }}>(comma-separated)</span>
+              {t('targets.intendedMajors')} <span style={{ color: 'var(--color-text-secondary)' }}>{t('targets.commaSeparated')}</span>
             </label>
             <input
               value={editMajors}
               onChange={(e) => setEditMajors(e.target.value)}
-              placeholder="e.g. Computer Science, Data Science"
+              placeholder={t('targets.majorsPlaceholder')}
               style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', width: '100%', boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ marginBottom: 'var(--space-3)' }}>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Year of Entry</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('targets.yearOfEntry')}</label>
             <input
               type="number"
               value={editYear}
@@ -746,24 +747,24 @@ function TargetSchools() {
             />
           </div>
           <div style={{ marginBottom: 'var(--space-3)' }}>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>Application Status</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>{t('targets.applicationStatus')}</label>
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value)}
               style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-md)', fontFamily: 'var(--font-family-base)', width: '100%', boxSizing: 'border-box' }}
             >
-              <option value="">— Not set —</option>
-              <option value="CONSIDERING">Considering</option>
-              <option value="APPLIED">Applied</option>
-              <option value="ADMITTED">Admitted</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="WITHDRAWN">Withdrawn</option>
+              <option value="">{t('targets.notSet')}</option>
+              <option value="CONSIDERING">{t('targets.considering')}</option>
+              <option value="APPLIED">{t('targets.applied')}</option>
+              <option value="ADMITTED">{t('targets.admitted')}</option>
+              <option value="REJECTED">{t('targets.rejected')}</option>
+              <option value="WITHDRAWN">{t('targets.withdrawn')}</option>
             </select>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-              Student Confidence
-              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 'normal' }}> — how committed is the student to this choice?</span>
+              {t('targets.studentConfidence')}
+              <span style={{ color: 'var(--color-text-secondary)', fontWeight: 'normal' }}> {t('targets.confidenceDesc')}</span>
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
               <input

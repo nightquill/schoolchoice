@@ -7,18 +7,12 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
-const STEPS = [
-  { number: 1, label: 'Welcome' },
-  { number: 2, label: 'School Info' },
-  { number: 3, label: 'Import' },
-  { number: 4, label: 'Ready' },
-];
-
-function StepIndicator({ currentStep }) {
+function StepIndicator({ currentStep, steps }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', gap: 'var(--space-6)', marginBottom: 'var(--space-8)' }}>
-      {STEPS.map((step) => {
+      {steps.map((step) => {
         const isActive = step.number === currentStep;
         const isComplete = step.number < currentStep;
         return (
@@ -63,8 +57,16 @@ function StepIndicator({ currentStep }) {
 }
 
 function Onboarding() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+
+  const STEPS = [
+    { number: 1, label: t('onboarding.welcome') },
+    { number: 2, label: t('onboarding.schoolInfo') },
+    { number: 3, label: t('onboarding.import') },
+    { number: 4, label: t('onboarding.ready') },
+  ];
   const [schoolName, setSchoolName] = useState('');
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
@@ -108,7 +110,7 @@ function Onboarding() {
 
   const handleFinish = () => {
     localStorage.setItem('onboarding_complete', 'true');
-    toast.success('Onboarding complete! Welcome aboard.');
+    toast.success(t('onboarding.onboardingComplete'));
     navigate('/dashboard');
   };
 
@@ -117,18 +119,17 @@ function Onboarding() {
       <NavBarV2 account={account} />
       <main className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         <div style={cardStyle}>
-          <StepIndicator currentStep={step} />
+          <StepIndicator currentStep={step} steps={STEPS} />
 
           {/* Step 1: Welcome */}
           {step === 1 && (
             <div>
-              <h1 style={titleStyle}>Welcome to Academic Advisor</h1>
+              <h1 style={titleStyle}>{t('onboarding.welcomeTitle')}</h1>
               <p style={descStyle}>
-                Let's get your account set up in just a few steps. We'll collect some basic
-                information about your school and help you import your first students.
+                {t('onboarding.welcomeDesc')}
               </p>
               <div style={buttonRowStyle}>
-                <Button onClick={() => setStep(2)}>Get Started</Button>
+                <Button onClick={() => setStep(2)}>{t('onboarding.getStarted')}</Button>
               </div>
             </div>
           )}
@@ -136,9 +137,9 @@ function Onboarding() {
           {/* Step 2: School Info */}
           {step === 2 && (
             <div>
-              <h1 style={titleStyle}>School Information</h1>
+              <h1 style={titleStyle}>{t('onboarding.schoolInformation')}</h1>
               <p style={descStyle}>
-                Enter your school name so we can personalise your experience.
+                {t('onboarding.enterSchoolName')}
               </p>
               <div style={{ maxWidth: 400, margin: '0 auto' }}>
                 <label
@@ -151,19 +152,19 @@ function Onboarding() {
                     marginBottom: 'var(--space-1)',
                   }}
                 >
-                  School Name
+                  {t('onboarding.schoolName')}
                 </label>
                 <Input
                   id="school-name"
-                  placeholder="e.g. St. Paul's Co-educational College"
+                  placeholder={t("onboarding.schoolNamePlaceholder")}
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
                   autoFocus
                 />
               </div>
               <div style={buttonRowStyle}>
-                <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-                <Button onClick={() => setStep(3)} disabled={!schoolName.trim()}>Next</Button>
+                <Button variant="outline" onClick={() => setStep(1)}>{t('onboarding.back')}</Button>
+                <Button onClick={() => setStep(3)} disabled={!schoolName.trim()}>{t('onboarding.next')}</Button>
               </div>
             </div>
           )}
@@ -171,15 +172,14 @@ function Onboarding() {
           {/* Step 3: Import Students */}
           {step === 3 && (
             <div>
-              <h1 style={titleStyle}>Import Students</h1>
+              <h1 style={titleStyle}>{t('onboarding.importStudents')}</h1>
               <p style={descStyle}>
-                You can upload a CSV or Excel file to bulk-import your students.
-                If you'd prefer to do this later, you can skip this step.
+                {t('onboarding.importDesc')}
               </p>
               <div style={buttonRowStyle}>
-                <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
-                <Button variant="secondary" onClick={() => setStep(4)}>Skip for now</Button>
-                <Button onClick={() => navigate('/entities/student/import')}>Import Students</Button>
+                <Button variant="outline" onClick={() => setStep(2)}>{t('onboarding.back')}</Button>
+                <Button variant="secondary" onClick={() => setStep(4)}>{t('onboarding.skipForNow')}</Button>
+                <Button onClick={() => navigate('/entities/student/import')}>{t('onboarding.importStudents')}</Button>
               </div>
             </div>
           )}
@@ -187,12 +187,12 @@ function Onboarding() {
           {/* Step 4: Ready */}
           {step === 4 && (
             <div>
-              <h1 style={titleStyle}>You're All Set!</h1>
+              <h1 style={titleStyle}>{t('onboarding.allSet')}</h1>
               <p style={descStyle}>
-                Your account is ready. Head to the dashboard to start working with your students.
+                {t('onboarding.readyDesc')}
               </p>
               <div style={buttonRowStyle}>
-                <Button onClick={handleFinish}>Go to Dashboard</Button>
+                <Button onClick={handleFinish}>{t('onboarding.goToDashboard')}</Button>
               </div>
             </div>
           )}

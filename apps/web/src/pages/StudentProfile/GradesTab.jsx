@@ -1,4 +1,5 @@
 import { useGradesTab } from '../../hooks/useGradesTab';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
@@ -43,6 +44,7 @@ const HKDSE_SUBJECTS = [
 const HKDSE_GRADES = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
 
 export default function GradesTab({ studentId, subjects }) {
+  const { t } = useTranslation();
   const {
     grades,
     loading,
@@ -59,7 +61,7 @@ export default function GradesTab({ studentId, subjects }) {
     dismissParsedGrade,
   } = useGradesTab(studentId);
 
-  if (loading) return <LoadingSpinner label="Loading grades..." />;
+  if (loading) return <LoadingSpinner label={t('grades.loading')} />;
   if (error) return <ErrorMessage message={error} />;
 
   const tableStyle = {
@@ -95,7 +97,7 @@ export default function GradesTab({ studentId, subjects }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       <div>
         <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
-          Upload Transcript (PDF or image, max 10 MB)
+          {t('grades.uploadTranscript')}
         </p>
         <FileUpload
           onFile={handleUpload}
@@ -105,19 +107,19 @@ export default function GradesTab({ studentId, subjects }) {
         />
         {transcriptState === 'parsing' && (
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-            Transcript uploaded. Parsing in progress{'…'}
+            {t('grades.transcriptParsing')}
           </p>
         )}
       </div>
 
       {parsedGrades.length > 0 && (
         <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)' }}>
-          <p style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-3)' }}>Parsed Grades Review</p>
+          <p style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-3)' }}>{t('grades.parsedReview')}</p>
           {parsedGrades.map((g, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
               <span style={{ fontSize: 'var(--font-size-sm)' }}>{g.subject} — Grade: {g.grade} (Confidence: {g.confidence})</span>
-              <Button onClick={() => handleAcceptSuggestion(g)}>Accept</Button>
-              <Button variant="secondary" onClick={() => dismissParsedGrade(i)}>Dismiss</Button>
+              <Button onClick={() => handleAcceptSuggestion(g)}>{t('grades.accept')}</Button>
+              <Button variant="secondary" onClick={() => dismissParsedGrade(i)}>{t('grades.dismiss')}</Button>
             </div>
           ))}
         </div>
@@ -127,14 +129,14 @@ export default function GradesTab({ studentId, subjects }) {
         <table style={tableStyle}>
           <thead>
             <tr>
-              <th style={thStyle}>Subject</th>
-              <th style={thStyle}>Sitting</th>
-              <th style={thStyle}>Year</th>
-              <th style={thStyle}>Grade</th>
-              <th style={thStyle}>Predicted Grade</th>
-              <th style={thStyle}>Transcript</th>
-              <th style={thStyle}>Notes</th>
-              <th style={thStyle}>Actions</th>
+              <th style={thStyle}>{t('grades.subject')}</th>
+              <th style={thStyle}>{t('grades.sitting')}</th>
+              <th style={thStyle}>{t('grades.year')}</th>
+              <th style={thStyle}>{t('grades.grade')}</th>
+              <th style={thStyle}>{t('grades.predictedGrade')}</th>
+              <th style={thStyle}>{t('grades.transcript')}</th>
+              <th style={thStyle}>{t('grades.notes')}</th>
+              <th style={thStyle}>{t('grades.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -159,7 +161,7 @@ export default function GradesTab({ studentId, subjects }) {
                     style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
                     aria-label={`Delete grade for ${g.subject_name}`}
                   >
-                    Delete
+                    {t('grades.delete')}
                   </button>
                 </td>
               </tr>
@@ -169,41 +171,41 @@ export default function GradesTab({ studentId, subjects }) {
       </div>
       {!newRow ? (
         <div>
-          <Button variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })}>Add Grade</Button>
+          <Button variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })}>{t('grades.addGrade')}</Button>
         </div>
       ) : (
         <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-primary)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>New Grade Entry</p>
+          <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>{t('grades.newGradeEntry')}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '2 1 200px' }}>
-              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Subject</label>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('grades.subject')}</label>
               <select
                 value={newRow.subject_name || ''}
                 onChange={(e) => setNewRow((r) => ({ ...r, subject_name: e.target.value }))}
                 style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '100%' }}
                 aria-label="Subject"
               >
-                <option value="">Select subject{'…'}</option>
+                <option value="">{t('grades.selectSubject')}</option>
                 {(subjects && subjects.length > 0 ? subjects : HKDSE_SUBJECTS).map((s) => (
                   <option key={s.code} value={s.name}>{s.name}</option>
                 ))}
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '1 1 120px' }}>
-              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Sitting</label>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('grades.sitting')}</label>
               <select
                 value={newRow.sitting || 'MOCK'}
                 onChange={(e) => setNewRow((r) => ({ ...r, sitting: e.target.value }))}
                 style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '100%' }}
                 aria-label="Sitting type"
               >
-                <option value="MOCK">MOCK</option>
-                <option value="TRIAL">TRIAL</option>
-                <option value="OFFICIAL">OFFICIAL</option>
+                <option value="MOCK">{t('common.mock')}</option>
+                <option value="TRIAL">{t('common.trial')}</option>
+                <option value="OFFICIAL">{t('common.official')}</option>
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '1 1 80px' }}>
-              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Year</label>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('grades.year')}</label>
               <input
                 type="number"
                 value={newRow.year_of_exam || ''}
@@ -214,7 +216,7 @@ export default function GradesTab({ studentId, subjects }) {
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '1 1 100px' }}>
-              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Grade</label>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('grades.grade')}</label>
               <select
                 value={newRow.raw_grade || ''}
                 onChange={(e) => setNewRow((r) => ({ ...r, raw_grade: e.target.value }))}
@@ -228,7 +230,7 @@ export default function GradesTab({ studentId, subjects }) {
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', flex: '2 1 160px' }}>
-              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Notes (optional)</label>
+              <label style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('grades.notesOptional')}</label>
               <input
                 value={newRow.notes || ''}
                 onChange={(e) => setNewRow((r) => ({ ...r, notes: e.target.value }))}
@@ -239,8 +241,8 @@ export default function GradesTab({ studentId, subjects }) {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-            <Button onClick={handleSaveNewRow}>Save Grade</Button>
-            <Button variant="secondary" onClick={() => setNewRow(null)}>Cancel</Button>
+            <Button onClick={handleSaveNewRow}>{t('grades.saveGrade')}</Button>
+            <Button variant="secondary" onClick={() => setNewRow(null)}>{t('grades.cancel')}</Button>
           </div>
         </div>
       )}

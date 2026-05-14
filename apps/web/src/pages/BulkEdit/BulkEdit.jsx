@@ -7,11 +7,12 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import GradeGrid from '../../components/GradeGrid/GradeGrid';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import client from '@schoolchoice/ui/api/client';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const SITTINGS = ['MOCK', 'TRIAL', 'OFFICIAL'];
 
 function BulkEdit() {
-  const { cohortId } = useParams();
+  const { t } = useTranslation();  const { cohortId } = useParams();
   const [sitting, setSitting] = useState('MOCK');
 
   const { data: account } = useQuery({
@@ -117,7 +118,7 @@ function BulkEdit() {
     >
       <NavBarV2 account={account} />
       <Link to={`/cohorts/${cohortId}`} style={backLinkStyle}>
-        ← Back to Cohort
+        {t('bulkEdit.backToCohort')}
       </Link>
 
       <div
@@ -145,7 +146,7 @@ function BulkEdit() {
               margin: 0,
             }}
           >
-            Bulk Edit Grades{cohort ? ` — ${cohort.name}` : ''}
+            {t('bulkEdit.title')}{cohort ? ` — ${cohort.name}` : ''}
           </h1>
 
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
@@ -161,7 +162,7 @@ function BulkEdit() {
           </div>
         </div>
 
-        {isLoading && <LoadingSpinner label="Loading grades..." />}
+        {isLoading && <LoadingSpinner label={t("bulkEdit.loading")} />}
 
         {!isLoading && students.length === 0 && (
           <p

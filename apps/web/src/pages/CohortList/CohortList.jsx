@@ -10,9 +10,10 @@ import { toast } from 'sonner';
 import { Modal } from '@schoolchoice/ui';
 import { getCohorts, createCohort, deleteCohort } from '../../api/cohorts';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function CohortList() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();  const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [cohorts, setCohorts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +129,7 @@ function CohortList() {
             <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
               Student Cohorts
             </h1>
-            <Button onClick={() => setCreateModalOpen(true)}>New Cohort</Button>
+            <Button onClick={() => setCreateModalOpen(true)}>{t('cohorts.newCohort')}</Button>
           </div>
 
           <div style={containerStyle}>
@@ -185,31 +186,31 @@ function CohortList() {
       {/* Create cohort modal */}
       <Modal
         isOpen={createModalOpen}
-        title="New Cohort"
+        title={t('cohorts.newCohort')}
         onClose={() => { setCreateModalOpen(false); setNewName(''); setNewDesc(''); }}
         onConfirm={handleCreate}
-        confirmLabel={creating ? 'Creating…' : 'Create'}
+        confirmLabel={creating ? t('cohorts.creating') : t('cohorts.create')}
         confirmVariant="primary"
       >
         <div>
           <label htmlFor="cohort-name-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-            Cohort Name <span aria-hidden="true">*</span>
+            {t('cohorts.cohortName')} <span aria-hidden="true">*</span>
           </label>
           <input
             id="cohort-name-input"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="e.g. 5A 2025"
+            placeholder={t("cohorts.cohortNamePlaceholder")}
             style={inputStyle}
           />
           <label htmlFor="cohort-desc-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-            Description (optional)
+            {t('cohorts.descriptionOptional')}
           </label>
           <input
             id="cohort-desc-input"
             value={newDesc}
             onChange={(e) => setNewDesc(e.target.value)}
-            placeholder="Optional description"
+            placeholder={t("cohorts.descriptionPlaceholder")}
             style={{ ...inputStyle, marginBottom: 0 }}
           />
         </div>
@@ -218,10 +219,10 @@ function CohortList() {
       {/* Delete confirmation modal */}
       <Modal
         isOpen={!!deleteTarget}
-        title="Delete Cohort"
+        title={t('cohorts.deleteCohort')}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        confirmLabel={deleting ? 'Deleting…' : 'Delete'}
+        confirmLabel={deleting ? t('cohorts.deleting') : t('cohorts.delete')}
         confirmVariant="danger"
       >
         <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>

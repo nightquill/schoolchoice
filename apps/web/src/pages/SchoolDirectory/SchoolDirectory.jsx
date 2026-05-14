@@ -10,11 +10,12 @@ import { toast } from 'sonner';
 import { searchSchools, createSchool, deleteSchool } from '../../api/schoolsV2';
 import { exportEntityCSV } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const LIMIT = 20;
 
 function SchoolDirectory() {
-  const [account, setAccount] = useState(null);
+  const { t } = useTranslation();  const [account, setAccount] = useState(null);
   const [schools, setSchools] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -37,9 +38,9 @@ function SchoolDirectory() {
       if (filters.q) params.q = filters.q;
       if (filters.type) params.filters = JSON.stringify({ type: filters.type });
       await exportEntityCSV('school', params);
-      toast.success('Export downloaded.');
+      toast.success(t('schools.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('schools.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -49,9 +50,9 @@ function SchoolDirectory() {
     setIsExporting(true);
     try {
       await exportEntityCSV('school', {});
-      toast.success('Export downloaded.');
+      toast.success(t('schools.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('schools.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -225,53 +226,53 @@ function SchoolDirectory() {
 
       <div style={filterBarStyle} role="search" aria-label="School search filters">
         <div style={fieldGroupStyle}>
-          <label htmlFor="school-search-q" style={labelStyle}>Search</label>
+          <label htmlFor="school-search-q" style={labelStyle}>{t('schools.search')}</label>
           <input
             id="school-search-q"
             value={filters.q}
             onChange={(e) => handleFilterChange('q', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="School name…"
+            placeholder={t("schools.schoolNamePlaceholder")}
             style={inputStyle}
           />
         </div>
         <div style={fieldGroupStyle}>
-          <label htmlFor="school-search-type" style={labelStyle}>Type</label>
+          <label htmlFor="school-search-type" style={labelStyle}>{t('schools.type')}</label>
           <select
             id="school-search-type"
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
             style={inputStyle}
           >
-            <option value="">All</option>
-            <option value="UNIVERSITY">University</option>
-            <option value="POLYTECHNIC">Polytechnic</option>
-            <option value="COMMUNITY_COLLEGE">Community College</option>
-            <option value="VOCATIONAL">Vocational</option>
-            <option value="HIGH_SCHOOL">High School</option>
+            <option value="">{t('schools.all')}</option>
+            <option value="UNIVERSITY">{t('schools.university')}</option>
+            <option value="POLYTECHNIC">{t('schools.polytechnic')}</option>
+            <option value="COMMUNITY_COLLEGE">{t('schools.communityCollege')}</option>
+            <option value="VOCATIONAL">{t('schools.vocational')}</option>
+            <option value="HIGH_SCHOOL">{t('schools.highSchool')}</option>
           </select>
         </div>
         <div style={fieldGroupStyle}>
-          <label htmlFor="school-search-location" style={labelStyle}>Location</label>
+          <label htmlFor="school-search-location" style={labelStyle}>{t('schools.location')}</label>
           <input
             id="school-search-location"
             value={filters.location}
             onChange={(e) => handleFilterChange('location', e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Location…"
+            placeholder={t("schools.locationPlaceholder")}
             style={inputStyle}
           />
         </div>
         <Button onClick={handleSearch} disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
+          {loading ? t('schools.searching') : t('schools.search')}
         </Button>
-        <Button variant="outline" onClick={() => setShowAddModal(true)}>+ Add Custom School</Button>
+        <Button variant="outline" onClick={() => setShowAddModal(true)}>{t('schools.addCustom')}</Button>
       </div>
 
       {showAddModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-6)', width: '480px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--shadow-lg)' }}>
-            <h2 style={{ margin: '0 0 var(--space-4) 0', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>Add Custom School</h2>
+            <h2 style={{ margin: '0 0 var(--space-4) 0', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{t('schools.addCustomTitle')}</h2>
             <form onSubmit={handleAddSchool} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {[
                 { label: 'Name *', field: 'name', placeholder: 'School full name' },
@@ -293,13 +294,13 @@ function SchoolDirectory() {
                 </div>
               ))}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>Type</label>
+                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.type')}</label>
                 <select value={addForm.type} onChange={(e) => setAddForm((f) => ({ ...f, type: e.target.value }))} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
-                  <option value="UNIVERSITY">University</option>
-                  <option value="POLYTECHNIC">Polytechnic</option>
-                  <option value="COMMUNITY_COLLEGE">Community College</option>
-                  <option value="VOCATIONAL">Vocational</option>
-                  <option value="HIGH_SCHOOL">High School</option>
+                  <option value="UNIVERSITY">{t('schools.university')}</option>
+                  <option value="POLYTECHNIC">{t('schools.polytechnic')}</option>
+                  <option value="COMMUNITY_COLLEGE">{t('schools.communityCollege')}</option>
+                  <option value="VOCATIONAL">{t('schools.vocational')}</option>
+                  <option value="HIGH_SCHOOL">{t('schools.highSchool')}</option>
                 </select>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
@@ -312,9 +313,9 @@ function SchoolDirectory() {
               </div>
               {addError && <p style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)', margin: 0 }}>{addError}</p>}
               <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
-                <Button variant="outline" onClick={() => { setShowAddModal(false); setAddError(''); }} disabled={addLoading}>Cancel</Button>
+                <Button variant="outline" onClick={() => { setShowAddModal(false); setAddError(''); }} disabled={addLoading}>{t('schools.cancel')}</Button>
                 <Button type="submit" disabled={addLoading} onClick={() => {}}>
-                  {addLoading ? 'Saving...' : 'Create School'}
+                  {addLoading ? t('schools.searching') : t('schools.createSchool')}
                 </Button>
               </div>
             </form>
@@ -323,7 +324,7 @@ function SchoolDirectory() {
       )}
 
       <main id="main-content" style={contentStyle}>
-        {loading && <LoadingSpinner label="Searching schools..." />}
+        {loading && <LoadingSpinner label={t("schools.searching")} />}
         {error && <ErrorMessage message={error} />}
 
         {!loading && !error && (
@@ -342,15 +343,15 @@ function SchoolDirectory() {
                         <span style={{ fontSize: '10px', background: '#7c3aed', color: '#fff', padding: '2px 7px', borderRadius: '8px' }}>Custom</span>
                         {confirmDeleteId === school.id ? (
                           <>
-                            <span style={{ fontSize: '11px', color: 'var(--color-error)', fontFamily: 'var(--font-family-base)' }}>Delete?</span>
+                            <span style={{ fontSize: '11px', color: 'var(--color-error)', fontFamily: 'var(--font-family-base)' }}>{t('schools.deleteConfirm')}</span>
                             <button
                               onClick={(e) => { e.stopPropagation(); handleDeleteSchool(school); setConfirmDeleteId(null); }}
                               style={{ background: 'var(--color-error)', color: '#fff', border: 'none', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
-                            >Yes</button>
+                            >{t('schools.yes')}</button>
                             <button
                               onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
                               style={{ background: 'var(--color-surface)', color: 'var(--color-text-secondary)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
-                            >No</button>
+                            >{t('schools.no')}</button>
                           </>
                         ) : (
                           <button

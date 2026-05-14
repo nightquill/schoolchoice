@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Input } from '@schoolchoice/ui/primitives/input';
 import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getSubjects } from '../../api/grades';
 import PersonalTab from './PersonalTab';
 import GradesTab from './GradesTab';
@@ -20,17 +21,19 @@ import ActivitiesTab from './ActivitiesTab';
 import NotesTab from './NotesTab';
 import PlansTab from './PlansTab';
 
-const TABS = [
-  { id: 'personal', label: 'Personal' },
-  { id: 'grades', label: 'Grades' },
-  { id: 'language', label: 'Language' },
-  { id: 'evaluations', label: 'Teacher Evaluations' },
-  { id: 'activities', label: 'Activities' },
-  { id: 'notes', label: 'Notes' },
-  { id: 'plans', label: 'Plans' },
-];
-
 function StudentProfile() {
+  const { t } = useTranslation();
+
+  const TABS = [
+    { id: 'personal', label: t('profile.tabs.personal') },
+    { id: 'grades', label: t('profile.tabs.grades') },
+    { id: 'language', label: t('profile.tabs.language') },
+    { id: 'evaluations', label: t('profile.tabs.evaluations') },
+    { id: 'activities', label: t('profile.tabs.activities') },
+    { id: 'notes', label: t('profile.tabs.notes') },
+    { id: 'plans', label: t('profile.tabs.plans') },
+  ];
+
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -69,10 +72,10 @@ function StudentProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['student', id] });
       setShowGraduateModal(false);
-      toast.success('Student marked as graduated. Data added to analytics.');
+      toast.success(t('profile.graduateSuccess'));
     },
     onError: () => {
-      toast.error('Failed to graduate student.');
+      toast.error(t('profile.graduateFailed'));
     },
   });
 
@@ -112,7 +115,7 @@ function StudentProfile() {
     <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)', overflowX: 'hidden' }}>
       <NavBarV2 account={account} />
       <Link to="/dashboard" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-block', padding: 'var(--space-3) var(--space-8)' }}>
-        {'\u2190'} Back to Dashboard
+        {'\u2190'} {t('profile.backToDashboard')}
       </Link>
 
       <QueryBoundary
@@ -138,14 +141,14 @@ function StudentProfile() {
               <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
                 {student.is_graduated && (
                   <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-success)', color: '#fff', padding: '2px 10px', borderRadius: '10px', fontWeight: 'var(--font-weight-medium)' }}>
-                    Graduated {student.graduation_year || ''}
+                    {t('profile.graduated')} {student.graduation_year || ''}
                   </span>
                 )}
                 {!student.is_graduated && (
-                  <Button variant="secondary" onClick={handleOpenGraduate}>Mark as Graduated</Button>
+                  <Button variant="secondary" onClick={handleOpenGraduate}>{t('profile.markGraduated')}</Button>
                 )}
-                <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>Target Schools</Button>
-                <Button onClick={handleGeneratePlan}>Generate Plan</Button>
+                <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>{t('profile.targetSchools')}</Button>
+                <Button onClick={handleGeneratePlan}>{t('profile.generatePlan')}</Button>
               </div>
             </div>
 
@@ -189,33 +192,33 @@ function StudentProfile() {
       <Dialog open={showGraduateModal} onOpenChange={setShowGraduateModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Mark as Graduated</DialogTitle>
+            <DialogTitle>{t('profile.markGraduated')}</DialogTitle>
           </DialogHeader>
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-            This will move the student to the alumni record and add their data to the analytics data store (grades and final destination will be anonymized).
+            {t('profile.graduateConfirm')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final School</label>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalSchool')}</label>
               <select
                 value={graduateForm.final_school_id}
                 onChange={(e) => setGraduateForm((f) => ({ ...f, final_school_id: e.target.value }))}
                 style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
               >
-                <option value="">None / Unknown</option>
+                <option value="">{t('profile.noneUnknown')}</option>
                 {schoolOptions.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Final Major</label>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalMajor')}</label>
               <Input
                 value={graduateForm.final_major}
                 onChange={(e) => setGraduateForm((f) => ({ ...f, final_major: e.target.value }))}
-                placeholder="e.g. Computer Science"
+                placeholder={t('profile.finalMajorPlaceholder')}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>Graduation Year</label>
+              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.graduationYear')}</label>
               <Input
                 type="number"
                 value={graduateForm.graduation_year}
@@ -224,9 +227,9 @@ function StudentProfile() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateMutation.isPending}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setShowGraduateModal(false)} disabled={graduateMutation.isPending}>{t('profile.cancel')}</Button>
             <Button onClick={handleGraduate} disabled={graduateMutation.isPending}>
-              {graduateMutation.isPending ? 'Saving…' : 'Confirm Graduate'}
+              {graduateMutation.isPending ? t('profile.saving') : t('profile.confirmGraduate')}
             </Button>
           </DialogFooter>
         </DialogContent>

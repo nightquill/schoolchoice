@@ -7,9 +7,10 @@ import { FormCard } from '@schoolchoice/ui';
 import { TextInput } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { ErrorMessage } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function RegisterPage() {
-  const { isAuthenticated, login } = useAuth();
+  const { t } = useTranslation();  const { isAuthenticated, login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -36,13 +37,13 @@ function RegisterPage() {
       const status = err.response?.status;
       const detail = err.response?.data?.detail;
       if (status === 409) {
-        setError('An account with this email already exists.');
+        setError(t('auth.emailExists'));
       } else if (status === 422) {
         // FastAPI returns detail as an array of validation errors
-        const msg = Array.isArray(detail) ? detail.map((e) => e.msg).join('. ') : (detail || 'Invalid input.');
+        const msg = Array.isArray(detail) ? detail.map((e) => e.msg).join('. ') : (detail || t('auth.invalidInput'));
         setError(msg);
       } else {
-        setError(typeof detail === 'string' ? detail : 'Registration failed. Please try again.');
+        setError(typeof detail === 'string' ? detail : t('auth.registrationFailed'));
       }
     } finally {
       setLoading(false);
@@ -60,10 +61,10 @@ function RegisterPage() {
 
   return (
     <div style={pageStyle}>
-      <FormCard title="Create Account">
+      <FormCard title={t('auth.createAccount')}>
         <form onSubmit={handleSubmit} noValidate>
           <TextInput
-            label="Email"
+            label={t('auth.email')}
             name="email"
             type="email"
             value={email}
@@ -71,7 +72,7 @@ function RegisterPage() {
             required
           />
           <TextInput
-            label="Password"
+            label={t('auth.password')}
             name="password"
             type="password"
             value={password}
@@ -81,12 +82,12 @@ function RegisterPage() {
           {error && <ErrorMessage message={error} />}
           <div style={{ marginTop: 'var(--space-4)' }}>
             <Button className="w-full text-base py-5" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
             </Button>
           </div>
           <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
-            Already have an account?{' '}
-            <a href="/login" style={{ color: 'var(--color-primary)' }}>Log in</a>
+            {t('auth.alreadyHaveAccount')}{' '}
+            <a href="/login" style={{ color: 'var(--color-primary)' }}>{t('auth.login')}</a>
           </p>
         </form>
       </FormCard>

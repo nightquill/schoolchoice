@@ -5,6 +5,7 @@ import { QueryBoundary } from '@schoolchoice/ui';
 import ImportWizard from '../../components/ImportWizard/ImportWizard';
 import { getEntitySchema } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const pageStyle = {
   background: 'var(--color-background)',
@@ -26,7 +27,7 @@ const headingStyle = {
 };
 
 export default function ImportWizardPage() {
-  const { name } = useParams();
+  const { t } = useTranslation();  const { name } = useParams();
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const schemaQuery = useQuery({
@@ -38,7 +39,7 @@ export default function ImportWizardPage() {
     <div style={pageStyle}>
       <NavBarV2 account={accountQuery.data ?? null} />
       <main id="main-content" className="px-4 md:px-8" style={contentStyle}>
-        <h1 style={headingStyle}>Import {name}</h1>
+        <h1 style={headingStyle}>{t('import.title')} {name}</h1>
         <div style={{
           marginBottom: 'var(--space-4)', padding: 'var(--space-3) var(--space-4)',
           background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)',

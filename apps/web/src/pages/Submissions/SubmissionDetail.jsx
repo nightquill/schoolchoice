@@ -8,6 +8,7 @@ import { ErrorMessage } from '@schoolchoice/ui';
 import { Modal } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getSubmission, approveSubmission, reviseSubmission, rejectSubmission } from '../../api/submissions';
 
 const BAND_CONFIG = [
@@ -32,7 +33,7 @@ function matchColor(pct) {
 }
 
 function SubmissionDetail() {
-  const { id } = useParams();
+  const { t } = useTranslation();  const { id } = useParams();
   const navigate = useNavigate();
   const [reviseOpen, setReviseOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
@@ -164,7 +165,7 @@ function SubmissionDetail() {
             marginBottom: 'var(--space-4)',
           }}
         >
-          &larr; Back to Submissions
+          {t('common.back')} Submissions
         </Link>
 
         {loading && <LoadingSpinner label="Loading submission..." />}

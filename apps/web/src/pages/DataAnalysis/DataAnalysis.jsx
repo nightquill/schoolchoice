@@ -8,6 +8,7 @@ import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getHkdseTrends, getPopularMajors, getStudentDirectory, getHkdsePopulationStats } from '../../api/analytics';
 import { getCohorts } from '../../api/cohorts';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const GRADE_ORDER = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
 const CATEGORY_LABELS = { CORE: 'Core', ELECTIVE: 'Elective', OTHER_LANGUAGE: 'Other Language', APPLIED_LEARNING: 'Applied Learning' };
@@ -202,7 +203,7 @@ const tdStyle = {
 };
 
 function DataAnalysis() {
-  const navigate = useNavigate();
+  const { t } = useTranslation();  const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [trends, setTrends] = useState(null);
   const [majors, setMajors] = useState(null);
@@ -339,14 +340,14 @@ function DataAnalysis() {
           Data Analysis
         </h1>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-          <button style={tabBtnStyle('trends')} onClick={() => setActiveSection('trends')}>HKDSE Grade Trends</button>
-          <button style={tabBtnStyle('combinations')} onClick={() => setActiveSection('combinations')}>Subject Combinations</button>
-          <button style={tabBtnStyle('majors')} onClick={() => setActiveSection('majors')}>Popular Majors</button>
-          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>Student Directory</button>
+          <button style={tabBtnStyle('trends')} onClick={() => setActiveSection('trends')}>{t('dataAnalysis.hkdseTrends')}</button>
+          <button style={tabBtnStyle('combinations')} onClick={() => setActiveSection('combinations')}>{t('dataAnalysis.subjectCombinations')}</button>
+          <button style={tabBtnStyle('majors')} onClick={() => setActiveSection('majors')}>{t('dataAnalysis.popularMajors')}</button>
+          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>{t('dataAnalysis.studentDirectory')}</button>
         </div>
       </div>
 
-      {loading && <div style={{ padding: 'var(--space-8)' }}><LoadingSpinner label="Loading analytics…" /></div>}
+      {loading && <div style={{ padding: 'var(--space-8)' }}><LoadingSpinner label={t("dataAnalysis.loading")} /></div>}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}
 
       {!loading && !error && (
@@ -358,19 +359,19 @@ function DataAnalysis() {
               <div style={sectionTitleStyle}>
                 <span>HKDSE Grade Distribution by Subject ({filteredTrends.length} subject-sitting pairs)</span>
                 <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Sitting:</label>
+                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.sitting')}</label>
                   <select value={sittingFilter} onChange={(e) => setSittingFilter(e.target.value)} style={inputStyle}>
                     <option value="">All</option>
                     <option value="MOCK">MOCK</option>
                     <option value="TRIAL">TRIAL</option>
                     <option value="OFFICIAL">OFFICIAL</option>
                   </select>
-                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Cohort:</label>
+                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.cohort')}</label>
                   <select value={cohortFilter} onChange={(e) => setCohortFilter(e.target.value)} style={inputStyle}>
-                    <option value="">All Students</option>
+                    <option value="">{t('dataAnalysis.allStudents')}</option>
                     {cohorts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Category:</label>
+                  <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.category')}</label>
                   <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} style={inputStyle}>
                     <option value="">All</option>
                     {categories.map((cat) => <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>)}
@@ -433,7 +434,7 @@ function DataAnalysis() {
                             ))}
                           </div>
                         )}
-                        <div style={{ fontSize: '10px', color: 'var(--color-primary)', marginTop: 'var(--space-2)' }}>Click for HKDSE population data →</div>
+                        <div style={{ fontSize: '10px', color: 'var(--color-primary)', marginTop: 'var(--space-2)' }}>{t('dataAnalysis.populationData')}</div>
                       </div>
                     );
                   }) : (populationStats?.subjects ?? []).map((subj) => {
@@ -463,9 +464,9 @@ function DataAnalysis() {
                           </span>
                         </div>
                         <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                          No student data
+                          {t('dataAnalysis.noStudentData')}
                         </div>
-                        <div style={{ fontSize: '10px', color: 'var(--color-primary)', marginTop: 'var(--space-2)' }}>Click for HKDSE population data →</div>
+                        <div style={{ fontSize: '10px', color: 'var(--color-primary)', marginTop: 'var(--space-2)' }}>{t('dataAnalysis.populationData')}</div>
                       </div>
                     );
                   })}
@@ -478,9 +479,9 @@ function DataAnalysis() {
           {activeSection === 'combinations' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Elective Subject Combinations by Frequency</span>
+                <span>{t('dataAnalysis.electiveCombinations')}</span>
                 <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                  Top pairs and triples of elective subjects taken together
+                  {t('dataAnalysis.topPairs')}
                 </span>
               </div>
               {subjectCombinations.length === 0 ? (
@@ -515,9 +516,9 @@ function DataAnalysis() {
           {activeSection === 'majors' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Popular Intended Majors</span>
+                <span>{t('dataAnalysis.popularIntendedMajors')}</span>
                 <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                  {majors?.total_distinct ?? 0} distinct majors across all targets and graduates
+                  {majors?.total_distinct ?? 0} {t('dataAnalysis.distinctMajors')}
                 </span>
               </div>
               {!majors?.majors?.length ? (
@@ -552,33 +553,33 @@ function DataAnalysis() {
           {activeSection === 'directory' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Anonymized Student Directory</span>
+                <span>{t('dataAnalysis.anonymizedDirectory')}</span>
                 <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>
                     <input type="checkbox" checked={graduatedOnly} onChange={(e) => setGraduatedOnly(e.target.checked)} />
-                    Graduated only
+                    {t('dataAnalysis.graduatedOnly')}
                   </label>
                   <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                    {directory?.total ?? 0} students · Names/contacts removed
+                    {directory?.total ?? 0} students · {t('dataAnalysis.namesRemoved')}
                   </span>
                 </div>
               </div>
               {!directory?.students?.length ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No student data available." />
+                  <EmptyState message="{t('dataAnalysis.noStudentData')} available." />
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={thStyle}>Anon ID</th>
-                        <th style={thStyle}>Class</th>
-                        <th style={thStyle}>Year</th>
-                        <th style={thStyle}>Status</th>
-                        <th style={thStyle}>Final School / Major</th>
-                        <th style={thStyle}>Subjects (grades)</th>
-                        <th style={thStyle}>School Outcomes</th>
+                        <th style={thStyle}>{t('dataAnalysis.anonId')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.class')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.year')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.status')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.finalSchoolMajor')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.subjectsGrades')}</th>
+                        <th style={thStyle}>{t('dataAnalysis.schoolOutcomes')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -593,7 +594,7 @@ function DataAnalysis() {
                                 Grad {s.graduation_year || ''}
                               </span>
                             ) : (
-                              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Active</span>
+                              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.active')}</span>
                             )}
                           </td>
                           <td style={{ ...tdStyle, fontSize: 'var(--font-size-xs)' }}>

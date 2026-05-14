@@ -1,19 +1,20 @@
 import { useNotesTab } from '../../hooks/useNotesTab';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 export default function NotesTab({ studentId, student, onSaved }) {
   const { notes, saveStatus, handleChange } = useNotesTab(student, studentId, onSaved);
-
+  const { t } = useTranslation();
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
         <label htmlFor="counsellor-notes" style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-          Counsellor Notes
+          {t('notes.counsellorNotes')}
         </label>
         {saveStatus === 'saving' && (
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Saving{'…'}</span>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('notes.saving')}</span>
         )}
         {saveStatus === 'saved' && (
-          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)' }}>{'\u2713'} Saved</span>
+          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success)' }}>{t('notes.saved')}</span>
         )}
       </div>
       <textarea
