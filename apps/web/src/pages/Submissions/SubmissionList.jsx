@@ -13,7 +13,7 @@ function SubmissionList() {
   const submissionsQuery = useQuery({ queryKey: ['submissions'], queryFn: getSubmissions });
 
   const account = accountQuery.data ?? null;
-  const submissions = submissionsQuery.data ?? [];
+  const submissions = submissionsQuery.data?.submissions ?? [];
   const loading = submissionsQuery.isLoading;
   const error = submissionsQuery.error;
 
