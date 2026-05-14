@@ -53,7 +53,7 @@ function CohortReport() {
         setPerfData(perf);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load report data.');
+        setError(err?.response?.data?.detail || t('cohortReport.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, [cohortId, sitting]);
@@ -140,7 +140,7 @@ function CohortReport() {
         {t('cohortDetail.backToCohorts')}
       </Link>
 
-      {loading && <LoadingSpinner label="Loading report..." />}
+      {loading && <LoadingSpinner label={t('cohortReport.loadingReport')} />}
       {error && (
         <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
           <ErrorMessage message={error} />
@@ -150,17 +150,17 @@ function CohortReport() {
       {!loading && !error && (
         <div style={containerStyle}>
           <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-6)' }}>
-            {cohortName} &mdash; Cohort Report
+            {cohortName} &mdash; {t('cohortReport.cohortReport')}
           </h1>
 
           {/* ---------- Target Distribution ---------- */}
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>
-              <span>Target School Distribution</span>
+              <span>{t('cohortReport.targetDistribution')}</span>
             </div>
             {!targetDist?.distribution?.length ? (
               <div style={{ padding: 'var(--space-5)' }}>
-                <EmptyState message="No target schools data for this cohort." />
+                <EmptyState message={t('cohortReport.noTargetData')} />
               </div>
             ) : (
               <div style={{ padding: 'var(--space-4)' }}>
@@ -187,7 +187,7 @@ function CohortReport() {
                       </div>
                     </div>
                     <div style={{ width: '80px', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', flexShrink: 0 }}>
-                      {d.avg_score != null ? `Avg: ${d.avg_score}` : ''}
+                      {d.avg_score != null ? `${t('cohortReport.avg')} ${d.avg_score}` : ''}
                     </div>
                   </div>
                 ))}
@@ -198,21 +198,21 @@ function CohortReport() {
           {/* ---------- Risk Breakdown ---------- */}
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>
-              <span>Risk Breakdown by Class</span>
+              <span>{t('cohortReport.riskBreakdown')}</span>
             </div>
             {!riskData?.breakdown?.length ? (
               <div style={{ padding: 'var(--space-5)' }}>
-                <EmptyState message="No risk data available." />
+                <EmptyState message={t('cohortReport.noRiskData')} />
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr>
-                      <th style={thStyle}>Class</th>
-                      <th style={thStyle}>Total Students</th>
-                      <th style={thStyle}>At Risk</th>
-                      <th style={thStyle}>Risk %</th>
+                      <th style={thStyle}>{t('cohortDetail.class')}</th>
+                      <th style={thStyle}>{t('cohortReport.totalStudents')}</th>
+                      <th style={thStyle}>{t('cohortReport.atRisk')}</th>
+                      <th style={thStyle}>{t('cohortReport.riskPct')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -243,10 +243,10 @@ function CohortReport() {
           {/* ---------- Subject Performance ---------- */}
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>
-              <span>Subject Performance</span>
+              <span>{t('cohortReport.subjectPerformance')}</span>
               <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
                 <label htmlFor="perf-sitting" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                  Sitting:
+                  {t('cohortDetail.sitting')}
                 </label>
                 <select
                   id="perf-sitting"
@@ -254,27 +254,27 @@ function CohortReport() {
                   onChange={(e) => setSitting(e.target.value)}
                   style={inputStyle}
                 >
-                  <option value="MOCK">MOCK</option>
-                  <option value="TRIAL">TRIAL</option>
-                  <option value="OFFICIAL">OFFICIAL</option>
+                  <option value="MOCK">{t('common.mock')}</option>
+                  <option value="TRIAL">{t('common.trial')}</option>
+                  <option value="OFFICIAL">{t('common.official')}</option>
                 </select>
               </div>
             </div>
             {!perfData?.subjects?.length ? (
               <div style={{ padding: 'var(--space-5)' }}>
-                <EmptyState message="No subject performance data." />
+                <EmptyState message={t('cohortReport.noSubjectPerfData')} />
               </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr>
-                      <th style={thStyle}>Code</th>
-                      <th style={thStyle}>Subject</th>
-                      <th style={thStyle}>Students</th>
-                      <th style={thStyle}>Mean</th>
-                      <th style={thStyle}>Min</th>
-                      <th style={thStyle}>Max</th>
+                      <th style={thStyle}>{t('cohortReport.code')}</th>
+                      <th style={thStyle}>{t('cohortReport.subject')}</th>
+                      <th style={thStyle}>{t('cohortDetail.students')}</th>
+                      <th style={thStyle}>{t('cohortReport.mean')}</th>
+                      <th style={thStyle}>{t('cohortReport.min')}</th>
+                      <th style={thStyle}>{t('cohortReport.max')}</th>
                     </tr>
                   </thead>
                   <tbody>

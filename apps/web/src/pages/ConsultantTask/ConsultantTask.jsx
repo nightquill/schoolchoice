@@ -91,7 +91,7 @@ function ConsultantTask() {
         }
       })
       .catch(() => {
-        setError('Failed to load plan data.');
+        setError(t('consultant.loadFailed'));
       })
       .finally(() => setLoading(false));
 
@@ -140,7 +140,7 @@ function ConsultantTask() {
         setPlan(result);
         toast.success(t('plan.planGenerated'));
       } catch (err) {
-        setStreamError('Failed to save plan. Please try again.');
+        setStreamError(t('consultant.saveFailed'));
       }
       setStreaming(false);
       setStreamTokens('');
@@ -150,7 +150,7 @@ function ConsultantTask() {
     source.onerror = () => {
       source.close();
       eventSourceRef.current = null;
-      setStreamError('Generation was interrupted. Please try again.');
+      setStreamError(t('consultant.interrupted'));
       setStreaming(false);
     };
   }, [id, taskId]);
@@ -184,9 +184,9 @@ function ConsultantTask() {
     setIsExportingHTML(true);
     try {
       await exportPlanHTML(plan.id);
-      toast.success('Plan exported as HTML.');
+      toast.success(t('consultant.exportSuccess'));
     } catch {
-      toast.error('Failed to export HTML. Please try again.');
+      toast.error(t('consultant.exportFailed'));
     } finally {
       setIsExportingHTML(false);
     }
@@ -227,7 +227,7 @@ function ConsultantTask() {
           ...prev,
           {
             role: 'system',
-            text: 'AI chat is not available: AI provider API key not configured.',
+            text: t('consultant.apiNotAvailable'),
             id: crypto.randomUUID(),
           },
         ]);
@@ -236,12 +236,12 @@ function ConsultantTask() {
           ...prev,
           {
             role: 'system',
-            text: 'Daily limit of 20 AI chat requests reached for this plan.',
+            text: t('consultant.dailyLimit'),
             id: crypto.randomUUID(),
           },
         ]);
       } else {
-        setChatError('Failed to send message. Please try again.');
+        setChatError(t('plan.messageFailed'));
       }
     } finally {
       setChatLoading(false);
@@ -288,13 +288,13 @@ function ConsultantTask() {
 
   // --- section list builder ---
   function buildSectionList(planData) {
-    const sections = [{ key: 'student_summary', label: 'Student Summary' }];
+    const sections = [{ key: 'student_summary', label: t('consultant.studentSummary') }];
     const schools = planData?.recommended_schools || [];
     const count = Math.min(schools.length || 0, 5);
     for (let i = 0; i < count; i++) {
-      sections.push({ key: `school_${i}_rationale`, label: `School ${i + 1} Rationale` });
+      sections.push({ key: `school_${i}_rationale`, label: t('consultant.schoolRationale', { number: i + 1 }) });
     }
-    sections.push({ key: 'action_plan_notes', label: 'Action Plan Notes' });
+    sections.push({ key: 'action_plan_notes', label: t('consultant.actionPlanNotes') });
     return sections;
   }
 
@@ -485,14 +485,14 @@ function ConsultantTask() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
       <Link to={`/students/${id}/profile`} style={backLinkStyle}>
-        {'\u2190'} {t('consultant.backTo')} {student?.full_name || 'Profile'}
+        {'\u2190'} {t('consultant.backTo')} {student?.full_name || t('account.profile')}
       </Link>
 
       {/* Main toolbar */}
       <div style={toolbarStyle}>
         <div style={toolbarLeftStyle}>
-          <p style={studentNameStyle}>{student?.full_name || 'Consultant Task'}</p>
-          {plan?.version && <p style={versionStyle}>Plan v{plan.version}</p>}
+          <p style={studentNameStyle}>{student?.full_name || t('consultant.consultantTask')}</p>
+          {plan?.version && <p style={versionStyle}>{t('plan.version', { version: plan.version })}</p>}
         </div>
 
         <div style={toolbarRightStyle}>
@@ -708,8 +708,8 @@ function ConsultantTask() {
           {!streaming && !streamError && !error && !plan?.html_content && (
             <div style={contentZoneStyle}>
               <EmptyState
-                message="No plan has been generated yet."
-                description="Click Generate Plan to create a school choice plan for this student."
+                message={t('plan.noPlan')}
+                description={t('consultant.emptyPlanDesc')}
               />
             </div>
           )}
@@ -925,14 +925,14 @@ function ChatPanel({
 
       {chatDisabled && (
         <div style={noKeyNoticeStyle}>
-          AI chat requires an API key. Configure AI_API_KEY in the backend to enable this feature.
+          {t('consultant.apiKeyRequired')}
         </div>
       )}
 
       <div style={messageListStyle}>
         {messages.length === 0 && (
           <p style={emptyHintStyle}>
-            Ask me to adjust a school&apos;s rationale, reorder schools, change action item priorities&hellip;
+            {t('plan.aiPlaceholder')}
           </p>
         )}
         {messages.map((msg) => (

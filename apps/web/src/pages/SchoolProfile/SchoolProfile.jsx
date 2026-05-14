@@ -36,7 +36,7 @@ function SchoolProfile() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load school profile.');
+        setError(err?.response?.data?.detail || t('schoolProfile.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -194,7 +194,7 @@ function SchoolProfile() {
       {error && (
         <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
           <ErrorMessage message={error} />
-          <Link to="/schools" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>Back to Directory</Link>
+          <Link to="/schools" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>{t('schoolProfile.backToDirectory')}</Link>
         </div>
       )}
 
@@ -324,7 +324,7 @@ function SchoolProfile() {
                     ))}
                   </div>
                 ) : (
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>No per-major requirement data available.</p>
+                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('schoolProfile.noMajorReqData')}</p>
                 )}
               </section>
             </div>
@@ -334,19 +334,19 @@ function SchoolProfile() {
                 <div style={statRowStyle}>
                   <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.acceptanceRate')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
-                    {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : 'N/A'}
+                    {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : t('schoolProfile.na')}
                   </span>
                 </div>
                 <div style={statRowStyle}>
                   <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.avgAdmittedScore')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
-                    {school.average_admitted_score != null ? school.average_admitted_score : 'N/A'}
+                    {school.average_admitted_score != null ? school.average_admitted_score : t('schoolProfile.na')}
                   </span>
                 </div>
                 <div style={{ ...statRowStyle, borderBottom: 'none' }}>
                   <span style={{ color: 'var(--color-text-secondary)' }}>{t('schoolProfile.scholarshipAvailable')}</span>
                   <span style={{ fontWeight: 'var(--font-weight-medium)', color: school.scholarship_available ? 'var(--color-success)' : 'inherit' }}>
-                    {school.scholarship_available ? 'Yes' : 'No'}
+                    {school.scholarship_available ? t('common.yes') : t('common.no')}
                   </span>
                 </div>
               </FormCard>
@@ -368,10 +368,10 @@ function SchoolProfile() {
 
           {(school.data_source || school.data_last_updated) && (
             <div style={provenanceStyle}>
-              {school.data_source && <span>Source: {school.data_source}</span>}
+              {school.data_source && <span>{t('schoolProfile.source')} {school.data_source}</span>}
               {school.data_source && school.data_last_updated && <span> &middot; </span>}
               {school.data_last_updated && (
-                <span>Last updated: {school.data_last_updated.slice(0, 10)}</span>
+                <span>{t('schoolProfile.lastUpdated')} {school.data_last_updated.slice(0, 10)}</span>
               )}
             </div>
           )}
@@ -380,14 +380,14 @@ function SchoolProfile() {
 
       <Modal
         isOpen={selectStudentModalOpen}
-        title="Select Student"
+        title={t('schoolProfile.selectStudentTitle')}
         onClose={() => setSelectStudentModalOpen(false)}
         onConfirm={() => selectedStudentId && handleAddToTargetWithStudent(selectedStudentId)}
         confirmLabel={t('schoolProfile.addToTargets')}
       >
         <div>
           <label htmlFor="student-select" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-2)' }}>
-            Select a student to add {school?.name} to their target list:
+            {t('schoolProfile.selectStudent', { school: school?.name })}
           </label>
           <select
             id="student-select"

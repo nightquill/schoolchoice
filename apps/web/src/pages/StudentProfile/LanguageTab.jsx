@@ -87,7 +87,7 @@ export default function LanguageTab({ studentId, student, onSaved }) {
             style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', alignSelf: 'center', paddingBottom: 'var(--space-1)' }}
             aria-label="Remove score"
           >
-            Remove
+            {t('activities.remove')}
           </button>
         </div>
       ))}

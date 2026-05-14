@@ -57,10 +57,10 @@ function SubmissionDetail() {
     setActionLoading(true);
     try {
       await approveSubmission(id);
-      toast.success('Submission approved');
+      toast.success(t('submissions.approveSuccess'));
       navigate('/submissions');
     } catch {
-      toast.error('Failed to approve submission');
+      toast.error(t('submissions.approveFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -71,11 +71,11 @@ function SubmissionDetail() {
     setActionLoading(true);
     try {
       await reviseSubmission(id, notes.trim());
-      toast.success('Sent back for revision');
+      toast.success(t('submissions.revisionSuccess'));
       setReviseOpen(false);
       navigate('/submissions');
     } catch {
-      toast.error('Failed to send revision request');
+      toast.error(t('submissions.revisionFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -86,11 +86,11 @@ function SubmissionDetail() {
     setActionLoading(true);
     try {
       await rejectSubmission(id, reason.trim());
-      toast.success('Submission rejected');
+      toast.success(t('submissions.rejectSuccess'));
       setRejectOpen(false);
       navigate('/submissions');
     } catch {
-      toast.error('Failed to reject submission');
+      toast.error(t('submissions.rejectFailed'));
     } finally {
       setActionLoading(false);
     }
@@ -165,10 +165,10 @@ function SubmissionDetail() {
             marginBottom: 'var(--space-4)',
           }}
         >
-          {t('common.back')} Submissions
+          {t('submissions.backToSubmissions')}
         </Link>
 
-        {loading && <LoadingSpinner label="Loading submission..." />}
+        {loading && <LoadingSpinner label={t('submissions.loadingSubmission')} />}
         {error && <ErrorMessage message={error} />}
 
         {!loading && !error && submission && (
@@ -182,14 +182,14 @@ function SubmissionDetail() {
                   color: 'var(--color-text-primary)',
                   margin: 0,
                 }}>
-                  {submission.student_name || 'Unknown Student'}
+                  {submission.student_name || t('submissions.unknownStudent')}
                 </h1>
                 <span style={statusBadge(submission.status)}>{submission.status}</span>
               </div>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 'var(--space-1) 0 0' }}>
-                {submission.class_name && `Class ${submission.class_name}`}
+                {submission.class_name && `${t('submissions.classLabel')} ${submission.class_name}`}
                 {submission.class_name && submission.submitted_at && ' · '}
-                {submission.submitted_at && `Submitted ${new Date(submission.submitted_at).toLocaleDateString()}`}
+                {submission.submitted_at && `${t('submissions.submitted')} ${new Date(submission.submitted_at).toLocaleDateString()}`}
               </p>
             </div>
 
@@ -198,13 +198,13 @@ function SubmissionDetail() {
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Rank</th>
-                    <th style={thStyle}>Band</th>
-                    <th style={thStyle}>Programme Name</th>
-                    <th style={thStyle}>JUPAS Code</th>
-                    <th style={thStyle}>Match %</th>
-                    <th style={thStyle}>Risk</th>
-                    <th style={thStyle}>Notes</th>
+                    <th style={thStyle}>{t('submissions.rank')}</th>
+                    <th style={thStyle}>{t('submissions.band')}</th>
+                    <th style={thStyle}>{t('submissions.programmeName')}</th>
+                    <th style={thStyle}>{t('submissions.jupasCode')}</th>
+                    <th style={thStyle}>{t('submissions.matchPct')}</th>
+                    <th style={thStyle}>{t('submissions.risk')}</th>
+                    <th style={thStyle}>{t('grades.notes')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,7 +245,7 @@ function SubmissionDetail() {
                                 background: '#fee2e2',
                                 color: '#991b1b',
                               }}>
-                                At Risk
+                                {t('submissions.atRisk')}
                               </span>
                             ) : null}
                           </td>
@@ -259,7 +259,7 @@ function SubmissionDetail() {
                   {choices.length === 0 && (
                     <tr>
                       <td colSpan={7} style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                        No choices submitted.
+                        {t('submissions.noChoices')}
                       </td>
                     </tr>
                   )}
@@ -275,14 +275,14 @@ function SubmissionDetail() {
                   disabled={actionLoading}
                   style={{ background: '#16a34a', color: '#fff', border: 'none' }}
                 >
-                  {actionLoading ? 'Processing...' : 'Approve'}
+                  {actionLoading ? t('submissions.processing') : t('submissions.approve')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setReviseOpen(true)}
                   disabled={actionLoading}
                 >
-                  Send Back for Revision
+                  {t('submissions.sendBackRevision')}
                 </Button>
                 <Button
                   variant="outline"
@@ -290,7 +290,7 @@ function SubmissionDetail() {
                   disabled={actionLoading}
                   style={{ color: '#dc2626', borderColor: '#dc2626' }}
                 >
-                  Reject
+                  {t('submissions.reject')}
                 </Button>
               </div>
             )}
@@ -300,18 +300,18 @@ function SubmissionDetail() {
         {/* Revise modal */}
         <Modal
           isOpen={reviseOpen}
-          title="Send Back for Revision"
+          title={t('submissions.sendBackTitle')}
           onClose={() => { setReviseOpen(false); setNotes(''); }}
           onConfirm={handleRevise}
-          confirmLabel="Send Revision"
+          confirmLabel={t('submissions.sendRevision')}
         >
           <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-            Notes for the student (required)
+            {t('submissions.notesRequired')}
           </label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Explain what needs to change..."
+            placeholder={t('submissions.notesPlaceholder')}
             rows={4}
             style={{
               width: '100%',
@@ -329,19 +329,19 @@ function SubmissionDetail() {
         {/* Reject modal */}
         <Modal
           isOpen={rejectOpen}
-          title="Reject Submission"
+          title={t('submissions.rejectTitle')}
           onClose={() => { setRejectOpen(false); setReason(''); }}
           onConfirm={handleReject}
-          confirmLabel="Reject"
+          confirmLabel={t('submissions.reject')}
           confirmVariant="danger"
         >
           <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-            Reason for rejection (required)
+            {t('submissions.reasonRequired')}
           </label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Explain why this submission is being rejected..."
+            placeholder={t('submissions.reasonPlaceholder')}
             rows={4}
             style={{
               width: '100%',

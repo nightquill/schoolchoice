@@ -234,7 +234,7 @@ export default function GradesTab({ studentId, subjects }) {
               <input
                 value={newRow.notes || ''}
                 onChange={(e) => setNewRow((r) => ({ ...r, notes: e.target.value }))}
-                placeholder="Notes"
+                placeholder={t('grades.notes')}
                 style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '100%' }}
                 aria-label="Notes"
               />

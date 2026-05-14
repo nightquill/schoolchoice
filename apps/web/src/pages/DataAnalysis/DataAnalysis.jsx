@@ -337,7 +337,7 @@ function DataAnalysis() {
 
       <div style={headerStyle}>
         <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-3) 0' }}>
-          Data Analysis
+          {t('dataAnalysis.title')}
         </h1>
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           <button style={tabBtnStyle('trends')} onClick={() => setActiveSection('trends')}>{t('dataAnalysis.hkdseTrends')}</button>
@@ -357,14 +357,14 @@ function DataAnalysis() {
           {activeSection === 'trends' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>HKDSE Grade Distribution by Subject ({filteredTrends.length} subject-sitting pairs)</span>
+                <span>{t('dataAnalysis.gradeDistribution')} ({filteredTrends.length})</span>
                 <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
                   <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.sitting')}</label>
                   <select value={sittingFilter} onChange={(e) => setSittingFilter(e.target.value)} style={inputStyle}>
-                    <option value="">All</option>
-                    <option value="MOCK">MOCK</option>
-                    <option value="TRIAL">TRIAL</option>
-                    <option value="OFFICIAL">OFFICIAL</option>
+                    <option value="">{t('dataAnalysis.all')}</option>
+                    <option value="MOCK">{t('common.mock')}</option>
+                    <option value="TRIAL">{t('common.trial')}</option>
+                    <option value="OFFICIAL">{t('common.official')}</option>
                   </select>
                   <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.cohort')}</label>
                   <select value={cohortFilter} onChange={(e) => setCohortFilter(e.target.value)} style={inputStyle}>
@@ -373,14 +373,14 @@ function DataAnalysis() {
                   </select>
                   <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.category')}</label>
                   <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} style={inputStyle}>
-                    <option value="">All</option>
+                    <option value="">{t('dataAnalysis.all')}</option>
                     {categories.map((cat) => <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>)}
                   </select>
                 </div>
               </div>
               {groupedSubjects.length === 0 && !(populationStats?.subjects?.length > 0) ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No grade data available. Add students with grades to see trends." />
+                  <EmptyState message={t('dataAnalysis.noGradeData')} />
                 </div>
               ) : (
                 <div style={{ padding: 'var(--space-3)', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 'var(--space-3)' }}>
@@ -486,7 +486,7 @@ function DataAnalysis() {
               </div>
               {subjectCombinations.length === 0 ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No combination data yet. Add elective grades to see patterns." />
+                  <EmptyState message={t('dataAnalysis.noCombinationData')} />
                 </div>
               ) : (
                 <div style={{ padding: 'var(--space-4)' }}>
@@ -499,7 +499,7 @@ function DataAnalysis() {
                           <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', fontWeight: i < 3 ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)' }}>
                             {i + 1}. {item.combination}
                           </span>
-                          <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{item.frequency} students</span>
+                          <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{item.frequency} {t('cohortDetail.students').toLowerCase()}</span>
                         </div>
                         <div style={{ height: '8px', background: 'var(--color-background)', borderRadius: '4px', overflow: 'hidden' }}>
                           <div style={{ height: '100%', width: `${pct}%`, background: 'var(--color-primary)', borderRadius: '4px', transition: 'width 0.3s' }} />
@@ -523,7 +523,7 @@ function DataAnalysis() {
               </div>
               {!majors?.majors?.length ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No major data yet. Add intended majors to target schools to see trends." />
+                  <EmptyState message={t('dataAnalysis.noMajorData')} />
                 </div>
               ) : (
                 <div style={{ padding: 'var(--space-4)' }}>
@@ -566,7 +566,7 @@ function DataAnalysis() {
               </div>
               {!directory?.students?.length ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="{t('dataAnalysis.noStudentData')} available." />
+                  <EmptyState message={t('dataAnalysis.noData')} />
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
@@ -591,7 +591,7 @@ function DataAnalysis() {
                           <td style={tdStyle}>
                             {s.is_graduated ? (
                               <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-success)', color: '#fff', padding: '1px 6px', borderRadius: '8px' }}>
-                                Grad {s.graduation_year || ''}
+                                {t('dataAnalysis.graduated')} {s.graduation_year || ''}
                               </span>
                             ) : (
                               <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.active')}</span>

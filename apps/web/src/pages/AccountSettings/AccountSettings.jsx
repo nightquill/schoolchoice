@@ -50,7 +50,7 @@ function AccountSettings() {
         setLocale(loc);
         localStorage.setItem('locale', loc);
       })
-      .catch(() => setError('Failed to load account settings.'))
+      .catch(() => setError(t('account.loading')))
       .finally(() => setLoading(false));
   }, []);
 
@@ -59,9 +59,9 @@ function AccountSettings() {
     try {
       const updated = await updateAccount({ display_name: displayName });
       setAccount(updated);
-      toast.success('Display name saved.');
+      toast.success(t('account.nameSaved'));
     } catch {
-      toast.error('Failed to save display name.');
+      toast.error(t('account.nameFailed'));
     } finally {
       setSavingName(false);
     }
@@ -70,11 +70,11 @@ function AccountSettings() {
   const handleChangePassword = async () => {
     setPwErrors({});
     if (pwForm.new_password !== pwForm.confirm_new_password) {
-      setPwErrors({ confirm_new_password: 'Passwords do not match.' });
+      setPwErrors({ confirm_new_password: t('account.passwordsMismatch') });
       return;
     }
     if (!pwForm.new_password) {
-      setPwErrors({ new_password: 'New password is required.' });
+      setPwErrors({ new_password: t('account.newPasswordRequired') });
       return;
     }
     setSavingPw(true);
@@ -84,14 +84,14 @@ function AccountSettings() {
         new_password: pwForm.new_password,
       });
       setPwForm({ current_password: '', new_password: '', confirm_new_password: '' });
-      toast.success('Password changed successfully.');
+      toast.success(t('account.passwordChanged'));
     } catch (err) {
       if (err?.response?.status === 401) {
-        setPwErrors({ current_password: 'Incorrect current password.' });
+        setPwErrors({ current_password: t('account.incorrectPassword') });
       } else if (err?.response?.status === 422) {
-        setPwErrors(err.response.data?.errors || { new_password: 'Password does not meet requirements.' });
+        setPwErrors(err.response.data?.errors || { new_password: t('account.passwordRequirements') });
       } else {
-        toast.error('Failed to change password.');
+        toast.error(t('account.passwordFailed'));
       }
     } finally {
       setSavingPw(false);
@@ -107,7 +107,7 @@ function AccountSettings() {
       localStorage.setItem('locale', preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en');
       toast.success(t('account.prefsSaved'));
     } catch {
-      toast.error('Failed to save preferences.');
+      toast.error(t('account.prefsFailed'));
     } finally {
       setSavingPrefs(false);
     }
@@ -122,9 +122,9 @@ function AccountSettings() {
       navigate('/login');
     } catch (err) {
       if (err?.response?.status === 401) {
-        setDeleteError('Incorrect password. Please try again.');
+        setDeleteError(t('account.incorrectPassword'));
       } else {
-        setDeleteError('Failed to delete account. Please try again.');
+        setDeleteError(t('account.deleteFailed'));
       }
     } finally {
       setDeleting(false);
@@ -184,7 +184,7 @@ function AccountSettings() {
   if (loading) return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <div style={{ padding: 'var(--space-10)' }}><LoadingSpinner label="Loading account settings..." /></div>
+      <div style={{ padding: 'var(--space-10)' }}><LoadingSpinner label={t('account.loading')} /></div>
     </div>
   );
 
@@ -201,37 +201,37 @@ function AccountSettings() {
 
       <main id="main-content" style={contentStyle}>
         <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-          Account Settings
+          {t('account.title')}
         </h1>
 
         {/* Display Name */}
         <div style={cardStyle()}>
-          <h2 style={cardTitleStyle}>Profile</h2>
+          <h2 style={cardTitleStyle}>{t('account.profile')}</h2>
           <TextInput
-            label="Display Name"
+            label={t('account.displayName')}
             name="display_name"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
           />
           <Button onClick={handleSaveName} disabled={savingName}>
-            {savingName ? 'Saving...' : 'Save'}
+            {savingName ? t('account.saving') : t('account.save')}
           </Button>
         </div>
 
         {/* Email */}
         <div style={cardStyle()}>
-          <h2 style={cardTitleStyle}>Email Address</h2>
+          <h2 style={cardTitleStyle}>{t('account.emailAddress')}</h2>
           <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-2) 0' }}>
             {account?.email}
           </p>
-          <span style={helperNoteStyle}>To change your email address, contact your administrator.</span>
+          <span style={helperNoteStyle}>{t('account.emailChangeNote')}</span>
         </div>
 
         {/* Change Password */}
         <div style={cardStyle()}>
-          <h2 style={cardTitleStyle}>Change Password</h2>
+          <h2 style={cardTitleStyle}>{t('account.changePassword')}</h2>
           <TextInput
-            label="Current Password"
+            label={t('account.currentPassword')}
             name="current_password"
             type="password"
             value={pwForm.current_password}
@@ -239,7 +239,7 @@ function AccountSettings() {
             error={pwErrors.current_password}
           />
           <TextInput
-            label="New Password"
+            label={t('account.newPassword')}
             name="new_password"
             type="password"
             value={pwForm.new_password}
@@ -247,7 +247,7 @@ function AccountSettings() {
             error={pwErrors.new_password}
           />
           <TextInput
-            label="Confirm New Password"
+            label={t('account.confirmNewPassword')}
             name="confirm_new_password"
             type="password"
             value={pwForm.confirm_new_password}
@@ -255,16 +255,16 @@ function AccountSettings() {
             error={pwErrors.confirm_new_password}
           />
           <Button onClick={handleChangePassword} disabled={savingPw}>
-            {savingPw ? 'Changing...' : 'Change Password'}
+            {savingPw ? t('account.changingPassword') : t('account.changePassword')}
           </Button>
         </div>
 
         {/* Preferences */}
         <div style={cardStyle()}>
-          <h2 style={cardTitleStyle}>Preferences</h2>
+          <h2 style={cardTitleStyle}>{t('account.preferences')}</h2>
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
-              Preferred Language
+              {t('account.preferredLanguage')}
             </p>
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <button
@@ -272,56 +272,56 @@ function AccountSettings() {
                 onClick={() => setPreferredLanguage('en')}
                 aria-pressed={preferredLanguage === 'en'}
               >
-                English
+                {t('account.english')}
               </button>
               <button
                 style={toggleBtnStyle(preferredLanguage === 'zh-HK')}
                 onClick={() => setPreferredLanguage('zh-HK')}
                 aria-pressed={preferredLanguage === 'zh-HK'}
               >
-                中文
+                {t('account.chinese')}
               </button>
             </div>
           </div>
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
-              Email Notifications{' '}
-              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>(coming soon)</span>
+              {t('account.emailNotifications')}{' '}
+              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('account.comingSoon')}</span>
             </p>
             <input type="checkbox" disabled aria-label="Email notifications (coming soon)" />
           </div>
           <Button onClick={handleSavePrefs} disabled={savingPrefs}>
-            {savingPrefs ? 'Saving...' : 'Save Preferences'}
+            {savingPrefs ? t('account.saving') : t('account.savePreferences')}
           </Button>
         </div>
 
         {/* Danger Zone */}
         <div style={cardStyle(true)}>
-          <h2 style={{ ...cardTitleStyle, color: 'var(--color-error)' }}>Danger Zone</h2>
+          <h2 style={{ ...cardTitleStyle, color: 'var(--color-error)' }}>{t('account.dangerZone')}</h2>
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-            Deleting your account is permanent and cannot be undone.
+            {t('account.deleteWarning')}
           </p>
-          <Button variant="destructive" onClick={() => setDeleteModalOpen(true)}>Delete Account</Button>
+          <Button variant="destructive" onClick={() => setDeleteModalOpen(true)}>{t('account.deleteAccount')}</Button>
         </div>
       </main>
 
       <Modal
         isOpen={deleteModalOpen}
-        title="Delete Account"
+        title={t('account.deleteAccount')}
         onClose={() => {
           setDeleteModalOpen(false);
           setDeletePassword('');
           setDeleteError('');
         }}
         onConfirm={handleDeleteAccount}
-        confirmLabel={deleting ? 'Deleting…' : 'Yes, Delete My Account'}
+        confirmLabel={deleting ? t('account.deleting') : t('account.confirmDelete')}
         confirmVariant="danger"
       >
         <p style={{ marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
-          This action cannot be undone. Your account will be deactivated and you will be logged out. Enter your password to confirm.
+          {t('account.deleteConfirm')}
         </p>
         <TextInput
-          label="Password"
+          label={t('auth.password')}
           name="delete_confirm_password"
           type="password"
           value={deletePassword}

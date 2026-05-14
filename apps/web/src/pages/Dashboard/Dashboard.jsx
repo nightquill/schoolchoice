@@ -73,7 +73,7 @@ function Dashboard() {
   const metrics = [
     { label: t('dashboard.totalStudents'), value: loading ? '--' : students.length },
     { label: t('dashboard.plansGenerated'), value: loading ? '--' : students.filter((s) => s.has_plan).length },
-    { label: 'Pending Submissions', value: submissionsQuery.isLoading ? '--' : (submissionsQuery.data?.length ?? 0) },
+    { label: t('submissions.pendingSubmissions'), value: submissionsQuery.isLoading ? '--' : (submissionsQuery.data?.length ?? 0) },
     ...entityMetrics.map((m, i) => ({
       label: m.label,
       value: entityCountQueries[i]?.data?.length ?? '--',
@@ -187,7 +187,7 @@ function Dashboard() {
             <Button variant="secondary" onClick={() => setShowAddForm(true)}>{t('dashboard.addStudent')}</Button>
           )}
           <Button variant="outline" onClick={() => navigate('/import/students')}>
-            Import (CSV / Excel)
+            {t('import.importCsvExcel')}
           </Button>
           <Button variant="outline" onClick={async () => {
             try {
@@ -201,10 +201,10 @@ function Dashboard() {
               URL.revokeObjectURL(url);
             } catch { /* ignore */ }
           }}>
-            Export Students (CSV)
+            {t('dashboard.exportStudents')}
           </Button>
           <Button variant="outline" onClick={() => navigate('/cohorts')}>
-            Cohorts &amp; Bulk Edit
+            {t('dashboard.cohortsBulkEdit')}
           </Button>
         </div>
 
@@ -283,7 +283,7 @@ function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ marginTop: 'var(--space-6)' }} role="list" aria-label="Student cards">
             {filteredStudents.map((student) => (
               <div key={student.id} style={cardStyle} role="listitem">
-                <p style={cardNameStyle}>{student.full_name || student.name || 'Unnamed Student'}</p>
+                <p style={cardNameStyle}>{student.full_name || student.name || t('dashboard.unnamedStudent')}</p>
                 {(student.year_of_study || student.class_name) && (
                   <p style={cardMetaStyle}>
                     {student.class_name && `${t('dashboard.class')} ${student.class_name}`}

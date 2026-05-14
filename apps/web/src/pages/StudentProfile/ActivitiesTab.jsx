@@ -73,7 +73,7 @@ export default function ActivitiesTab({ studentId, student }) {
         <div key={index} style={cardStyle}>
           <div style={collapsibleHeaderStyle} onClick={() => toggleActivity(index)}>
             <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-              {act.activity || 'New Activity'}
+              {act.activity || t('activities.addActivity')}
             </span>
             <button style={toggleBtnStyle} aria-label={activityOpen[index] ? 'Collapse' : 'Expand'}>
               {activityOpen[index] ? '\u25B2' : '\u25BC'}
@@ -117,7 +117,7 @@ export default function ActivitiesTab({ studentId, student }) {
           <div key={index} style={cardStyle}>
             <div style={collapsibleHeaderStyle} onClick={() => toggleAward(index)}>
               <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                {aw.title || 'New Award'}
+                {aw.title || t('activities.addAward')}
               </span>
               <button style={toggleBtnStyle} aria-label={awardOpen[index] ? 'Collapse' : 'Expand'}>
                 {awardOpen[index] ? '\u25B2' : '\u25BC'}

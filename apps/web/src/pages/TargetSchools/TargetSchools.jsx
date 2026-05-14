@@ -21,6 +21,7 @@ import { useTranslation } from '@schoolchoice/ui/i18n';
 
 // ---- TargetSchoolRow ----
 function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, onRemove, onEdit }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // match_score is stored as 0.0–1.0 in the DB; multiply by 100 for display
@@ -102,7 +103,7 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
               background: target.preference_confidence >= 4 ? '#dbeafe' : target.preference_confidence >= 3 ? '#f3f4f6' : '#fef3c7',
               color: target.preference_confidence >= 4 ? '#1d4ed8' : target.preference_confidence >= 3 ? '#6b7280' : '#92400e',
             }}>
-              {target.preference_confidence === 5 ? 'Decided' : target.preference_confidence === 4 ? 'Strong' : target.preference_confidence === 3 ? 'Interested' : target.preference_confidence === 2 ? 'Exploring' : 'Unsure'}
+              {target.preference_confidence === 5 ? t('targets.decided') : target.preference_confidence === 4 ? t('targets.strong') : target.preference_confidence === 3 ? t('targets.interested') : target.preference_confidence === 2 ? t('targets.exploring') : t('targets.unsure')}
             </span>
           )}
         </span>
@@ -112,12 +113,12 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
           </div>
         )}
         {target.year_of_entry && (
-          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>Entry: {target.year_of_entry}</div>
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{t('targets.entry')} {target.year_of_entry}</div>
         )}
       </div>
       <EligibilityBadge pass={target.eligibility_pass} failingCriteria={target.failing_criteria} />
       {target.at_risk && (
-        <span style={{fontSize:'10px',fontWeight:700,color:'#fff',background:'#dc2626',padding:'1px 6px',borderRadius:'8px',flexShrink:0}}>AT RISK</span>
+        <span style={{fontSize:'10px',fontWeight:700,color:'#fff',background:'#dc2626',padding:'1px 6px',borderRadius:'8px',flexShrink:0}}>{t('targets.atRiskBadge')}</span>
       )}
       {matchScore != null && (
         <span style={matchStyle} aria-label={`Match score: ${matchScore}%`}>
@@ -148,21 +149,21 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
           onClick={() => navigate(`/schools/${target.school_id}`)}
           aria-label={`View ${target.school_name} profile`}
         >
-          View
+          {t('targets.view')}
         </button>
         <button
           style={iconBtnStyle}
           onClick={onEdit}
           aria-label={`Edit ${target.school_name} target details`}
         >
-          Edit
+          {t('targets.edit')}
         </button>
         <button
           style={removeBtnStyle}
           onClick={onRemove}
           aria-label={`Remove ${target.school_name} from target list`}
         >
-          Remove
+          {t('targets.remove')}
         </button>
       </div>
     </li>
@@ -171,6 +172,7 @@ function TargetSchoolRow({ target, rank, isFirst, isLast, onMoveUp, onMoveDown, 
 
 // ---- By-Major view ----
 function MajorView({ targets }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Build map: major -> [{target, matchScore, matchColor}]
@@ -241,12 +243,12 @@ function MajorView({ targets }) {
       ))}
       {noMajorTargets.length > 0 && (
         <div>
-          <div style={{ ...majorHeadingStyle, color: 'var(--color-text-secondary)', background: 'var(--color-background)' }}>No Major Specified</div>
+          <div style={{ ...majorHeadingStyle, color: 'var(--color-text-secondary)', background: 'var(--color-background)' }}>{t('targets.noMajorSpecified')}</div>
           {noMajorTargets.map(renderTarget)}
         </div>
       )}
       {!hasMajors && noMajorTargets.length === 0 && (
-        <div style={{ padding: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>No targets to display.</div>
+        <div style={{ padding: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>{t('targets.noTargets')}</div>
       )}
     </div>
   );
@@ -296,7 +298,7 @@ function TargetSchools() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load target schools.');
+        setError(err?.response?.data?.detail || t('targets.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -512,7 +514,7 @@ function TargetSchools() {
               <div>
                 <div style={{fontWeight:'var(--font-weight-bold)',color:'#991b1b',fontSize:'var(--font-size-sm)'}}>{t('targets.atRiskTitle')}</div>
                 <div style={{color:'#7f1d1d',fontSize:'var(--font-size-xs)',marginTop:'2px'}}>
-                  {targets.filter(t => t.at_risk).length} target(s) where predicted score falls below the programme's lower quartile.
+                  {t('targets.atRiskDesc', { count: targets.filter(tgt => tgt.at_risk).length })}
                 </div>
               </div>
             </div>
@@ -543,7 +545,7 @@ function TargetSchools() {
             </div>
 
             {targets.length === 0 ? (
-              <EmptyState message="No target schools yet. Click 'Add School' to begin." />
+              <EmptyState message={t('targets.emptyState')} />
             ) : viewMode === 'major' ? (
               <MajorView targets={targets} />
             ) : (
@@ -701,7 +703,7 @@ function TargetSchools() {
             </div>
             <div style={{ flex: '1 1 100px' }}>
               <label htmlFor="year-of-entry-input" style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)' }}>
-                Year of Entry
+                {t('targets.yearOfEntry')}
               </label>
               <input
                 id="year-of-entry-input"
@@ -783,12 +785,12 @@ function TargetSchools() {
                 minWidth: '90px',
                 textAlign: 'right',
               }}>
-                {editConfidence === 5 ? 'Decided' : editConfidence === 4 ? 'Strong' : editConfidence === 3 ? 'Interested' : editConfidence === 2 ? 'Exploring' : 'Unsure'}
+                {editConfidence === 5 ? t('targets.decided') : editConfidence === 4 ? t('targets.strong') : editConfidence === 3 ? t('targets.interested') : editConfidence === 2 ? t('targets.exploring') : t('targets.unsure')}
               </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-              <span>Unsure</span>
-              <span>Decided</span>
+              <span>{t('targets.unsure')}</span>
+              <span>{t('targets.decided')}</span>
             </div>
           </div>
         </div>

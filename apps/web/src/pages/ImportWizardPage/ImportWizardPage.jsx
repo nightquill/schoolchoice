@@ -46,34 +46,34 @@ export default function ImportWizardPage() {
           borderRadius: 'var(--border-radius-md)', fontSize: 'var(--font-size-sm)',
         }}>
           <p style={{ margin: '0 0 var(--space-2)', fontWeight: 'var(--font-weight-medium)' }}>
-            Accepted formats: <strong>CSV</strong> (.csv) and <strong>Excel</strong> (.xlsx)
+            {t('import.acceptedFormats')} <strong>CSV</strong> (.csv) &amp; <strong>Excel</strong> (.xlsx)
           </p>
           {name === 'student' && (
             <>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Student columns:</strong> name, class_name, year_of_study, gender, target_region, date_of_birth, preferred_language
+                <strong>{t('import.studentColumns')}</strong> {t('import.studentColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Grade columns:</strong> CHLA, ENGL, MATH, CSD, PHYS, CHEM, BIOL, ECON, HIST, GEOG, ICT, M1, M2 (use HKDSE grades: 5**, 5*, 5, 4, 3, 2, 1, U, A, AD)
+                <strong>{t('import.gradeColumns')}</strong> {t('import.gradeColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Sitting columns:</strong> sitting (MOCK / TRIAL / OFFICIAL), year_of_exam (e.g. 2025)
+                <strong>{t('import.sittingColumns')}</strong> {t('import.sittingColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>
-                Existing students matched by name — new names auto-create, existing names update data.
+                {t('import.matchByName')}
               </p>
               <a
                 href="/data/sample-students.csv"
                 download="sample-students.csv"
                 style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline' }}
               >
-                Download sample CSV (10 students with grades)
+                {t('import.downloadSample')}
               </a>
             </>
           )}
           {name !== 'student' && (
             <p style={{ margin: 0, color: 'var(--color-text-secondary)' }}>
-              Your file should contain columns matching the entity schema. Column headers will be auto-mapped.
+              {t('import.columnAutoMap')}
             </p>
           )}
         </div>

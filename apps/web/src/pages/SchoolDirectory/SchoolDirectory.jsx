@@ -81,7 +81,7 @@ function SchoolDirectory() {
       setTotal(count);
       setPage(pageNum);
     } catch (err) {
-      setError(err?.response?.data?.detail || 'Failed to load schools.');
+      setError(err?.response?.data?.detail || t('schools.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,7 @@ function SchoolDirectory() {
       setSchools((prev) => prev.filter((s) => s.id !== school.id));
       setTotal((prev) => prev - 1);
     } catch (err) {
-      alert(err?.response?.data?.detail || 'Failed to delete school.');
+      alert(err?.response?.data?.detail || t('schools.deleteFailed'));
     } finally {
       setDeletingId(null);
     }
@@ -117,7 +117,7 @@ function SchoolDirectory() {
 
   const handleAddSchool = async (e) => {
     e.preventDefault();
-    if (!addForm.name.trim()) { setAddError('School name is required.'); return; }
+    if (!addForm.name.trim()) { setAddError(t('schools.nameRequired')); return; }
     setAddLoading(true);
     setAddError('');
     try {
@@ -138,7 +138,7 @@ function SchoolDirectory() {
       setAddForm({ name: '', name_zh: '', type: 'UNIVERSITY', location: '', description: '', website: '', minimum_entry_score: '', notable_programs: '', notes: '' });
       fetchSchools(1, filters);
     } catch (err) {
-      setAddError(err?.response?.data?.detail || 'Failed to create school.');
+      setAddError(err?.response?.data?.detail || t('schools.createFailed'));
     } finally {
       setAddLoading(false);
     }
@@ -275,12 +275,12 @@ function SchoolDirectory() {
             <h2 style={{ margin: '0 0 var(--space-4) 0', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{t('schools.addCustomTitle')}</h2>
             <form onSubmit={handleAddSchool} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
               {[
-                { label: 'Name *', field: 'name', placeholder: 'School full name' },
-                { label: 'Chinese Name', field: 'name_zh', placeholder: 'Optional' },
-                { label: 'Location', field: 'location', placeholder: 'e.g. Hong Kong' },
-                { label: 'Website', field: 'website', placeholder: 'https://...' },
-                { label: 'Min. Entry Score', field: 'minimum_entry_score', placeholder: 'Numeric', type: 'number' },
-                { label: 'Notable Programs', field: 'notable_programs', placeholder: 'Comma-separated' },
+                { label: `${t('schools.name')} *`, field: 'name', placeholder: t('schools.schoolFullName') },
+                { label: t('schools.chineseName'), field: 'name_zh', placeholder: t('schools.optional') },
+                { label: t('schools.location'), field: 'location', placeholder: t('schools.locationExample') },
+                { label: t('schools.website'), field: 'website', placeholder: t('schools.websitePlaceholder') },
+                { label: t('schools.minEntryScore'), field: 'minimum_entry_score', placeholder: t('schools.numeric'), type: 'number' },
+                { label: t('schools.notablePrograms'), field: 'notable_programs', placeholder: t('schools.commaSeparated') },
               ].map(({ label, field, placeholder, type }) => (
                 <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                   <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{label}</label>
@@ -304,12 +304,12 @@ function SchoolDirectory() {
                 </select>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>Description</label>
-                <textarea value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} rows={3} placeholder="Optional description" style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
+                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.description')}</label>
+                <textarea value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} rows={3} placeholder={t('schools.optionalDescription')} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>Notes</label>
-                <textarea value={addForm.notes} onChange={(e) => setAddForm((f) => ({ ...f, notes: e.target.value }))} rows={2} placeholder="Internal notes" style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
+                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.internalNotes')}</label>
+                <textarea value={addForm.notes} onChange={(e) => setAddForm((f) => ({ ...f, notes: e.target.value }))} rows={2} placeholder={t('schools.internalNotes')} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
               </div>
               {addError && <p style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)', margin: 0 }}>{addError}</p>}
               <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
@@ -330,17 +330,17 @@ function SchoolDirectory() {
         {!loading && !error && (
           <>
             <p style={countStyle}>
-              Showing {schools.length} of {total} school{total !== 1 ? 's' : ''}.
+              {t('schools.showing', { count: schools.length, total })}
             </p>
             {schools.length === 0 ? (
-              <EmptyState message="No schools match your filters. Try adjusting the search criteria." />
+              <EmptyState message={t('schools.noMatch')} />
             ) : (
               <div style={gridStyle} role="list" aria-label="School results">
                 {schools.map((school) => (
                   <div key={school.id} role="listitem" style={{ position: 'relative' }}>
                     {school.is_custom === true && (
                       <div style={{ position: 'absolute', top: 'var(--space-2)', right: 'var(--space-2)', zIndex: 10, display: 'flex', gap: 'var(--space-1)', alignItems: 'center' }}>
-                        <span style={{ fontSize: '10px', background: '#7c3aed', color: '#fff', padding: '2px 7px', borderRadius: '8px' }}>Custom</span>
+                        <span style={{ fontSize: '10px', background: '#7c3aed', color: '#fff', padding: '2px 7px', borderRadius: '8px' }}>{t('schools.custom')}</span>
                         {confirmDeleteId === school.id ? (
                           <>
                             <span style={{ fontSize: '11px', color: 'var(--color-error)', fontFamily: 'var(--font-family-base)' }}>{t('schools.deleteConfirm')}</span>
@@ -360,7 +360,7 @@ function SchoolDirectory() {
                             style={{ background: 'var(--color-error)', color: '#fff', border: 'none', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
                             aria-label={`Delete ${school.name}`}
                           >
-                            {deletingId === school.id ? '…' : 'Delete'}
+                            {deletingId === school.id ? '…' : t('schools.delete')}
                           </button>
                         )}
                       </div>
@@ -374,11 +374,11 @@ function SchoolDirectory() {
             {totalPages > 1 && (
               <div style={paginationStyle} role="navigation" aria-label="Pagination">
                 <Button variant="outline" disabled={page <= 1} onClick={() => fetchSchools(page - 1, filters)}>
-                  Previous
+                  {t('schools.previous')}
                 </Button>
-                <span style={pageIndicatorStyle}>Page {page} of {totalPages}</span>
+                <span style={pageIndicatorStyle}>{t('schools.pageOf', { page, total: totalPages })}</span>
                 <Button variant="outline" disabled={page >= totalPages} onClick={() => fetchSchools(page + 1, filters)}>
-                  Next
+                  {t('schools.next')}
                 </Button>
               </div>
             )}

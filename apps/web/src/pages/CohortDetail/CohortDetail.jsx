@@ -97,7 +97,7 @@ function CohortDetail() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load cohort.');
+        setError(err?.response?.data?.detail || t('cohortDetail.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -106,7 +106,7 @@ function CohortDetail() {
     setStatsLoading(true);
     getCohortStats(id, sitting || undefined)
       .then(setStats)
-      .catch(() => toast.error('Failed to load stats.'))
+      .catch(() => toast.error(t('cohortDetail.statsFailed')))
       .finally(() => setStatsLoading(false));
   };
 
@@ -129,7 +129,7 @@ function CohortDetail() {
       const result = await searchStudents(params);
       setSearchResults(result.students ?? []);
     } catch {
-      toast.error('Search failed.');
+      toast.error(t('cohortDetail.searchFailed'));
     } finally {
       setSearchLoading(false);
     }
@@ -153,7 +153,7 @@ function CohortDetail() {
       setAddModalOpen(false);
       setSelectedIds(new Set());
       setSearchResults([]);
-      toast.success(`${selectedIds.size} student(s) added.`);
+      toast.success(t('cohortDetail.addSuccess', { count: selectedIds.size }));
       loadStats(sittingFilter);
     } catch {
       toast.error(t('cohortDetail.addFailed'));
@@ -248,7 +248,7 @@ function CohortDetail() {
       <NavBarV2 account={account} />
       <Link to="/cohorts" style={backLinkStyle}>{t('cohortDetail.backToCohorts')}</Link>
 
-      {loading && <LoadingSpinner label="Loading cohort…" />}
+      {loading && <LoadingSpinner label={t('cohortDetail.loading')} />}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}
 
       {!loading && !error && cohort && (
@@ -279,7 +279,7 @@ function CohortDetail() {
               </div>
               {cohort.members.length === 0 ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No students yet. Click 'Add Students' to begin." />
+                  <EmptyState message={t('cohortDetail.noStudents')} />
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
@@ -320,7 +320,7 @@ function CohortDetail() {
                               onClick={() => setRemoveTarget(member)}
                               aria-label={`Remove ${member.full_name} from cohort`}
                             >
-                              Remove
+                              {t('cohortDetail.remove')}
                             </button>
                           </td>
                         </tr>
@@ -337,7 +337,7 @@ function CohortDetail() {
                 <span>{t('cohortDetail.subjectStats')}</span>
                 <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
                   <label htmlFor="sitting-filter" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                    Sitting:
+                    {t('cohortDetail.sitting')}
                   </label>
                   <select
                     id="sitting-filter"
@@ -346,9 +346,9 @@ function CohortDetail() {
                     style={{ ...inputStyle, minWidth: '120px' }}
                   >
                     <option value="">{t('cohortDetail.all')}</option>
-                    <option value="MOCK">MOCK</option>
-                    <option value="TRIAL">TRIAL</option>
-                    <option value="OFFICIAL">OFFICIAL</option>
+                    <option value="MOCK">{t('common.mock')}</option>
+                    <option value="TRIAL">{t('common.trial')}</option>
+                    <option value="OFFICIAL">{t('common.official')}</option>
                   </select>
                   {statsLoading && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Loading…</span>}
                 </div>
@@ -356,7 +356,7 @@ function CohortDetail() {
 
               {!stats || stats.subject_stats.length === 0 ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No grade data for this cohort yet." />
+                  <EmptyState message={t('cohortDetail.noGradeData')} />
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
@@ -391,7 +391,7 @@ function CohortDetail() {
         title={t('cohortDetail.addStudentsTitle')}
         onClose={() => { setAddModalOpen(false); setSelectedIds(new Set()); setSearchResults([]); setSearchQuery(''); setSearchClass(''); setSearchYear(''); }}
         onConfirm={handleAddMembers}
-        confirmLabel={adding ? 'Adding…' : `Add Selected (${selectedIds.size})`}
+        confirmLabel={adding ? t('cohortDetail.addingLabel') : t('cohortDetail.addSelectedLabel', { count: selectedIds.size })}
         confirmVariant="primary"
       >
         <div>
@@ -426,7 +426,7 @@ function CohortDetail() {
 
           {searchResults.length === 0 && !searchLoading && (
             <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-              Showing all results. Type to filter.
+              {t('cohortDetail.showingAll')}
             </p>
           )}
 
@@ -479,7 +479,7 @@ function CohortDetail() {
         confirmVariant="danger"
       >
         <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
-          Remove <strong>{removeTarget?.full_name}</strong> from this cohort? The student's data is not affected.
+          {t('cohortDetail.removeConfirm', { name: removeTarget?.full_name })}
         </p>
       </Modal>
 

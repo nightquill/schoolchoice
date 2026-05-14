@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AlertCircle, AlertTriangle, Info, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { getAlerts } from '../../api/alerts';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const SEVERITY_CONFIG = {
   error: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', Icon: AlertCircle },
@@ -9,10 +10,10 @@ const SEVERITY_CONFIG = {
   info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1e40af', Icon: Info },
 };
 
-const CATEGORIES = [
+const CATEGORIES_CONFIG = [
   {
     id: 'missing',
-    label: 'Missing / Incomplete',
+    labelKey: 'alerts.missing',
     types: ['missing_grades', 'missing_targets', 'stale_data'],
     color: '#d97706',
     bg: '#fffbeb',
@@ -21,7 +22,7 @@ const CATEGORIES = [
   },
   {
     id: 'conservative',
-    label: 'Too Conservative',
+    labelKey: 'alerts.conservative',
     types: ['dubious_conservative'],
     color: '#2563eb',
     bg: '#eff6ff',
@@ -30,7 +31,7 @@ const CATEGORIES = [
   },
   {
     id: 'ambitious',
-    label: 'Too Ambitious',
+    labelKey: 'alerts.ambitious',
     types: ['dubious_ambitious', 'at_risk_target'],
     color: '#dc2626',
     bg: '#fef2f2',
@@ -40,6 +41,7 @@ const CATEGORIES = [
 ];
 
 function AlertsPanel() {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(new Set());
   const [expandedTab, setExpandedTab] = useState(null);
 
@@ -66,6 +68,7 @@ function AlertsPanel() {
   };
 
   // Group alerts strictly by category
+  const CATEGORIES = CATEGORIES_CONFIG.map(cat => ({ ...cat, label: t(cat.labelKey) }));
   const grouped = {};
   for (const cat of CATEGORIES) {
     grouped[cat.id] = allAlerts.filter((a) => cat.types.includes(a.type));
@@ -79,7 +82,7 @@ function AlertsPanel() {
         color: 'var(--color-text-primary)',
         margin: '0 0 var(--space-2) 0',
       }}>
-        Alerts
+        {t('alerts.title')}
       </h2>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -143,7 +146,7 @@ function AlertsPanel() {
                             background: 'none', border: 'none', cursor: 'pointer',
                             padding: 1, color: cat.color, opacity: 0.5, flexShrink: 0,
                           }}
-                          aria-label="Dismiss"
+                          aria-label={t('alerts.dismiss')}
                         >
                           <X size={12} />
                         </button>
@@ -159,7 +162,7 @@ function AlertsPanel() {
                   fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)',
                   borderTop: `1px solid ${cat.border}`,
                 }}>
-                  No alerts in this category.
+                  {t('alerts.noAlerts')}
                 </div>
               )}
             </div>

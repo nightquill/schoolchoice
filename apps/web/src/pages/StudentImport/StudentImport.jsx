@@ -98,7 +98,7 @@ export default function StudentImport() {
       const data = await commitImport(file);
       setCommitResult(data);
       setStep(3);
-      toast.success('Import completed successfully');
+      toast.success(t('import.importSuccess'));
     } catch (err) {
       const msg = err?.response?.data?.detail || err.message || 'Import failed';
       toast.error(msg);
@@ -125,7 +125,7 @@ export default function StudentImport() {
 
         {/* Step indicator */}
         <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-5)', fontSize: 'var(--font-size-sm)' }}>
-          {['Upload File', 'Preview & Confirm', 'Done'].map((label, i) => (
+          {[t('import.uploadFile'), t('import.previewConfirm'), t('import.done')].map((label, i) => (
             <span
               key={label}
               style={{
@@ -143,36 +143,36 @@ export default function StudentImport() {
           <>
             <div style={infoBoxStyle}>
               <p style={{ margin: '0 0 var(--space-2)', fontWeight: 'var(--font-weight-medium)' }}>
-                Accepted formats: <strong>CSV</strong> (.csv) and <strong>Excel</strong> (.xlsx)
+                {t('import.acceptedFormats')} <strong>CSV</strong> (.csv) &amp; <strong>Excel</strong> (.xlsx)
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Required columns:</strong> candidate_number, name
+                <strong>{t('import.requiredColumns')}</strong> {t('import.requiredColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Grade columns:</strong> CHLA, ENGL, MATH, CSD, PHYS, CHEM, BIOL, ECON, HIST, GEOG, ICT, M1, M2 (use HKDSE grades: 5**, 5*, 5, 4, 3, 2, 1, U, A, AD)
+                <strong>{t('import.gradeColumns')}</strong> {t('import.gradeColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)' }}>
-                <strong>Sitting columns:</strong> sitting (MOCK / TRIAL / OFFICIAL), year_of_exam (e.g. 2025)
+                <strong>{t('import.sittingColumns')}</strong> {t('import.sittingColumnsList')}
               </p>
               <p style={{ margin: '0 0 var(--space-2)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>
-                Existing students matched by candidate_number -- new numbers auto-create, existing numbers update data.
+                {t('import.matchByCandidateNumber')}
               </p>
               <a
                 href="/data/sample-students.csv"
                 download="sample-students.csv"
                 style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-weight-medium)', textDecoration: 'underline' }}
               >
-                Download sample CSV (10 students with grades)
+                {t('import.downloadSample')}
               </a>
             </div>
 
             <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-3)', padding: 'var(--space-8)' }}>
               {previewLoading ? (
-                <LoadingSpinner label="Analysing file..." />
+                <LoadingSpinner label={t('import.analysing')} />
               ) : (
                 <>
                   <p style={{ margin: 0, color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-                    Select a CSV or Excel file to import students
+                    {t('import.selectFile')}
                   </p>
                   <input
                     ref={fileRef}
@@ -196,25 +196,25 @@ export default function StudentImport() {
                 <p style={{ margin: 0, fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: '#166534' }}>
                   {summary.new ?? 0}
                 </p>
-                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>New Students</p>
+                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('import.newStudents')}</p>
               </div>
               <div style={summaryCardStyle}>
                 <p style={{ margin: 0, fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: '#1e40af' }}>
                   {summary.updated ?? 0}
                 </p>
-                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Updates</p>
+                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('import.updates')}</p>
               </div>
               <div style={summaryCardStyle}>
                 <p style={{ margin: 0, fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: '#991b1b' }}>
                   {summary.errors ?? 0}
                 </p>
-                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Errors</p>
+                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('import.errors')}</p>
               </div>
               <div style={summaryCardStyle}>
                 <p style={{ margin: 0, fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
                   {summary.grades ?? 0}
                 </p>
-                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Grades</p>
+                <p style={{ margin: 0, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('import.gradesCount')}</p>
               </div>
             </div>
 
@@ -223,12 +223,12 @@ export default function StudentImport() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--font-size-sm)' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--color-border)' }}>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Row</th>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Status</th>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Candidate #</th>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Name</th>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Grades</th>
-                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>Notes</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.row')}</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.status')}</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.candidateHash')}</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.name')}</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.gradesCol')}</th>
+                    <th style={{ padding: 'var(--space-2)', textAlign: 'left' }}>{t('import.notesCol')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -253,7 +253,7 @@ export default function StudentImport() {
                   {rows.length === 0 && (
                     <tr>
                       <td colSpan={6} style={{ padding: 'var(--space-4)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-                        No rows found in file
+                        {t('import.noRowsFound')}
                       </td>
                     </tr>
                   )}
@@ -264,10 +264,10 @@ export default function StudentImport() {
             {/* Action buttons */}
             <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
               <Button onClick={handleCommit} disabled={commitLoading || (summary.errors > 0 && summary.new === 0 && summary.updated === 0)}>
-                {commitLoading ? 'Importing...' : 'Confirm Import'}
+                {commitLoading ? t('import.importing') : t('import.confirmImport')}
               </Button>
               <Button variant="outline" onClick={handleCancel} disabled={commitLoading}>
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </>
@@ -278,13 +278,13 @@ export default function StudentImport() {
           <div style={{ ...cardStyle, textAlign: 'center', padding: 'var(--space-8)' }}>
             <div style={{ fontSize: '48px', marginBottom: 'var(--space-3)' }}>&#10003;</div>
             <h2 style={{ margin: '0 0 var(--space-3)', fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
-              Import Complete
+              {t('import.importComplete')}
             </h2>
             <p style={{ margin: '0 0 var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              {commitResult?.created ?? 0} students created, {commitResult?.updated ?? 0} updated, {commitResult?.grades ?? 0} grades recorded.
+              {t('import.studentsCreated', { created: commitResult?.created ?? 0, updated: commitResult?.updated ?? 0, grades: commitResult?.grades ?? 0 })}
             </p>
             <Button onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
+              {t('import.backToDashboard')}
             </Button>
           </div>
         )}

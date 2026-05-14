@@ -127,7 +127,7 @@ function CohortList() {
         <>
           <div style={headerStyle}>
             <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-              Student Cohorts
+              {t('cohorts.title')}
             </h1>
             <Button onClick={() => setCreateModalOpen(true)}>{t('cohorts.newCohort')}</Button>
           </div>
