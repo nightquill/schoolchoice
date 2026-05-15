@@ -323,29 +323,50 @@ class OrganisationMembership(Base):
 
 
 # ---------------------------------------------------------------------------
-# cohort_permissions — per-cohort access overrides
+# teacher_groups — named groups of teachers within an organisation
+# ---------------------------------------------------------------------------
+
+
+class TeacherGroup(Base):
+    __tablename__ = "teacher_groups"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid())
+    organisation_id = Column(UUID(as_uuid=True), ForeignKey("organisations.id", ondelete="CASCADE"), nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
+    updated_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now(), default=_utcnow)
+    members = relationship("TeacherGroupMember", back_populates="group", cascade="all, delete-orphan")
+    permissions = relationship("CohortPermission", back_populates="group", cascade="all, delete-orphan")
+
+
+class TeacherGroupMember(Base):
+    __tablename__ = "teacher_group_members"
+    __table_args__ = (UniqueConstraint("group_id", "user_id", name="uq_tgm_group_user"),)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid())
+    group_id = Column(UUID(as_uuid=True), ForeignKey("teacher_groups.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    group = relationship("TeacherGroup", back_populates="members")
+
+
+# ---------------------------------------------------------------------------
+# cohort_permissions — group-based per-cohort access control
 # ---------------------------------------------------------------------------
 
 
 class CohortPermission(Base):
-    """Per-cohort permission override. A viewer with global read_only
-    can be granted read_write on specific cohorts."""
-
     __tablename__ = "cohort_permissions"
-
-    __table_args__ = (
-        UniqueConstraint("user_id", "cohort_id", name="uq_cohort_perm_user_cohort"),
-    )
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid(), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    __table_args__ = (UniqueConstraint("group_id", "cohort_id", name="uq_cohort_perm_group_cohort"),)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid())
+    group_id = Column(UUID(as_uuid=True), ForeignKey("teacher_groups.id", ondelete="CASCADE"), nullable=False)
     cohort_id = Column(UUID(as_uuid=True), ForeignKey("student_cohorts.id", ondelete="CASCADE"), nullable=False)
-    permission = Column(
-        String(20), nullable=False, default="read_write",
-        server_default="'read_write'",
-        comment="Cohort-level permission: read_write | read_only",
-    )
-    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
+    visible = Column(Boolean, nullable=False, default=True, server_default="true")
+    programme_choices = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
+    grades = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
+    plan_generation = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
+    submissions = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
+    reports = Column(String(10), nullable=False, default="read_only", server_default="'read_only'")
+    cohort_management = Column(String(10), nullable=False, default="none", server_default="'none'")
+    group = relationship("TeacherGroup", back_populates="permissions")
 
 
 # ---------------------------------------------------------------------------
