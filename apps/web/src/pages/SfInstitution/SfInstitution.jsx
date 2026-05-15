@@ -7,6 +7,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getSfInstitution } from '../../api/selfFinancing';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const LEVEL_LABELS = {
   associate_degree: { label: 'Associate Degree', short: 'AD', bg: '#dbeafe', color: '#1e40af' },
@@ -23,6 +24,7 @@ function getTierStyle(mean) {
 }
 
 export default function SfInstitution() {
+  const { t } = useTranslation();
   const { code } = useParams();
   const [search, setSearch] = useState('');
   const [levelFilter, setLevelFilter] = useState('');
@@ -58,11 +60,11 @@ export default function SfInstitution() {
       <NavBarV2 account={account} />
       <div style={{ maxWidth: '100%', margin: '0 auto', padding: 'var(--space-4) var(--space-6)' }}>
         <Link to="/schools" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontSize: 'var(--font-size-sm)' }}>
-          ← Back to Directory
+          ← {t('schoolProfile.backToDirectory')}
         </Link>
 
-        {instQuery.isLoading && <LoadingSpinner label="Loading..." />}
-        {instQuery.error && <ErrorMessage message="Failed to load institution" />}
+        {instQuery.isLoading && <LoadingSpinner label={t('common.loading')} />}
+        {instQuery.error && <ErrorMessage message={t('sfInstitution.loadFailed')} />}
 
         {inst && (
           <>
@@ -71,7 +73,7 @@ export default function SfInstitution() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
-                    <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>Sub-degree</span>
+                    <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>{t('sfInstitution.subDegree')}</span>
                     <span style={{ background: '#f0fdf4', color: '#059669', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>Tier {inst.tier}</span>
                   </div>
                   <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 'var(--space-2) 0 0' }}>
@@ -80,12 +82,12 @@ export default function SfInstitution() {
                   {inst.name_zh && <div style={{ fontSize: 'var(--font-size-lg)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{inst.name_zh}</div>}
                   {inst.parent_university && (
                     <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', marginTop: 'var(--space-1)', fontWeight: 'var(--font-weight-medium)' }}>
-                      Under {inst.parent_university}
+                      {t('sfInstitution.under')} {inst.parent_university}
                     </div>
                   )}
                   <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)', display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
                     {inst.location && <span>{inst.location}</span>}
-                    {inst.website && <a href={inst.website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>Website ↗</a>}
+                    {inst.website && <a href={inst.website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>{t('schoolProfile.website')}</a>}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
@@ -93,11 +95,11 @@ export default function SfInstitution() {
                     <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#059669' }}>
                       {inst.articulation_rate != null ? `${Math.round(inst.articulation_rate * 100)}%` : 'N/A'}
                     </div>
-                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Articulation Rate</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('sfInstitution.articulationRate')}</div>
                   </div>
                   <div style={{ background: '#eff6ff', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
                     <div style={{ fontSize: 'var(--font-size-xl)', fontWeight: 700, color: '#2563eb' }}>{data.total}</div>
-                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Programmes</div>
+                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('sfInstitution.programmes')}</div>
                   </div>
                 </div>
               </div>
@@ -105,11 +107,11 @@ export default function SfInstitution() {
 
             {/* Filters */}
             <div style={{ display: 'flex', gap: 'var(--space-3)', marginBottom: 'var(--space-3)', alignItems: 'center', flexWrap: 'wrap' }}>
-              <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', margin: 0, color: 'var(--color-text-primary)' }}>Programmes</h2>
+              <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', margin: 0, color: 'var(--color-text-primary)' }}>{t('sfInstitution.programmes')}</h2>
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search programmes..."
+                placeholder={t('sfInstitution.searchProgrammes')}
                 style={{ padding: 'var(--space-2) var(--space-3)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', width: '220px' }}
               />
               {levels.length > 1 && (
@@ -118,7 +120,7 @@ export default function SfInstitution() {
                   onChange={(e) => setLevelFilter(e.target.value)}
                   style={{ padding: 'var(--space-2) var(--space-3)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
                 >
-                  <option value="">All Levels</option>
+                  <option value="">{t('sfInstitution.allLevels')}</option>
                   {levels.map(l => <option key={l} value={l}>{LEVEL_LABELS[l]?.label ?? l}</option>)}
                 </select>
               )}
@@ -132,12 +134,12 @@ export default function SfInstitution() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>
-                    <th style={{ ...thStyle, width: '60px' }}>Level</th>
-                    <th style={thStyle}>Programme</th>
-                    <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>Mean</th>
-                    <th style={{ ...thStyle, width: '60px', textAlign: 'center' }}>LQ</th>
-                    <th style={{ ...thStyle, width: '60px', textAlign: 'center' }}>UQ</th>
-                    <th style={{ ...thStyle, width: '100px', textAlign: 'right' }}>Competitiveness</th>
+                    <th style={{ ...thStyle, width: '60px' }}>{t('sfInstitution.level')}</th>
+                    <th style={thStyle}>{t('sfInstitution.programme')}</th>
+                    <th style={{ ...thStyle, width: '80px', textAlign: 'center' }}>{t('sfInstitution.mean')}</th>
+                    <th style={{ ...thStyle, width: '60px', textAlign: 'center' }}>{t('sfInstitution.lq')}</th>
+                    <th style={{ ...thStyle, width: '60px', textAlign: 'center' }}>{t('sfInstitution.uq')}</th>
+                    <th style={{ ...thStyle, width: '100px', textAlign: 'right' }}>{t('sfInstitution.competitiveness')}</th>
                     <th style={{ ...thStyle, width: '30px' }}></th>
                   </tr>
                 </thead>
@@ -178,14 +180,14 @@ export default function SfInstitution() {
                     );
                   })}
                   {filteredProgs.length === 0 && (
-                    <tr><td colSpan={7} style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>No programmes match your filters.</td></tr>
+                    <tr><td colSpan={7} style={{ padding: 'var(--space-6)', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>{t('sfInstitution.noMatch')}</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
 
             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-3)', textAlign: 'center' }}>
-              Scores are best-5 HKDSE subjects · Source: {allProgs[0]?.data_source || 'CSPE/iPASS'}
+              {t('sfInstitution.scoresNote')} · {t('sfInstitution.source')}: {allProgs[0]?.data_source || 'CSPE/iPASS'}
             </div>
           </>
         )}

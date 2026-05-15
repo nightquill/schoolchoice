@@ -10,8 +10,10 @@ import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
 import { getStudents, createStudent } from '../../api/students';
 import { exportEntityCSV } from '../../api/entities';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function StudentListPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -45,9 +47,9 @@ function StudentListPage() {
       await createStudent(formData);
       setShowForm(false);
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success('Student added successfully.');
+      toast.success(t('studentList.addSuccess'));
     } catch {
-      setFormError('Could not save student. Please check your input and try again.');
+      setFormError(t('studentList.addFailed'));
     } finally {
       setFormLoading(false);
     }
@@ -59,9 +61,9 @@ function StudentListPage() {
       const params = {};
       if (debouncedSearch) params.q = debouncedSearch;
       await exportEntityCSV('student', params);
-      toast.success('Export downloaded.');
+      toast.success(t('studentList.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('studentList.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -71,9 +73,9 @@ function StudentListPage() {
     setIsExporting(true);
     try {
       await exportEntityCSV('student', {});
-      toast.success('Export downloaded.');
+      toast.success(t('studentList.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('studentList.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -139,9 +141,9 @@ function StudentListPage() {
       <NavBar />
       <div className="px-4 md:px-8" style={{ maxWidth: '100%', margin: '0 auto', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <div style={headerRowStyle}>
-          <h1 style={headingStyle}>Students</h1>
+          <h1 style={headingStyle}>{t('studentList.title')}</h1>
           {!showForm && (
-            <Button onClick={() => setShowForm(true)}>Add Student</Button>
+            <Button onClick={() => setShowForm(true)}>{t('studentList.addStudent')}</Button>
           )}
         </div>
 
@@ -160,8 +162,8 @@ function StudentListPage() {
             <Input
               type="text"
               role="searchbox"
-              aria-label="Search students"
-              placeholder="Search students by name..."
+              aria-label={t('studentList.searchLabel')}
+              placeholder={t('studentList.searchPlaceholder')}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               style={{ maxWidth: 320, minHeight: 44, paddingLeft: 34 }}
@@ -182,7 +184,7 @@ function StudentListPage() {
                 textDecoration: 'underline',
               }}
             >
-              Clear search
+              {t('studentList.clearSearch')}
             </button>
           )}
         </div>
@@ -194,7 +196,7 @@ function StudentListPage() {
               onSubmit={handleCreateStudent}
               onCancel={() => { setShowForm(false); setFormError(''); }}
               loading={formLoading}
-              submitLabel="Save"
+              submitLabel={t('common.save')}
             />
           </div>
         )}
@@ -203,9 +205,9 @@ function StudentListPage() {
           <table style={tableStyle}>
             <thead>
               <tr>
-                <th style={thStyle}>Name</th>
-                <th style={thStyle}>Target Region</th>
-                <th style={thStyle}>Created</th>
+                <th style={thStyle}>{t('common.name')}</th>
+                <th style={thStyle}>{t('studentList.targetRegion')}</th>
+                <th style={thStyle}>{t('studentList.created')}</th>
                 <th style={thStyle}></th>
               </tr>
             </thead>
@@ -213,13 +215,13 @@ function StudentListPage() {
               {studentsQuery.isLoading ? (
                 <tr>
                   <td colSpan={4}>
-                    <LoadingSpinner label="Loading students..." />
+                    <LoadingSpinner label={t('studentList.loading')} />
                   </td>
                 </tr>
               ) : studentsQuery.isError ? (
                 <tr>
                   <td colSpan={4}>
-                    <ErrorMessage message="Could not load students. Please refresh the page." />
+                    <ErrorMessage message={t('studentList.loadFailed')} />
                   </td>
                 </tr>
               ) : students.length === 0 ? (
@@ -228,8 +230,8 @@ function StudentListPage() {
                     <EmptyState
                       message={
                         debouncedSearch
-                          ? 'No students match your search. Try a different name.'
-                          : 'No students yet. Click Add Student to create a profile.'
+                          ? t('studentList.noSearchResults')
+                          : t('studentList.emptyState')
                       }
                     />
                   </td>

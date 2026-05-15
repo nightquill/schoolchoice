@@ -32,7 +32,7 @@ function CohortList() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load cohorts.');
+        setError(err?.response?.data?.detail || t('cohorts.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -46,9 +46,9 @@ function CohortList() {
       setCreateModalOpen(false);
       setNewName('');
       setNewDesc('');
-      toast.success('Cohort created.');
+      toast.success(t('cohorts.cohortCreated'));
     } catch {
-      toast.error('Failed to create cohort.');
+      toast.error(t('cohorts.createFailed'));
     } finally {
       setCreating(false);
     }
@@ -61,9 +61,9 @@ function CohortList() {
       await deleteCohort(deleteTarget.id);
       setCohorts((prev) => prev.filter((c) => c.id !== deleteTarget.id));
       setDeleteTarget(null);
-      toast.success('Cohort deleted.');
+      toast.success(t('cohorts.cohortDeleted'));
     } catch {
-      toast.error('Failed to delete cohort.');
+      toast.error(t('cohorts.deleteFailed'));
     } finally {
       setDeleting(false);
     }
@@ -120,7 +120,7 @@ function CohortList() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
 
-      {loading && <LoadingSpinner label="Loading cohorts…" />}
+      {loading && <LoadingSpinner label={t('cohorts.loading')} />}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}
 
       {!loading && !error && (
@@ -134,7 +134,7 @@ function CohortList() {
 
           <div style={containerStyle}>
             {cohorts.length === 0 ? (
-              <EmptyState message="No cohorts yet. Create one to group students and view aggregate stats." />
+              <EmptyState message={t('cohorts.emptyState')} />
             ) : (
               cohorts.map((cohort) => (
                 <div
@@ -156,7 +156,7 @@ function CohortList() {
                       </div>
                     )}
                     <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)' }}>
-                      {cohort.member_count} {cohort.member_count === 1 ? 'student' : 'students'}
+                      {t('cohorts.studentCount', { count: cohort.member_count })}
                     </div>
                   </div>
                   <button
@@ -174,7 +174,7 @@ function CohortList() {
                     onClick={(e) => { e.stopPropagation(); setDeleteTarget(cohort); }}
                     aria-label={`Delete cohort ${cohort.name}`}
                   >
-                    Delete
+                    {t('cohorts.delete')}
                   </button>
                 </div>
               ))
@@ -226,7 +226,7 @@ function CohortList() {
         confirmVariant="danger"
       >
         <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
-          Delete cohort <strong>{deleteTarget?.name}</strong>? This cannot be undone. Students are not affected.
+          {t('cohorts.deleteConfirm', { name: deleteTarget?.name })}
         </p>
       </Modal>
 

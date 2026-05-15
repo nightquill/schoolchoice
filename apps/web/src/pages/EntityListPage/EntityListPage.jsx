@@ -10,6 +10,7 @@ import { ActionBar } from '@schoolchoice/ui';
 import { SearchFilterBar } from '@schoolchoice/ui';
 import { getEntitySchema, getEntityList, exportEntityCSV } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const pageStyle = {
   background: 'var(--color-background)',
@@ -51,6 +52,7 @@ function buildFilterParams(filters) {
 }
 
 export default function EntityListPage() {
+  const { t } = useTranslation();
   const { name } = useParams();
   const navigate = useNavigate();
 
@@ -96,9 +98,9 @@ export default function EntityListPage() {
         params.filters = JSON.stringify(activeFilters);
       }
       await exportEntityCSV(name, params);
-      toast.success('Export downloaded.');
+      toast.success(t('entityList.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('entityList.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -108,9 +110,9 @@ export default function EntityListPage() {
     setIsExporting(true);
     try {
       await exportEntityCSV(name, {});
-      toast.success('Export downloaded.');
+      toast.success(t('entityList.exportSuccess'));
     } catch {
-      toast.error('Export failed. Please try again.');
+      toast.error(t('entityList.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -157,7 +159,7 @@ export default function EntityListPage() {
           resourceName={name}
         >
           {showEmptyState ? (
-            <EmptyState message="No results found. Try adjusting your search or filters." />
+            <EmptyState message={t('entityList.noResults')} />
           ) : (
             <EntityListView
               schema={schemaQuery.data}

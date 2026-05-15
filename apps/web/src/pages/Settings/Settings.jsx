@@ -8,6 +8,7 @@ import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { listUsers, createUser, updateUser, deleteUser } from '../../api/admin';
 import { MoreVertical } from 'lucide-react';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 import {
   Table,
@@ -44,6 +45,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@schoolchoice/ui/primitives/tabs';
 
 function Settings() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user: authUser } = useAuth();
   const [account, setAccount] = useState(null);
@@ -84,9 +86,9 @@ function Settings() {
       setUsers(data);
     } catch (err) {
       if (err?.response?.status === 403) {
-        toast.error('You do not have permission to perform this action.');
+        toast.error(t('settings.noPermission'));
       } else {
-        toast.error('Failed to load users.');
+        toast.error(t('settings.loadUsersFailed'));
       }
     } finally {
       setUsersLoading(false);
@@ -131,7 +133,7 @@ function Settings() {
           payload.password = formData.password;
         }
         await updateUser(editingUser.id, payload);
-        toast.success('User updated successfully.');
+        toast.success(t('settings.userUpdated'));
       } else {
         await createUser({
           email: formData.email,
@@ -139,18 +141,17 @@ function Settings() {
           display_name: formData.display_name || undefined,
           role: formData.role,
         });
-        toast.success('User created successfully.');
+        toast.success(t('settings.userCreated'));
       }
       setDialogOpen(false);
       await fetchUsers();
     } catch (err) {
       if (err?.response?.status === 409) {
-        toast.error('A user with this email already exists.');
+        toast.error(t('settings.emailExists'));
       } else if (err?.response?.status === 403) {
-        toast.error('You do not have permission to perform this action.');
+        toast.error(t('settings.noPermission'));
       } else {
-        const action = editingUser ? 'update' : 'create';
-        toast.error(`Failed to ${action} user. Please try again.`);
+        toast.error(editingUser ? t('settings.updateFailed') : t('settings.createFailed'));
       }
     } finally {
       setSaving(false);
@@ -167,15 +168,15 @@ function Settings() {
     setDeleting(true);
     try {
       await deleteUser(deletingUser.id);
-      toast.success('User deleted.');
+      toast.success(t('settings.userDeleted'));
       setDeleteDialogOpen(false);
       setDeletingUser(null);
       await fetchUsers();
     } catch (err) {
       if (err?.response?.status === 403) {
-        toast.error('You do not have permission to perform this action.');
+        toast.error(t('settings.noPermission'));
       } else {
-        toast.error('Failed to delete user. Please try again.');
+        toast.error(t('settings.deleteFailed'));
       }
     } finally {
       setDeleting(false);
@@ -221,7 +222,7 @@ function Settings() {
       <div style={pageStyle}>
         <NavBarV2 account={account} />
         <div style={{ padding: 'var(--space-10)' }}>
-          <LoadingSpinner label="Loading..." />
+          <LoadingSpinner label={t('common.loading')} />
         </div>
       </div>
     );
@@ -251,12 +252,12 @@ function Settings() {
             margin: 0,
           }}
         >
-          Settings
+          {t('nav.settings')}
         </h1>
 
         <Tabs defaultValue="users">
           <TabsList variant="line">
-            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="users">{t('settings.users')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -277,13 +278,13 @@ function Settings() {
                     margin: 0,
                   }}
                 >
-                  User Management
+                  {t('settings.userManagement')}
                 </h2>
-                <Button onClick={openCreateDialog}>Create User</Button>
+                <Button onClick={openCreateDialog}>{t('settings.createUser')}</Button>
               </div>
 
               {usersLoading ? (
-                <LoadingSpinner label="Loading users..." />
+                <LoadingSpinner label={t('settings.loadingUsers')} />
               ) : users.length === 0 ? (
                 <div
                   style={{
@@ -299,22 +300,22 @@ function Settings() {
                       margin: '0 0 var(--space-2) 0',
                     }}
                   >
-                    No users found.
+                    {t('settings.noUsersFound')}
                   </p>
                   <p style={{ fontSize: 'var(--font-size-sm)', margin: 0 }}>
-                    Create a user account to get started.
+                    {t('settings.createToGetStarted')}
                   </p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead scope="col">Name</TableHead>
-                      <TableHead scope="col">Email</TableHead>
-                      <TableHead scope="col">Role</TableHead>
-                      <TableHead scope="col">Created</TableHead>
+                      <TableHead scope="col">{t('common.name')}</TableHead>
+                      <TableHead scope="col">{t('settings.email')}</TableHead>
+                      <TableHead scope="col">{t('settings.role')}</TableHead>
+                      <TableHead scope="col">{t('settings.created')}</TableHead>
                       <TableHead scope="col" style={{ width: '48px' }}>
-                        Actions
+                        {t('common.actions')}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -353,7 +354,7 @@ function Settings() {
                                   : { background: '#f1f5f9', color: '#475569', borderColor: 'transparent' }
                               }
                             >
-                              {u.role === 'admin' ? 'Admin' : 'Counsellor'}
+                              {u.role === 'admin' ? t('settings.admin') : t('settings.counsellor')}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -370,28 +371,28 @@ function Settings() {
                             <DropdownMenu>
                               <DropdownMenuTrigger
                                 className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent cursor-pointer border-0 bg-transparent"
-                                aria-label="Actions"
+                                aria-label={t('common.actions')}
                               >
                                 <MoreVertical size={16} />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openEditDialog(u)}>
-                                  Edit
+                                  {t('common.edit')}
                                 </DropdownMenuItem>
                                 {isSelf ? (
                                   <DropdownMenuItem
                                     disabled
-                                    title="You cannot delete your own account."
+                                    title={t('settings.cannotDeleteSelf')}
                                     aria-disabled="true"
                                   >
-                                    Delete
+                                    {t('common.delete')}
                                   </DropdownMenuItem>
                                 ) : (
                                   <DropdownMenuItem
                                     onClick={() => openDeleteDialog(u)}
                                     className="text-destructive"
                                   >
-                                    Delete
+                                    {t('common.delete')}
                                   </DropdownMenuItem>
                                 )}
                               </DropdownMenuContent>
@@ -412,7 +413,7 @@ function Settings() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle>{editingUser ? 'Edit User' : 'Create User'}</DialogTitle>
+            <DialogTitle>{editingUser ? t('settings.editUser') : t('settings.createUser')}</DialogTitle>
           </DialogHeader>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <div>
@@ -426,7 +427,7 @@ function Settings() {
                   marginBottom: 'var(--space-1)',
                 }}
               >
-                Full Name
+                {t('settings.fullName')}
               </label>
               <Input
                 id="user-name"
@@ -446,7 +447,7 @@ function Settings() {
                   marginBottom: 'var(--space-1)',
                 }}
               >
-                Email
+                {t('settings.email')}
               </label>
               <Input
                 id="user-email"
@@ -468,7 +469,7 @@ function Settings() {
                   marginBottom: 'var(--space-1)',
                 }}
               >
-                Password
+                {t('settings.password')}
               </label>
               <Input
                 id="user-password"
@@ -476,7 +477,7 @@ function Settings() {
                 value={formData.password}
                 onChange={(e) => setFormData((f) => ({ ...f, password: e.target.value }))}
                 required={!editingUser}
-                placeholder={editingUser ? 'Leave blank to keep current password' : ''}
+                placeholder={editingUser ? t('settings.leaveBlankPassword') : ''}
               />
             </div>
             <div>
@@ -490,23 +491,23 @@ function Settings() {
                   marginBottom: 'var(--space-1)',
                 }}
               >
-                Role
+                {t('settings.role')}
               </label>
               <Select value={formData.role} onValueChange={(val) => setFormData((f) => ({ ...f, role: val }))}>
                 <SelectTrigger id="user-role" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="counsellor">Counsellor</SelectItem>
+                  <SelectItem value="admin">{t('settings.admin')}</SelectItem>
+                  <SelectItem value="counsellor">{t('settings.counsellor')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
+            <DialogClose render={<Button variant="ghost" />}>{t('common.cancel')}</DialogClose>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? t('settings.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -516,7 +517,7 @@ function Settings() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{t('settings.deleteUser')}</DialogTitle>
           </DialogHeader>
           <p
             style={{
@@ -526,8 +527,7 @@ function Settings() {
               margin: 0,
             }}
           >
-            Are you sure you want to delete {deletingUser?.display_name || deletingUser?.email}?
-            This action cannot be undone.
+            {t('settings.deleteConfirm')} {deletingUser?.display_name || deletingUser?.email}?
           </p>
           <DialogFooter>
             <DialogClose
@@ -537,10 +537,10 @@ function Settings() {
                 setDeletingUser(null);
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </DialogClose>
             <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
-              {deleting ? 'Deleting...' : 'Delete'}
+              {deleting ? t('settings.deleting') : t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

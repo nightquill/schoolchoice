@@ -10,8 +10,10 @@ import { EmptyState } from '@schoolchoice/ui';
 import { getRecommendations } from '../../api/recommendations';
 import { getActionPlan } from '../../api/actionPlan';
 import { getStudent } from '../../api/students';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function RecommendationPage() {
+  const { t } = useTranslation();
   const { id: studentId } = useParams();
 
   const [student, setStudent] = useState(null);
@@ -44,9 +46,9 @@ function RecommendationPage() {
       } catch (err) {
         const status = err.response?.status;
         if (status === 403 || status === 404) {
-          setRecError('Could not load recommendations. You may not have access to this student.');
+          setRecError(t('recommendations.noAccess'));
         } else {
-          setRecError('Could not load recommendations. Please try again.');
+          setRecError(t('recommendations.loadFailed'));
         }
       } finally {
         setRecLoading(false);
@@ -65,9 +67,9 @@ function RecommendationPage() {
         if (status === 404) {
           setPlanEmpty(true);
         } else if (status === 403) {
-          setPlanError('Could not load action plan. Please try again.');
+          setPlanError(t('recommendations.planLoadFailed'));
         } else {
-          setPlanError('Could not load action plan. Please try again.');
+          setPlanError(t('recommendations.planLoadFailed'));
         }
       } finally {
         setPlanLoading(false);
@@ -115,25 +117,25 @@ function RecommendationPage() {
     marginTop: 0,
   };
 
-  const studentName = student ? student.name : 'Student';
+  const studentName = student ? student.name : t('recommendations.student');
 
   return (
     <div style={pageStyle}>
       <NavBar />
       <div style={contentStyle}>
         <Link to={`/students/${studentId}/profile`} style={backLinkStyle}>
-          {`< Back to ${studentName}`}
+          {`< ${t('recommendations.backTo')} ${studentName}`}
         </Link>
-        <h1 style={headingStyle}>Recommendations for {studentName}</h1>
+        <h1 style={headingStyle}>{t('recommendations.title')} {studentName}</h1>
 
         <section>
-          <h2 style={sectionHeadingStyle}>School Recommendations</h2>
+          <h2 style={sectionHeadingStyle}>{t('recommendations.schoolRecommendations')}</h2>
           {recLoading ? (
-            <LoadingSpinner label="Loading recommendations…" />
+            <LoadingSpinner label={t('recommendations.loading')} />
           ) : recError ? (
             <ErrorMessage message={recError} />
           ) : recommendations.length === 0 ? (
-            <EmptyState message="No recommendations have been generated yet. Return to the student profile and click Generate Recommendations." />
+            <EmptyState message={t('recommendations.emptyState')} />
           ) : (
             recommendations.map((rec, index) => (
               <RecommendationCard
@@ -145,13 +147,13 @@ function RecommendationPage() {
         </section>
 
         <section style={{ marginTop: 'var(--space-8)' }}>
-          <h2 style={sectionHeadingStyle}>Action Plan</h2>
+          <h2 style={sectionHeadingStyle}>{t('recommendations.actionPlan')}</h2>
           {planLoading ? (
-            <LoadingSpinner label="Loading action plan…" />
+            <LoadingSpinner label={t('recommendations.loadingPlan')} />
           ) : planError ? (
             <ErrorMessage message={planError} />
           ) : planEmpty ? (
-            <EmptyState message="No action plan available yet. Return to the student profile and click Generate Action Plan." />
+            <EmptyState message={t('recommendations.planEmptyState')} />
           ) : actionPlan ? (
             <ActionPlanDisplay actionPlan={actionPlan} />
           ) : null}

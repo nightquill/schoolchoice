@@ -327,19 +327,19 @@ function SchoolProfile() {
                   <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : 'N/A'}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success-text)', marginTop: '2px' }}>Accept Rate</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success-text)', marginTop: '2px' }}>{t('schoolProfile.acceptanceRate')}</div>
                 </div>
                 <div style={{ ...statCardBase, background: 'var(--color-info-bg)' }}>
                   <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-info-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {school.average_admitted_score != null ? school.average_admitted_score : 'N/A'}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-info-text)', marginTop: '2px' }}>Avg Score</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-info-text)', marginTop: '2px' }}>{t('schoolProfile.avgAdmittedScore')}</div>
                 </div>
                 <div style={{ ...statCardBase, background: 'var(--color-purple-bg)' }}>
                   <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-purple-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {filtered.length}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-purple-text)', marginTop: '2px' }}>Programmes</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-purple-text)', marginTop: '2px' }}>{t('schoolProfile.programs')}</div>
                 </div>
               </div>
             </div>
@@ -348,23 +348,23 @@ function SchoolProfile() {
           {/* Programme list */}
           <div style={contentStyle}>
             <div style={headerRowStyle}>
-              <h2 style={h2Style}>Programmes</h2>
+              <h2 style={h2Style}>{t('schoolProfile.programs')}</h2>
               <div style={filterRowStyle}>
                 <input
                   type="text"
-                  placeholder="Search programmes..."
+                  placeholder={t('schoolProfile.searchProgrammes')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   style={inputStyle}
-                  aria-label="Search programmes"
+                  aria-label={t('schoolProfile.searchProgrammes')}
                 />
                 <select
                   value={faculty}
                   onChange={(e) => setFaculty(e.target.value)}
                   style={selectStyle}
-                  aria-label="Filter by faculty"
+                  aria-label={t('schoolProfile.filterByFaculty')}
                 >
-                  <option value="">All Faculties</option>
+                  <option value="">{t('schoolProfile.allFaculties')}</option>
                   {faculties.map((f) => (
                     <option key={f} value={f}>{f}</option>
                   ))}
@@ -373,7 +373,7 @@ function SchoolProfile() {
             </div>
 
             {filtered.length === 0 ? (
-              <p style={emptyStyle}>No programmes found.</p>
+              <p style={emptyStyle}>{t('schoolProfile.noProgrammesFound')}</p>
             ) : (
               <div style={cardStackStyle}>
                 {filtered.map((prog) => {
@@ -395,7 +395,7 @@ function SchoolProfile() {
 
                       <div style={medianColStyle}>
                         <span style={medianValueStyle}>{tier.median ?? '—'}</span>
-                        <span style={medianLabelStyle}>Median</span>
+                        <span style={medianLabelStyle}>{t('schoolProfile.median')}</span>
                       </div>
 
                       <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', minWidth: '100px', justifyContent: 'flex-end' }}>
