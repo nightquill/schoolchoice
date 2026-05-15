@@ -17,8 +17,9 @@ from sqlalchemy.exc import IntegrityError
 
 from app.core.dependencies import get_current_user, require_role
 from app.core.security import get_password_hash
-from app.db.models import User
+from app.db.models import CohortPermission, OrganisationMembership, User
 from app.db.session import get_db
+from app.modules.school_choice.models.models import StudentCohort
 from app.schemas.v2.admin_users import (
     UserAdminResponse,
     UserCreateAdmin,
@@ -202,6 +203,8 @@ def update_user(
         user.role = payload.role
     if payload.password is not None:
         user.hashed_password = get_password_hash(payload.password)
+    if payload.can_manage_cohorts is not None:
+        user.can_manage_cohorts = payload.can_manage_cohorts
     db.commit()
     db.refresh(user)
     return user
@@ -286,3 +289,265 @@ def preview_data_refresh(
         "added_preview": added[:20],
         "updated_preview": updated[:20],
     }
+
+
+# ---------------------------------------------------------------------------
+# Cohort permission management (SEC-03)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/cohorts/{cohort_id}/permissions")
+def list_cohort_permissions(
+    cohort_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """List users with their permission level for a cohort. Admin only."""
+    cohort = db.query(StudentCohort).filter(StudentCohort.id == cohort_id).first()
+    if not cohort:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cohort not found")
+
+    perms = (
+        db.query(CohortPermission, User)
+        .join(User, CohortPermission.user_id == User.id)
+        .filter(CohortPermission.cohort_id == cohort_id)
+        .all()
+    )
+
+    return {
+        "permissions": [
+            {
+                "user_id": str(u.id),
+                "email": u.email,
+                "display_name": u.display_name,
+                "role": u.role,
+                "permission": cp.permission,
+            }
+            for cp, u in perms
+        ]
+    }
+
+
+@router.put("/cohorts/{cohort_id}/permissions")
+def set_cohort_permission(
+    cohort_id: UUID,
+    payload: dict,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Set or update a user's permission on a cohort. Admin only."""
+    user_id_str = payload.get("user_id")
+    permission = payload.get("permission")
+
+    if not user_id_str or permission not in ("read_write", "read_only"):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Required: user_id (UUID) and permission ('read_write' | 'read_only')",
+        )
+
+    try:
+        target_user_id = UUID(str(user_id_str))
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid user_id")
+
+    cohort = db.query(StudentCohort).filter(StudentCohort.id == cohort_id).first()
+    if not cohort:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cohort not found")
+
+    user = db.query(User).filter(User.id == target_user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    existing = (
+        db.query(CohortPermission)
+        .filter(CohortPermission.user_id == target_user_id, CohortPermission.cohort_id == cohort_id)
+        .first()
+    )
+
+    if existing:
+        existing.permission = permission
+    else:
+        cp = CohortPermission(user_id=target_user_id, cohort_id=cohort_id, permission=permission)
+        db.add(cp)
+
+    db.commit()
+
+    return {"user_id": str(target_user_id), "cohort_id": str(cohort_id), "permission": permission}
+
+
+@router.delete("/cohorts/{cohort_id}/permissions/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_cohort_permission(
+    cohort_id: UUID,
+    user_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Remove a user's cohort-specific permission override. Admin only."""
+    cp = (
+        db.query(CohortPermission)
+        .filter(CohortPermission.user_id == user_id, CohortPermission.cohort_id == cohort_id)
+        .first()
+    )
+    if not cp:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission override not found")
+
+    db.delete(cp)
+    db.commit()
+
+
+@router.get("/users-with-permissions")
+def list_users_with_permissions(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """List all counsellor/admin users with org-level permission and cohort overrides. Admin only."""
+    users = (
+        db.query(User)
+        .filter(User.is_active == True, User.role.in_(["admin", "counsellor"]))  # noqa: E712
+        .all()
+    )
+
+    result = []
+    for u in users:
+        # Get org-level permission from membership
+        membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == u.id).first()
+        org_permission = membership.permission if membership else "read_write"
+
+        # Get cohort-level overrides
+        cohort_perms = (
+            db.query(CohortPermission, StudentCohort)
+            .join(StudentCohort, CohortPermission.cohort_id == StudentCohort.id)
+            .filter(CohortPermission.user_id == u.id)
+            .all()
+        )
+
+        result.append({
+            "id": str(u.id),
+            "email": u.email,
+            "display_name": u.display_name,
+            "role": u.role,
+            "org_permission": org_permission,
+            "cohort_permissions": [
+                {
+                    "cohort_id": str(sc.id),
+                    "cohort_name": sc.name,
+                    "permission": cp.permission,
+                }
+                for cp, sc in cohort_perms
+            ],
+        })
+
+    return {"users": result}
+
+
+# ---------------------------------------------------------------------------
+# Submission rate limit setting
+# ---------------------------------------------------------------------------
+
+@router.get("/settings/submission-rate-limit")
+def get_submission_rate_limit(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    """Get the current submission rate limit per student per 24h."""
+    from app.db.models import Organisation, OrganisationMembership
+    import json as _json
+
+    membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+    if not membership:
+        return {"rate_limit": 3}
+    org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
+    if not org or not org.metadata_:
+        return {"rate_limit": 3}
+    try:
+        meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else {}
+        return {"rate_limit": meta.get("submission_rate_limit", 3)}
+    except (ValueError, TypeError):
+        return {"rate_limit": 3}
+
+
+@router.put("/settings/submission-rate-limit")
+def set_submission_rate_limit(
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    """Set submission rate limit per student per 24h. Admin only."""
+    from app.db.models import Organisation, OrganisationMembership
+    import json as _json
+
+    limit = payload.get("rate_limit")
+    if not isinstance(limit, int) or limit < 1 or limit > 100:
+        raise HTTPException(status_code=422, detail="rate_limit must be an integer between 1 and 100")
+
+    membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+    if not membership:
+        raise HTTPException(status_code=404, detail="No organisation found")
+
+    org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organisation not found")
+
+    try:
+        meta = _json.loads(org.metadata_) if org.metadata_ and isinstance(org.metadata_, str) else {}
+    except (ValueError, TypeError):
+        meta = {}
+
+    meta["submission_rate_limit"] = limit
+    org.metadata_ = _json.dumps(meta)
+    db.commit()
+
+    return {"rate_limit": limit}
+
+
+# ---------------------------------------------------------------------------
+# Plan detail level setting
+# ---------------------------------------------------------------------------
+
+@router.get("/settings/plan-detail-level")
+def get_plan_detail_level(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    from app.db.models import Organisation, OrganisationMembership
+    import json as _json
+
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        return {"level": "A"}
+    org = db.query(Organisation).filter(Organisation.id == org_id).first()
+    if not org:
+        return {"level": "A"}
+    try:
+        meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else (org.metadata_ or {})
+        return {"level": meta.get("plan_detail_level", "A")}
+    except (ValueError, TypeError):
+        return {"level": "A"}
+
+
+@router.put("/settings/plan-detail-level")
+def set_plan_detail_level(
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    from app.db.models import Organisation, OrganisationMembership
+    import json as _json
+
+    level = payload.get("level", "A")
+    if level not in ("A", "B", "C"):
+        raise HTTPException(status_code=400, detail="level must be A, B, or C")
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        raise HTTPException(status_code=400, detail="No active organisation")
+    org = db.query(Organisation).filter(Organisation.id == org_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organisation not found")
+    try:
+        meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else (org.metadata_ or {})
+    except (ValueError, TypeError):
+        meta = {}
+    meta["plan_detail_level"] = level
+    org.metadata_ = _json.dumps(meta)
+    db.commit()
+    return {"level": level}

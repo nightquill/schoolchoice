@@ -10,7 +10,7 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
-import { listUsers, updateUser, getSubmissionRateLimit, setSubmissionRateLimit } from '../../api/admin';
+import { listUsers, updateUser, getSubmissionRateLimit, setSubmissionRateLimit, getPlanDetailLevel, setPlanDetailLevel } from '../../api/admin';
 import { getCohorts, createCohort, deleteCohort, getCohort, addCohortMembers, removeCohortMember, searchStudents } from '../../api/cohorts';
 import { getCohortPermissions, setCohortPermission, removeCohortPermission } from '../../api/admin';
 import { useTranslation } from '@schoolchoice/ui/i18n';
@@ -659,10 +659,17 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
 function SettingsSection({ t }) {
   const [rateLimit, setRateLimit] = useState(3);
   const [saving, setSaving] = useState(false);
+  const [detailLevel, setDetailLevel] = useState('A');
+  const [savingLevel, setSavingLevel] = useState(false);
 
   const rateLimitQuery = useQuery({
     queryKey: ['admin-submission-rate-limit'],
     queryFn: getSubmissionRateLimit,
+  });
+
+  const detailLevelQuery = useQuery({
+    queryKey: ['admin-plan-detail-level'],
+    queryFn: getPlanDetailLevel,
   });
 
   useEffect(() => {
@@ -670,6 +677,12 @@ function SettingsSection({ t }) {
       setRateLimit(rateLimitQuery.data.rate_limit);
     }
   }, [rateLimitQuery.data]);
+
+  useEffect(() => {
+    if (detailLevelQuery.data?.level) {
+      setDetailLevel(detailLevelQuery.data.level);
+    }
+  }, [detailLevelQuery.data]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -683,13 +696,27 @@ function SettingsSection({ t }) {
     }
   };
 
+  const handleSaveLevel = async () => {
+    setSavingLevel(true);
+    try {
+      await setPlanDetailLevel(detailLevel);
+      toast.success(t('adminManage.settingsSaved'));
+    } catch {
+      toast.error(t('adminManage.settingsFailed'));
+    } finally {
+      setSavingLevel(false);
+    }
+  };
+
+  const radioStyle = { display: 'flex', alignItems: 'center', gap: 'var(--space-2)', cursor: 'pointer', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' };
+
   return (
     <div>
       <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-4) 0' }}>
         {t('adminManage.settings')}
       </h2>
 
-      <div style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', maxWidth: '480px' }}>
+      <div style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', maxWidth: '480px', marginBottom: 'var(--space-4)' }}>
         <label htmlFor="submission-rate" style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
           {t('adminManage.submissionRateLimit')}
         </label>
@@ -713,6 +740,32 @@ function SettingsSection({ t }) {
             {saving ? t('profile.saving') : t('targets.save')}
           </Button>
         </div>
+      </div>
+
+      <div style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', maxWidth: '480px' }}>
+        <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
+          {t('adminManage.planDetailLevel')}
+        </label>
+        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3) 0' }}>
+          {t('adminManage.planDetailDesc')}
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+          <label style={radioStyle}>
+            <input type="radio" name="plan-detail-level" value="A" checked={detailLevel === 'A'} onChange={() => setDetailLevel('A')} />
+            {t('adminManage.bandAOnly')}
+          </label>
+          <label style={radioStyle}>
+            <input type="radio" name="plan-detail-level" value="B" checked={detailLevel === 'B'} onChange={() => setDetailLevel('B')} />
+            {t('adminManage.bandAB')}
+          </label>
+          <label style={radioStyle}>
+            <input type="radio" name="plan-detail-level" value="C" checked={detailLevel === 'C'} onChange={() => setDetailLevel('C')} />
+            {t('adminManage.bandABC')}
+          </label>
+        </div>
+        <Button onClick={handleSaveLevel} disabled={savingLevel}>
+          {savingLevel ? t('profile.saving') : t('targets.save')}
+        </Button>
       </div>
     </div>
   );

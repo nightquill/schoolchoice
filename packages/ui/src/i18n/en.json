@@ -226,7 +226,8 @@
     "noPlansEmptyState": "No plans saved yet. Click 'Generate New Plan' to create one.",
     "snapshotAtGeneration": "Snapshot at generation time:",
     "best5Aggregate": "Best-5 aggregate:",
-    "noContentStored": "Plan content was not stored for this entry."
+    "noContentStored": "Plan content was not stored for this entry.",
+    "downloadPdf": "Download PDF"
   },
   "cohorts": {
     "loading": "Loading cohorts…",
@@ -337,7 +338,16 @@
     "sectionSaveFailed": "Failed to save section.",
     "sectionResetFailed": "Failed to reset section.",
     "noPlanGenerated": "No plan has been generated yet.",
-    "exportFailed": "Failed to export HTML. Please try again."
+    "exportFailed": "Failed to export HTML. Please try again.",
+    "progressAnalyzing": "Analyzing grades...",
+    "progressMatching": "Matching programmes...",
+    "progressGenerating": "Generating insights...",
+    "progressFormatting": "Formatting plan...",
+    "progressDone": "Plan ready!",
+    "exportPdf": "Export PDF",
+    "academicStrengths": "Academic Strengths",
+    "yourGrades": "Your Grades",
+    "bandABenchmark": "Band A Benchmark"
   },
   "account": {
     "loading": "Loading account settings...",
@@ -818,7 +828,12 @@
     "submissionRateDesc": "Maximum number of choice submissions a student can make per day.",
     "perStudentPerDay": "per student per day",
     "settingsSaved": "Setting saved",
-    "settingsFailed": "Failed to save setting"
+    "settingsFailed": "Failed to save setting",
+    "planDetailLevel": "Plan Detail Level",
+    "planDetailDesc": "How many of the student's programme choices to include in generated plans.",
+    "bandAOnly": "Band A only (top 3 choices)",
+    "bandAB": "Band A+B (top 6 choices)",
+    "bandABC": "Band A+B+C (top 10 choices)"
   },
   "methodology": {
     "title": "Methodology"

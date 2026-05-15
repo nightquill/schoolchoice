@@ -29,3 +29,9 @@ export const getSubmissionRateLimit = () =>
 
 export const setSubmissionRateLimit = (limit) =>
   put('/api/v1/admin/settings/submission-rate-limit', { rate_limit: limit });
+
+export const getPlanDetailLevel = () =>
+  get('/api/v1/admin/settings/plan-detail-level');
+
+export const setPlanDetailLevel = (level) =>
+  put('/api/v1/admin/settings/plan-detail-level', { level });

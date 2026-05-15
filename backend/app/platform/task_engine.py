@@ -236,6 +236,30 @@ class TaskEngine:
                 resolved[slot_name] = self._load_matchmaker_results(entity_id, db)
             else:
                 raise ValueError(f"Unknown data slot type: '{slot_type}'")
+
+        # Inject JUPAS milestones for timeline-aware prompts
+        from app.modules.school_choice.data.jupas_calendar import get_all_milestones
+        resolved["milestones"] = get_all_milestones()
+
+        # Filter by plan detail level
+        if "matchmaker" in resolved:
+            max_rank = 3  # default Band A
+            from app.modules.school_choice.models.models import Student as _Stu
+            from app.db.models import Organisation
+            import json as _jj
+            stu = db.query(_Stu).filter(_Stu.id == entity_id).first()
+            org_id = getattr(stu, "organisation_id", None) if stu else None
+            if org_id:
+                org = db.query(Organisation).filter(Organisation.id == org_id).first()
+                if org:
+                    try:
+                        meta = _jj.loads(org.metadata_) if isinstance(org.metadata_, str) else (org.metadata_ or {})
+                        level = meta.get("plan_detail_level", "A")
+                        max_rank = {"A": 3, "B": 6, "C": 10}.get(level, 3)
+                    except (ValueError, TypeError):
+                        pass
+            resolved["matchmaker"] = resolved["matchmaker"][:max_rank]
+
         return resolved
 
     def _truncate_context(self, context: dict, task: TaskDefinition) -> dict:
@@ -372,6 +396,17 @@ class TaskEngine:
                 "rationale": d.get("rationale", ""),
                 "data_completeness_pct": round((d.get("data_completeness") or 0) * 100),
             })
+
+        # Enrich with non-grade requirements and deadlines
+        from app.modules.school_choice.models.models import JupasProgramme as _JP
+        for item in simplified:
+            jupas_code = item.get("major_jupas_code")
+            if jupas_code:
+                prog = db.query(_JP).filter(_JP.jupas_code == jupas_code).first()
+                if prog:
+                    item["non_grade_requirements"] = prog.non_grade_requirements or {}
+                    item["deadlines"] = prog.deadlines or {}
+
         return simplified
 
     @classmethod

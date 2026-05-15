@@ -10,6 +10,7 @@ from app.db.models import User
 from app.modules.school_choice.models.models import JupasProgramme, School, Student
 from app.services.student_data_builder import build_student_data
 from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+from app.modules.school_choice.data.jupas_calendar import get_all_milestones, get_next_milestone
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ def list_all_programmes(
                 "school_name": p.school.name if p.school else None,
                 "faculty": p.faculty,
                 "admission_stats": p.admission_stats,
+                "non_grade_requirements": p.non_grade_requirements,
             }
             for p in programmes
         ],
@@ -74,6 +76,7 @@ def search_programmes(
             "school_id": str(p.school_id),
             "school_name": p.school.name if p.school else None,
             "faculty": p.faculty,
+            "non_grade_requirements": p.non_grade_requirements,
         }
         for p in programmes
     ]
@@ -166,7 +169,32 @@ def get_programme_students(
             "institution_code": programme.institution_code,
             "admission_stats": latest_stats,
             "minimum_requirements": programme.minimum_requirements or {},
+            "non_grade_requirements": programme.non_grade_requirements,
         },
         "students": scored_students,
         "total": len(scored_students),
+    }
+
+
+@router.get("/{jupas_code}/deadlines")
+def get_programme_deadlines(
+    jupas_code: str,
+    db: Session = Depends(get_db),
+):
+    """Return merged JUPAS milestones + programme-specific deadlines."""
+    programme = db.query(JupasProgramme).filter(
+        JupasProgramme.jupas_code == jupas_code.upper()
+    ).first()
+    if not programme:
+        raise HTTPException(status_code=404, detail="Programme not found")
+
+    from datetime import date
+    today = date.today().isoformat()
+
+    return {
+        "jupas_code": programme.jupas_code,
+        "programme_name": programme.name,
+        "milestones": get_all_milestones(),
+        "next_milestone": get_next_milestone(today),
+        "programme_deadlines": programme.deadlines or {},
     }

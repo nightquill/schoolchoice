@@ -1,9 +1,12 @@
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { usePlansTab } from '../../hooks/usePlansTab';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
+import { exportPlanHistoryPDF } from '../../api/plan';
+import { FileDown } from 'lucide-react';
 
 export default function PlansTab({ studentId }) {
   const navigate = useNavigate();
@@ -16,6 +19,19 @@ export default function PlansTab({ studentId }) {
     handleDelete,
   } = usePlansTab(studentId);
   const { t } = useTranslation();
+  const [downloadingPdf, setDownloadingPdf] = useState(null);
+  const handleDownloadPdf = useCallback(async (e, planId) => {
+    e.stopPropagation();
+    setDownloadingPdf(planId);
+    try {
+      await exportPlanHistoryPDF(studentId, planId);
+    } catch (err) {
+      console.error('PDF download failed', err);
+    } finally {
+      setDownloadingPdf(null);
+    }
+  }, [studentId]);
+
   const cardStyle = {
     background: 'var(--color-surface)',
     border: 'var(--border-width) solid var(--color-border)',
@@ -59,13 +75,22 @@ export default function PlansTab({ studentId }) {
           </button>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-2)' }}>
             <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', margin: 0 }}>{selected.plan_label}</h3>
-            <Button
-              variant="destructive"
-              onClick={(e) => handleDelete(e, selected.id)}
-              disabled={deleting === selected.id}
-            >
-              {deleting === selected.id ? t('plans.deleting') : t('plans.deletePlan')}
-            </Button>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+              <Button
+                onClick={(e) => handleDownloadPdf(e, selected.id)}
+                disabled={downloadingPdf === selected.id}
+              >
+                <FileDown size={16} style={{ marginRight: 4 }} />
+                {downloadingPdf === selected.id ? '…' : t('plans.downloadPdf')}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={(e) => handleDelete(e, selected.id)}
+                disabled={deleting === selected.id}
+              >
+                {deleting === selected.id ? t('plans.deleting') : t('plans.deletePlan')}
+              </Button>
+            </div>
           </div>
           {selected.snapshot_data && (
             <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', padding: 'var(--space-3)', marginBottom: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
@@ -111,13 +136,24 @@ export default function PlansTab({ studentId }) {
                 </div>
               )}
             </div>
-            <button
-              onClick={(e) => handleDelete(e, plan.id)}
-              disabled={deleting === plan.id}
-              style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)' }}
-            >
-              {deleting === plan.id ? '…' : t('common.delete')}
-            </button>
+            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+              <button
+                onClick={(e) => handleDownloadPdf(e, plan.id)}
+                disabled={downloadingPdf === plan.id}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-primary)', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)', display: 'inline-flex', alignItems: 'center', gap: '2px' }}
+                title={t('plans.downloadPdf')}
+              >
+                <FileDown size={14} />
+                {downloadingPdf === plan.id ? '…' : t('plans.downloadPdf')}
+              </button>
+              <button
+                onClick={(e) => handleDelete(e, plan.id)}
+                disabled={deleting === plan.id}
+                style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)' }}
+              >
+                {deleting === plan.id ? '…' : t('common.delete')}
+              </button>
+            </div>
           </div>
         </div>
       ))}

@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
@@ -637,3 +638,67 @@ def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan)
         logger.warning("Failed to load student data for regeneration: %s", exc)
 
     return student_for_regen, match_results_for_regen
+
+
+# ---------------------------------------------------------------------------
+# GET /students/{student_id}/plan/export-pdf
+# ---------------------------------------------------------------------------
+
+@router.get("/{student_id}/plan/export-pdf")
+def export_plan_pdf(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Export current plan as PDF."""
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
+    if not plan or not plan.html_content:
+        raise HTTPException(status_code=404, detail="No plan found")
+
+    try:
+        from weasyprint import HTML
+        pdf_bytes = HTML(string=plan.html_content).write_pdf()
+    except ImportError:
+        # Fallback: return HTML for browser print
+        return Response(content=plan.html_content, media_type="text/html")
+
+    student = db.query(Student).filter(Student.id == student_id).first()
+    filename = f"plan-{(student.name or 'student').replace(' ', '_')}-v{plan.version or 1}.pdf"
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+# ---------------------------------------------------------------------------
+# GET /students/{student_id}/plans/history/{plan_id}/export-pdf
+# ---------------------------------------------------------------------------
+
+@router.get("/{student_id}/plans/history/{plan_id}/export-pdf")
+def export_plan_history_pdf(
+    student_id: UUID,
+    plan_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Export a historical plan version as PDF."""
+    plan = db.query(PlanHistory).filter(
+        PlanHistory.id == plan_id,
+        PlanHistory.student_id == student_id,
+    ).first()
+    if not plan or not plan.html_content:
+        raise HTTPException(status_code=404, detail="Plan version not found")
+
+    try:
+        from weasyprint import HTML
+        pdf_bytes = HTML(string=plan.html_content).write_pdf()
+    except ImportError:
+        return Response(content=plan.html_content, media_type="text/html")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="plan-v{plan.version or 0}.pdf"'},
+    )

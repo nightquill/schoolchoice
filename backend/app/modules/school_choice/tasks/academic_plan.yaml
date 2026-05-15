@@ -53,6 +53,23 @@ prompts:
     4. Order all action items chronologically.
     5. Include at least 8-10 action items spanning the full application cycle.
 
+    PROGRAMME SPECIFICITY RULES:
+    1. Always reference the programme name AND JUPAS code (e.g., "JS6456 — HKU Medicine"),
+       not just the university name.
+    2. For each recommended programme, explain what makes it DISTINCT from the others
+       on this list — different career pathways, teaching approach, or admission emphasis.
+       Do NOT repeat the same rationale across programmes.
+    3. If a programme has non_grade_requirements (interview, portfolio, audition,
+       aptitude_test), include specific preparation actions with deadlines:
+       - Interview: suggest mock interview practice, common question themes for that field
+       - Portfolio: suggest portfolio review timeline, what to include for that discipline
+       - Audition: suggest rehearsal schedule and repertoire selection
+    4. Use the programme deadlines and JUPAS milestones provided to set real dates
+       in all action items. Work backward from each deadline to suggest when
+       preparation should start.
+    5. Each programme's action_items must be unique to that programme. Generic items
+       like "research the programme" are not acceptable.
+
     STUDENT PREFERENCES:
     - If the student has listed preferred schools or majors, prioritise those in
       recommendations — but still include other strong matches for comparison.
@@ -96,6 +113,9 @@ prompts:
 
     School Match Results (ranked by overall fit, highest first):
     {{ matchmaker | tojson(indent=2) }}
+
+    JUPAS Application Milestones:
+    {{ milestones | tojson(indent=2) }}
 
     Generate the academic plan now.
 

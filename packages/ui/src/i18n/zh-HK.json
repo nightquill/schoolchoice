@@ -283,7 +283,8 @@
     "noPlansEmptyState": "尚未儲存計劃。點擊「生成新計劃」以建立一個。",
     "snapshotAtGeneration": "生成時的快照：",
     "best5Aggregate": "最佳五科總分：",
-    "noContentStored": "此項目未儲存計劃內容。"
+    "noContentStored": "此項目未儲存計劃內容。",
+    "downloadPdf": "下載 PDF"
   },
   "targets": {
     "backToProfile": "返回檔案",
@@ -589,7 +590,16 @@
     "sectionSaveFailed": "儲存段落失敗。",
     "sectionResetFailed": "重設段落失敗。",
     "noPlanGenerated": "尚未生成計劃。",
-    "exportFailed": "匯出 HTML 失敗。請重試。"
+    "exportFailed": "匯出 HTML 失敗。請重試。",
+    "progressAnalyzing": "正在分析成績...",
+    "progressMatching": "正在配對課程...",
+    "progressGenerating": "正在生成建議...",
+    "progressFormatting": "正在排版計劃...",
+    "progressDone": "計劃已完成！",
+    "exportPdf": "匯出 PDF",
+    "academicStrengths": "學業優勢",
+    "yourGrades": "你的成績",
+    "bandABenchmark": "Band A 基準"
   },
   "consultant": {
     "backTo": "返回",
@@ -818,7 +828,12 @@
     "submissionRateDesc": "每位學生每日可提交的選科表上限。",
     "perStudentPerDay": "每位學生每日",
     "settingsSaved": "設定已儲存",
-    "settingsFailed": "儲存設定失敗"
+    "settingsFailed": "儲存設定失敗",
+    "planDetailLevel": "計劃詳細程度",
+    "planDetailDesc": "生成計劃時包含學生的多少個課程選擇。",
+    "bandAOnly": "只有 Band A（前 3 個志願）",
+    "bandAB": "Band A+B（前 6 個志願）",
+    "bandABC": "Band A+B+C（前 10 個志願）"
   },
   "methodology": {
     "title": "方法"

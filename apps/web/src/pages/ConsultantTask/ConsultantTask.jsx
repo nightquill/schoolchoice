@@ -3,16 +3,23 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { FileDown, StopCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import SSEStreamDisplay from '../../components/SSEStreamDisplay/SSEStreamDisplay';
+import PlanProgress from '../../components/PlanProgress/PlanProgress';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
+import PlanRadarChart from '../../components/PlanRadarChart/PlanRadarChart';
 import { TemplateSelector } from '@schoolchoice/ui';
 import { toast } from 'sonner';
 import { saveConsultantTask, sendConsultantChat } from '../../api/consultant';
+import { exportPlanPDF } from '../../api/plan';
+import { getGrades } from '../../api/grades';
+import { getTargets } from '../../api/targets';
+import { getAllProgrammes } from '../../api/jupas';
 import { ChatPanel } from '../../components/PlanChat/PlanChat';
 import usePlanWorkspace from '../../hooks/usePlanWorkspace';
 import {
@@ -34,6 +41,29 @@ import {
   modalDialogStyle,
 } from '../../components/PlanWorkspace/planStyles';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+
+const JUPAS_MILESTONES = [
+  { label: 'JUPAS application opens', date: '2025-09-01' },
+  { label: 'Reference letters deadline', date: '2025-10-31' },
+  { label: 'Personal statement draft', date: '2025-11-15' },
+  { label: 'Band A submission deadline', date: '2025-12-08' },
+  { label: 'HKDSE exam period', date: '2026-03-28' },
+  { label: 'HKDSE exam ends', date: '2026-05-10' },
+  { label: 'Band A/B/C revision', date: '2026-05-20' },
+  { label: 'Revision period ends', date: '2026-06-05' },
+  { label: 'HKDSE results release', date: '2026-07-15' },
+  { label: 'Main round offers', date: '2026-08-10' },
+];
+
+function getNextMilestone() {
+  const today = new Date().toISOString().slice(0, 10);
+  return JUPAS_MILESTONES.find(m => m.date >= today) || null;
+}
+
+function daysUntil(dateStr) {
+  const diff = new Date(dateStr) - new Date();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
 
 function ConsultantTask() {
   const { t } = useTranslation();
@@ -81,6 +111,20 @@ function ConsultantTask() {
     chatTextareaRef,
     loadPlan,
   } = usePlanWorkspace({ studentId: id, chatFn });
+
+  // --- PDF export state ---
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const handleExportPDF = useCallback(async () => {
+    setIsExportingPDF(true);
+    try {
+      await exportPlanPDF(id);
+      toast.success(t('plan.exportPdf'));
+    } catch (err) {
+      toast.error(err?.message || 'PDF export failed');
+    } finally {
+      setIsExportingPDF(false);
+    }
+  }, [id, t]);
 
   // --- SSE streaming state (ConsultantTask-unique) ---
   const [streaming, setStreaming] = useState(false);
@@ -176,6 +220,53 @@ function ConsultantTask() {
   const hasPlan = !streaming && !error && plan?.html_content;
   const sectionList = buildSectionList(plan);
 
+  // --- Radar chart data queries ---
+  const gradesQuery = useQuery({
+    queryKey: ['grades', id],
+    queryFn: () => getGrades(id),
+    enabled: !!hasPlan,
+  });
+
+  const targetsQuery = useQuery({
+    queryKey: ['targets', id],
+    queryFn: () => getTargets(id),
+    enabled: !!hasPlan,
+  });
+
+  const jupasQuery = useQuery({
+    queryKey: ['jupas-all'],
+    queryFn: getAllProgrammes,
+    staleTime: 10 * 60 * 1000,
+    enabled: !!hasPlan,
+  });
+
+  // Build gradesByCode from grades array
+  const gradesByCode = {};
+  const gradesArr = Array.isArray(gradesQuery.data) ? gradesQuery.data : (gradesQuery.data?.grades ?? []);
+  gradesArr.forEach(g => {
+    if (g.subject_code && (g.raw_grade || g.predicted_grade)) {
+      gradesByCode[g.subject_code] = g.raw_grade || g.predicted_grade;
+    }
+  });
+
+  // Get rank 1 target's programme admission stats for benchmark
+  const targets = targetsQuery.data?.targets || (Array.isArray(targetsQuery.data) ? targetsQuery.data : []);
+  const rank1 = targets.find(t => t.student_rank === 1) || targets[0];
+  const rank1Code = rank1?.jupas_code;
+
+  const allProgs = jupasQuery.data?.programmes || (Array.isArray(jupasQuery.data) ? jupasQuery.data : []);
+  const rank1Prog = rank1Code ? allProgs.find(p => p.jupas_code === rank1Code) : null;
+  const admissionStats = rank1Prog?.admission_stats || {};
+  const latestYear = Object.keys(admissionStats).sort().pop();
+  const median = latestYear ? admissionStats[latestYear]?.median : null;
+  const perSubjectBenchmark = median ? median / 5 : null;
+
+  const radarSubjects = Object.keys(gradesByCode);
+  const benchmarkByCode = {};
+  if (perSubjectBenchmark) {
+    radarSubjects.forEach(code => { benchmarkByCode[code] = perSubjectBenchmark; });
+  }
+
   // --- ConsultantTask-unique styles ---
   const stopBtnStyle = {
     display: 'inline-flex',
@@ -235,6 +326,23 @@ function ConsultantTask() {
         </div>
 
         <div style={toolbarRightStyle}>
+          {(() => {
+            const milestone = getNextMilestone();
+            if (!milestone) return null;
+            const days = daysUntil(milestone.date);
+            return (
+              <span style={{
+                fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)',
+                color: days <= 30 ? 'var(--color-error)' : 'var(--color-warning-text)',
+                background: days <= 30 ? 'var(--color-error-bg)' : 'var(--color-warning-bg)',
+                padding: '2px 10px', borderRadius: 'var(--border-radius-sm)',
+                border: `1px solid ${days <= 30 ? 'var(--color-error-border)' : 'var(--color-warning-border)'}`,
+              }}>
+                {milestone.label}: {new Date(milestone.date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })} — {days} days
+              </span>
+            );
+          })()}
+
           <Button
             onClick={handleGenerate}
             disabled={streaming}
@@ -257,6 +365,20 @@ function ConsultantTask() {
             >
               <FileDown size={16} />
               {isExportingHTML ? t('plan.exporting') : t('plan.exportHtml')}
+            </button>
+          )}
+
+          {hasPlan && (
+            <button
+              onClick={handleExportPDF}
+              disabled={isExportingPDF}
+              style={{
+                ...exportBtnStyle,
+                cursor: isExportingPDF ? 'wait' : 'pointer',
+              }}
+            >
+              <FileDown size={16} />
+              {isExportingPDF ? t('plan.exporting') : t('plan.exportPdf')}
             </button>
           )}
 
@@ -363,32 +485,10 @@ function ConsultantTask() {
 
       {!loading && (
         <>
-          {/* SSE Streaming display */}
+          {/* Plan generation progress */}
           {streaming && (
-            <div style={planAreaStyle}>
-              <div style={iframeColStyle}>
-                <SSEStreamDisplay
-                  tokens={streamTokens}
-                  isStreaming={streaming}
-                  error={streamError}
-                  onRetry={handleGenerate}
-                />
-              </div>
-              {/* Desktop chat during streaming */}
-              <div style={chatColStyle} className="consultant-chat-desktop">
-                <ChatPanel
-                  messages={messages}
-                  chatInput={chatInput}
-                  setChatInput={setChatInput}
-                  chatLoading={chatLoading}
-                  chatError={chatError}
-                  chatDisabled={true}
-                  messagesEndRef={messagesEndRef}
-                  chatTextareaRef={chatTextareaRef}
-                  onSend={handleSendChat}
-                  onKeyDown={handleChatKeyDown}
-                />
-              </div>
+            <div style={contentZoneStyle}>
+              <PlanProgress isActive={streaming} isDone={false} />
             </div>
           )}
 
@@ -408,6 +508,17 @@ function ConsultantTask() {
                 isStreaming={false}
                 error={streamError}
                 onRetry={handleGenerate}
+              />
+            </div>
+          )}
+
+          {/* Radar chart — above the plan */}
+          {hasPlan && radarSubjects.length >= 3 && (
+            <div style={{ padding: '0 var(--space-6)', marginBottom: 'var(--space-4)' }}>
+              <PlanRadarChart
+                gradesByCode={gradesByCode}
+                benchmarkByCode={benchmarkByCode}
+                subjects={radarSubjects}
               />
             </div>
           )}

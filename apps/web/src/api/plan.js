@@ -29,3 +29,42 @@ export const editPlanSection = (studentId, sectionKey, htmlContent) =>
 
 export const resetPlanSection = (studentId, sectionKey) =>
   del(`/api/v1/students/${studentId}/plan/section/${sectionKey}`);
+
+export const exportPlanPDF = async (studentId) => {
+  const resp = await client.get(`/api/v1/students/${studentId}/plan/export-pdf`, { responseType: 'blob' });
+  const contentType = resp.headers?.['content-type'] || '';
+  if (contentType.includes('pdf')) {
+    const url = URL.createObjectURL(resp.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'academic-plan.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } else {
+    // Fallback: open HTML in new tab for print
+    const html = await resp.data.text();
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  }
+};
+
+export const exportPlanHistoryPDF = async (studentId, planId) => {
+  const resp = await client.get(`/api/v1/students/${studentId}/plans/history/${planId}/export-pdf`, { responseType: 'blob' });
+  const contentType = resp.headers?.['content-type'] || '';
+  if (contentType.includes('pdf')) {
+    const url = URL.createObjectURL(resp.data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'academic-plan-history.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  } else {
+    const html = await resp.data.text();
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  }
+};

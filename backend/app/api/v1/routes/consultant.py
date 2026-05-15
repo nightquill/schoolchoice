@@ -491,6 +491,14 @@ def save_consultant_task(
     )
     db.add(history_entry)
 
+    # Also create a PlanGenerationJob record for analytics tracking
+    from app.modules.school_choice.models.models import PlanGenerationJob
+    job = PlanGenerationJob(
+        student_id=_to_uuid(body.entity_id),
+        status="DONE",
+    )
+    db.add(job)
+
     db.commit()
     db.refresh(plan)
 

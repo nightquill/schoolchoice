@@ -399,26 +399,31 @@ def get_plan_generation_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Plan generation frequency over time, grouped by granularity."""
-    from app.modules.school_choice.models.models import PlanGenerationJob
+    """Plan generation frequency over time, grouped by granularity.
+
+    Queries AcademicPlan (source of truth) rather than PlanGenerationJob,
+    because the consultant SSE save path writes directly to AcademicPlan
+    without creating PlanGenerationJob records.
+    """
+    from app.db.models_v2 import AcademicPlan
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     org_id = getattr(current_user, "active_organisation_id", None)
 
-    query = db.query(PlanGenerationJob).filter(
-        PlanGenerationJob.created_at >= cutoff,
-        PlanGenerationJob.status == "DONE",
+    query = db.query(AcademicPlan).filter(
+        AcademicPlan.generated_at.isnot(None),
+        AcademicPlan.generated_at >= cutoff,
     )
     if org_id:
-        query = query.join(Student, PlanGenerationJob.student_id == Student.id).filter(
+        query = query.join(Student, AcademicPlan.student_id == Student.id).filter(
             Student.organisation_id == org_id
         )
 
-    jobs = query.all()
+    plans = query.all()
 
     buckets: dict[str, int] = defaultdict(int)
-    for job in jobs:
-        key = _bucket_date(job.created_at, granularity)
+    for plan in plans:
+        key = _bucket_date(plan.generated_at, granularity)
         buckets[key] += 1
 
     data = [{"date": k, "count": v} for k, v in sorted(buckets.items())]

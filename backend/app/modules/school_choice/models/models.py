@@ -428,7 +428,13 @@ class JupasProgramme(Base):
     scoring_formula = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="Scoring formula with scale, weights, best_n")
     minimum_requirements = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="General and subject-specific requirements")
     admission_stats = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="Per-year UQ/Median/LQ stats")
+    non_grade_requirements = Column(JSONB, nullable=True, comment="Interview, portfolio, aptitude test requirements")
     notes = Column(Text, nullable=True)
+    deadlines = Column(
+        JSON,
+        nullable=True,
+        comment="Per-programme deadlines: {application, interview, portfolio, audition}",
+    )
     data_source = Column(Text, nullable=True)
     data_confidence = Column(String(50), nullable=True, server_default="'estimated'", comment="verified | estimated")
     admission_year = Column(
