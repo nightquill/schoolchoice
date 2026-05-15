@@ -532,22 +532,21 @@ function ConsultantTask() {
             </div>
           )}
 
-          {/* Radar chart — above the plan */}
-          {hasPlan && radarSubjects.length >= 3 && (
-            <div style={{ padding: '0 var(--space-6)', marginBottom: 'var(--space-4)' }}>
-              <PlanRadarChart
-                gradesByCode={gradesByCode}
-                benchmarkByCode={benchmarkByCode}
-                subjects={radarSubjects}
-                benchmarkLabel={rank1Prog ? `${rank1Code} — ${rank1Prog.name}` : undefined}
-              />
-            </div>
-          )}
-
-          {/* Plan display (two-column) */}
+          {/* Plan display (two-column: plan+radar on left, chat on right) */}
           {hasPlan && (
             <div style={planAreaStyle}>
               <div style={iframeColStyle}>
+                {/* Radar chart — inside the plan column */}
+                {radarSubjects.length >= 3 && (
+                  <div style={{ marginBottom: 'var(--space-4)' }}>
+                    <PlanRadarChart
+                      gradesByCode={gradesByCode}
+                      benchmarkByCode={benchmarkByCode}
+                      subjects={radarSubjects}
+                      benchmarkLabel={rank1Prog ? `${rank1Code} — ${rank1Prog.name}` : undefined}
+                    />
+                  </div>
+                )}
                 <iframe
                   ref={iframeRef}
                   style={iframeStyle}

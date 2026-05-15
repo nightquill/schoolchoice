@@ -658,18 +658,16 @@ def export_plan_pdf(
     try:
         from weasyprint import HTML
         pdf_bytes = HTML(string=plan.html_content).write_pdf()
-    except ImportError:
-        # Fallback: return HTML for browser print
+        student = db.query(Student).filter(Student.id == student_id).first()
+        filename = f"plan-{(student.name or 'student').replace(' ', '_')}-v{plan.version or 1}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception:
+        # Fallback: return HTML for browser print-to-PDF
         return Response(content=plan.html_content, media_type="text/html")
-
-    student = db.query(Student).filter(Student.id == student_id).first()
-    filename = f"plan-{(student.name or 'student').replace(' ', '_')}-v{plan.version or 1}.pdf"
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
 
 
 # ---------------------------------------------------------------------------
@@ -694,11 +692,10 @@ def export_plan_history_pdf(
     try:
         from weasyprint import HTML
         pdf_bytes = HTML(string=plan.html_content).write_pdf()
-    except ImportError:
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="plan-v{plan.version or 0}.pdf"'},
+        )
+    except Exception:
         return Response(content=plan.html_content, media_type="text/html")
-
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="plan-v{plan.version or 0}.pdf"'},
-    )

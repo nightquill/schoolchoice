@@ -103,7 +103,7 @@ function SubmissionList() {
           {chartData.length > 0 && (
             <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)' }}>
               <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <LineChart data={chartData} margin={{ top: 10, right: 40, bottom: 10, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                   <XAxis dataKey="date" tick={{ fontSize: 12, fontVariantNumeric: 'tabular-nums' }}
                     tickFormatter={(v) => { const d = new Date(v); return granularity === 'monthly' ? d.toLocaleDateString('en', { month: 'short' }) : d.toLocaleDateString('en', { month: 'short', day: 'numeric' }); }} />

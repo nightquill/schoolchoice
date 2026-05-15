@@ -80,7 +80,7 @@ export default function PlansAnalytics() {
         ) : (
           <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData.length > 0 ? chartData : [{ date: new Date().toISOString().slice(0, 10), count: 0 }]} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+              <LineChart data={chartData.length > 0 ? chartData : [{ date: new Date().toISOString().slice(0, 10), count: 0 }]} margin={{ top: 10, right: 40, bottom: 10, left: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
                   dataKey="date"
