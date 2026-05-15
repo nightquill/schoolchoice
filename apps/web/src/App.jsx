@@ -37,6 +37,7 @@ import SfProgrammeDetail from './pages/SfInstitution/SfProgrammeDetail';
 import StudentPlan from './pages/StudentPlan/StudentPlan';
 import PlansAnalytics from './pages/Analytics/PlansAnalytics';
 import SubmissionsAnalytics from './pages/Analytics/SubmissionsAnalytics';
+import AdminTeacherGroups from './pages/AdminTeacherGroups/AdminTeacherGroups';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -119,6 +120,7 @@ export default function App() {
         <Route path="/submissions/:id" element={<ProtectedRoute><SubmissionDetail /></ProtectedRoute>} />
 
         <Route path="/admin/manage" element={<AdminRoute><AdminManage /></AdminRoute>} />
+        <Route path="/admin/teacher-groups" element={<ProtectedRoute><AdminTeacherGroups /></ProtectedRoute>} />
         <Route path="/settings" element={<Navigate to="/admin/manage" replace />} />
         <Route path="/methodology" element={<ProtectedRoute><MethodologyReport /></ProtectedRoute>} />
         <Route path="/import/students" element={<ProtectedRoute><StudentImport /></ProtectedRoute>} />
