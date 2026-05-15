@@ -386,6 +386,26 @@ def save_consultant_task(
     ai_schools = output_dict.get("recommended_schools") or []
     match_results_for_render = []
     for s in ai_schools:
+        major_name = s.get("major_name")
+        jupas_code = s.get("jupas_code")
+        # Backfill major_name from JupasProgramme if LLM didn't provide it
+        if not major_name and jupas_code:
+            from app.modules.school_choice.models.models import JupasProgramme
+            prog = db.query(JupasProgramme).filter(JupasProgramme.jupas_code == jupas_code).first()
+            if prog:
+                major_name = prog.name
+            else:
+                # LLM may hallucinate JUPAS codes — try matching by school name
+                school_name = s.get("school_name", "")
+                if school_name:
+                    from app.db.models import School
+                    school = db.query(School).filter(School.name.ilike(f"%{school_name.split(' — ')[0].strip()}%")).first()
+                    if school:
+                        # Find any programme for this school
+                        prog = db.query(JupasProgramme).filter(JupasProgramme.school_id == school.id).first()
+                        if prog and not jupas_code:
+                            jupas_code = prog.jupas_code
+                            s["jupas_code"] = jupas_code
         match_results_for_render.append({
             "school_name": s.get("school_name", ""),
             "fit_score": s.get("fit_score", 0.0),
@@ -396,9 +416,12 @@ def save_consultant_task(
             "shap_explanation": None,
             "required_subjects": [],
             "intended_majors": [],
-            "major_name": None,
-            "major_jupas_code": s.get("jupas_code"),
+            "major_name": major_name,
+            "major_jupas_code": jupas_code,
         })
+        # Also backfill into the output_dict so it persists in recommended_schools JSON
+        if major_name and not s.get("major_name"):
+            s["major_name"] = major_name
 
     # Map AI action_plan to action_items format
     ai_actions = output_dict.get("action_plan") or []

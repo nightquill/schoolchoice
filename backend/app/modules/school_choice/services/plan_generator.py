@@ -457,12 +457,40 @@ def _section_target_schools(match_results: list, colors: dict, overrides: dict |
           <ul class="school-actions">{items}</ul>
         </div>"""
 
+        # Programme-specific deadline tags
+        deadline_tags = ""
+        if jupas:
+            try:
+                from app.modules.school_choice.models.models import JupasProgramme as _JP
+                from app.db.session import SessionLocal
+                _db = SessionLocal()
+                _prog = _db.query(_JP).filter(_JP.jupas_code == jupas).first()
+                if _prog:
+                    ngr = _prog.non_grade_requirements or {}
+                    dl = _prog.deadlines or {}
+                    tags = []
+                    if ngr.get("interview"):
+                        d = dl.get("interview", "")
+                        tags.append(f'<span style="background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;">Interview{": " + d if d else ""}</span>')
+                    if ngr.get("portfolio"):
+                        d = dl.get("portfolio", "")
+                        tags.append(f'<span style="background:#F5F3FF;color:#7C3AED;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;">Portfolio{": " + d if d else ""}</span>')
+                    if ngr.get("audition"):
+                        d = dl.get("audition", "")
+                        tags.append(f'<span style="background:#FEF2F2;color:#991B1B;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;">Audition{": " + d if d else ""}</span>')
+                    if tags:
+                        deadline_tags = '<div style="display:flex;gap:4px;margin-top:4px;">' + "".join(tags) + '</div>'
+                _db.close()
+            except Exception:
+                pass
+
         content += f"""
     <div class="school-card">
       <div class="school-header">
         <div>
           <div class="school-name">{display_name}</div>
           <div class="school-meta">{meta_str}</div>
+          {deadline_tags}
         </div>
         <span class="badge {badge_class} counselor-only-inline" style="display:none;">{pct}%</span>
       </div>
@@ -752,7 +780,7 @@ def generate_html_plan(
         _section_header(student, generated_at, best5),
         _section_metrics(student, best5, min(num_schools, 8), colors),
         _section_assessment(ai_assessment),
-        _section_academic_profile(student, colors),
+        # Academic profile table removed — replaced by interactive radar chart in frontend
         _section_target_schools(match_results, colors, overrides=overrides),
         _section_roadmap(action_items, colors),
         _section_growth_areas(student, skill_gaps, colors),
