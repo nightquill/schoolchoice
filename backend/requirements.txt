@@ -24,3 +24,4 @@ nh3>=0.2.15
 openpyxl==3.0.9
 jsonschema>=4.23.0
 slowapi>=0.1.9
+chardet>=5.0

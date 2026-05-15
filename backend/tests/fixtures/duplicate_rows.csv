@@ -1,0 +1,4 @@
+candidate_number,name,class_name,ENGL,MATH,sitting,year_of_exam
+T001,Chan Ka Wai,5A,4,3,MOCK,2025
+T001,Chan Ka Wai,,5*,4,OFFICIAL,2026
+T001,Chan Ka Wai,,,5**,TRIAL,2025
