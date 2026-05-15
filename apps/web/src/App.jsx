@@ -27,6 +27,7 @@ import SubmissionDetail from './pages/Submissions/SubmissionDetail';
 import StudentImport from './pages/StudentImport/StudentImport';
 import MethodologyReport from './pages/MethodologyReport/MethodologyReport';
 import Onboarding from './pages/Onboarding/Onboarding';
+import InviteAccept from './pages/InviteAccept/InviteAccept';
 import AdminManage from './pages/AdminManage/AdminManage';
 import StudentDashboard from './pages/StudentDashboard/StudentDashboard';
 import StudentSubmissions from './pages/Submissions/StudentSubmissions';
@@ -79,6 +80,7 @@ export default function App() {
         {/* v1 public routes (unchanged) */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/invite/:token" element={<InviteAccept />} />
 
         {/* v1 protected routes (unchanged) */}
         <Route path="/students" element={<ProtectedRoute><StudentListPage /></ProtectedRoute>} />
