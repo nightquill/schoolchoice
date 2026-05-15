@@ -95,13 +95,18 @@ def list_students(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=500),
     q: str | None = Query(None, description="Text search across student name"),
+    unaccounted: bool = Query(False, description="Filter to students with no active user account"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
     from sqlalchemy import select
+    from app.db.models import User as UserModel
 
-    all_students = student_service.get_students(db, user_id=current_user.id, organisation_id=_org_id(current_user), q=q)
+    all_students = student_service.get_students(
+        db, user_id=current_user.id, organisation_id=_org_id(current_user),
+        q=q, unaccounted=unaccounted,
+    )
     total = len(all_students)
     students = all_students[skip : skip + limit]
 
@@ -109,6 +114,7 @@ def list_students(
     student_ids = [s.id for s in students]
     plan_map = {}
     at_risk_set: set = set()
+    account_sids: set = set()
     if student_ids:
         rows = db.execute(
             select(AcademicPlan.student_id, AcademicPlan.generated_at).where(
@@ -127,6 +133,15 @@ def list_students(
         ).fetchall()
         at_risk_set = {row[0] for row in risk_rows}
 
+        # Account status lookup
+        acct_rows = db.execute(
+            select(UserModel.student_id).where(
+                UserModel.student_id.in_(student_ids),
+                UserModel.is_active.is_(True),
+            )
+        ).fetchall()
+        account_sids = {row[0] for row in acct_rows}
+
     result = []
     for s in students:
         item = StudentListItem.model_validate(s)
@@ -134,7 +149,15 @@ def list_students(
         item.plan_generated_at = plan_map.get(s.id)
         item.full_name = s.name
         item.has_at_risk_targets = s.id in at_risk_set
-        result.append(item)
+        item_dict = item.model_dump()
+        item_dict["has_account"] = s.id in account_sids
+        item_dict["invite_status"] = (
+            "accepted" if getattr(s, "invite_accepted_at", None)
+            else "invited" if getattr(s, "invite_sent_at", None)
+            else "none"
+        )
+        item_dict["email"] = getattr(s, "email", None)
+        result.append(item_dict)
     return {"items": result, "total": total}
 
 

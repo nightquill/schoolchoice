@@ -17,12 +17,14 @@ from app.services.student_data_builder import build_student_data, build_student_
 
 
 def get_students(
-    db: Session, user_id: UUID, *, organisation_id: UUID | None = None, q: str | None = None
+    db: Session, user_id: UUID, *, organisation_id: UUID | None = None,
+    q: str | None = None, unaccounted: bool = False,
 ) -> list[Student]:
     """
     Return all student profiles owned by the given counselor.
     When *organisation_id* is set, scope by organisation instead of user.
     When *q* is provided, filter by student name (case-insensitive).
+    When *unaccounted* is True, filter to students with no active linked User account.
     REQ-015, REQ-032
     """
     if organisation_id is not None:
@@ -31,6 +33,14 @@ def get_students(
         query = db.query(Student).filter(Student.user_id == user_id)
     if q:
         query = query.filter(Student.name.ilike(f"%{q}%"))
+    if unaccounted:
+        from sqlalchemy import select
+        from app.db.models import User as UserModel
+        linked_ids_subq = db.query(UserModel.student_id).filter(
+            UserModel.student_id.isnot(None),
+            UserModel.is_active.is_(True),
+        ).subquery()
+        query = query.filter(~Student.id.in_(select(linked_ids_subq)))
     return query.all()
 
 
