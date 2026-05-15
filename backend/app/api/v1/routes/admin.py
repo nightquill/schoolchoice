@@ -263,6 +263,48 @@ def reset_user_password(
 
 
 # ---------------------------------------------------------------------------
+# POST /admin/students/{source_id}/merge/{target_id}
+# ---------------------------------------------------------------------------
+
+@router.post("/students/{source_id}/merge/{target_id}")
+def merge_students(
+    source_id: UUID,
+    target_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Merge an unaccounted student into an accounted one. Admin only."""
+    from app.services.merge_service import MergeError, merge_student
+
+    try:
+        result = merge_student(str(source_id), str(target_id), db)
+    except MergeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return result
+
+
+# ---------------------------------------------------------------------------
+# DELETE /admin/cleanup/fake-accounts
+# ---------------------------------------------------------------------------
+
+@router.delete("/cleanup/fake-accounts")
+def cleanup_fake_accounts(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Delete all fake student accounts (email like %@student.local). Admin only."""
+    fake_users = db.query(User).filter(User.email.like("%@student.local")).all()
+    count = len(fake_users)
+    for u in fake_users:
+        u.student_id = None  # Preserve student data
+    db.flush()
+    for u in fake_users:
+        db.delete(u)
+    db.commit()
+    return {"deleted": count, "message": f"Removed {count} fake account(s)"}
+
+
+# ---------------------------------------------------------------------------
 # POST /admin/data-refresh/preview
 # ---------------------------------------------------------------------------
 
