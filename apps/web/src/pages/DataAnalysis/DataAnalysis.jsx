@@ -219,7 +219,7 @@ function DataAnalysis() {
   const [graduatedOnly, setGraduatedOnly] = useState(false);
 
   useEffect(() => {
-    Promise.all([getAccount(), getHkdseTrends(), getPopularMajors(), getStudentDirectory(), getCohorts(), getHkdsePopulationStats()])
+    Promise.all([getAccount(), getHkdseTrends(), getPopularMajors(), getStudentDirectory(true), getCohorts(), getHkdsePopulationStats()])
       .then(([accountData, trendsData, majorsData, dirData, cohortsData, populationData]) => {
         setAccount(accountData);
         setTrends(trendsData);
@@ -281,7 +281,7 @@ function DataAnalysis() {
   };
 
   const containerStyle = {
-    maxWidth: '1200px',
+    maxWidth: '100%',
     margin: '0 auto',
     padding: 'var(--space-6) var(--space-8)',
   };
@@ -343,7 +343,7 @@ function DataAnalysis() {
           <button style={tabBtnStyle('trends')} onClick={() => setActiveSection('trends')}>{t('dataAnalysis.hkdseTrends')}</button>
           <button style={tabBtnStyle('combinations')} onClick={() => setActiveSection('combinations')}>{t('dataAnalysis.subjectCombinations')}</button>
           <button style={tabBtnStyle('majors')} onClick={() => setActiveSection('majors')}>{t('dataAnalysis.popularMajors')}</button>
-          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>{t('dataAnalysis.studentDirectory')}</button>
+          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>Graduation Outcomes</button>
         </div>
       </div>
 
@@ -549,88 +549,131 @@ function DataAnalysis() {
             </div>
           )}
 
-          {/* ---- Anonymized Student Directory ---- */}
+          {/* ---- Graduation Outcomes ---- */}
           {activeSection === 'directory' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>{t('dataAnalysis.anonymizedDirectory')}</span>
-                <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={graduatedOnly} onChange={(e) => setGraduatedOnly(e.target.checked)} />
-                    {t('dataAnalysis.graduatedOnly')}
-                  </label>
-                  <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                    {directory?.total ?? 0} students · {t('dataAnalysis.namesRemoved')}
-                  </span>
-                </div>
+                <span>Graduation Outcomes</span>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                  Actual admission results for graduated students
+                </span>
               </div>
               {!directory?.students?.length ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message={t('dataAnalysis.noData')} />
+                  <EmptyState message="No graduated students yet. Mark students as graduated to see outcomes here." />
                 </div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr>
-                        <th style={thStyle}>{t('dataAnalysis.anonId')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.class')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.year')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.status')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.finalSchoolMajor')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.subjectsGrades')}</th>
-                        <th style={thStyle}>{t('dataAnalysis.schoolOutcomes')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {directory.students.map((s) => (
-                        <tr key={s.anon_id}>
-                          <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: 'var(--font-size-xs)' }}>{s.anon_id}</td>
-                          <td style={tdStyle}>{s.class_name || '—'}</td>
-                          <td style={tdStyle}>{s.year_of_study || '—'}</td>
-                          <td style={tdStyle}>
-                            {s.is_graduated ? (
-                              <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-success)', color: '#fff', padding: '1px 6px', borderRadius: '8px' }}>
-                                {t('dataAnalysis.graduated')} {s.graduation_year || ''}
-                              </span>
-                            ) : (
-                              <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.active')}</span>
-                            )}
-                          </td>
-                          <td style={{ ...tdStyle, fontSize: 'var(--font-size-xs)' }}>
-                            {s.final_school && <div style={{ fontWeight: 'var(--font-weight-medium)' }}>{s.final_school}</div>}
-                            {s.final_major && <div style={{ color: 'var(--color-text-secondary)' }}>{s.final_major}</div>}
-                            {!s.final_school && !s.final_major && '—'}
-                          </td>
-                          <td style={{ ...tdStyle, fontSize: 'var(--font-size-xs)', maxWidth: '180px' }}>
-                            {Object.entries(s.grades || {}).map(([k, v]) => `${k}:${v}`).join(' ')}
-                          </td>
-                          <td style={{ ...tdStyle, fontSize: 'var(--font-size-xs)', maxWidth: '200px' }}>
-                            {(s.school_outcomes || []).map((o) => (
-                              <span
-                                key={o.school_id}
-                                style={{
-                                  display: 'inline-block',
-                                  marginRight: '4px',
-                                  marginBottom: '2px',
-                                  padding: '1px 6px',
-                                  borderRadius: '10px',
-                                  background: o.status === 'ADMITTED' ? 'var(--color-success)' : o.status === 'REJECTED' ? 'var(--color-error)' : 'var(--color-background)',
-                                  color: o.status === 'ADMITTED' || o.status === 'REJECTED' ? '#fff' : 'var(--color-text-secondary)',
-                                  border: 'var(--border-width) solid var(--color-border)',
-                                }}
-                              >
-                                {o.status}
-                                {o.intended_majors?.length > 0 && ` (${o.intended_majors[0]})`}
-                              </span>
-                            ))}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              ) : (() => {
+                const grads = (directory.students || []).filter(s => s.is_graduated);
+                const withOutcome = grads.filter(s => s.final_school);
+                // Aggregate: which schools did graduates go to?
+                const schoolCounts = {};
+                grads.forEach(s => {
+                  const school = s.final_school || 'Unknown';
+                  schoolCounts[school] = (schoolCounts[school] || 0) + 1;
+                });
+                const majorCounts = {};
+                grads.forEach(s => {
+                  if (s.final_major) majorCounts[s.final_major] = (majorCounts[s.final_major] || 0) + 1;
+                });
+                const sortedSchools = Object.entries(schoolCounts).sort((a, b) => b[1] - a[1]);
+                const sortedMajors = Object.entries(majorCounts).sort((a, b) => b[1] - a[1]);
+
+                return (
+                  <div style={{ padding: 'var(--space-4)' }}>
+                    {/* Summary cards */}
+                    <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
+                      <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{grads.length}</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Graduated</div>
+                      </div>
+                      <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>{withOutcome.length}</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>With Recorded Outcome</div>
+                      </div>
+                      <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>{sortedSchools.length}</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Distinct Universities</div>
+                      </div>
+                      <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
+                        <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>{sortedMajors.length}</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Distinct Programmes</div>
+                      </div>
+                    </div>
+
+                    {/* Destination distribution */}
+                    {sortedSchools.length > 0 && (
+                      <div style={{ marginBottom: 'var(--space-6)' }}>
+                        <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+                          University Destinations
+                        </h3>
+                        {sortedSchools.map(([school, count]) => (
+                          <div key={school} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                            <div style={{ flex: 1, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{school}</div>
+                            <div style={{ width: '120px' }}>
+                              <div style={{ height: '16px', background: 'var(--color-background)', borderRadius: '8px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${(count / grads.length) * 100}%`, background: 'var(--color-primary)', borderRadius: '8px', minWidth: '8px' }} />
+                              </div>
+                            </div>
+                            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', minWidth: '40px', textAlign: 'right' }}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Programme distribution */}
+                    {sortedMajors.length > 0 && (
+                      <div style={{ marginBottom: 'var(--space-6)' }}>
+                        <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+                          Programme Distribution
+                        </h3>
+                        {sortedMajors.slice(0, 15).map(([major, count]) => (
+                          <div key={major} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                            <div style={{ flex: 1, fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>{major}</div>
+                            <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Individual graduate table */}
+                    {grads.length > 0 && (
+                      <div>
+                        <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+                          Individual Outcomes
+                        </h3>
+                        <div style={{ overflowX: 'auto' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <thead>
+                              <tr>
+                                <th style={thStyle}>{t('dataAnalysis.class')}</th>
+                                <th style={thStyle}>{t('dataAnalysis.year')}</th>
+                                <th style={thStyle}>Graduation Year</th>
+                                <th style={thStyle}>Final University</th>
+                                <th style={thStyle}>Final Programme</th>
+                                <th style={thStyle}>Best 5</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {grads.map((s) => (
+                                <tr key={s.anon_id}>
+                                  <td style={tdStyle}>{s.class_name || '—'}</td>
+                                  <td style={tdStyle}>{s.year_of_study || '—'}</td>
+                                  <td style={tdStyle}>{s.graduation_year || '—'}</td>
+                                  <td style={{ ...tdStyle, fontWeight: 'var(--font-weight-medium)' }}>{s.final_school || '—'}</td>
+                                  <td style={tdStyle}>{s.final_major || '—'}</td>
+                                  <td style={{ ...tdStyle, fontSize: 'var(--font-size-xs)' }}>
+                                    {Object.entries(s.grades || {}).map(([k, v]) => `${k}:${v}`).join(' ')}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
 

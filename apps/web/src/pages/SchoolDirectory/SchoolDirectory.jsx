@@ -7,15 +7,19 @@ import { EmptyState } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { toast } from 'sonner';
-import { searchSchools, createSchool, deleteSchool } from '../../api/schoolsV2';
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { searchSchools } from '../../api/schoolsV2';
 import { exportEntityCSV } from '../../api/entities';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { getSfInstitutions } from '../../api/selfFinancing';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const LIMIT = 20;
 
 function SchoolDirectory() {
-  const { t } = useTranslation();  const [account, setAccount] = useState(null);
+  const { t } = useTranslation();
+  const [account, setAccount] = useState(null);
   const [schools, setSchools] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -23,12 +27,6 @@ function SchoolDirectory() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ q: '', type: '', location: '' });
   const debounceRef = useRef(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', name_zh: '', type: 'UNIVERSITY', location: '', description: '', website: '', minimum_entry_score: '', notable_programs: '', notes: '' });
-  const [addLoading, setAddLoading] = useState(false);
-  const [addError, setAddError] = useState('');
-  const [deletingId, setDeletingId] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExportFiltered = useCallback(async () => {
@@ -101,48 +99,6 @@ function SchoolDirectory() {
   };
 
   const totalPages = Math.max(1, Math.ceil(total / LIMIT));
-
-  const handleDeleteSchool = async (school) => {
-    setDeletingId(school.id);
-    try {
-      await deleteSchool(school.id);
-      setSchools((prev) => prev.filter((s) => s.id !== school.id));
-      setTotal((prev) => prev - 1);
-    } catch (err) {
-      alert(err?.response?.data?.detail || t('schools.deleteFailed'));
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  const handleAddSchool = async (e) => {
-    e.preventDefault();
-    if (!addForm.name.trim()) { setAddError(t('schools.nameRequired')); return; }
-    setAddLoading(true);
-    setAddError('');
-    try {
-      const payload = {
-        name: addForm.name.trim(),
-        name_zh: addForm.name_zh.trim() || null,
-        type: addForm.type || null,
-        location: addForm.location.trim() || null,
-        description: addForm.description.trim() || null,
-        website: addForm.website.trim() || null,
-        minimum_entry_score: addForm.minimum_entry_score !== '' ? parseFloat(addForm.minimum_entry_score) : null,
-        notable_programs: addForm.notable_programs ? addForm.notable_programs.split(',').map((s) => s.trim()).filter(Boolean) : null,
-        notes: addForm.notes.trim() || null,
-        is_custom: true,
-      };
-      await createSchool(payload);
-      setShowAddModal(false);
-      setAddForm({ name: '', name_zh: '', type: 'UNIVERSITY', location: '', description: '', website: '', minimum_entry_score: '', notable_programs: '', notes: '' });
-      fetchSchools(1, filters);
-    } catch (err) {
-      setAddError(err?.response?.data?.detail || t('schools.createFailed'));
-    } finally {
-      setAddLoading(false);
-    }
-  };
 
   const pageStyle = {
     background: 'var(--color-background)',
@@ -222,6 +178,7 @@ function SchoolDirectory() {
         onExportFiltered={handleExportFiltered}
         onExportAll={handleExportAll}
         isExporting={isExporting}
+        hideImport
       />
 
       <div style={filterBarStyle} role="search" aria-label="School search filters">
@@ -266,62 +223,7 @@ function SchoolDirectory() {
         <Button onClick={handleSearch} disabled={loading}>
           {loading ? t('schools.searching') : t('schools.search')}
         </Button>
-        <Button variant="outline" onClick={() => setShowAddModal(true)}>{t('schools.addCustom')}</Button>
       </div>
-
-      {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-6)', width: '480px', maxWidth: '95vw', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--shadow-lg)' }}>
-            <h2 style={{ margin: '0 0 var(--space-4) 0', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{t('schools.addCustomTitle')}</h2>
-            <form onSubmit={handleAddSchool} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-              {[
-                { label: `${t('schools.name')} *`, field: 'name', placeholder: t('schools.schoolFullName') },
-                { label: t('schools.chineseName'), field: 'name_zh', placeholder: t('schools.optional') },
-                { label: t('schools.location'), field: 'location', placeholder: t('schools.locationExample') },
-                { label: t('schools.website'), field: 'website', placeholder: t('schools.websitePlaceholder') },
-                { label: t('schools.minEntryScore'), field: 'minimum_entry_score', placeholder: t('schools.numeric'), type: 'number' },
-                { label: t('schools.notablePrograms'), field: 'notable_programs', placeholder: t('schools.commaSeparated') },
-              ].map(({ label, field, placeholder, type }) => (
-                <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                  <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{label}</label>
-                  <input
-                    type={type || 'text'}
-                    value={addForm[field]}
-                    onChange={(e) => setAddForm((f) => ({ ...f, [field]: e.target.value }))}
-                    placeholder={placeholder}
-                    style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                  />
-                </div>
-              ))}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.type')}</label>
-                <select value={addForm.type} onChange={(e) => setAddForm((f) => ({ ...f, type: e.target.value }))} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
-                  <option value="UNIVERSITY">{t('schools.university')}</option>
-                  <option value="POLYTECHNIC">{t('schools.polytechnic')}</option>
-                  <option value="COMMUNITY_COLLEGE">{t('schools.communityCollege')}</option>
-                  <option value="VOCATIONAL">{t('schools.vocational')}</option>
-                  <option value="HIGH_SCHOOL">{t('schools.highSchool')}</option>
-                </select>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.description')}</label>
-                <textarea value={addForm.description} onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))} rows={3} placeholder={t('schools.optionalDescription')} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('schools.internalNotes')}</label>
-                <textarea value={addForm.notes} onChange={(e) => setAddForm((f) => ({ ...f, notes: e.target.value }))} rows={2} placeholder={t('schools.internalNotes')} style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', resize: 'vertical' }} />
-              </div>
-              {addError && <p style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-sm)', margin: 0 }}>{addError}</p>}
-              <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
-                <Button variant="outline" onClick={() => { setShowAddModal(false); setAddError(''); }} disabled={addLoading}>{t('schools.cancel')}</Button>
-                <Button type="submit" disabled={addLoading} onClick={() => {}}>
-                  {addLoading ? t('schools.searching') : t('schools.createSchool')}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       <main id="main-content" style={contentStyle}>
         {loading && <LoadingSpinner label={t("schools.searching")} />}
@@ -337,34 +239,7 @@ function SchoolDirectory() {
             ) : (
               <div style={gridStyle} role="list" aria-label="School results">
                 {schools.map((school) => (
-                  <div key={school.id} role="listitem" style={{ position: 'relative' }}>
-                    {school.is_custom === true && (
-                      <div style={{ position: 'absolute', top: 'var(--space-2)', right: 'var(--space-2)', zIndex: 10, display: 'flex', gap: 'var(--space-1)', alignItems: 'center' }}>
-                        <span style={{ fontSize: '10px', background: '#7c3aed', color: '#fff', padding: '2px 7px', borderRadius: '8px' }}>{t('schools.custom')}</span>
-                        {confirmDeleteId === school.id ? (
-                          <>
-                            <span style={{ fontSize: '11px', color: 'var(--color-error)', fontFamily: 'var(--font-family-base)' }}>{t('schools.deleteConfirm')}</span>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDeleteSchool(school); setConfirmDeleteId(null); }}
-                              style={{ background: 'var(--color-error)', color: '#fff', border: 'none', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
-                            >{t('schools.yes')}</button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(null); }}
-                              style={{ background: 'var(--color-surface)', color: 'var(--color-text-secondary)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
-                            >{t('schools.no')}</button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(school.id); }}
-                            disabled={deletingId === school.id}
-                            style={{ background: 'var(--color-error)', color: '#fff', border: 'none', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer', fontSize: '11px', padding: '2px 7px', fontFamily: 'var(--font-family-base)' }}
-                            aria-label={`Delete ${school.name}`}
-                          >
-                            {deletingId === school.id ? '…' : t('schools.delete')}
-                          </button>
-                        )}
-                      </div>
-                    )}
+                  <div key={school.id} role="listitem">
                     <SchoolCard school={school} />
                   </div>
                 ))}
@@ -384,7 +259,74 @@ function SchoolDirectory() {
             )}
           </>
         )}
+
+        {/* Self-financing / Sub-degree section — separate from JUPAS */}
+        <SfInstitutionsSection />
       </main>
+    </div>
+  );
+}
+
+function SfInstitutionsSection() {
+  const sfQuery = useQuery({ queryKey: ['sf-institutions'], queryFn: getSfInstitutions, staleTime: 60000 });
+  const institutions = sfQuery.data?.institutions ?? [];
+
+  if (sfQuery.isLoading || institutions.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 'var(--space-8)', paddingTop: 'var(--space-6)', borderTop: '2px solid var(--color-border)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+        <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+          Sub-degree &amp; Self-financing
+        </h2>
+        <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>
+          副學士 · 高級文憑
+        </span>
+      </div>
+      <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
+        Associate Degree, Higher Diploma, and self-financing programmes — separate from JUPAS.
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--space-4)' }}>
+        {institutions.map((inst) => (
+          <Link
+            key={inst.id}
+            to={`/sf/${inst.code}`}
+            style={{
+              display: 'block', textDecoration: 'none', color: 'inherit',
+              background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)',
+              borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)',
+              transition: 'border-color 0.15s',
+            }}
+            onMouseOver={(e) => e.currentTarget.style.borderColor = '#7c3aed'}
+            onMouseOut={(e) => e.currentTarget.style.borderColor = ''}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
+                  {inst.name}
+                </div>
+                {inst.name_zh && <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>{inst.name_zh}</div>}
+                {inst.parent_university && (
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
+                    {inst.parent_university}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 'var(--space-2)', flexShrink: 0 }}>
+                <span style={{ background: '#f0fdf4', color: '#059669', padding: '2px 8px', borderRadius: '10px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>
+                  Tier {inst.tier}
+                </span>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-3)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+              {inst.articulation_rate != null && (
+                <span>{Math.round(inst.articulation_rate * 100)}% articulation</span>
+              )}
+              {inst.location && <span>{inst.location}</span>}
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

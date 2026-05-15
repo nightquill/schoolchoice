@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Menu, X, Settings } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Menu, X } from 'lucide-react';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getEntities } from '../../api/entities';
@@ -23,8 +23,10 @@ function NavBarV2({ account }) {
     return () => mql.removeEventListener('change', handler);
   }, []);
 
+  const qc = useQueryClient();
   const handleLogout = () => {
     logout();
+    qc.clear();
     navigate('/login');
   };
 
@@ -35,6 +37,7 @@ function NavBarV2({ account }) {
   });
 
   const isAdmin = account?.role === 'admin';
+  const isStudent = account?.role === 'student';
   const displayName = account?.display_name || account?.email || '';
 
   const navStyle = {
@@ -75,12 +78,15 @@ function NavBarV2({ account }) {
     const isActive = location.pathname === path || location.pathname.startsWith(path + '/');
     return {
       fontSize: 'var(--font-size-sm)',
-      fontWeight: isActive ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
-      color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+      fontWeight: isActive ? 'var(--font-weight-bold)' : 'var(--font-weight-medium)',
+      color: isActive ? 'var(--color-primary)' : 'var(--color-text-primary)',
       textDecoration: 'none',
       padding: 'var(--space-1) var(--space-2)',
       borderRadius: 'var(--border-radius-sm)',
       fontFamily: 'var(--font-family-base)',
+      background: isActive ? 'var(--color-info-bg)' : 'transparent',
+      transition: 'background 0.15s, color 0.15s',
+      whiteSpace: 'nowrap',
     };
   };
 
@@ -127,6 +133,7 @@ function NavBarV2({ account }) {
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={mobileMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+          aria-expanded={mobileMenuOpen}
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: 'var(--color-text-primary)' }}
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -139,30 +146,35 @@ function NavBarV2({ account }) {
           <Link to="/dashboard" style={getLinkStyle('/dashboard')}>
             {t('nav.dashboard')}
           </Link>
-          <Link to="/schools" style={getLinkStyle('/schools')}>
-            {t('nav.schoolDirectory')}
-          </Link>
-          <Link to="/cohorts" style={getLinkStyle('/cohorts')}>
-            {t('nav.cohorts')}
-          </Link>
-          <Link to="/data-analysis" style={getLinkStyle('/data-analysis')}>
-            {t('nav.dataAnalysis')}
-          </Link>
-          <Link to="/submissions" style={getLinkStyle('/submissions')}>
-            Submissions
-          </Link>
+          {isStudent && (
+            <Link to="/my-submissions" style={getLinkStyle('/my-submissions')}>
+              {t('nav.mySubmissions')}
+            </Link>
+          )}
+          {!isStudent && (
+            <>
+              <Link to="/schools" style={getLinkStyle('/schools')}>
+                {t('nav.schoolDirectory')}
+              </Link>
+              <Link to="/data-analysis" style={getLinkStyle('/data-analysis')}>
+                {t('nav.dataAnalysis')}
+              </Link>
+              <Link to="/submissions" style={getLinkStyle('/submissions')}>
+                {t('nav.submissions')}
+              </Link>
+            </>
+          )}
+          {isAdmin && (
+            <Link to="/admin/manage" style={getLinkStyle('/admin/manage')}>
+              {t('nav.manage')}
+            </Link>
+          )}
           {isAdmin && (
             <Link to="/admin/data-refresh" style={getLinkStyle('/admin/data-refresh')}>
               {t('nav.dataRefresh')}
             </Link>
           )}
-          {isAdmin && (
-            <Link to="/settings" style={{ ...getLinkStyle('/settings'), display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <Settings size={18} />
-              {t('nav.settings')}
-            </Link>
-          )}
-          {entityLinks.map((entity) => (
+          {!isStudent && entityLinks.map((entity) => (
             <Link key={entity.name} to={`/entities/${entity.name}`} style={getLinkStyle(`/entities/${entity.name}`)}>
               {entity.name}
             </Link>
@@ -194,7 +206,7 @@ function NavBarV2({ account }) {
           <button
             style={logoutStyle}
             onClick={handleLogout}
-            aria-label="Log out"
+            aria-label={t('nav.logout')}
           >
             {t('nav.logout')}
           </button>
@@ -215,20 +227,23 @@ function NavBarV2({ account }) {
           boxShadow: 'var(--shadow-md)',
         }}>
           <Link to="/dashboard" style={getMobileLinkStyle('/dashboard')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dashboard')}</Link>
-          <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>{t('nav.schoolDirectory')}</Link>
-          <Link to="/cohorts" style={getMobileLinkStyle('/cohorts')} onClick={() => setMobileMenuOpen(false)}>{t('nav.cohorts')}</Link>
-          <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataAnalysis')}</Link>
-          <Link to="/submissions" style={getMobileLinkStyle('/submissions')} onClick={() => setMobileMenuOpen(false)}>Submissions</Link>
+          {isStudent && (
+            <Link to="/my-submissions" style={getMobileLinkStyle('/my-submissions')} onClick={() => setMobileMenuOpen(false)}>{t('nav.mySubmissions')}</Link>
+          )}
+          {!isStudent && (
+            <>
+              <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>{t('nav.schoolDirectory')}</Link>
+              <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataAnalysis')}</Link>
+              <Link to="/submissions" style={getMobileLinkStyle('/submissions')} onClick={() => setMobileMenuOpen(false)}>{t('nav.submissions')}</Link>
+            </>
+          )}
+          {isAdmin && (
+            <Link to="/admin/manage" style={getMobileLinkStyle('/admin/manage')} onClick={() => setMobileMenuOpen(false)}>{t('nav.manage')}</Link>
+          )}
           {isAdmin && (
             <Link to="/admin/data-refresh" style={getMobileLinkStyle('/admin/data-refresh')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataRefresh')}</Link>
           )}
-          {isAdmin && (
-            <Link to="/settings" style={{ ...getMobileLinkStyle('/settings'), display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => setMobileMenuOpen(false)}>
-              <Settings size={18} />
-              {t('nav.settings')}
-            </Link>
-          )}
-          {entityLinks.map((entity) => (
+          {!isStudent && entityLinks.map((entity) => (
             <Link key={entity.name} to={`/entities/${entity.name}`} style={getMobileLinkStyle(`/entities/${entity.name}`)} onClick={() => setMobileMenuOpen(false)}>
               {entity.name}
             </Link>
@@ -244,7 +259,7 @@ function NavBarV2({ account }) {
           <button
             style={{ ...logoutStyle, display: 'block', padding: '12px 24px', minHeight: '44px', width: '100%', textAlign: 'left' }}
             onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
-            aria-label="Log out"
+            aria-label={t('nav.logout')}
           >
             {t('nav.logout')}
           </button>

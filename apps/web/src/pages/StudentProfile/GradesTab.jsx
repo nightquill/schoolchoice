@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { useGradesTab } from '../../hooks/useGradesTab';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { LoadingSpinner } from '@schoolchoice/ui';
@@ -6,39 +7,11 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { PredictedGradeBadge } from '@schoolchoice/ui';
 import { FileUpload } from '@schoolchoice/ui';
 
-const HKDSE_SUBJECTS = [
-  { code: 'CHLA', name: 'Chinese Language' },
-  { code: 'ENGL', name: 'English Language' },
-  { code: 'MATH', name: 'Mathematics (Compulsory Part)' },
-  { code: 'CSD',  name: 'Citizenship and Social Development' },
-  { code: 'CHIH', name: 'Chinese History' },
-  { code: 'CHIL', name: 'Chinese Literature' },
-  { code: 'HIST', name: 'History' },
-  { code: 'GEOG', name: 'Geography' },
-  { code: 'TOUR', name: 'Tourism and Hospitality Studies' },
-  { code: 'VART', name: 'Visual Arts' },
-  { code: 'MUSC', name: 'Music' },
-  { code: 'ERS',  name: 'Ethics and Religious Studies' },
-  { code: 'PE',   name: 'Physical Education' },
-  { code: 'ECON', name: 'Economics' },
-  { code: 'BAFS', name: 'Business, Accounting and Financial Studies' },
-  { code: 'BIOL', name: 'Biology' },
-  { code: 'CHEM', name: 'Chemistry' },
-  { code: 'PHYS', name: 'Physics' },
-  { code: 'CSCI', name: 'Combined Science' },
-  { code: 'ISCI', name: 'Integrated Science' },
-  { code: 'M1',   name: 'Mathematics Extended Module 1 (M1)' },
-  { code: 'M2',   name: 'Mathematics Extended Module 2 (M2)' },
-  { code: 'ICT',  name: 'Information and Communication Technology' },
-  { code: 'DAT',  name: 'Design and Applied Technology' },
-  { code: 'HMSC', name: 'Health Management and Social Care' },
-  { code: 'TL',   name: 'Technology and Living' },
-  { code: 'FREN', name: 'French' },
-  { code: 'GERM', name: 'German' },
-  { code: 'JAPA', name: 'Japanese' },
-  { code: 'SPAN', name: 'Spanish' },
-  { code: 'PTH',  name: 'Putonghua' },
-  { code: 'APL_GENERIC', name: 'Applied Learning (Generic)' },
+const HKDSE_SUBJECT_CODES = [
+  'CHLA', 'ENGL', 'MATH', 'CSD', 'CHIH', 'CHIL', 'HIST', 'GEOG', 'TOUR',
+  'VART', 'MUSC', 'ERS', 'PE', 'ECON', 'BAFS', 'BIOL', 'CHEM', 'PHYS',
+  'CSCI', 'ISCI', 'M1', 'M2', 'ICT', 'DAT', 'HMSC', 'TL',
+  'FREN', 'GERM', 'JAPA', 'SPAN', 'PTH', 'APL_GENERIC',
 ];
 
 const HKDSE_GRADES = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
@@ -60,6 +33,21 @@ export default function GradesTab({ studentId, subjects }) {
     handleSaveNewRow,
     dismissParsedGrade,
   } = useGradesTab(studentId);
+
+  // Sitting filter — default to the sitting with most grades
+  const sittingCounts = useMemo(() => {
+    const counts = {};
+    (grades || []).forEach((g) => { counts[g.sitting] = (counts[g.sitting] || 0) + 1; });
+    return counts;
+  }, [grades]);
+  const availableSittings = useMemo(() => Object.keys(sittingCounts).sort(), [sittingCounts]);
+  const defaultSitting = useMemo(() => {
+    if (availableSittings.length === 0) return 'MOCK';
+    return availableSittings.reduce((a, b) => (sittingCounts[a] >= sittingCounts[b] ? a : b));
+  }, [availableSittings, sittingCounts]);
+  const [sittingFilter, setSittingFilter] = useState(null); // null = use default
+  const activeSitting = sittingFilter ?? defaultSitting;
+  const filteredGrades = useMemo(() => (grades || []).filter((g) => g.sitting === activeSitting), [grades, activeSitting]);
 
   if (loading) return <LoadingSpinner label={t('grades.loading')} />;
   if (error) return <ErrorMessage message={error} />;
@@ -125,12 +113,36 @@ export default function GradesTab({ studentId, subjects }) {
         </div>
       )}
 
+      {/* Sitting toggle */}
+      {availableSittings.length > 1 && (
+        <div style={{ display: 'flex', gap: 0, borderRadius: 'var(--border-radius-sm)', overflow: 'hidden', border: 'var(--border-width) solid var(--color-border)', width: 'fit-content' }}>
+          {availableSittings.map((sitting) => (
+            <button
+              key={sitting}
+              onClick={() => setSittingFilter(sitting)}
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                background: activeSitting === sitting ? 'var(--color-primary)' : 'var(--color-surface)',
+                color: activeSitting === sitting ? '#fff' : 'var(--color-text-secondary)',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-base)',
+                fontWeight: activeSitting === sitting ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)',
+                borderRight: 'var(--border-width) solid var(--color-border)',
+              }}
+            >
+              {t(`common.${sitting.toLowerCase()}`) || sitting} ({sittingCounts[sitting]})
+            </button>
+          ))}
+        </div>
+      )}
+
       <div style={{ overflowX: 'auto' }}>
         <table style={tableStyle}>
           <thead>
             <tr>
               <th style={thStyle}>{t('grades.subject')}</th>
-              <th style={thStyle}>{t('grades.sitting')}</th>
               <th style={thStyle}>{t('grades.year')}</th>
               <th style={thStyle}>{t('grades.grade')}</th>
               <th style={thStyle}>{t('grades.predictedGrade')}</th>
@@ -140,10 +152,9 @@ export default function GradesTab({ studentId, subjects }) {
             </tr>
           </thead>
           <tbody>
-            {grades.map((g) => (
+            {filteredGrades.map((g) => (
               <tr key={g.id}>
-                <td style={{ ...tdStyle, position: 'sticky', left: 0, background: 'var(--color-surface)' }}>{g.subject_name || g.subject_code}</td>
-                <td style={tdStyle}>{g.sitting}</td>
+                <td style={{ ...tdStyle, position: 'sticky', left: 0, background: 'var(--color-surface)' }}>{(() => { const k = `subjects.${g.subject_code}`; const tr = t(k); return tr !== k ? tr : (g.subject_name || g.subject_code); })()}</td>
                 <td style={tdStyle}>{g.year_of_exam || '\u2014'}</td>
                 <td style={tdStyle}>{g.raw_grade}</td>
                 <td style={tdStyle}>
@@ -186,7 +197,16 @@ export default function GradesTab({ studentId, subjects }) {
                 aria-label="Subject"
               >
                 <option value="">{t('grades.selectSubject')}</option>
-                {(subjects && subjects.length > 0 ? subjects : HKDSE_SUBJECTS).map((s) => (
+                {(subjects && subjects.length > 0
+                  ? subjects.map((s) => {
+                      const translated = t(`subjects.${s.code}`);
+                      return { code: s.code, name: translated !== `subjects.${s.code}` ? translated : (s.name || s.code) };
+                    })
+                  : HKDSE_SUBJECT_CODES.map((code) => {
+                      const translated = t(`subjects.${code}`);
+                      return { code, name: translated !== `subjects.${code}` ? translated : code };
+                    })
+                ).map((s) => (
                   <option key={s.code} value={s.name}>{s.name}</option>
                 ))}
               </select>

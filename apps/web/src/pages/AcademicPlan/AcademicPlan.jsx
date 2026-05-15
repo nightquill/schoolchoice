@@ -668,7 +668,7 @@ function AcademicPlan() {
 
           {!isGenerating && !error && !plan?.html_content && (
             <div style={contentZoneStyle}>
-              <EmptyState message="No plan has been generated yet." />
+              <EmptyState message={t('plan.noPlanGenerated')} />
               <Button label={t('plan.generatePlan')} variant="primary" onClick={handleGeneratePlan} loading={generating} />
             </div>
           )}

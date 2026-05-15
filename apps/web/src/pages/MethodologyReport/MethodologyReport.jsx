@@ -68,7 +68,7 @@ function MethodologyReport() {
 
   const contentStyle = {
     padding: 'var(--space-6) var(--space-8)',
-    maxWidth: '960px',
+    maxWidth: '100%',
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--space-8)',

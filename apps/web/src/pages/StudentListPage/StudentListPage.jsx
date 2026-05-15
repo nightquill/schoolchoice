@@ -137,7 +137,7 @@ function StudentListPage() {
   return (
     <div style={pageStyle}>
       <NavBar />
-      <div className="px-4 md:px-8" style={{ maxWidth: '960px', margin: '0 auto', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
+      <div className="px-4 md:px-8" style={{ maxWidth: '100%', margin: '0 auto', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <div style={headerRowStyle}>
           <h1 style={headingStyle}>Students</h1>
           {!showForm && (

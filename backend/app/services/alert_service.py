@@ -18,6 +18,7 @@ from app.modules.school_choice.models.models import (
     StudentSchoolTarget,
     StudentSubjectGrade,
 )
+from app.modules.school_choice.models.submissions import StudentChoiceSubmission
 
 # Severity ordering for sort (lower = higher priority)
 _SEVERITY_ORDER = {"error": 0, "warning": 1, "info": 2}
@@ -97,6 +98,21 @@ def generate_alerts(
     for t in all_targets:
         targets_by_student.setdefault(t.student_id, []).append(t)
 
+    # Pre-fetch JUPAS programme medians for conservative alert
+    from app.modules.school_choice.models.models import JupasProgramme
+    import json as _json
+
+    _prog_median_cache: dict[str, float | None] = {}
+    all_progs = db.query(JupasProgramme).filter(JupasProgramme.admission_stats.isnot(None)).all()
+    for prog in all_progs:
+        try:
+            stats = _json.loads(prog.admission_stats) if isinstance(prog.admission_stats, str) else (prog.admission_stats or {})
+            if stats:
+                latest = stats.get(max(stats.keys()), {})
+                _prog_median_cache[prog.jupas_code] = float(latest["median"]) if "median" in latest else None
+        except (ValueError, TypeError, KeyError):
+            pass
+
     now = datetime.now(timezone.utc)
     stale_threshold = now - timedelta(days=30)
 
@@ -136,6 +152,22 @@ def generate_alerts(
 
         # Dubious choice detection — per-choice, not per-student
         student_targets = targets_by_student.get(sid, [])
+
+        # Sort by rank to identify Band A (top 3 choices)
+        sorted_targets = sorted(student_targets, key=lambda t: t.student_rank or 999)
+
+        # Find the student's best achievable median — the highest programme median
+        # where the student's match score >= 50% (realistic chance)
+        best_achievable_median = 0
+        best_achievable_label = ""
+        for tgt in student_targets:
+            sc = float(tgt.match_score) if tgt.match_score is not None else 0
+            if sc >= 0.50 and tgt.jupas_code:
+                med = _prog_median_cache.get(tgt.jupas_code)
+                if med and med > best_achievable_median:
+                    best_achievable_median = med
+                    best_achievable_label = tgt.programme_name or tgt.jupas_code
+
         for tgt in student_targets:
             score = float(tgt.match_score) if tgt.match_score is not None else None
             if score is None:
@@ -145,15 +177,32 @@ def generate_alerts(
             school_label = getattr(school_obj, "name", "Unknown") if school_obj else "Unknown"
             choice_label = f"{school_label} — {prog_label}" if prog_label else school_label
 
-            # Too conservative: this choice is very safe (>85%)
-            if score > 0.85:
-                alerts.append({
-                    "type": "dubious_conservative",
-                    "severity": "info",
-                    "student_id": str(sid),
-                    "student_name": sname,
-                    "message": f"{sname}: {choice_label} ({int(score*100)}% match) — may be too conservative. Consider a more competitive option.",
-                })
+            # Too conservative: Band A choice (rank 1-3) where the student has very high
+            # probability AND there exist more competitive programmes they could aim for.
+            # Logic: if this is a top-3 choice AND score > 80% AND there's a programme
+            # with a higher median that the student could still get into (>50%),
+            # then suggest aiming higher.
+            rank = tgt.student_rank or 999
+            if rank <= 3 and score > 0.80 and tgt.jupas_code:
+                this_median = _prog_median_cache.get(tgt.jupas_code, 0)
+                if this_median and best_achievable_median > 0 and best_achievable_median > this_median * 1.1:
+                    alerts.append({
+                        "type": "dubious_conservative",
+                        "severity": "info",
+                        "student_id": str(sid),
+                        "student_name": sname,
+                        "message": f"{sname}: choice #{rank} {choice_label} (median {this_median:.0f}) — student may qualify for more competitive programmes (e.g. median {best_achievable_median:.0f}). Consider aiming higher for Band A.",
+                    })
+                elif score > 0.90:
+                    # Very safe even without comparison data — flag
+                    alerts.append({
+                        "type": "dubious_conservative",
+                        "severity": "info",
+                        "student_id": str(sid),
+                        "student_name": sname,
+                        "message": f"{sname}: choice #{rank} {choice_label} ({int(score*100)}% match) — very safe choice for Band A. Consider a more competitive option.",
+                    })
+
             # Too ambitious: this choice is a significant reach (<25%)
             if score < 0.25:
                 alerts.append({
@@ -178,6 +227,44 @@ def generate_alerts(
                     "student_name": sname,
                     "message": f"{sname}'s grade data has not been updated in over 30 days.",
                 })
+
+    # Missing plan — students who have never had a plan generated
+    from app.modules.school_choice.models.models import AcademicPlan
+    students_with_plan = set(
+        row.student_id
+        for row in db.query(AcademicPlan.student_id).filter(
+            AcademicPlan.generated_at.isnot(None)
+        ).all()
+    )
+    for student in students:
+        if student.id not in students_with_plan:
+            alerts.append({
+                "type": "missing_plan",
+                "severity": "info",
+                "student_id": str(student.id),
+                "student_name": student.name or "Unnamed",
+                "message": f"{student.name or 'Unnamed'} has no academic plan generated yet.",
+            })
+
+    # Pending-review submissions — one alert per pending submission
+    pending_subs_q = (
+        db.query(StudentChoiceSubmission, Student)
+        .join(Student, StudentChoiceSubmission.student_id == Student.id)
+        .filter(StudentChoiceSubmission.status == "pending")
+    )
+    if organisation_id is not None:
+        pending_subs_q = pending_subs_q.filter(Student.organisation_id == organisation_id)
+
+    for sub, student in pending_subs_q.all():
+        choice_count = len(sub.choices) if sub.choices else 0
+        alerts.append({
+            "type": "pending_review",
+            "severity": "warning",
+            "student_id": str(student.id),
+            "student_name": student.name or "Unnamed",
+            "submission_id": str(sub.id),
+            "message": f"{student.name or 'Unnamed'} submitted {choice_count} choice(s) for review.",
+        })
 
     # Sort by severity priority
     alerts.sort(key=lambda a: _SEVERITY_ORDER.get(a["severity"], 99))

@@ -86,7 +86,7 @@ function RecommendationPage() {
   };
 
   const contentStyle = {
-    maxWidth: '960px',
+    maxWidth: '100%',
     margin: '0 auto',
     padding: 'var(--space-8) var(--space-6)',
   };

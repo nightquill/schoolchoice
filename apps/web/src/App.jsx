@@ -31,6 +31,10 @@ import AdminManage from './pages/AdminManage/AdminManage';
 import StudentDashboard from './pages/StudentDashboard/StudentDashboard';
 import StudentSubmissions from './pages/Submissions/StudentSubmissions';
 import ProgrammeDetail from './pages/ProgrammeDetail/ProgrammeDetail';
+import SfInstitution from './pages/SfInstitution/SfInstitution';
+import SfProgrammeDetail from './pages/SfInstitution/SfProgrammeDetail';
+import PlansAnalytics from './pages/Analytics/PlansAnalytics';
+import SubmissionsAnalytics from './pages/Analytics/SubmissionsAnalytics';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,6 +95,9 @@ export default function App() {
         <Route path="/schools" element={<ProtectedRoute><SchoolDirectory /></ProtectedRoute>} />
         <Route path="/schools/:id" element={<ProtectedRoute><SchoolProfile /></ProtectedRoute>} />
         <Route path="/schools/:schoolId/programmes/:code" element={<ProtectedRoute><ProgrammeDetail /></ProtectedRoute>} />
+        {/* Self-financing / Sub-degree — completely separate from JUPAS */}
+        <Route path="/sf/:code" element={<ProtectedRoute><SfInstitution /></ProtectedRoute>} />
+        <Route path="/sf/:code/programmes/:progId" element={<ProtectedRoute><SfProgrammeDetail /></ProtectedRoute>} />
         <Route path="/account/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
         <Route path="/admin/data-refresh" element={<ProtectedRoute><AdminDataRefresh /></ProtectedRoute>} />
         {/* Cohort list now on dashboard — redirect old URL */}
@@ -98,6 +105,8 @@ export default function App() {
         <Route path="/cohorts/:id" element={<ProtectedRoute><CohortDetail /></ProtectedRoute>} />
         <Route path="/cohorts/:cohortId/report" element={<ProtectedRoute><CohortReport /></ProtectedRoute>} />
         <Route path="/cohorts/:cohortId/bulk-edit" element={<ProtectedRoute><BulkEdit /></ProtectedRoute>} />
+        <Route path="/analytics/plans" element={<ProtectedRoute><PlansAnalytics /></ProtectedRoute>} />
+        <Route path="/analytics/submissions" element={<ProtectedRoute><SubmissionsAnalytics /></ProtectedRoute>} />
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
 

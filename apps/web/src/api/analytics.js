@@ -18,3 +18,9 @@ export const getHkdsePopulationStats = (subjectCode) => {
   if (subjectCode) params.subject_code = subjectCode;
   return client.get('/api/v1/analytics/hkdse-population', { params }).then((r) => r.data);
 };
+
+export const getPlanHistory = (params = {}) =>
+  client.get('/api/v1/analytics/plan-history', { params }).then(r => r.data);
+
+export const getSubmissionHistory = (params = {}) =>
+  client.get('/api/v1/analytics/submission-history', { params }).then(r => r.data);

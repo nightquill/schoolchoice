@@ -143,14 +143,14 @@ def get_hkdse_trends(
     # Sort by category then subject code
     result.sort(key=lambda x: (x.get("category", ""), x["subject_code"]))
 
-    # Subject combinations (by subject code pairs, top 20)
+    # Subject combinations — elective only (by subject code pairs, top 20)
     combo_counter: Counter = Counter()
     for student_id, subject_ids in student_subjects.items():
         codes = []
         for sid_str in subject_ids:
             try:
                 subj = _get_subject(UUID(sid_str))
-                if subj:
+                if subj and (subj.category or "").upper() == "ELECTIVE":
                     codes.append(subj.code)
             except Exception:
                 pass
@@ -372,4 +372,100 @@ def get_subject_combinations(
             {"combination": c, "frequency": f}
             for c, f in combo_counter.most_common(top_n)
         ]
+    }
+
+
+# ---------------------------------------------------------------------------
+# Plan + Submission history (time-series analytics)
+# ---------------------------------------------------------------------------
+from datetime import datetime, timedelta, timezone
+
+
+def _bucket_date(dt: datetime, granularity: str) -> str:
+    """Bucket a datetime into a date string based on granularity."""
+    if granularity == "weekly":
+        monday = dt - timedelta(days=dt.weekday())
+        return monday.strftime("%Y-%m-%d")
+    elif granularity == "monthly":
+        return dt.strftime("%Y-%m-01")
+    else:
+        return dt.strftime("%Y-%m-%d")
+
+
+@router.get("/plan-history")
+def get_plan_generation_history(
+    granularity: str = Query("daily", description="daily | weekly | monthly"),
+    days: int = Query(90, ge=1, le=365),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Plan generation frequency over time, grouped by granularity."""
+    from app.modules.school_choice.models.models import PlanGenerationJob
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    org_id = getattr(current_user, "active_organisation_id", None)
+
+    query = db.query(PlanGenerationJob).filter(
+        PlanGenerationJob.created_at >= cutoff,
+        PlanGenerationJob.status == "DONE",
+    )
+    if org_id:
+        query = query.join(Student, PlanGenerationJob.student_id == Student.id).filter(
+            Student.organisation_id == org_id
+        )
+
+    jobs = query.all()
+
+    buckets: dict[str, int] = defaultdict(int)
+    for job in jobs:
+        key = _bucket_date(job.created_at, granularity)
+        buckets[key] += 1
+
+    data = [{"date": k, "count": v} for k, v in sorted(buckets.items())]
+    return {"data": data, "granularity": granularity, "total": sum(v for v in buckets.values())}
+
+
+@router.get("/submission-history")
+def get_submission_history(
+    granularity: str = Query("daily", description="daily | weekly | monthly"),
+    days: int = Query(90, ge=1, le=365),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Submission frequency over time: total created and approved, grouped by granularity."""
+    from app.modules.school_choice.models.submissions import StudentChoiceSubmission
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    org_id = getattr(current_user, "active_organisation_id", None)
+
+    query = db.query(StudentChoiceSubmission).filter(
+        StudentChoiceSubmission.created_at >= cutoff,
+    )
+    if org_id:
+        query = query.join(Student, StudentChoiceSubmission.student_id == Student.id).filter(
+            Student.organisation_id == org_id
+        )
+
+    submissions = query.all()
+
+    total_buckets: dict[str, int] = defaultdict(int)
+    approved_buckets: dict[str, int] = defaultdict(int)
+
+    for sub in submissions:
+        key = _bucket_date(sub.created_at, granularity)
+        total_buckets[key] += 1
+        if sub.status == "approved" and sub.reviewed_at:
+            approved_key = _bucket_date(sub.reviewed_at, granularity)
+            approved_buckets[approved_key] += 1
+
+    all_dates = sorted(set(list(total_buckets.keys()) + list(approved_buckets.keys())))
+    data = [
+        {"date": d, "total": total_buckets.get(d, 0), "approved": approved_buckets.get(d, 0)}
+        for d in all_dates
+    ]
+    return {
+        "data": data,
+        "granularity": granularity,
+        "total_submissions": sum(total_buckets.values()),
+        "total_approved": sum(approved_buckets.values()),
     }

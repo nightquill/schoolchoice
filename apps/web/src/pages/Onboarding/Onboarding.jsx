@@ -68,6 +68,7 @@ function Onboarding() {
     { number: 4, label: t('onboarding.ready') },
   ];
   const [schoolName, setSchoolName] = useState('');
+  const [setupLoading, setSetupLoading] = useState(false);
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const account = accountQuery.data ?? null;
@@ -164,7 +165,19 @@ function Onboarding() {
               </div>
               <div style={buttonRowStyle}>
                 <Button variant="outline" onClick={() => setStep(1)}>{t('onboarding.back')}</Button>
-                <Button onClick={() => setStep(3)} disabled={!schoolName.trim()}>{t('onboarding.next')}</Button>
+                <Button onClick={async () => {
+                  if (!schoolName.trim()) return;
+                  setSetupLoading(true);
+                  try {
+                    const { default: client } = await import('@schoolchoice/ui/api/client');
+                    await client.post('/api/v1/account/setup-organisation', { school_name: schoolName.trim() });
+                    setStep(3);
+                  } catch {
+                    toast.error('Failed to create organisation.');
+                  } finally {
+                    setSetupLoading(false);
+                  }
+                }} disabled={!schoolName.trim() || setupLoading}>{setupLoading ? t('common.loading') : t('onboarding.next')}</Button>
               </div>
             </div>
           )}

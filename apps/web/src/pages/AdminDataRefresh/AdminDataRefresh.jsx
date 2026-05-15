@@ -100,7 +100,7 @@ function AdminDataRefresh() {
   };
 
   const contentStyle = {
-    maxWidth: '760px',
+    maxWidth: '100%',
     margin: '0 auto',
     padding: 'var(--space-10) var(--space-8)',
     display: 'flex',

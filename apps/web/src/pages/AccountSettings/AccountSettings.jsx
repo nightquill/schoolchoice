@@ -204,19 +204,21 @@ function AccountSettings() {
           {t('account.title')}
         </h1>
 
-        {/* Display Name */}
-        <div style={cardStyle()}>
-          <h2 style={cardTitleStyle}>{t('account.profile')}</h2>
-          <TextInput
-            label={t('account.displayName')}
-            name="display_name"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-          />
-          <Button onClick={handleSaveName} disabled={savingName}>
-            {savingName ? t('account.saving') : t('account.save')}
-          </Button>
-        </div>
+        {/* Display Name — hidden for students (name managed by school) */}
+        {account?.role !== 'student' && (
+          <div style={cardStyle()}>
+            <h2 style={cardTitleStyle}>{t('account.profile')}</h2>
+            <TextInput
+              label={t('account.displayName')}
+              name="display_name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+            <Button onClick={handleSaveName} disabled={savingName}>
+              {savingName ? t('account.saving') : t('account.save')}
+            </Button>
+          </div>
+        )}
 
         {/* Email */}
         <div style={cardStyle()}>
@@ -295,14 +297,16 @@ function AccountSettings() {
           </Button>
         </div>
 
-        {/* Danger Zone */}
-        <div style={cardStyle(true)}>
-          <h2 style={{ ...cardTitleStyle, color: 'var(--color-error)' }}>{t('account.dangerZone')}</h2>
-          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-            {t('account.deleteWarning')}
-          </p>
-          <Button variant="destructive" onClick={() => setDeleteModalOpen(true)}>{t('account.deleteAccount')}</Button>
-        </div>
+        {/* Danger Zone — hidden for students */}
+        {account?.role !== 'student' && (
+          <div style={cardStyle(true)}>
+            <h2 style={{ ...cardTitleStyle, color: 'var(--color-error)' }}>{t('account.dangerZone')}</h2>
+            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+              {t('account.deleteWarning')}
+            </p>
+            <Button variant="destructive" onClick={() => setDeleteModalOpen(true)}>{t('account.deleteAccount')}</Button>
+          </div>
+        )}
       </main>
 
       <Modal

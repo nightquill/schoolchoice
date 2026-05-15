@@ -10,6 +10,7 @@ import { getAllProgrammes } from '../../api/jupas';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getCompetitivenessTier } from '../../utils/competitiveness';
+import { getRequirementBadges } from '../../utils/requirementBadges';
 
 function SchoolProfile() {
   const { t } = useTranslation();
@@ -60,7 +61,7 @@ function SchoolProfile() {
   // Styles
   const pageStyle = {
     background: 'var(--color-background)',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     fontFamily: 'var(--font-family-base)',
   };
 
@@ -83,6 +84,7 @@ function SchoolProfile() {
     fontWeight: 'var(--font-weight-bold)',
     color: 'var(--color-text-primary)',
     margin: '0 0 var(--space-1) 0',
+    textWrap: 'balance',
   };
 
   const schoolNameZhStyle = {
@@ -138,7 +140,7 @@ function SchoolProfile() {
 
   const contentStyle = {
     padding: 'var(--space-6) var(--space-8)',
-    maxWidth: '960px',
+    maxWidth: '100%',
   };
 
   const headerRowStyle = {
@@ -155,6 +157,7 @@ function SchoolProfile() {
     fontWeight: 'var(--font-weight-bold)',
     color: 'var(--color-text-primary)',
     margin: 0,
+    textWrap: 'balance',
   };
 
   const filterRowStyle = {
@@ -172,7 +175,6 @@ function SchoolProfile() {
     color: 'var(--color-text-primary)',
     background: 'var(--color-surface)',
     width: '220px',
-    outline: 'none',
   };
 
   const selectStyle = {
@@ -183,7 +185,6 @@ function SchoolProfile() {
     fontFamily: 'var(--font-family-base)',
     color: 'var(--color-text-primary)',
     background: 'var(--color-surface)',
-    outline: 'none',
   };
 
   const cardStackStyle = {
@@ -208,7 +209,7 @@ function SchoolProfile() {
   const jupasCodeStyle = {
     fontFamily: 'monospace',
     fontSize: 'var(--font-size-xs)',
-    background: '#f1f5f9',
+    background: 'var(--color-background)',
     borderRadius: '4px',
     padding: '2px 8px',
     color: 'var(--color-text-secondary)',
@@ -251,6 +252,7 @@ function SchoolProfile() {
     fontSize: 'var(--font-size-sm)',
     color: 'var(--color-text-primary)',
     display: 'block',
+    fontVariantNumeric: 'tabular-nums',
   };
 
   const medianLabelStyle = {
@@ -321,23 +323,23 @@ function SchoolProfile() {
               </div>
 
               <div style={statsRowStyle}>
-                <div style={{ ...statCardBase, background: '#d1fae5' }}>
-                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#065f46' }}>
+                <div style={{ ...statCardBase, background: 'var(--color-success-bg)' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {school.acceptance_rate != null ? `${Math.round(school.acceptance_rate * 100)}%` : 'N/A'}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#065f46', marginTop: '2px' }}>Accept Rate</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-success-text)', marginTop: '2px' }}>Accept Rate</div>
                 </div>
-                <div style={{ ...statCardBase, background: '#dbeafe' }}>
-                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#1e40af' }}>
+                <div style={{ ...statCardBase, background: 'var(--color-info-bg)' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-info-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {school.average_admitted_score != null ? school.average_admitted_score : 'N/A'}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#1e40af', marginTop: '2px' }}>Avg Score</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-info-text)', marginTop: '2px' }}>Avg Score</div>
                 </div>
-                <div style={{ ...statCardBase, background: '#ede9fe' }}>
-                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: '#6b21a8' }}>
+                <div style={{ ...statCardBase, background: 'var(--color-purple-bg)' }}>
+                  <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-purple-text)', fontVariantNumeric: 'tabular-nums' }}>
                     {filtered.length}
                   </div>
-                  <div style={{ fontSize: 'var(--font-size-xs)', color: '#6b21a8', marginTop: '2px' }}>Programmes</div>
+                  <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-purple-text)', marginTop: '2px' }}>Programmes</div>
                 </div>
               </div>
             </div>
@@ -396,15 +398,22 @@ function SchoolProfile() {
                         <span style={medianLabelStyle}>Median</span>
                       </div>
 
-                      <span
-                        style={{
-                          ...tierBadgeBase,
-                          background: tier.bg,
-                          color: tier.color,
-                        }}
-                      >
-                        {tier.label}
-                      </span>
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', minWidth: '100px', justifyContent: 'flex-end' }}>
+                        <span
+                          style={{
+                            ...tierBadgeBase,
+                            background: tier.bg,
+                            color: tier.color,
+                          }}
+                        >
+                          {tier.label}
+                        </span>
+                        {getRequirementBadges(prog.non_grade_requirements, true).map((badge) => (
+                          <span key={badge.label} style={{ ...tierBadgeBase, background: badge.bg, color: badge.color, fontSize: '10px' }}>
+                            {badge.label}
+                          </span>
+                        ))}
+                      </div>
 
                       <span style={arrowStyle}>→</span>
                     </Link>

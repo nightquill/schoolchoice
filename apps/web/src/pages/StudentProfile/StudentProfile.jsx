@@ -13,25 +13,22 @@ import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getSubjects } from '../../api/grades';
-import PersonalTab from './PersonalTab';
+import ProgrammeChoicesTab from './ProgrammeChoicesTab';
 import GradesTab from './GradesTab';
 import LanguageTab from './LanguageTab';
-import EvaluationsTab from './EvaluationsTab';
-import ActivitiesTab from './ActivitiesTab';
-import NotesTab from './NotesTab';
 import PlansTab from './PlansTab';
+import PersonalTab from './PersonalTab';
+import OtherTab from './OtherTab';
 
 function StudentProfile() {
   const { t } = useTranslation();
 
   const TABS = [
-    { id: 'personal', label: t('profile.tabs.personal') },
+    { id: 'programmes', label: t('profile.tabs.programmes') },
     { id: 'grades', label: t('profile.tabs.grades') },
-    { id: 'language', label: t('profile.tabs.language') },
-    { id: 'evaluations', label: t('profile.tabs.evaluations') },
-    { id: 'activities', label: t('profile.tabs.activities') },
-    { id: 'notes', label: t('profile.tabs.notes') },
     { id: 'plans', label: t('profile.tabs.plans') },
+    { id: 'personal', label: t('profile.tabs.personal') },
+    { id: 'other', label: t('profile.tabs.other') },
   ];
 
   const { id } = useParams();
@@ -42,7 +39,7 @@ function StudentProfile() {
   const [graduateForm, setGraduateForm] = useState({ final_school_id: '', final_major: '', graduation_year: new Date().getFullYear() });
   const [schoolOptions, setSchoolOptions] = useState([]);
 
-  const activeTab = searchParams.get('tab') || 'personal';
+  const activeTab = searchParams.get('tab') || 'programmes';
 
   // Student data via useQuery (D-01: parent-fetches-all pattern)
   const studentQuery = useQuery({
@@ -84,7 +81,6 @@ function StudentProfile() {
   };
 
   const handleStudentSaved = (updated) => {
-    // Optimistically update the query cache with the returned data
     queryClient.setQueryData(['student', id], updated);
   };
 
@@ -112,7 +108,7 @@ function StudentProfile() {
   };
 
   return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)', overflowX: 'hidden' }}>
+    <div style={{ background: 'var(--color-background)', minHeight: '100dvh', fontFamily: 'var(--font-family-base)', overflowX: 'hidden' }}>
       <NavBarV2 account={account} />
       <Link to="/dashboard" style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-block', padding: 'var(--space-3) var(--space-8)' }}>
         {'\u2190'} {t('profile.backToDashboard')}
@@ -129,14 +125,26 @@ function StudentProfile() {
           <>
             <div className="px-4 md:px-8" style={{ background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)', padding: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-                <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                  {student.full_name || 'Student Profile'}
-                </h1>
-                {student.year_of_study && (
-                  <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
-                    Year {student.year_of_study}
-                  </p>
-                )}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                  <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+                    {student.full_name || 'Student Profile'}
+                  </h1>
+                  {student.candidate_number && (
+                    <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-secondary)', background: 'var(--color-background)', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', border: 'var(--border-width) solid var(--color-border)' }}>
+                      {student.candidate_number}
+                    </span>
+                  )}
+                  {student.class_name && (
+                    <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-primary)', background: 'rgba(37,99,235,0.08)', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)' }}>
+                      {t('dashboard.class')} {student.class_name}
+                    </span>
+                  )}
+                  {student.year_of_study && (
+                    <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                      {t('dashboard.year')} {student.year_of_study}
+                    </span>
+                  )}
+                </div>
               </div>
               <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
                 {student.is_graduated && (
@@ -147,7 +155,6 @@ function StudentProfile() {
                 {!student.is_graduated && (
                   <Button variant="secondary" onClick={handleOpenGraduate}>{t('profile.markGraduated')}</Button>
                 )}
-                <Button variant="secondary" onClick={() => navigate(`/students/${id}/targets`)}>{t('profile.targetSchools')}</Button>
                 <Button onClick={handleGeneratePlan}>{t('profile.generatePlan')}</Button>
               </div>
             </div>
@@ -161,27 +168,24 @@ function StudentProfile() {
                 </TabsList>
               </div>
 
-              <div className="px-4 md:px-8" style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
-                <TabsContent value="personal">
-                  <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} />
+              <div className="px-4 md:px-8" style={{ maxWidth: '100%', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
+                <TabsContent value="programmes">
+                  <ProgrammeChoicesTab studentId={id} />
                 </TabsContent>
                 <TabsContent value="grades">
                   <GradesTab studentId={id} subjects={subjects} />
-                </TabsContent>
-                <TabsContent value="language">
-                  <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} />
-                </TabsContent>
-                <TabsContent value="evaluations">
-                  <EvaluationsTab studentId={id} />
-                </TabsContent>
-                <TabsContent value="activities">
-                  <ActivitiesTab studentId={id} student={student} />
-                </TabsContent>
-                <TabsContent value="notes">
-                  <NotesTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                  <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-4)' }}>
+                    <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                  </div>
                 </TabsContent>
                 <TabsContent value="plans">
                   <PlansTab studentId={id} />
+                </TabsContent>
+                <TabsContent value="personal">
+                  <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                </TabsContent>
+                <TabsContent value="other">
+                  <OtherTab studentId={id} student={student} onSaved={handleStudentSaved} />
                 </TabsContent>
               </div>
             </Tabs>
@@ -199,8 +203,10 @@ function StudentProfile() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalSchool')}</label>
+              <label htmlFor="final-school" style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalSchool')}</label>
               <select
+                id="final-school"
+                name="final_school"
                 value={graduateForm.final_school_id}
                 onChange={(e) => setGraduateForm((f) => ({ ...f, final_school_id: e.target.value }))}
                 style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
@@ -210,16 +216,20 @@ function StudentProfile() {
               </select>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalMajor')}</label>
+              <label htmlFor="final-major" style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.finalMajor')}</label>
               <Input
+                id="final-major"
+                name="final_major"
                 value={graduateForm.final_major}
                 onChange={(e) => setGraduateForm((f) => ({ ...f, final_major: e.target.value }))}
                 placeholder={t('profile.finalMajorPlaceholder')}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.graduationYear')}</label>
+              <label htmlFor="grad-year" style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('profile.graduationYear')}</label>
               <Input
+                id="grad-year"
+                name="graduation_year"
                 type="number"
                 value={graduateForm.graduation_year}
                 onChange={(e) => setGraduateForm((f) => ({ ...f, graduation_year: e.target.value }))}

@@ -72,7 +72,7 @@ function CohortDetail() {
   const [cohort, setCohort] = useState(null);
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
-  const [sittingFilter, setSittingFilter] = useState('');
+  const [sittingFilter, setSittingFilter] = useState('MOCK');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -199,7 +199,7 @@ function CohortDetail() {
   };
 
   const containerStyle = {
-    maxWidth: '1100px',
+    maxWidth: '100%',
     margin: '0 auto',
     padding: 'var(--space-6) var(--space-8)',
   };
@@ -246,7 +246,7 @@ function CohortDetail() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to="/cohorts" style={backLinkStyle}>{t('cohortDetail.backToCohorts')}</Link>
+      <Link to="/dashboard" style={backLinkStyle}>{t('profile.backToDashboard')}</Link>
 
       {loading && <LoadingSpinner label={t('cohortDetail.loading')} />}
       {error && <div style={{ padding: 'var(--space-6) var(--space-8)' }}><ErrorMessage message={error} /></div>}

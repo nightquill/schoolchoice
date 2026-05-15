@@ -1,47 +1,49 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { AlertCircle, AlertTriangle, Info, X, ChevronDown, ChevronRight } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Info, FileCheck, X, ChevronDown, ChevronRight } from 'lucide-react';
 import { getAlerts } from '../../api/alerts';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const SEVERITY_CONFIG = {
-  error: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', Icon: AlertCircle },
-  warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e', Icon: AlertTriangle },
-  info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1e40af', Icon: Info },
+  error: { bg: 'var(--color-error-bg)', border: 'var(--color-error-border)', color: 'var(--color-error-text)', Icon: AlertCircle },
+  warning: { bg: 'var(--color-warning-bg)', border: 'var(--color-warning-border)', color: 'var(--color-warning-text)', Icon: AlertTriangle },
+  info: { bg: 'var(--color-info-bg)', border: 'var(--color-info-border)', color: 'var(--color-info-text)', Icon: Info },
 };
 
 const CATEGORIES_CONFIG = [
   {
-    id: 'missing',
+    id: 'dataQuality',
     labelKey: 'alerts.missing',
     types: ['missing_grades', 'missing_targets', 'stale_data'],
-    color: '#d97706',
-    bg: '#fffbeb',
-    border: '#fde68a',
+    color: 'var(--color-warning-text)',
+    bg: 'var(--color-warning-bg)',
+    border: 'var(--color-warning-border)',
     Icon: AlertTriangle,
   },
   {
     id: 'conservative',
     labelKey: 'alerts.conservative',
     types: ['dubious_conservative'],
-    color: '#2563eb',
-    bg: '#eff6ff',
-    border: '#bfdbfe',
+    color: 'var(--color-info-text)',
+    bg: 'var(--color-info-bg)',
+    border: 'var(--color-info-border)',
     Icon: Info,
   },
   {
     id: 'ambitious',
     labelKey: 'alerts.ambitious',
     types: ['dubious_ambitious', 'at_risk_target'],
-    color: '#dc2626',
-    bg: '#fef2f2',
-    border: '#fecaca',
+    color: 'var(--color-error-text)',
+    bg: 'var(--color-error-bg)',
+    border: 'var(--color-error-border)',
     Icon: AlertCircle,
   },
 ];
 
 function AlertsPanel() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(new Set());
   const [expandedTab, setExpandedTab] = useState(null);
 
@@ -59,12 +61,21 @@ function AlertsPanel() {
 
   if (allAlerts.length === 0) return null;
 
-  const handleDismiss = (alert) => {
+  const handleDismiss = (e, alert) => {
+    e.stopPropagation();
     setDismissed((prev) => {
       const next = new Set(prev);
       next.add(`${alert.type}-${alert.student_id}`);
       return next;
     });
+  };
+
+  const handleAlertClick = (alert) => {
+    if (alert.type === 'pending_review' && alert.submission_id) {
+      navigate(`/submissions/${alert.submission_id}`);
+    } else if (alert.student_id) {
+      navigate(`/students/${alert.student_id}/profile?tab=programmes`);
+    }
   };
 
   // Group alerts strictly by category
@@ -108,12 +119,12 @@ function AlertsPanel() {
                 }}
                 aria-expanded={isExpanded}
               >
-                {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                <CatIcon size={14} />
+                {isExpanded ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronRight size={14} aria-hidden="true" />}
+                <CatIcon size={14} aria-hidden="true" />
                 <span style={{ flex: 1 }}>{cat.label}</span>
                 <span style={{
                   background: count > 0 ? cat.color : 'var(--color-border)',
-                  color: '#fff',
+                  color: 'var(--color-surface)',
                   fontSize: '0.7rem', fontWeight: 700,
                   padding: '1px 8px', borderRadius: '999px',
                   minWidth: '24px', textAlign: 'center',
@@ -130,18 +141,29 @@ function AlertsPanel() {
                     return (
                       <div
                         key={key}
+                        onClick={() => handleAlertClick(alert)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleAlertClick(alert); } }}
                         style={{
                           display: 'flex', alignItems: 'flex-start', gap: 'var(--space-2)',
                           padding: 'var(--space-2) var(--space-3)',
                           borderBottom: `1px solid ${cat.border}`,
                           fontSize: 'var(--font-size-xs)', color: cat.color,
                           background: 'var(--color-surface)',
+                          cursor: alert.student_id ? 'pointer' : 'default',
                         }}
-                        role="alert"
+                        role="button"
+                        tabIndex={0}
                       >
-                        <span style={{ flex: 1 }}>{alert.message}</span>
+                        <span style={{
+                          flex: 1,
+                          textDecoration: alert.student_id ? 'underline' : 'none',
+                          textDecorationColor: alert.student_id ? `${cat.color}40` : undefined,
+                          textUnderlineOffset: '2px',
+                        }}>
+                          {alert.message}
+                        </span>
                         <button
-                          onClick={() => handleDismiss(alert)}
+                          onClick={(e) => handleDismiss(e, alert)}
                           style={{
                             background: 'none', border: 'none', cursor: 'pointer',
                             padding: 1, color: cat.color, opacity: 0.5, flexShrink: 0,

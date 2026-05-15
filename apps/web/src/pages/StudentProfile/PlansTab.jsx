@@ -46,7 +46,7 @@ export default function PlansTab({ studentId }) {
       </div>
 
       {plans.length === 0 && (
-        <EmptyState message="No plans saved yet. Click 'Generate New Plan' to create one." />
+        <EmptyState message={t('plans.noPlansEmptyState')} />
       )}
 
       {selected && (

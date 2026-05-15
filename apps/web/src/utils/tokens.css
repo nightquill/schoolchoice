@@ -1,24 +1,46 @@
 :root {
-  /* Colors */
+  /* Colors — core */
   --color-primary:        #2563EB;
+  --color-primary-hover:  #1D4ED8;
   --color-secondary:      #64748B;
   --color-background:     #F8FAFC;
   --color-surface:        #FFFFFF;
   --color-text-primary:   #0F172A;
-  --color-text-secondary: #475569;
+  --color-text-secondary: #334155;
+  --color-text-tertiary:  #64748B;
   --color-error:          #DC2626;
   --color-success:        #16A34A;
   --color-warning:        #D97706;
-  --color-border:         #CBD5E1;
+  --color-info:           #2563EB;
+  --color-border:         #94A3B8;
+  --color-border-hover:   #64748B;
 
-  /* Typography */
+  /* Status backgrounds — light tints for badges/alerts */
+  --color-error-bg:       #FEF2F2;
+  --color-error-border:   #FECACA;
+  --color-error-text:     #7F1D1D;
+  --color-success-bg:     #F0FDF4;
+  --color-success-border: #BBF7D0;
+  --color-success-text:   #14532D;
+  --color-warning-bg:     #FFFBEB;
+  --color-warning-border: #FDE68A;
+  --color-warning-text:   #78350F;
+  --color-info-bg:        #EFF6FF;
+  --color-info-border:    #BFDBFE;
+  --color-info-text:      #1E40AF;
+  --color-purple:         #7C3AED;
+  --color-purple-bg:      #F5F3FF;
+  --color-purple-border:  #DDD6FE;
+  --color-purple-text:    #5B21B6;
+
+  /* Typography — optimized for visibility */
   --font-family-base:     system-ui, -apple-system, sans-serif;
-  --font-size-xs:         0.75rem;
-  --font-size-sm:         0.875rem;
-  --font-size-md:         1rem;
-  --font-size-lg:         1.125rem;
-  --font-size-xl:         1.25rem;
-  --font-size-2xl:        1.5rem;
+  --font-size-xs:         0.8125rem;
+  --font-size-sm:         0.9375rem;
+  --font-size-md:         1.0625rem;
+  --font-size-lg:         1.1875rem;
+  --font-size-xl:         1.375rem;
+  --font-size-2xl:        1.625rem;
   --font-weight-normal:   400;
   --font-weight-medium:   500;
   --font-weight-bold:     700;
@@ -45,6 +67,11 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.10);
+
+  /* Layout */
+  --content-max-width:  100%;
+  --content-narrow:     640px;
+  --content-padding:    var(--space-4) var(--space-6);
 
   /* Breakpoints */
   --breakpoint-sm: 640px;

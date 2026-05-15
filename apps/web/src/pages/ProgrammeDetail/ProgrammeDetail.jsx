@@ -4,24 +4,25 @@ import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { LoadingSpinner, ErrorMessage } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getProgrammeStudents } from '../../api/jupas';
+import { getRequirementBadges } from '../../utils/requirementBadges';
 
 // Derive tier from flat admission_stats { median, upper_quartile, lower_quartile }
 function getTierFromStats(stats) {
   if (!stats || stats.median == null) {
-    return { label: 'Accessible', bg: '#eff6ff', color: '#1e40af' };
+    return { label: 'Accessible', bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
   }
   const m = Number(stats.median);
-  if (m >= 28) return { label: 'Very Competitive', bg: '#fef2f2', color: '#dc2626' };
-  if (m >= 24) return { label: 'Competitive', bg: '#fef3c7', color: '#92400e' };
-  if (m >= 20) return { label: 'Moderate', bg: '#d1fae5', color: '#065f46' };
-  return { label: 'Accessible', bg: '#eff6ff', color: '#1e40af' };
+  if (m >= 28) return { label: 'Very Competitive', bg: 'var(--color-error-bg)', color: 'var(--color-error-text)' };
+  if (m >= 24) return { label: 'Competitive', bg: 'var(--color-warning-bg)', color: 'var(--color-warning-text)' };
+  if (m >= 20) return { label: 'Moderate', bg: 'var(--color-success-bg)', color: 'var(--color-success-text)' };
+  return { label: 'Accessible', bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
 }
 
 function matchColor(score) {
   if (score == null) return 'var(--color-text-secondary)';
-  if (score >= 0.75) return '#059669';
-  if (score >= 0.50) return '#a16207';
-  return '#dc2626';
+  if (score >= 0.75) return 'var(--color-success)';
+  if (score >= 0.50) return 'var(--color-warning)';
+  return 'var(--color-error)';
 }
 
 function EligibilityBadge({ eligible }) {
@@ -31,9 +32,9 @@ function EligibilityBadge({ eligible }) {
     padding: '2px 8px',
     fontSize: '11px',
     fontWeight: '600',
-    background: eligible ? 'rgba(5,150,105,0.1)' : 'rgba(220,38,38,0.1)',
-    color: eligible ? '#059669' : '#dc2626',
-    border: `1px solid ${eligible ? 'rgba(5,150,105,0.25)' : 'rgba(220,38,38,0.25)'}`,
+    background: eligible ? 'var(--color-success-bg)' : 'var(--color-error-bg)',
+    color: eligible ? 'var(--color-success-text)' : 'var(--color-error-text)',
+    border: `1px solid ${eligible ? 'var(--color-success-border)' : 'var(--color-error-border)'}`,
   };
   return <span style={style}>{eligible ? 'Eligible' : 'Ineligible'}</span>;
 }
@@ -58,7 +59,7 @@ function StudentRow({ student }) {
         </Link>
       </td>
       <td style={tdBase}>{student.class_name || '—'}</td>
-      <td style={{ ...tdBase, fontWeight: '600', color: matchColor(student.match_score) }}>
+      <td style={{ ...tdBase, fontWeight: '600', color: matchColor(student.match_score), fontVariantNumeric: 'tabular-nums' }}>
         {matchPct}
       </td>
       <td style={tdBase}>{student.weighted_score != null ? student.weighted_score : '—'}</td>
@@ -95,6 +96,7 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
         <span style={labelStyle}>{title} — {students.length} student{students.length !== 1 ? 's' : ''}</span>
         {!defaultOpen && (
           <button
+            aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
             style={{
               background: 'none',
@@ -165,7 +167,7 @@ export default function ProgrammeDetail() {
 
   const pageStyle = {
     background: 'var(--color-background)',
-    minHeight: '100vh',
+    minHeight: '100dvh',
     fontFamily: 'var(--font-family-base)',
   };
 
@@ -231,6 +233,7 @@ export default function ProgrammeDetail() {
     color,
     lineHeight: '1.1',
     marginBottom: '4px',
+    fontVariantNumeric: 'tabular-nums',
   });
 
   const statLabelStyle = {
@@ -285,6 +288,11 @@ export default function ProgrammeDetail() {
           >
             {tier.label}
           </span>
+          {getRequirementBadges(programme?.non_grade_requirements).map((badge) => (
+            <span key={badge.label} style={{ background: badge.bg, color: badge.color, borderRadius: '999px', padding: '3px 10px', fontSize: '12px', fontWeight: '600' }}>
+              {badge.label}
+            </span>
+          ))}
         </div>
         <h1
           style={{
@@ -292,6 +300,7 @@ export default function ProgrammeDetail() {
             fontSize: '20px',
             fontWeight: '700',
             color: 'var(--color-text-primary)',
+            textWrap: 'balance',
           }}
         >
           {programme?.name || code}
@@ -303,19 +312,19 @@ export default function ProgrammeDetail() {
         </div>
       </div>
 
-      <div style={{ padding: '24px 32px', maxWidth: '1100px' }}>
+      <div style={{ padding: '24px 32px', maxWidth: '100%' }}>
         {/* Stats row */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
           <div style={cardStyle}>
-            <div style={statNumStyle('#059669')}>{stats.median ?? '—'}</div>
+            <div style={statNumStyle('var(--color-success)')}>{stats.median ?? '—'}</div>
             <div style={statLabelStyle}>Median Score</div>
           </div>
           <div style={cardStyle}>
-            <div style={statNumStyle('#2563eb')}>{stats.upper_quartile ?? '—'}</div>
+            <div style={statNumStyle('var(--color-primary)')}>{stats.upper_quartile ?? '—'}</div>
             <div style={statLabelStyle}>Upper Quartile</div>
           </div>
           <div style={cardStyle}>
-            <div style={statNumStyle('#d97706')}>{stats.lower_quartile ?? '—'}</div>
+            <div style={statNumStyle('var(--color-warning)')}>{stats.lower_quartile ?? '—'}</div>
             <div style={statLabelStyle}>Lower Quartile</div>
           </div>
           <div style={cardStyle}>
@@ -359,12 +368,12 @@ export default function ProgrammeDetail() {
                   <span
                     key={subj}
                     style={{
-                      background: 'rgba(220,38,38,0.08)',
-                      border: '1px solid rgba(220,38,38,0.2)',
+                      background: 'var(--color-error-bg)',
+                      border: '1px solid var(--color-error-border)',
                       borderRadius: '4px',
                       padding: '2px 7px',
                       fontSize: '12px',
-                      color: '#dc2626',
+                      color: 'var(--color-error-text)',
                     }}
                   >
                     {subj} ≥ {grade}
@@ -380,12 +389,12 @@ export default function ProgrammeDetail() {
                   <span
                     key={i}
                     style={{
-                      background: 'rgba(37,99,235,0.08)',
-                      border: '1px solid rgba(37,99,235,0.2)',
+                      background: 'var(--color-info-bg)',
+                      border: '1px solid var(--color-info-border)',
                       borderRadius: '4px',
                       padding: '2px 7px',
                       fontSize: '12px',
-                      color: '#2563eb',
+                      color: 'var(--color-info-text)',
                     }}
                   >
                     {typeof s === 'string' ? s : s.subject_code}
@@ -412,6 +421,7 @@ export default function ProgrammeDetail() {
                 fontSize: 'var(--font-size-lg)',
                 fontWeight: '600',
                 color: 'var(--color-text-primary)',
+                textWrap: 'balance',
               }}
             >
               Your Students — Scored against this programme
@@ -424,15 +434,15 @@ export default function ProgrammeDetail() {
           <TierSection
             title="Strong Candidates"
             students={strong}
-            bgColor="#f0fdf4"
-            textColor="#059669"
+            bgColor="var(--color-success-bg)"
+            textColor="var(--color-success-text)"
             defaultOpen={true}
           />
           <TierSection
             title="Possible"
             students={possible}
-            bgColor="#fefce8"
-            textColor="#a16207"
+            bgColor="var(--color-warning-bg)"
+            textColor="var(--color-warning-text)"
             defaultOpen={true}
           />
 
@@ -445,21 +455,22 @@ export default function ProgrammeDetail() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '8px 12px',
-                  background: '#f8fafc',
+                  background: 'var(--color-background)',
                   borderRadius: stretchOpen ? '6px 6px 0 0' : '6px',
                 }}
               >
-                <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: '600', color: '#64748b' }}>
+                <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
                   Stretch — {stretch.length} student{stretch.length !== 1 ? 's' : ''}
                 </span>
                 <button
+                  aria-expanded={stretchOpen}
                   onClick={() => setStretchOpen((v) => !v)}
                   style={{
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
                     fontSize: 'var(--font-size-sm)',
-                    color: '#64748b',
+                    color: 'var(--color-text-secondary)',
                     padding: '0',
                   }}
                 >
