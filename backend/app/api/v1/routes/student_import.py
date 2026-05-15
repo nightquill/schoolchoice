@@ -13,6 +13,8 @@ from app.db.session import get_db
 from app.db.models import User
 from app.services.student_import_service import (
     parse_student_csv,
+    validate_file,
+    ImportFileError,
     validate_rows,
     commit_import,
 )
@@ -34,6 +36,14 @@ async def _read_and_validate_file(file: UploadFile) -> bytes:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"File exceeds maximum size of {MAX_FILE_SIZE // (1024 * 1024)} MB",
+        )
+    # File format validation (magic bytes, corruption, row count)
+    try:
+        validate_file(content, file.filename or "upload.csv")
+    except ImportFileError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
         )
     return content
 
@@ -72,6 +82,8 @@ async def preview_import(
     return {
         "rows": validated,
         "subject_columns": parsed["subject_columns"],
+        "unmapped_columns": parsed.get("unmapped_columns", []),
+        "grade_conversions": parsed.get("grade_conversions", []),
         "summary": summary,
     }
 
