@@ -1,7 +1,7 @@
-import client from '@schoolchoice/ui/api/client';
+import { get } from './helpers';
 
 export const getSchools = () =>
-  client.get('/api/v1/schools').then((r) => r.data);
+  get('/api/v1/schools');
 
 export const getSchool = (id) =>
-  client.get(`/api/v1/schools/${id}`).then((r) => r.data);
+  get(`/api/v1/schools/${id}`);

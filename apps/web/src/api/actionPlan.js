@@ -1,7 +1,7 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post } from './helpers';
 
 export const generateActionPlan = (studentId) =>
-  client.post(`/api/v1/students/${studentId}/action-plan`).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/action-plan`);
 
 export const getActionPlan = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/action-plan`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/action-plan`);

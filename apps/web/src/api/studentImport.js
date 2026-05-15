@@ -1,4 +1,4 @@
-import client from '@schoolchoice/ui/api/client';
+import { client } from './helpers';
 
 export const previewImport = (file) => {
   const form = new FormData();

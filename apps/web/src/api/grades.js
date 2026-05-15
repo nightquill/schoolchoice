@@ -1,16 +1,16 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post, put, del } from './helpers';
 
 export const getGrades = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/grades`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/grades`);
 
 export const createGrade = (studentId, data) =>
-  client.post(`/api/v1/students/${studentId}/grades`, data).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/grades`, data);
 
 export const updateGrade = (studentId, gradeId, data) =>
-  client.put(`/api/v1/students/${studentId}/grades/${gradeId}`, data).then((r) => r.data);
+  put(`/api/v1/students/${studentId}/grades/${gradeId}`, data);
 
 export const deleteGrade = (studentId, gradeId) =>
-  client.delete(`/api/v1/students/${studentId}/grades/${gradeId}`).then((r) => r.data);
+  del(`/api/v1/students/${studentId}/grades/${gradeId}`);
 
 export const getSubjects = () =>
-  client.get('/api/v1/grades/subjects').then((r) => r.data);
+  get('/api/v1/grades/subjects');

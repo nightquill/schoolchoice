@@ -1,31 +1,31 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post, put, patch, del } from './helpers';
 
 export const listUsers = () =>
-  client.get('/api/v1/admin/users').then((r) => r.data);
+  get('/api/v1/admin/users');
 
 export const createUser = (data) =>
-  client.post('/api/v1/admin/users', data).then((r) => r.data);
+  post('/api/v1/admin/users', data);
 
 export const updateUser = (id, data) =>
-  client.patch(`/api/v1/admin/users/${id}`, data).then((r) => r.data);
+  patch(`/api/v1/admin/users/${id}`, data);
 
 export const deleteUser = (id) =>
-  client.delete(`/api/v1/admin/users/${id}`).then((r) => r.data);
+  del(`/api/v1/admin/users/${id}`);
 
 export const getUsersWithPermissions = () =>
-  client.get('/api/v1/admin/users-with-permissions').then((r) => r.data);
+  get('/api/v1/admin/users-with-permissions');
 
 export const getCohortPermissions = (cohortId) =>
-  client.get(`/api/v1/admin/cohorts/${cohortId}/permissions`).then((r) => r.data);
+  get(`/api/v1/admin/cohorts/${cohortId}/permissions`);
 
 export const setCohortPermission = (cohortId, data) =>
-  client.put(`/api/v1/admin/cohorts/${cohortId}/permissions`, data).then((r) => r.data);
+  put(`/api/v1/admin/cohorts/${cohortId}/permissions`, data);
 
 export const removeCohortPermission = (cohortId, userId) =>
-  client.delete(`/api/v1/admin/cohorts/${cohortId}/permissions/${userId}`).then((r) => r.data);
+  del(`/api/v1/admin/cohorts/${cohortId}/permissions/${userId}`);
 
 export const getSubmissionRateLimit = () =>
-  client.get('/api/v1/admin/settings/submission-rate-limit').then((r) => r.data);
+  get('/api/v1/admin/settings/submission-rate-limit');
 
 export const setSubmissionRateLimit = (limit) =>
-  client.put('/api/v1/admin/settings/submission-rate-limit', { rate_limit: limit }).then((r) => r.data);
+  put('/api/v1/admin/settings/submission-rate-limit', { rate_limit: limit });

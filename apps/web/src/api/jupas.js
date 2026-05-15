@@ -1,10 +1,10 @@
-import client from '@schoolchoice/ui/api/client';
+import { get } from './helpers';
 
 export const searchJupas = (q) =>
-  client.get('/api/v1/jupas/search', { params: { q, limit: 20 } }).then((r) => r.data);
+  get('/api/v1/jupas/search', { params: { q, limit: 20 } });
 
 export const getAllProgrammes = () =>
-  client.get('/api/v1/jupas/all').then((r) => r.data);
+  get('/api/v1/jupas/all');
 
 export const getProgrammeStudents = (jupasCode) =>
-  client.get(`/api/v1/jupas/${jupasCode}/students`).then((r) => r.data);
+  get(`/api/v1/jupas/${jupasCode}/students`);

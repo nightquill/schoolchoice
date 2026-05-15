@@ -1,31 +1,31 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post, patch, del, client } from './helpers';
 
 export const generatePlan = (studentId, planType = 'UNIVERSITY') =>
-  client.post(`/api/v1/students/${studentId}/plan`, { plan_type: planType }).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/plan`, { plan_type: planType });
 
 export const getPlanStatus = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/plan/status`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/plan/status`);
 
 export const getPlan = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/plan`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/plan`);
 
 export const getPlanHistory = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/plans/history`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/plans/history`);
 
 export const deletePlanHistory = (studentId, planId) =>
   client.delete(`/api/v1/students/${studentId}/plans/history/${planId}`);
 
 // REQ-16: Counsellor AI Chat
 export const sendPlanChat = (studentId, message) =>
-  client.post(`/api/v1/students/${studentId}/plan/chat`, { message }).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/plan/chat`, { message });
 
 // REQ-17: Template selector
 export const setPlanTemplate = (studentId, templateId) =>
-  client.patch(`/api/v1/students/${studentId}/plan/template`, { template_id: templateId }).then((r) => r.data);
+  patch(`/api/v1/students/${studentId}/plan/template`, { template_id: templateId });
 
 // REQ-17: Per-section editing
 export const editPlanSection = (studentId, sectionKey, htmlContent) =>
-  client.patch(`/api/v1/students/${studentId}/plan/section`, { section_key: sectionKey, html_content: htmlContent }).then((r) => r.data);
+  patch(`/api/v1/students/${studentId}/plan/section`, { section_key: sectionKey, html_content: htmlContent });
 
 export const resetPlanSection = (studentId, sectionKey) =>
-  client.delete(`/api/v1/students/${studentId}/plan/section/${sectionKey}`).then((r) => r.data);
+  del(`/api/v1/students/${studentId}/plan/section/${sectionKey}`);

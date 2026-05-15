@@ -1,10 +1,10 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post } from './helpers';
 
 export const runMatch = (studentId) =>
-  client.post(`/api/v1/students/${studentId}/match`).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/match`);
 
 export const getMatch = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/match`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/match`);
 
 export const getAutoRecommendations = (studentId, limit = 5) =>
-  client.get(`/api/v1/students/${studentId}/recommendations/auto`, { params: { limit } }).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/recommendations/auto`, { params: { limit } });

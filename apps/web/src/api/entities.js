@@ -1,4 +1,4 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post, put, del, client } from './helpers';
 
 const SAFE_TABLE_NAME = /^[a-z][a-z0-9_]*$/;
 
@@ -9,10 +9,10 @@ function validateTableName(tableName) {
 }
 
 export const getEntities = () =>
-  client.get('/api/v1/entities').then((r) => r.data);
+  get('/api/v1/entities');
 
 export const getEntitySchema = (name) =>
-  client.get(`/api/v1/entities/${name}/schema`).then((r) => r.data);
+  get(`/api/v1/entities/${name}/schema`);
 
 export const getEntityList = (tableName, params = {}) => {
   validateTableName(tableName);
@@ -27,22 +27,22 @@ export const getEntityList = (tableName, params = {}) => {
 
 export const getEntityDetail = (tableName, id) => {
   validateTableName(tableName);
-  return client.get(`/api/v1/${tableName}/${id}`).then((r) => r.data);
+  return get(`/api/v1/${tableName}/${id}`);
 };
 
 export const createEntity = (tableName, data) => {
   validateTableName(tableName);
-  return client.post(`/api/v1/${tableName}`, data).then((r) => r.data);
+  return post(`/api/v1/${tableName}`, data);
 };
 
 export const updateEntity = (tableName, id, data) => {
   validateTableName(tableName);
-  return client.put(`/api/v1/${tableName}/${id}`, data).then((r) => r.data);
+  return put(`/api/v1/${tableName}/${id}`, data);
 };
 
 export const deleteEntity = (tableName, id) => {
   validateTableName(tableName);
-  return client.delete(`/api/v1/${tableName}/${id}`).then((r) => r.data);
+  return del(`/api/v1/${tableName}/${id}`);
 };
 
 // --- Import API functions (DATA-01, DATA-02, DATA-03) ---
@@ -51,24 +51,20 @@ export const importParse = (entityName, file) => {
   const formData = new FormData();
   formData.append('file', file);
   // Do NOT set Content-Type — let Axios set multipart boundary automatically (Pitfall 1)
-  return client.post(`/api/v1/entities/${entityName}/import/parse`, formData)
-    .then((r) => r.data);
+  return post(`/api/v1/entities/${entityName}/import/parse`, formData);
 };
 
 export const importParseSheet = (entityName, file, sheetName) => {
   const formData = new FormData();
   formData.append('file', file);
-  return client.post(`/api/v1/entities/${entityName}/import/parse-sheet?sheet_name=${encodeURIComponent(sheetName)}`, formData)
-    .then((r) => r.data);
+  return post(`/api/v1/entities/${entityName}/import/parse-sheet?sheet_name=${encodeURIComponent(sheetName)}`, formData);
 };
 
 export const importValidate = (entityName, payload) =>
-  client.post(`/api/v1/entities/${entityName}/import/validate`, payload)
-    .then((r) => r.data);
+  post(`/api/v1/entities/${entityName}/import/validate`, payload);
 
 export const importCommit = (entityName, payload) =>
-  client.post(`/api/v1/entities/${entityName}/import/commit`, payload)
-    .then((r) => r.data);
+  post(`/api/v1/entities/${entityName}/import/commit`, payload);
 
 // --- Export API functions (DATA-04, DATA-06) ---
 

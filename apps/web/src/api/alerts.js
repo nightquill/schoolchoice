@@ -1,3 +1,3 @@
-import client from '@schoolchoice/ui/api/client';
+import { get } from './helpers';
 
-export const getAlerts = () => client.get('/api/v1/alerts').then((r) => r.data);
+export const getAlerts = () => get('/api/v1/alerts');

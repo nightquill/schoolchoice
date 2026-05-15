@@ -1,16 +1,16 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post, put, del } from './helpers';
 
 export const getTargets = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/targets`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/targets`);
 
 export const addTarget = (studentId, data) =>
-  client.post(`/api/v1/students/${studentId}/targets`, data).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/targets`, data);
 
 export const updateTarget = (studentId, targetId, data) =>
-  client.put(`/api/v1/students/${studentId}/targets/${targetId}`, data).then((r) => r.data);
+  put(`/api/v1/students/${studentId}/targets/${targetId}`, data);
 
 export const deleteTarget = (studentId, targetId) =>
-  client.delete(`/api/v1/students/${studentId}/targets/${targetId}`).then((r) => r.data);
+  del(`/api/v1/students/${studentId}/targets/${targetId}`);
 
 export const reorderTargets = (studentId, orderedIds) =>
-  client.post(`/api/v1/students/${studentId}/targets/reorder`, { ordered_ids: orderedIds }).then((r) => r.data);
+  post(`/api/v1/students/${studentId}/targets/reorder`, { ordered_ids: orderedIds });

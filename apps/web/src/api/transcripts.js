@@ -1,4 +1,4 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, client } from './helpers';
 
 export const uploadTranscript = (studentId, file) => {
   const formData = new FormData();
@@ -9,4 +9,4 @@ export const uploadTranscript = (studentId, file) => {
 };
 
 export const getTranscript = (studentId) =>
-  client.get(`/api/v1/students/${studentId}/transcript`).then((r) => r.data);
+  get(`/api/v1/students/${studentId}/transcript`);

@@ -1,4 +1,4 @@
-import client from '@schoolchoice/ui/api/client';
+import { get } from './helpers';
 
 export const getMethodology = () =>
-  client.get('/api/v1/methodology').then((r) => r.data);
+  get('/api/v1/methodology');

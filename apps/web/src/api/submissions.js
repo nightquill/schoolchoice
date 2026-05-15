@@ -1,7 +1,7 @@
-import client from '@schoolchoice/ui/api/client';
+import { get, post } from './helpers';
 
-export const getSubmissions = () => client.get('/api/v1/submissions').then(r => r.data);
-export const getSubmission = (id) => client.get(`/api/v1/submissions/${id}`).then(r => r.data);
-export const approveSubmission = (id) => client.post(`/api/v1/submissions/${id}/approve`).then(r => r.data);
-export const reviseSubmission = (id, notes, flaggedChoices = []) => client.post(`/api/v1/submissions/${id}/revise`, { notes, flagged_choices: flaggedChoices }).then(r => r.data);
-export const rejectSubmission = (id, reason) => client.post(`/api/v1/submissions/${id}/reject`, { reason }).then(r => r.data);
+export const getSubmissions = () => get('/api/v1/submissions');
+export const getSubmission = (id) => get(`/api/v1/submissions/${id}`);
+export const approveSubmission = (id) => post(`/api/v1/submissions/${id}/approve`);
+export const reviseSubmission = (id, notes, flaggedChoices = []) => post(`/api/v1/submissions/${id}/revise`, { notes, flagged_choices: flaggedChoices });
+export const rejectSubmission = (id, reason) => post(`/api/v1/submissions/${id}/reject`, { reason });

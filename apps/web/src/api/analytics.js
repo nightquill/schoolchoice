@@ -1,26 +1,26 @@
-import client from '@schoolchoice/ui/api/client';
+import { get } from './helpers';
 
 export const getHkdseTrends = (sitting, cohortId) => {
   const params = {};
   if (sitting) params.sitting = sitting;
   if (cohortId) params.cohort_id = cohortId;
-  return client.get('/api/v1/analytics/hkdse-trends', { params }).then((r) => r.data);
+  return get('/api/v1/analytics/hkdse-trends', { params });
 };
 
 export const getPopularMajors = (limit = 20) =>
-  client.get('/api/v1/analytics/popular-majors', { params: { limit } }).then((r) => r.data);
+  get('/api/v1/analytics/popular-majors', { params: { limit } });
 
 export const getStudentDirectory = (graduatedOnly = false) =>
-  client.get('/api/v1/analytics/student-directory', { params: graduatedOnly ? { graduated_only: true } : {} }).then((r) => r.data);
+  get('/api/v1/analytics/student-directory', { params: graduatedOnly ? { graduated_only: true } : {} });
 
 export const getHkdsePopulationStats = (subjectCode) => {
   const params = {};
   if (subjectCode) params.subject_code = subjectCode;
-  return client.get('/api/v1/analytics/hkdse-population', { params }).then((r) => r.data);
+  return get('/api/v1/analytics/hkdse-population', { params });
 };
 
 export const getPlanHistory = (params = {}) =>
-  client.get('/api/v1/analytics/plan-history', { params }).then(r => r.data);
+  get('/api/v1/analytics/plan-history', { params });
 
 export const getSubmissionHistory = (params = {}) =>
-  client.get('/api/v1/analytics/submission-history', { params }).then(r => r.data);
+  get('/api/v1/analytics/submission-history', { params });
