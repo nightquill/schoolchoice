@@ -173,6 +173,10 @@ class User(Base):
         server_default="false",
         comment="If true, this teacher can create/edit/delete cohorts",
     )
+    reset_token_jti = Column(
+        String(36), nullable=True,
+        comment="Current password reset token JTI — cleared after use",
+    )
 
     # Relationships
     students = relationship(

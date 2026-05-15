@@ -163,6 +163,18 @@ class Student(Base):
         server_default="'en'",
         comment="'en' or 'zh-HK'",
     )
+    invite_token_jti = Column(
+        String(36), nullable=True,
+        comment="Current invite token JTI — cleared on accept, set on invite/reinvite",
+    )
+    invite_sent_at = Column(
+        TIMESTAMP(timezone=True), nullable=True,
+        comment="When the last invite was generated",
+    )
+    invite_accepted_at = Column(
+        TIMESTAMP(timezone=True), nullable=True,
+        comment="When the student accepted invite and created account",
+    )
     ielts_score = Column(
         JSONB, nullable=True,
         comment=(
