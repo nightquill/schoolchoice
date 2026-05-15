@@ -10,6 +10,7 @@ import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
 import { getStudents, createStudent } from '../../api/students';
 import { exportEntityCSV } from '../../api/entities';
+import { inviteStudent } from '../../api/invite';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function StudentListPage() {
@@ -21,6 +22,7 @@ function StudentListPage() {
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isExporting, setIsExporting] = useState(false);
+  const [showUnaccounted, setShowUnaccounted] = useState(false);
 
   useEffect(() => {
     const handle = setTimeout(() => setDebouncedSearch(searchText), 300);
@@ -28,10 +30,11 @@ function StudentListPage() {
   }, [searchText]);
 
   const studentsQuery = useQuery({
-    queryKey: ['students', debouncedSearch],
+    queryKey: ['students', debouncedSearch, showUnaccounted],
     queryFn: () => {
       const params = {};
       if (debouncedSearch) params.q = debouncedSearch;
+      if (showUnaccounted) params.unaccounted = true;
       return getStudents(params);
     },
   });
@@ -187,6 +190,21 @@ function StudentListPage() {
               {t('studentList.clearSearch')}
             </button>
           )}
+          <button
+            onClick={() => setShowUnaccounted(!showUnaccounted)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: 'var(--border-radius-sm)',
+              border: 'var(--border-width) solid var(--color-border)',
+              background: showUnaccounted ? 'var(--color-primary)' : 'var(--color-surface)',
+              color: showUnaccounted ? 'white' : 'var(--color-text-secondary)',
+              fontSize: 'var(--font-size-sm)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {showUnaccounted ? 'Showing Unaccounted' : 'Unaccounted'}
+          </button>
         </div>
 
         {showForm && (
@@ -208,25 +226,26 @@ function StudentListPage() {
                 <th style={thStyle}>{t('common.name')}</th>
                 <th style={thStyle}>{t('studentList.targetRegion')}</th>
                 <th style={thStyle}>{t('studentList.created')}</th>
+                <th style={thStyle}>Account</th>
                 <th style={thStyle}></th>
               </tr>
             </thead>
             <tbody>
               {studentsQuery.isLoading ? (
                 <tr>
-                  <td colSpan={4}>
+                  <td colSpan={5}>
                     <LoadingSpinner label={t('studentList.loading')} />
                   </td>
                 </tr>
               ) : studentsQuery.isError ? (
                 <tr>
-                  <td colSpan={4}>
+                  <td colSpan={5}>
                     <ErrorMessage message={t('studentList.loadFailed')} />
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={4}>
+                  <td colSpan={5}>
                     <EmptyState
                       message={
                         debouncedSearch
@@ -238,7 +257,7 @@ function StudentListPage() {
                 </tr>
               ) : (
                 students.map((student) => (
-                  <StudentRow key={student.id} student={student} />
+                  <StudentRow key={student.id} student={student} onInvite={inviteStudent} queryClient={queryClient} />
                 ))
               )}
             </tbody>

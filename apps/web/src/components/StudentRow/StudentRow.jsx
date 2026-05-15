@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
-function StudentRow({ student }) {
+function StudentRow({ student, onInvite, queryClient }) {
   const navigate = useNavigate();
   const { id, name, target_region, created_at } = student;
 
@@ -62,6 +63,37 @@ function StudentRow({ student }) {
       </td>
       <td style={tdSecondary}>{regionDisplay}</td>
       <td style={tdSecondary}>{createdDisplay}</td>
+      <td style={tdBase}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          {student.has_account ? (
+            <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', background: '#dcfce7', color: '#166534' }}>Active</span>
+          ) : student.invite_status === 'invited' ? (
+            <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', background: '#dbeafe', color: '#1e40af' }}>Invited</span>
+          ) : (
+            <>
+              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', background: '#fef3c7', color: '#92400e' }}>No Account</span>
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  const email = student.email || window.prompt('Enter student email:');
+                  if (!email) return;
+                  try {
+                    const result = await onInvite(student.id, email);
+                    toast.success(`Invite link copied for ${name}`);
+                    if (navigator.clipboard) navigator.clipboard.writeText(window.location.origin + result.invite_url);
+                    queryClient.invalidateQueries({ queryKey: ['students'] });
+                  } catch (err) {
+                    toast.error(err?.response?.data?.detail || 'Failed to invite');
+                  }
+                }}
+                style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)' }}
+              >
+                Invite
+              </button>
+            </>
+          )}
+        </div>
+      </td>
       <td style={tdSecondary}>{'>'}</td>
     </tr>
   );
