@@ -18,10 +18,20 @@ import uuid
 from datetime import datetime
 from typing import Any
 
+import chardet
 from sqlalchemy.orm import Session
 
 from app.db.models import Student
 from app.db.models_v2 import Subject, StudentSubjectGrade
+
+
+# ---------------------------------------------------------------------------
+# Exceptions
+# ---------------------------------------------------------------------------
+
+class ImportFileError(Exception):
+    """Raised when an uploaded file fails validation."""
+    pass
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +87,106 @@ def _sanitise_candidate_number(raw: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# File validation
+# ---------------------------------------------------------------------------
+
+# Magic bytes for rejected file types
+_MAGIC_CHECKS: list[tuple[bytes, str]] = [
+    (b"%PDF", "PDF files cannot be imported. Please upload a CSV file."),
+    (b"\x89PNG", "This looks like an image file. Please upload a CSV file."),
+    (b"\xff\xd8\xff", "This looks like an image file. Please upload a CSV file."),
+    (b"GIF8", "This looks like an image file. Please upload a CSV file."),
+    (b"\xd0\xcf\x11\xe0", "This looks like an old Office file (.xls/.doc). Please save as .xlsx or CSV and re-upload."),
+]
+
+MAX_DATA_ROWS = 2000
+
+
+def validate_file(content: bytes, filename: str) -> bool:
+    """Validate an uploaded file before parsing.
+
+    Args:
+        content: Raw file bytes.
+        filename: Original filename (used for extension check).
+
+    Returns:
+        True if valid.
+
+    Raises:
+        ImportFileError: If the file is invalid.
+    """
+    if not content or not content.strip():
+        raise ImportFileError("The file is empty. Please upload a CSV with data.")
+
+    # Check magic bytes
+    for magic, msg in _MAGIC_CHECKS:
+        if content[:len(magic)] == magic:
+            raise ImportFileError(msg)
+
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+    # Excel files: verify openpyxl can open them
+    if ext in ("xlsx", "xls"):
+        import openpyxl
+        try:
+            openpyxl.load_workbook(io.BytesIO(content), read_only=True)
+        except Exception:
+            raise ImportFileError(
+                "The Excel file appears to be corrupted and cannot be opened. "
+                "Please re-export it and try again."
+            )
+        return True
+
+    # CSV validation
+    encoding = detect_encoding(content)
+    text = content.decode(encoding, errors="replace")
+    if text and text[0] == "\ufeff":
+        text = text[1:]
+
+    lines = [l for l in text.splitlines() if l.strip()]
+    if len(lines) < 2:
+        raise ImportFileError(
+            "The CSV file has no data rows. "
+            "It must contain a header row and at least one data row."
+        )
+    if len(lines) - 1 > MAX_DATA_ROWS:
+        raise ImportFileError(
+            f"The CSV file has {len(lines) - 1} data rows, which exceeds "
+            f"the limit of {MAX_DATA_ROWS}. Please split into smaller files."
+        )
+
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Encoding detection
+# ---------------------------------------------------------------------------
+
+def detect_encoding(content: bytes) -> str:
+    """Detect the encoding of raw bytes.
+
+    Priority: UTF-8 BOM → UTF-8 → chardet → latin-1 fallback.
+    """
+    # UTF-8 BOM
+    if content[:3] == b"\xef\xbb\xbf":
+        return "utf-8-sig"
+
+    # Try strict UTF-8
+    try:
+        content.decode("utf-8")
+        return "utf-8"
+    except UnicodeDecodeError:
+        pass
+
+    # chardet
+    result = chardet.detect(content)
+    if result and result.get("encoding") and (result.get("confidence", 0) > 0.5):
+        return result["encoding"]
+
+    return "latin-1"
+
+
+# ---------------------------------------------------------------------------
 # parse_student_csv
 # ---------------------------------------------------------------------------
 
@@ -89,11 +199,11 @@ def parse_student_csv(content: bytes) -> dict:
     Returns:
         Dict with keys: rows, subject_columns, summary.
     """
-    # Decode: prefer utf-8-sig (strips BOM), fall back to latin-1
-    try:
-        text = content.decode("utf-8-sig")
-    except UnicodeDecodeError:
-        text = content.decode("latin-1")
+    # Decode using detected encoding
+    encoding = detect_encoding(content)
+    text = content.decode(encoding, errors="replace")
+    if text and text[0] == "\ufeff":
+        text = text[1:]
 
     # Strip control characters from the entire text before CSV parsing
     # (csv.reader chokes on NUL bytes)

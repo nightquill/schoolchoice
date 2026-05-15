@@ -22,6 +22,9 @@ import pytest
 
 from app.services.student_import_service import (
     parse_student_csv,
+    validate_file,
+    ImportFileError,
+    detect_encoding,
     VALID_GRADES,
 )
 
@@ -260,3 +263,79 @@ class TestParseStudentCsv:
         )
         result = parse_student_csv(csv_bytes)
         assert result["rows"][0]["year_of_exam"] == 2025
+
+
+# ---------------------------------------------------------------------------
+# Tests: validate_file
+# ---------------------------------------------------------------------------
+
+class TestFileValidation:
+    """Tests for validate_file."""
+
+    def test_pdf_rejected(self):
+        content = b"%PDF-1.4 fake pdf content here"
+        with pytest.raises(ImportFileError, match="PDF"):
+            validate_file(content, "report.pdf")
+
+    def test_png_rejected(self):
+        content = b"\x89PNG\r\n\x1a\n fake png"
+        with pytest.raises(ImportFileError, match="image"):
+            validate_file(content, "photo.png")
+
+    def test_jpeg_rejected(self):
+        content = b"\xff\xd8\xff\xe0 fake jpeg"
+        with pytest.raises(ImportFileError, match="image"):
+            validate_file(content, "photo.jpg")
+
+    def test_empty_csv_rejected(self):
+        content = b"candidate_number,name,ENGL\n"
+        with pytest.raises(ImportFileError, match="no data rows"):
+            validate_file(content, "empty.csv")
+
+    def test_valid_csv_accepted(self):
+        content = _make_csv(
+            ["candidate_number", "name", "ENGL"],
+            [["A001", "Alice", "5"]],
+        )
+        assert validate_file(content, "students.csv") is True
+
+    def test_row_limit_exceeded(self):
+        rows = [[f"X{i:04}", f"Student {i}", "4"] for i in range(2001)]
+        content = _make_csv(["candidate_number", "name", "ENGL"], rows)
+        with pytest.raises(ImportFileError, match="2000"):
+            validate_file(content, "big.csv")
+
+    def test_corrupt_xlsx_rejected(self):
+        content = b"PK\x03\x04this is not a real xlsx"
+        with pytest.raises(ImportFileError, match="corrupted"):
+            validate_file(content, "bad.xlsx")
+
+
+# ---------------------------------------------------------------------------
+# Tests: detect_encoding
+# ---------------------------------------------------------------------------
+
+class TestEncodingDetection:
+    """Tests for detect_encoding."""
+
+    def test_utf8_detected(self):
+        content = "candidate_number,name\nT001,Alice Wong\n".encode("utf-8")
+        assert detect_encoding(content) == "utf-8"
+
+    def test_utf8_bom_detected(self):
+        content = b"\xef\xbb\xbf" + "candidate_number,name\nT001,Alice\n".encode("utf-8")
+        enc = detect_encoding(content)
+        assert enc.lower().replace("-", "") in ("utf8", "utf8sig")
+
+    def test_big5_detected(self):
+        content = "candidate_number,姓名\nT001,陳嘉偉\n".encode("big5")
+        enc = detect_encoding(content)
+        assert "big5" in enc.lower() or "ascii" not in enc.lower()
+
+    def test_decode_with_detected_encoding(self):
+        original = "candidate_number,姓名,英文\nT001,陳嘉偉,5*\nT002,黃美儀,5\n"
+        content = original.encode("big5")
+        enc = detect_encoding(content)
+        decoded = content.decode(enc)
+        assert "陳嘉偉" in decoded
+        assert "黃美儀" in decoded
