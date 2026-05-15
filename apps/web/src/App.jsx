@@ -33,6 +33,7 @@ import StudentSubmissions from './pages/Submissions/StudentSubmissions';
 import ProgrammeDetail from './pages/ProgrammeDetail/ProgrammeDetail';
 import SfInstitution from './pages/SfInstitution/SfInstitution';
 import SfProgrammeDetail from './pages/SfInstitution/SfProgrammeDetail';
+import StudentPlan from './pages/StudentPlan/StudentPlan';
 import PlansAnalytics from './pages/Analytics/PlansAnalytics';
 import SubmissionsAnalytics from './pages/Analytics/SubmissionsAnalytics';
 
@@ -110,6 +111,7 @@ export default function App() {
         <Route path="/data-analysis" element={<ProtectedRoute><DataAnalysis /></ProtectedRoute>} />
         <Route path="/data-analysis/subjects/:subjectCode" element={<ProtectedRoute><SubjectDetail /></ProtectedRoute>} />
 
+        <Route path="/my-plan" element={<ProtectedRoute><StudentPlan /></ProtectedRoute>} />
         <Route path="/my-submissions" element={<ProtectedRoute><StudentSubmissions /></ProtectedRoute>} />
         <Route path="/submissions" element={<ProtectedRoute><SubmissionList /></ProtectedRoute>} />
         <Route path="/submissions/:id" element={<ProtectedRoute><SubmissionDetail /></ProtectedRoute>} />

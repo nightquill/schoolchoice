@@ -9,6 +9,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@schoolchoice/ui/primitives/dialog';
 import SSEStreamDisplay from '../../components/SSEStreamDisplay/SSEStreamDisplay';
 import PlanProgress from '../../components/PlanProgress/PlanProgress';
 import PlanSectionEditor from '../../components/PlanSectionEditor/PlanSectionEditor';
@@ -16,7 +17,7 @@ import PlanRadarChart from '../../components/PlanRadarChart/PlanRadarChart';
 import { TemplateSelector } from '@schoolchoice/ui';
 import { toast } from 'sonner';
 import { saveConsultantTask, sendConsultantChat } from '../../api/consultant';
-import { exportPlanPDF } from '../../api/plan';
+import { exportPlanPDF, releasePlan, getReleaseStatus } from '../../api/plan';
 import { getGrades } from '../../api/grades';
 import { getTargets } from '../../api/targets';
 import { getAllProgrammes } from '../../api/jupas';
@@ -143,6 +144,11 @@ function ConsultantTask() {
   // --- mobile chat toggle ---
   const [showChat, setShowChat] = useState(false);
 
+  // --- release plan state ---
+  const [showReleaseModal, setShowReleaseModal] = useState(false);
+  const [releaseNote, setReleaseNote] = useState('');
+  const [releasing, setReleasing] = useState(false);
+
   // Cleanup EventSource on unmount
   useEffect(() => {
     return () => {
@@ -242,6 +248,25 @@ function ConsultantTask() {
 
   const hasPlan = !streaming && !error && plan?.html_content;
   const sectionList = buildSectionList(plan);
+
+  // --- Release status query ---
+  const releaseQuery = useQuery({
+    queryKey: ['release-status', id],
+    queryFn: () => getReleaseStatus(id),
+    enabled: !!plan?.html_content,
+  });
+
+  const handleRelease = async () => {
+    setReleasing(true);
+    try {
+      await releasePlan(id, releaseNote);
+      toast.success(t('plan.released'));
+      setShowReleaseModal(false);
+      setReleaseNote('');
+      releaseQuery.refetch();
+    } catch { toast.error(t('plan.releaseFailed')); }
+    finally { setReleasing(false); }
+  };
 
   // --- Radar chart data queries ---
   const gradesQuery = useQuery({
@@ -402,6 +427,20 @@ function ConsultantTask() {
             >
               <FileDown size={16} />
               {isExportingPDF ? t('plan.exporting') : t('plan.exportPdf')}
+            </button>
+          )}
+
+          {plan?.html_content && (
+            <button
+              onClick={() => setShowReleaseModal(true)}
+              style={{
+                ...exportBtnStyle,
+                background: releaseQuery.data?.released ? 'var(--color-success-bg)' : 'transparent',
+                color: releaseQuery.data?.released ? 'var(--color-success-text)' : exportBtnStyle.color,
+                borderColor: releaseQuery.data?.released ? 'var(--color-success-border)' : undefined,
+              }}
+            >
+              {releaseQuery.data?.released ? `✓ ${t('plan.released')} v${releaseQuery.data.version}` : t('plan.releaseToStudent')}
             </button>
           )}
 
@@ -652,6 +691,33 @@ function ConsultantTask() {
           </div>
         </div>
       )}
+
+      {/* Release plan modal */}
+      <Dialog open={showReleaseModal} onOpenChange={setShowReleaseModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('plan.releaseToStudent')}</DialogTitle>
+          </DialogHeader>
+          <div style={{ marginBottom: 'var(--space-3)' }}>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', marginBottom: 'var(--space-1)', color: 'var(--color-text-secondary)' }}>
+              {t('plan.releaseNote')}
+            </label>
+            <textarea
+              value={releaseNote}
+              onChange={(e) => setReleaseNote(e.target.value)}
+              placeholder={t('plan.releaseNote')}
+              rows={3}
+              style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', boxSizing: 'border-box', resize: 'vertical' }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowReleaseModal(false)}>{t('dashboard.cancel')}</Button>
+            <Button onClick={handleRelease} disabled={releasing}>
+              {releasing ? '...' : (releaseQuery.data?.released ? t('plan.rerelease') : t('plan.releaseToStudent'))}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Responsive styles for mobile/desktop chat visibility */}
       <style>{`

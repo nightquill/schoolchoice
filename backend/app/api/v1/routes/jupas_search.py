@@ -16,6 +16,16 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/jupas", tags=["jupas"])
 
+
+def _programme_url(prog) -> str:
+    """Generate JUPAS programme URL, with override support."""
+    if getattr(prog, 'website_url', None):
+        return prog.website_url
+    code = getattr(prog, 'institution_code', '') or ''
+    jupas = getattr(prog, 'jupas_code', '') or ''
+    return f"https://www.jupas.edu.hk/en/programme/{code}/{jupas}/"
+
+
 @router.get("/all")
 def list_all_programmes(
     db: Session = Depends(get_db),
@@ -37,6 +47,7 @@ def list_all_programmes(
                 "faculty": p.faculty,
                 "admission_stats": p.admission_stats,
                 "non_grade_requirements": p.non_grade_requirements,
+                "website_url": _programme_url(p),
             }
             for p in programmes
         ],
@@ -77,6 +88,7 @@ def search_programmes(
             "school_name": p.school.name if p.school else None,
             "faculty": p.faculty,
             "non_grade_requirements": p.non_grade_requirements,
+            "website_url": _programme_url(p),
         }
         for p in programmes
     ]
@@ -194,6 +206,7 @@ def get_programme_deadlines(
     return {
         "jupas_code": programme.jupas_code,
         "programme_name": programme.name,
+        "website_url": _programme_url(programme),
         "milestones": get_all_milestones(),
         "next_milestone": get_next_milestone(today),
         "programme_deadlines": programme.deadlines or {},

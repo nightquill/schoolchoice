@@ -430,6 +430,7 @@ class JupasProgramme(Base):
     admission_stats = Column(JSONB, nullable=False, server_default="{}", default=dict, comment="Per-year UQ/Median/LQ stats")
     non_grade_requirements = Column(JSONB, nullable=True, comment="Interview, portfolio, aptitude test requirements")
     notes = Column(Text, nullable=True)
+    website_url = Column(String(500), nullable=True, comment="Override URL for programme page")
     deadlines = Column(
         JSON,
         nullable=True,
@@ -1274,6 +1275,8 @@ class AcademicPlan(Base):
         default=dict,
         comment="Rate-limit counters: {date_counsellor_planid: count}",
     )
+    released_at = Column(TIMESTAMP(timezone=True), nullable=True, comment="When plan was released to student")
+    release_note = Column(Text, nullable=True, comment="Counselor note to student on release")
     created_at = Column(
         TIMESTAMP(timezone=True),
         nullable=False,

@@ -17,6 +17,7 @@ from app.db.session import get_db
 from app.modules.school_choice.models.models import (
     JupasProgramme,
     Student,
+    StudentSchoolTarget,
     StudentSubjectGrade,
     Subject,
 )
@@ -97,6 +98,7 @@ def get_student_choices(
             "status": submission.status,
             "choices": submission.choices,
             "counsellor_notes": submission.counsellor_notes,
+            "flagged_choices": submission.flagged_choices,
             "submitted_at": submission.submitted_at.isoformat() if submission.submitted_at else None,
             "reviewed_at": submission.reviewed_at.isoformat() if submission.reviewed_at else None,
         }
@@ -197,7 +199,39 @@ def submit_choices(
     user: User = Depends(get_current_student),
     db: Session = Depends(get_db),
 ):
-    """Submit draft/revision_requested submission for counsellor approval."""
+    """Submit draft/revision_requested submission for counsellor approval. Rate limited."""
+    from app.db.models import Organisation, OrganisationMembership
+
+    # Rate limit: check how many submissions in the last N hours (configurable per org)
+    membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == user.id).first()
+    max_per_day = 3  # default
+    if membership:
+        org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
+        if org and org.metadata_:
+            import json as _json
+            try:
+                meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else org.metadata_
+                max_per_day = meta.get("submission_rate_limit", 3) if isinstance(meta, dict) else 3
+            except (ValueError, TypeError):
+                pass
+
+    from datetime import timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    recent_count = (
+        db.query(StudentChoiceSubmission)
+        .filter(
+            StudentChoiceSubmission.student_id == user.student_id,
+            StudentChoiceSubmission.submitted_at != None,  # noqa: E711
+            StudentChoiceSubmission.submitted_at >= cutoff,
+        )
+        .count()
+    )
+    if recent_count >= max_per_day:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Submission rate limit reached ({max_per_day} per 24 hours). Please try again later.",
+        )
+
     submission = (
         db.query(StudentChoiceSubmission)
         .filter(
@@ -316,3 +350,126 @@ def get_match_scores(
             })
 
     return {"scores": scores}
+
+
+# ---------------------------------------------------------------------------
+# 6. GET /student/choices/history
+# ---------------------------------------------------------------------------
+
+@router.get("/choices/history")
+def get_submission_history(
+    user: User = Depends(get_current_student),
+    db: Session = Depends(get_db),
+):
+    """Return all submissions for this student, newest first."""
+    submissions = (
+        db.query(StudentChoiceSubmission)
+        .filter(StudentChoiceSubmission.student_id == user.student_id)
+        .order_by(StudentChoiceSubmission.updated_at.desc())
+        .all()
+    )
+    return {
+        "submissions": [
+            {
+                "id": str(s.id),
+                "status": s.status,
+                "choices": s.choices,
+                "counsellor_notes": s.counsellor_notes,
+                "flagged_choices": s.flagged_choices,
+                "submitted_at": s.submitted_at.isoformat() if s.submitted_at else None,
+                "reviewed_at": s.reviewed_at.isoformat() if s.reviewed_at else None,
+                "created_at": s.created_at.isoformat() if s.created_at else None,
+            }
+            for s in submissions
+        ]
+    }
+
+
+# ---------------------------------------------------------------------------
+# 7. GET /student/plan — student views released plan
+# ---------------------------------------------------------------------------
+
+@router.get("/plan")
+def student_get_plan(db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.models import AcademicPlan
+    plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student.id).first()
+    if not plan or not plan.released_at:
+        raise HTTPException(status_code=404, detail="No plan released yet")
+    return {
+        "html_content": plan.html_content,
+        "release_note": plan.release_note,
+        "released_at": plan.released_at.isoformat(),
+        "version": plan.version,
+    }
+
+
+# ---------------------------------------------------------------------------
+# 8. Grade builds (student portal)
+# ---------------------------------------------------------------------------
+
+@router.get("/grade-builds")
+def student_list_builds(db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.grade_builds import GradeBuild
+    builds = db.query(GradeBuild).filter(GradeBuild.student_id == student.id).order_by(GradeBuild.created_at).all()
+    return {"builds": [{"id": str(b.id), "name": b.name, "grades": b.grades} for b in builds]}
+
+
+@router.post("/grade-builds")
+def student_create_build(body: dict, db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.grade_builds import GradeBuild
+    count = db.query(GradeBuild).filter(GradeBuild.student_id == student.id).count()
+    if count >= 5:
+        raise HTTPException(status_code=400, detail="Maximum 5 grade builds")
+    build = GradeBuild(student_id=student.id, name=body.get("name", "Build"), grades=body.get("grades", {}))
+    db.add(build)
+    db.commit()
+    db.refresh(build)
+    return {"id": str(build.id), "name": build.name, "grades": build.grades}
+
+
+@router.put("/grade-builds/{build_id}")
+def student_update_build(build_id: str, body: dict, db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.grade_builds import GradeBuild
+    build = db.query(GradeBuild).filter(GradeBuild.id == build_id, GradeBuild.student_id == student.id).first()
+    if not build:
+        raise HTTPException(status_code=404, detail="Build not found")
+    if "name" in body:
+        build.name = body["name"]
+    if "grades" in body:
+        build.grades = body["grades"]
+    db.commit()
+    return {"id": str(build.id), "name": build.name, "grades": build.grades}
+
+
+@router.delete("/grade-builds/{build_id}")
+def student_delete_build(build_id: str, db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.grade_builds import GradeBuild
+    build = db.query(GradeBuild).filter(GradeBuild.id == build_id, GradeBuild.student_id == student.id).first()
+    if not build:
+        raise HTTPException(status_code=404, detail="Build not found")
+    db.delete(build)
+    db.commit()
+    return {"deleted": True}
+
+
+@router.post("/grade-builds/{build_id}/scores")
+def student_score_build(build_id: str, db: Session = Depends(get_db), student: Student = Depends(get_current_student)):
+    from app.modules.school_choice.models.grade_builds import GradeBuild
+    build = db.query(GradeBuild).filter(GradeBuild.id == build_id, GradeBuild.student_id == student.id).first()
+    if not build:
+        raise HTTPException(status_code=404, detail="Build not found")
+    targets = db.query(StudentSchoolTarget).filter(StudentSchoolTarget.student_id == student.id).all()
+    results = []
+    for t in targets:
+        if not t.jupas_code:
+            continue
+        prog = db.query(JupasProgramme).filter(JupasProgramme.jupas_code == t.jupas_code).first()
+        if not prog:
+            continue
+        prog_dict = {"jupas_code": prog.jupas_code, "name": prog.name, "scoring_formula": prog.scoring_formula or {}, "minimum_requirements": prog.minimum_requirements or {}, "admission_stats": prog.admission_stats or {}}
+        try:
+            score = score_student_for_programme(build.grades, prog_dict)
+            results.append({"jupas_code": prog.jupas_code, "programme_name": prog.name, "match_score": score.get("admission_probability"), "eligible": score.get("eligible")})
+        except Exception:
+            results.append({"jupas_code": prog.jupas_code, "programme_name": prog.name, "match_score": None, "eligible": None})
+    return {"build_id": str(build.id), "scores": results}

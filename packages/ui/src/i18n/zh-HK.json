@@ -13,7 +13,8 @@
     "mySubmissions": "我的提交",
     "manage": "用戶管理",
     "openMenu": "開啟選單",
-    "closeMenu": "關閉選單"
+    "closeMenu": "關閉選單",
+    "myPlan": "我的計劃"
   },
   "auth": {
     "login": "登入",
@@ -599,7 +600,18 @@
     "exportPdf": "匯出 PDF",
     "academicStrengths": "學業優勢",
     "yourGrades": "你的成績",
-    "bandABenchmark": "Band A 基準"
+    "bandABenchmark": "Band A 基準",
+    "released": "計劃已發佈給學生",
+    "releaseFailed": "發佈失敗",
+    "releaseToStudent": "發佈給學生",
+    "releaseNote": "為學生添加備註…",
+    "rerelease": "重新發佈"
+  },
+  "studentPlan": {
+    "title": "我的升學計劃",
+    "notReleased": "你的輔導老師尚未發佈計劃。",
+    "counselorNote": "輔導老師備註",
+    "releasedOn": "發佈日期"
   },
   "consultant": {
     "backTo": "返回",
@@ -981,6 +993,15 @@
     "exportSuccess": "匯出完成。",
     "exportFailed": "匯出失敗，請重試。",
     "noResults": "找不到結果。請調整搜尋條件或篩選。"
+  },
+  "gradeBuilds": {
+    "actualGrades": "實際成績",
+    "newBuild": "+ 新組合",
+    "buildName": "組合名稱",
+    "scoreUsing": "使用成績",
+    "liveScores": "即時配對分數",
+    "maxBuilds": "已達 5 個組合上限",
+    "deleteBuild": "刪除組合"
   },
   "studentList": {
     "title": "學生",

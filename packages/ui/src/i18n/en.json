@@ -13,7 +13,8 @@
     "mySubmissions": "My Submissions",
     "manage": "User Management",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "myPlan": "My Plan"
   },
   "auth": {
     "login": "Login",
@@ -347,7 +348,18 @@
     "exportPdf": "Export PDF",
     "academicStrengths": "Academic Strengths",
     "yourGrades": "Your Grades",
-    "bandABenchmark": "Band A Benchmark"
+    "bandABenchmark": "Band A Benchmark",
+    "released": "Plan released to student",
+    "releaseFailed": "Failed to release plan",
+    "releaseToStudent": "Release to Student",
+    "releaseNote": "Add a note for your student...",
+    "rerelease": "Re-release"
+  },
+  "studentPlan": {
+    "title": "My Academic Plan",
+    "notReleased": "Your counselor has not released a plan yet.",
+    "counselorNote": "Your counselor's note",
+    "releasedOn": "Released"
   },
   "account": {
     "loading": "Loading account settings...",
@@ -981,6 +993,15 @@
     "exportSuccess": "Export downloaded.",
     "exportFailed": "Export failed. Please try again.",
     "noResults": "No results found. Try adjusting your search or filters."
+  },
+  "gradeBuilds": {
+    "actualGrades": "Actual Grades",
+    "newBuild": "+ New Build",
+    "buildName": "Build name",
+    "scoreUsing": "Score using",
+    "liveScores": "Live Match Scores",
+    "maxBuilds": "Maximum 5 builds reached",
+    "deleteBuild": "Delete build"
   },
   "studentList": {
     "title": "Students",

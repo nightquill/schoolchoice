@@ -1,4 +1,5 @@
 """JUPAS application cycle milestones — updated manually each admission cycle."""
+from __future__ import annotations
 
 JUPAS_CYCLE_YEAR = 2026
 

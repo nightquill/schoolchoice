@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useGradesTab } from '../../hooks/useGradesTab';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { LoadingSpinner } from '@schoolchoice/ui';
@@ -6,6 +7,8 @@ import { ErrorMessage } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { PredictedGradeBadge } from '@schoolchoice/ui';
 import { FileUpload } from '@schoolchoice/ui';
+import { getGradeBuilds, createGradeBuild, updateGradeBuild, deleteGradeBuild, scoreBuild } from '../../api/gradeBuilds';
+import { toast } from 'sonner';
 
 const HKDSE_SUBJECT_CODES = [
   'CHLA', 'ENGL', 'MATH', 'CSD', 'CHIH', 'CHIL', 'HIST', 'GEOG', 'TOUR',
@@ -33,6 +36,77 @@ export default function GradesTab({ studentId, subjects }) {
     handleSaveNewRow,
     dismissParsedGrade,
   } = useGradesTab(studentId);
+
+  // Grade builds state
+  const [activeBuildId, setActiveBuildId] = useState(null); // null = actual grades
+  const [buildGrades, setBuildGrades] = useState({});
+  const [liveScores, setLiveScores] = useState([]);
+  const [newBuildName, setNewBuildName] = useState('');
+  const [showNewBuild, setShowNewBuild] = useState(false);
+
+  const buildsQuery = useQuery({
+    queryKey: ['grade-builds', studentId],
+    queryFn: () => getGradeBuilds(studentId),
+  });
+  const builds = buildsQuery.data?.builds ?? [];
+  const activeBuild = builds.find(b => b.id === activeBuildId);
+
+  const scoreTimeoutRef = useRef(null);
+  const fetchLiveScores = useCallback((buildId) => {
+    if (scoreTimeoutRef.current) clearTimeout(scoreTimeoutRef.current);
+    scoreTimeoutRef.current = setTimeout(async () => {
+      try {
+        const result = await scoreBuild(studentId, buildId);
+        setLiveScores(result.scores || []);
+      } catch { /* ignore */ }
+    }, 300);
+  }, [studentId]);
+
+  const handleCreateBuild = async () => {
+    if (!newBuildName.trim()) return;
+    try {
+      const result = await createGradeBuild(studentId, newBuildName.trim());
+      buildsQuery.refetch();
+      setActiveBuildId(result.id);
+      setBuildGrades(result.grades || {});
+      setNewBuildName('');
+      setShowNewBuild(false);
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'Failed to create build');
+    }
+  };
+
+  const handleBuildGradeChange = async (subjectCode, grade) => {
+    const newGrades = { ...buildGrades, [subjectCode]: grade };
+    setBuildGrades(newGrades);
+    if (activeBuildId) {
+      try {
+        await updateGradeBuild(studentId, activeBuildId, { grades: newGrades });
+        fetchLiveScores(activeBuildId);
+      } catch { /* ignore */ }
+    }
+  };
+
+  const handleDeleteBuild = async () => {
+    if (!activeBuildId) return;
+    try {
+      await deleteGradeBuild(studentId, activeBuildId);
+      setActiveBuildId(null);
+      setBuildGrades({});
+      setLiveScores([]);
+      buildsQuery.refetch();
+    } catch { toast.error('Failed to delete'); }
+  };
+
+  useEffect(() => {
+    if (activeBuildId && activeBuild) {
+      setBuildGrades(activeBuild.grades || {});
+      fetchLiveScores(activeBuildId);
+    } else {
+      setBuildGrades({});
+      setLiveScores([]);
+    }
+  }, [activeBuildId]); // eslint-disable-line
 
   // Sitting filter — default to the sitting with most grades
   const sittingCounts = useMemo(() => {
@@ -83,6 +157,85 @@ export default function GradesTab({ studentId, subjects }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      {/* Build selector */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
+        <select
+          value={activeBuildId || ''}
+          onChange={(e) => setActiveBuildId(e.target.value || null)}
+          style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
+        >
+          <option value="">{t('gradeBuilds.actualGrades')}</option>
+          {builds.map(b => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
+        {!showNewBuild && builds.length < 5 && (
+          <button onClick={() => setShowNewBuild(true)} style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
+            {t('gradeBuilds.newBuild')}
+          </button>
+        )}
+        {showNewBuild && (
+          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+            <input value={newBuildName} onChange={(e) => setNewBuildName(e.target.value)} placeholder={t('gradeBuilds.buildName')} style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', width: '150px' }} onKeyDown={(e) => e.key === 'Enter' && handleCreateBuild()} />
+            <Button onClick={handleCreateBuild}>{t('dashboard.create')}</Button>
+            <button onClick={() => { setShowNewBuild(false); setNewBuildName(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>&#x2715;</button>
+          </div>
+        )}
+        {activeBuildId && (
+          <button onClick={handleDeleteBuild} style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
+            {t('gradeBuilds.deleteBuild')}
+          </button>
+        )}
+      </div>
+
+      {/* Editable build grades */}
+      {activeBuildId && (
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>{t('grades.subject')}</th>
+                <th style={thStyle}>{t('grades.grade')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {HKDSE_SUBJECT_CODES.map(code => {
+                const translated = t(`subjects.${code}`);
+                const label = translated !== `subjects.${code}` ? translated : code;
+                return (
+                  <tr key={code}>
+                    <td style={tdStyle}>{label}</td>
+                    <td style={tdStyle}>
+                      <select value={buildGrades[code] || ''} onChange={(e) => handleBuildGradeChange(code, e.target.value)} style={{ padding: '2px 4px', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
+                        <option value="">{'\u2014'}</option>
+                        {HKDSE_GRADES.map(g => <option key={g} value={g}>{g}</option>)}
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {/* Live scores panel */}
+          {liveScores.length > 0 && (
+            <div style={{ marginTop: 'var(--space-3)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-3)' }}>
+              <h4 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', margin: '0 0 var(--space-2) 0' }}>{t('gradeBuilds.liveScores')}</h4>
+              {liveScores.map(s => (
+                <div key={s.jupas_code} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--font-size-sm)', padding: 'var(--space-1) 0', borderBottom: '1px solid var(--color-border)' }}>
+                  <span>{s.programme_name}</span>
+                  <span style={{ fontWeight: 'var(--font-weight-bold)', fontVariantNumeric: 'tabular-nums', color: s.match_score >= 0.7 ? 'var(--color-success)' : s.match_score >= 0.4 ? 'var(--color-warning)' : 'var(--color-error)' }}>
+                    {s.match_score != null ? `${Math.round(s.match_score * 100)}%` : '\u2014'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Actual grades view */}
+      {!activeBuildId && (<>
       <div>
         <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
           {t('grades.uploadTranscript')}
@@ -266,6 +419,7 @@ export default function GradesTab({ studentId, subjects }) {
           </div>
         </div>
       )}
+      </>)}
     </div>
   );
 }

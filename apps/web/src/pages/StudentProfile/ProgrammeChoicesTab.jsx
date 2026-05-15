@@ -688,6 +688,13 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                         </div>
                         <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{prog.name}</div>
                         {prog.faculty && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{prog.faculty}</div>}
+                        {prog.website_url && (
+                          <a href={prog.website_url} target="_blank" rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', textDecoration: 'none', marginTop: '2px', display: 'inline-block' }}>
+                            ↗ JUPAS
+                          </a>
+                        )}
                       </li>
                     );
                   })}

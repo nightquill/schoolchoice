@@ -45,7 +45,10 @@ from app.platform.health import check_orm_schema_parity, run_health_check
 # (safety net — module loader also imports models, but create_all runs before discovery)
 import app.db.models_v2  # noqa: F401
 from app.modules.school_choice.models.submissions import StudentChoiceSubmission  # noqa: F401
+from app.modules.school_choice.models.grade_builds import GradeBuild  # noqa: F401
 from app.api.v1.routes.jupas_search import router as jupas_search_router
+from app.api.v1.routes.self_financing import router as sf_router
+from app.api.v1.routes.grade_builds import router as grade_builds_router
 
 _startup_logger = _logging.getLogger("app.startup")
 
@@ -291,6 +294,8 @@ app.include_router(alerts_router, prefix="/api/v1")
 app.include_router(consent_router, prefix="/api/v1")
 app.include_router(student_import_router, prefix="/api/v1")
 app.include_router(jupas_search_router, prefix="/api/v1")
+app.include_router(sf_router, prefix="/api/v1")
+app.include_router(grade_builds_router, prefix="/api/v1")
 
 from app.api.v1.routes.reports import router as reports_router
 app.include_router(reports_router, prefix="/api/v1")
@@ -300,6 +305,9 @@ app.include_router(student_portal_router, prefix="/api/v1")
 
 from app.api.v1.routes.submissions import router as submissions_router
 app.include_router(submissions_router, prefix="/api/v1")
+
+from app.api.v1.routes.plan_release import router as plan_release_router
+app.include_router(plan_release_router, prefix="/api/v1")
 
 # ---------------------------------------------------------------------------
 # Task YAML validation at startup (Pitfall 4 prevention)

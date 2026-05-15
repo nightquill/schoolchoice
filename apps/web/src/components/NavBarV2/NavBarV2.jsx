@@ -151,6 +151,12 @@ function NavBarV2({ account }) {
               {t('nav.mySubmissions')}
             </Link>
           )}
+          {isStudent && (
+            <Link to="/my-plan" style={getLinkStyle('/my-plan')}>{t('nav.myPlan')}</Link>
+          )}
+          {isStudent && (
+            <Link to="/schools" style={getLinkStyle('/schools')}>{t('nav.schoolDirectory')}</Link>
+          )}
           {!isStudent && (
             <>
               <Link to="/schools" style={getLinkStyle('/schools')}>
@@ -229,6 +235,12 @@ function NavBarV2({ account }) {
           <Link to="/dashboard" style={getMobileLinkStyle('/dashboard')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dashboard')}</Link>
           {isStudent && (
             <Link to="/my-submissions" style={getMobileLinkStyle('/my-submissions')} onClick={() => setMobileMenuOpen(false)}>{t('nav.mySubmissions')}</Link>
+          )}
+          {isStudent && (
+            <Link to="/my-plan" style={getMobileLinkStyle('/my-plan')} onClick={() => setMobileMenuOpen(false)}>{t('nav.myPlan')}</Link>
+          )}
+          {isStudent && (
+            <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>{t('nav.schoolDirectory')}</Link>
           )}
           {!isStudent && (
             <>

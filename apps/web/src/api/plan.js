@@ -50,6 +50,15 @@ export const exportPlanPDF = async (studentId) => {
   }
 };
 
+export const releasePlan = (studentId, note = '') =>
+  post(`/api/v1/students/${studentId}/plan/release`, { note });
+
+export const getStudentPlan = () =>
+  get('/api/v1/student/plan');
+
+export const getReleaseStatus = (studentId) =>
+  get(`/api/v1/students/${studentId}/plan/release-status`);
+
 export const exportPlanHistoryPDF = async (studentId, planId) => {
   const resp = await client.get(`/api/v1/students/${studentId}/plans/history/${planId}/export-pdf`, { responseType: 'blob' });
   const contentType = resp.headers?.['content-type'] || '';
