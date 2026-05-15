@@ -309,6 +309,9 @@ app.include_router(submissions_router, prefix="/api/v1")
 from app.api.v1.routes.plan_release import router as plan_release_router
 app.include_router(plan_release_router, prefix="/api/v1")
 
+from app.api.v1.routes.invite import router as invite_router
+app.include_router(invite_router, prefix="/api/v1")
+
 # ---------------------------------------------------------------------------
 # Task YAML validation at startup (Pitfall 4 prevention)
 # ---------------------------------------------------------------------------
