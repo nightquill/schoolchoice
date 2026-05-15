@@ -536,17 +536,6 @@ function ConsultantTask() {
           {hasPlan && (
             <div style={planAreaStyle}>
               <div style={iframeColStyle}>
-                {/* Radar chart — inside the plan column */}
-                {radarSubjects.length >= 3 && (
-                  <div style={{ marginBottom: 'var(--space-4)' }}>
-                    <PlanRadarChart
-                      gradesByCode={gradesByCode}
-                      benchmarkByCode={benchmarkByCode}
-                      subjects={radarSubjects}
-                      benchmarkLabel={rank1Prog ? `${rank1Code} — ${rank1Prog.name}` : undefined}
-                    />
-                  </div>
-                )}
                 <iframe
                   ref={iframeRef}
                   style={iframeStyle}

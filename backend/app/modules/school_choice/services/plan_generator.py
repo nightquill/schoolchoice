@@ -323,11 +323,28 @@ def _section_header(student: dict, generated_at: str, best5: int) -> str:
     name = _esc(student.get("name") or "Student")
     year = student.get("year_of_study")
     year_str = f" · Year {year}" if year else ""
+
+    # Next JUPAS milestone
+    deadline_badge = ""
+    try:
+        from app.modules.school_choice.data.jupas_calendar import get_next_milestone
+        from datetime import date
+        milestone = get_next_milestone(date.today().isoformat())
+        if milestone:
+            from datetime import datetime as _dt
+            days = (_dt.strptime(milestone["date"], "%Y-%m-%d").date() - date.today()).days
+            color = "#dc2626" if days <= 30 else "#d97706"
+            bg = "#fef2f2" if days <= 30 else "#fffbeb"
+            deadline_badge = f'<div style="margin-top:8px;"><span style="background:{bg};color:{color};padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid {color}22;">{_esc(milestone["label"])}: {milestone["date"]} — {days} days</span></div>'
+    except Exception:
+        pass
+
     return f"""
   <div class="header">
     <div class="header-label">University Application Strategy</div>
     <h1>{name}</h1>
     <div class="subtitle">Prepared {_esc(generated_at)}{year_str}</div>
+    {deadline_badge}
     <div class="counselor-only" style="margin-top:8px;font-size:12px;color:#6b7280;">Best-5 Aggregate: {best5}</div>
   </div>"""
 
@@ -370,28 +387,92 @@ def _section_assessment(ai_assessment: str | None) -> str:
   </div>"""
 
 
-def _section_academic_profile(student: dict, colors: dict) -> str:
+def _section_academic_profile(student: dict, colors: dict, benchmark_median: float | None = None, benchmark_label: str = "Band A Benchmark") -> str:
+    """Render academic strengths as an SVG radar chart comparing student grades vs benchmark."""
+    import math
+
+    GRADE_MAP = {"5**": 7, "5*": 6, "5": 5, "4": 4, "3": 3, "2": 2, "1": 1, "U": 0, "A": 6, "B": 4, "C": 3}
     grades = student.get("subject_grades") or []
     if not grades:
         return '<div class="section"><h2>Your Academic Strengths</h2><p>No grade records on file yet.</p></div>'
 
-    rows = ""
+    # Build subject data (best grade per subject)
+    subject_data = {}
     for g in grades:
-        subj = _esc(g.get("subject_name") or g.get("subject_code") or "")
+        code = g.get("subject_code") or g.get("subject_name") or ""
+        name = g.get("subject_name") or code
         raw = g.get("raw_grade") or ""
-        predicted = g.get("predicted_grade") or ""
-        sitting = _esc(g.get("sitting") or "")
-        bg = _grade_color(raw, colors)
-        rows += f'<tr><td>{subj}</td><td>{_esc(sitting)}</td><td style="background:{bg};font-weight:600;">{_esc(raw)}</td><td>{_esc(predicted)}</td></tr>'
+        val = GRADE_MAP.get(raw, 0)
+        if code not in subject_data or val > subject_data[code]["val"]:
+            subject_data[code] = {"name": name, "val": val}
 
-    return f"""
-  <div class="section">
-    <h2>Your Academic Strengths</h2>
-    <table class="data-table">
-      <thead><tr><th>Subject</th><th>Sitting</th><th>Grade</th><th>Predicted</th></tr></thead>
-      <tbody>{rows}</tbody>
-    </table>
-  </div>"""
+    subjects = list(subject_data.values())
+    if len(subjects) < 3:
+        return '<div class="section"><h2>Your Academic Strengths</h2><p>Need at least 3 subjects for chart.</p></div>'
+
+    n = len(subjects)
+    cx, cy, r = 200, 200, 150
+    max_val = 7
+
+    # Per-subject benchmark (uniform distribution of median across subjects)
+    bench_per = (benchmark_median / n) if benchmark_median else None
+
+    def polar(i, val):
+        angle = (2 * math.pi * i / n) - math.pi / 2
+        x = cx + r * (val / max_val) * math.cos(angle)
+        y = cy + r * (val / max_val) * math.sin(angle)
+        return x, y
+
+    # Grid circles
+    grid_lines = ""
+    for level in range(1, 8):
+        pts = " ".join(f"{polar(i, level)[0]:.1f},{polar(i, level)[1]:.1f}" for i in range(n))
+        grid_lines += f'<polygon points="{pts}" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>'
+
+    # Axis lines
+    for i in range(n):
+        x, y = polar(i, max_val)
+        grid_lines += f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#e5e7eb" stroke-width="0.5"/>'
+
+    # Student polygon
+    student_pts = " ".join(f"{polar(i, s['val'])[0]:.1f},{polar(i, s['val'])[1]:.1f}" for i, s in enumerate(subjects))
+
+    # Benchmark polygon
+    bench_svg = ""
+    if bench_per and bench_per > 0:
+        bench_pts = " ".join(f"{polar(i, min(bench_per, max_val))[0]:.1f},{polar(i, min(bench_per, max_val))[1]:.1f}" for i in range(n))
+        bench_svg = f'<polygon points="{bench_pts}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,5"/>'
+
+    # Labels
+    labels = ""
+    for i, s in enumerate(subjects):
+        x, y = polar(i, max_val + 1)
+        anchor = "middle"
+        if x < cx - 10:
+            anchor = "end"
+        elif x > cx + 10:
+            anchor = "start"
+        labels += f'<text x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}" font-size="11" fill="{colors["text-secondary"]}">{_esc(s["name"])}</text>'
+
+    # Legend
+    legend = f"""
+    <g transform="translate({cx - 120}, {cy + r + 25})">
+      <rect x="0" y="0" width="12" height="12" fill="{colors['primary']}" opacity="0.3" stroke="{colors['primary']}" stroke-width="2"/>
+      <text x="18" y="10" font-size="11" fill="{colors['text']}">Your Grades</text>
+      <rect x="120" y="0" width="12" height="12" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3,3"/>
+      <text x="138" y="10" font-size="11" fill="{colors['text']}">{_esc(benchmark_label)}</text>
+    </g>"""
+
+    svg = f"""
+    <svg viewBox="0 0 400 {cy + r + 55}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;margin:0 auto;display:block;">
+      {grid_lines}
+      <polygon points="{student_pts}" fill="{colors['primary']}" fill-opacity="0.25" stroke="{colors['primary']}" stroke-width="2"/>
+      {bench_svg}
+      {labels}
+      {legend}
+    </svg>"""
+
+    return f'<div class="section"><h2>Your Academic Strengths</h2>{svg}</div>'
 
 
 def _section_target_schools(match_results: list, colors: dict, overrides: dict | None = None) -> str:
@@ -780,7 +861,7 @@ def generate_html_plan(
         _section_header(student, generated_at, best5),
         _section_metrics(student, best5, min(num_schools, 8), colors),
         _section_assessment(ai_assessment),
-        # Academic profile table removed — replaced by interactive radar chart in frontend
+        _section_academic_profile(student, colors, benchmark_median=best5 * 0.8 if best5 else None, benchmark_label="Band A Target"),
         _section_target_schools(match_results, colors, overrides=overrides),
         _section_roadmap(action_items, colors),
         _section_growth_areas(student, skill_gaps, colors),
