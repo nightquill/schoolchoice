@@ -63,6 +63,92 @@ PROFILE_FIELDS: set[str] = {
     "date_of_birth", "target_region", "preferred_language",
 }
 
+# ---------------------------------------------------------------------------
+# Header mapping: Chinese + English full names → internal codes
+# ---------------------------------------------------------------------------
+
+_ZH_PROFILE_MAP: dict[str, str] = {
+    "姓名": "name", "名稱": "name", "學生姓名": "name",
+    "學號": "candidate_number", "考生編號": "candidate_number", "准考證號": "candidate_number",
+    "班別": "class_name", "班級": "class_name",
+    "年級": "year_of_study",
+    "性別": "gender",
+    "出生日期": "date_of_birth",
+}
+
+_ZH_SUBJECT_MAP: dict[str, str] = {
+    "中文": "CHLA", "中國語文": "CHLA",
+    "英文": "ENGL", "英國語文": "ENGL",
+    "數學": "MATH",
+    "公民科": "CSD", "公民與社會發展科": "CSD", "公社科": "CSD",
+    "物理": "PHYS", "化學": "CHEM", "生物": "BIOL",
+    "經濟": "ECON",
+    "企會財": "BAFS", "企業會計與財務概論": "BAFS",
+    "地理": "GEOG", "歷史": "HIST",
+    "中史": "CHIH", "中國歷史": "CHIH",
+    "中國文學": "CHIL",
+    "視覺藝術": "VART", "視藝": "VART",
+    "音樂": "MUSC",
+    "資訊及通訊科技": "ICT",
+    "體育": "PE",
+}
+
+_EN_SUBJECT_MAP: dict[str, str] = {
+    "english language": "ENGL", "chinese language": "CHLA",
+    "mathematics": "MATH", "citizenship and social development": "CSD",
+    "physics": "PHYS", "chemistry": "CHEM", "biology": "BIOL",
+    "economics": "ECON", "business, accounting and financial studies": "BAFS",
+    "geography": "GEOG", "history": "HIST",
+    "chinese history": "CHIH", "chinese literature": "CHIL",
+    "visual arts": "VART", "music": "MUSC",
+    "information and communication technology": "ICT",
+    "physical education": "PE",
+    "tourism and hospitality studies": "TOUR",
+    "design and applied technology": "DAT",
+    "health management and social care": "HMSC",
+    "technology and living": "TL",
+    "ethics and religious studies": "ERS",
+    "combined science": "CSCI", "integrated science": "ISCI",
+    "french": "FREN", "german": "GERM", "japanese": "JAPA",
+    "spanish": "SPAN", "putonghua": "PTH",
+}
+
+# All known internal names (used by map_headers to skip already-valid headers)
+_KNOWN_INTERNAL: set[str] = (
+    {"name", "candidate_number", "sitting", "year_of_exam", "cohort"}
+    | PROFILE_FIELDS
+    | HKDSE_SUBJECT_CODES
+)
+
+
+def map_headers(headers: list[str]) -> dict[str, str]:
+    """Map Chinese/English full-name headers to internal codes.
+
+    Returns dict of original_header → mapped_name, only for headers that need remapping.
+    Headers already using internal names are skipped.
+    """
+    mapping: dict[str, str] = {}
+    for h in headers:
+        stripped = h.strip()
+        # Already a known internal name — skip
+        if stripped in _KNOWN_INTERNAL or stripped.upper() in HKDSE_SUBJECT_CODES:
+            continue
+        # Chinese profile field
+        if stripped in _ZH_PROFILE_MAP:
+            mapping[h] = _ZH_PROFILE_MAP[stripped]
+            continue
+        # Chinese subject
+        if stripped in _ZH_SUBJECT_MAP:
+            mapping[h] = _ZH_SUBJECT_MAP[stripped]
+            continue
+        # English full name (case-insensitive)
+        lower = stripped.lower()
+        if lower in _EN_SUBJECT_MAP:
+            mapping[h] = _EN_SUBJECT_MAP[lower]
+            continue
+    return mapping
+
+
 # Regex: only alphanumeric and hyphens
 _CANDIDATE_RE = re.compile(r"[^a-zA-Z0-9\-]")
 
@@ -212,11 +298,22 @@ def parse_student_csv(content: bytes) -> dict:
     reader = csv.DictReader(io.StringIO(text))
     headers = list(reader.fieldnames or [])
 
-    # Detect which columns are subject codes
+    # Map Chinese/English full-name headers to internal codes
+    header_mapping = map_headers(headers)
+
+    # Track unmapped columns
+    recognized: set[str] = set()
+    for h in headers:
+        mapped = header_mapping.get(h, h.strip())
+        if mapped in _KNOWN_INTERNAL or mapped.upper() in HKDSE_SUBJECT_CODES:
+            recognized.add(h)
+    unmapped_columns = [h.strip() for h in headers if h not in recognized and h.strip()]
+
+    # Detect which columns are subject codes (using mapped names)
     subject_columns: list[str] = []
     for h in headers:
-        h_upper = h.strip().upper()
-        if h_upper in HKDSE_SUBJECT_CODES:
+        mapped = header_mapping.get(h, h.strip())
+        if mapped.upper() in HKDSE_SUBJECT_CODES:
             subject_columns.append(h.strip())
 
     current_year = datetime.now().year
@@ -228,13 +325,14 @@ def parse_student_csv(content: bytes) -> dict:
         warnings: list[str] = []
         errors: list[str] = []
 
-        # Clean all cell values
+        # Clean all cell values (applying header mapping to keys)
         cleaned: dict[str, str] = {}
         for k, v in raw_row.items():
             if k is None:
                 continue
             val = str(v) if v is not None else ""
-            cleaned[k.strip()] = _strip_control_chars(val.strip())
+            mapped_key = header_mapping.get(k, k.strip())
+            cleaned[mapped_key] = _strip_control_chars(val.strip())
 
         # --- name (required) ---
         name = cleaned.get("name", "").strip()
@@ -296,13 +394,14 @@ def parse_student_csv(content: bytes) -> dict:
         # --- grades ---
         grades: dict[str, str] = {}
         for col in subject_columns:
-            grade_val = cleaned.get(col, "").strip()
+            mapped_col = header_mapping.get(col, col.strip())
+            grade_val = cleaned.get(mapped_col, "").strip()
             if not grade_val:
                 continue
             if grade_val in VALID_GRADES:
-                grades[col.upper()] = grade_val
+                grades[mapped_col.upper()] = grade_val
             else:
-                warnings.append(f"Invalid grade '{grade_val}' for {col}; skipped")
+                warnings.append(f"Invalid grade '{grade_val}' for {mapped_col}; skipped")
 
         # --- profile fields ---
         profile: dict[str, Any] = {}
@@ -347,6 +446,7 @@ def parse_student_csv(content: bytes) -> dict:
     return {
         "rows": rows,
         "subject_columns": subject_columns,
+        "unmapped_columns": unmapped_columns,
         "summary": {
             "total": len(rows),
             "valid": valid_count,

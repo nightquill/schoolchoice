@@ -25,6 +25,7 @@ from app.services.student_import_service import (
     validate_file,
     ImportFileError,
     detect_encoding,
+    map_headers,
     VALID_GRADES,
 )
 
@@ -339,3 +340,70 @@ class TestEncodingDetection:
         decoded = content.decode(enc)
         assert "陳嘉偉" in decoded
         assert "黃美儀" in decoded
+
+
+# ---------------------------------------------------------------------------
+# Tests: Header Mapping
+# ---------------------------------------------------------------------------
+
+class TestHeaderMapping:
+    """Tests for map_headers and Chinese/English header integration."""
+
+    def test_chinese_profile_headers(self):
+        headers = ["學號", "姓名", "班別", "性別"]
+        mapped = map_headers(headers)
+        assert mapped == {"學號": "candidate_number", "姓名": "name", "班別": "class_name", "性別": "gender"}
+
+    def test_chinese_subject_headers(self):
+        headers = ["中文", "英文", "數學", "物理", "公民科"]
+        mapped = map_headers(headers)
+        assert mapped == {"中文": "CHLA", "英文": "ENGL", "數學": "MATH", "物理": "PHYS", "公民科": "CSD"}
+
+    def test_english_fullname_headers(self):
+        headers = ["English Language", "Mathematics", "Chinese Language", "Physics"]
+        mapped = map_headers(headers)
+        assert mapped == {"English Language": "ENGL", "Mathematics": "MATH", "Chinese Language": "CHLA", "Physics": "PHYS"}
+
+    def test_case_insensitive(self):
+        headers = ["ENGLISH LANGUAGE", "mathematics", " Chinese Language "]
+        mapped = map_headers(headers)
+        assert mapped["ENGLISH LANGUAGE"] == "ENGL"
+        assert mapped["mathematics"] == "MATH"
+        assert mapped[" Chinese Language "] == "CHLA"
+
+    def test_already_valid_codes_passthrough(self):
+        headers = ["candidate_number", "name", "ENGL", "MATH"]
+        mapped = map_headers(headers)
+        assert "ENGL" not in mapped
+        assert "MATH" not in mapped
+
+    def test_unmapped_headers_excluded(self):
+        headers = ["name", "favorite_color", "shoe_size"]
+        mapped = map_headers(headers)
+        assert "favorite_color" not in mapped
+        assert "shoe_size" not in mapped
+
+    def test_chinese_csv_parses_correctly(self):
+        csv_content = "學號,姓名,班別,中文,英文,數學,公民科\nT001,陳嘉偉,5A,3,5*,4,A\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        row = result["rows"][0]
+        assert row["name"] == "陳嘉偉"
+        assert row["candidate_number"] == "T001"
+        assert row["grades"]["CHLA"] == "3"
+        assert row["grades"]["ENGL"] == "5*"
+        assert row["grades"]["MATH"] == "4"
+        assert row["profile"]["class_name"] == "5A"
+
+    def test_english_fullname_csv_parses_correctly(self):
+        csv_content = "candidate_number,name,English Language,Mathematics,Physics\nT001,Alice,5*,4,5\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        row = result["rows"][0]
+        assert row["grades"]["ENGL"] == "5*"
+        assert row["grades"]["MATH"] == "4"
+        assert row["grades"]["PHYS"] == "5"
+
+    def test_unmapped_columns_reported(self):
+        csv_content = "candidate_number,name,ENGL,favorite_color,shoe_size\nT001,Alice,5,blue,42\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert "favorite_color" in result.get("unmapped_columns", [])
+        assert "shoe_size" in result.get("unmapped_columns", [])
