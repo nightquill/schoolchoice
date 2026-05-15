@@ -488,7 +488,14 @@ def save_consultant_task(
         plan.version = (plan.version or 1) + 1
 
     plan.html_content = html_content
-    plan.recommended_schools = output_dict.get("recommended_schools")
+    # Validate JUPAS codes — strip any that don't exist in our DB
+    rec_schools = output_dict.get("recommended_schools") or []
+    for s in rec_schools:
+        jc = s.get("jupas_code")
+        if jc and not db.query(JupasProgramme).filter(JupasProgramme.jupas_code == jc).first():
+            s["jupas_code"] = None
+            s["major_name"] = None
+    plan.recommended_schools = rec_schools
     plan.action_items = output_dict.get("action_plan")
     plan.generated_at = datetime.now(timezone.utc)
     plan.updated_at = datetime.now(timezone.utc)

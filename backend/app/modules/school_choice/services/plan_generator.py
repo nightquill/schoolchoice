@@ -387,8 +387,9 @@ def _section_assessment(ai_assessment: str | None) -> str:
   </div>"""
 
 
-def _section_academic_profile(student: dict, colors: dict, benchmark_median: float | None = None, benchmark_label: str = "Band A Benchmark") -> str:
-    """Render academic strengths as an SVG radar chart comparing student grades vs benchmark."""
+def _section_academic_profile(student: dict, colors: dict, benchmark_median: float | None = None, benchmark_label: str = "Band A Benchmark", benchmark_weights: dict | None = None) -> str:
+    """Render academic strengths as an SVG radar chart comparing student grades vs benchmark.
+    benchmark_weights: optional {subject_code: weight} from programme scoring_formula."""
     import math
 
     GRADE_MAP = {"5**": 7, "5*": 6, "5": 5, "4": 4, "3": 3, "2": 2, "1": 1, "U": 0, "A": 6, "B": 4, "C": 3}
@@ -414,9 +415,21 @@ def _section_academic_profile(student: dict, colors: dict, benchmark_median: flo
     cx, cy, r = 200, 200, 150
     max_val = 7
 
-    # Per-subject benchmark (uniform distribution of median across subjects)
-    # Benchmark median is a best-5 total — divide by 5 (not n) to get per-subject level
-    bench_per = (benchmark_median / 5) if benchmark_median else None
+    # Per-subject benchmark — weighted by programme's scoring formula if available
+    bench_values = None
+    if benchmark_median:
+        avg = benchmark_median / 5  # baseline per-subject
+        if benchmark_weights:
+            # Scale each subject's benchmark by its weight relative to average weight
+            total_w = sum(benchmark_weights.get(s["name"], 1.0) for s in subjects) or 1
+            avg_w = total_w / len(subjects)
+            bench_values = []
+            for s in subjects:
+                w = benchmark_weights.get(s["name"], benchmark_weights.get(s.get("code", ""), 1.0))
+                # Higher weight → higher benchmark for that subject
+                bench_values.append(min(avg * (w / avg_w), max_val))
+        else:
+            bench_values = [min(avg, max_val)] * len(subjects)
 
     def polar(i, val):
         angle = (2 * math.pi * i / n) - math.pi / 2
@@ -438,10 +451,10 @@ def _section_academic_profile(student: dict, colors: dict, benchmark_median: flo
     # Student polygon
     student_pts = " ".join(f"{polar(i, s['val'])[0]:.1f},{polar(i, s['val'])[1]:.1f}" for i, s in enumerate(subjects))
 
-    # Benchmark polygon
+    # Benchmark polygon — per-subject weighted
     bench_svg = ""
-    if bench_per and bench_per > 0:
-        bench_pts = " ".join(f"{polar(i, min(bench_per, max_val))[0]:.1f},{polar(i, min(bench_per, max_val))[1]:.1f}" for i in range(n))
+    if bench_values:
+        bench_pts = " ".join(f"{polar(i, bench_values[i])[0]:.1f},{polar(i, bench_values[i])[1]:.1f}" for i in range(n))
         bench_svg = f'<polygon points="{bench_pts}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5,5"/>'
 
     # Labels
@@ -861,12 +874,12 @@ def generate_html_plan(
     # Get rank 1 programme benchmark for radar chart
     rank1_median = None
     rank1_label = "Band A Target"
+    rank1_weights = None
     try:
         from app.modules.school_choice.models.models import JupasProgramme as _JP
         from app.db.session import SessionLocal
         import json as _jj
         _bench_db = SessionLocal()
-        # Find rank 1 from match results by checking student's targets
         for r in match_results:
             jupas = r.get("major_jupas_code") or r.get("jupas_code") if isinstance(r, dict) else getattr(r, "major_jupas_code", None)
             if jupas:
@@ -878,6 +891,13 @@ def generate_html_plan(
                         if "median" in latest:
                             rank1_median = float(latest["median"])
                             rank1_label = f"{jupas} — {prog.name}"
+                            # Extract subject weights from scoring_formula
+                            sf = prog.scoring_formula or {}
+                            if isinstance(sf, str):
+                                sf = _jj.loads(sf)
+                            weights = sf.get("weights", {})
+                            if weights:
+                                rank1_weights = weights
                             break
         _bench_db.close()
     except Exception:
@@ -887,7 +907,7 @@ def generate_html_plan(
         _section_header(student, generated_at, best5),
         _section_metrics(student, best5, min(num_schools, 8), colors),
         _section_assessment(ai_assessment),
-        _section_academic_profile(student, colors, benchmark_median=rank1_median, benchmark_label=rank1_label),
+        _section_academic_profile(student, colors, benchmark_median=rank1_median, benchmark_label=rank1_label, benchmark_weights=rank1_weights),
         _section_target_programmes(match_results, colors, overrides=overrides),
         _section_roadmap(action_items, colors),
         _section_growth_areas(student, skill_gaps, colors),

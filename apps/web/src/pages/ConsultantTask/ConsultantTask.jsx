@@ -371,6 +371,18 @@ function ConsultantTask() {
         <div style={toolbarLeftStyle}>
           <p style={studentNameStyle}>{student?.full_name || t('consultant.consultantTask')}</p>
           {plan?.version && <p style={versionStyle}>{t('plan.version', { version: plan.version })}</p>}
+          <button
+            onClick={() => setPlanLanguage(l => l === '繁體中文' ? 'English' : '繁體中文')}
+            style={{
+              padding: '2px 8px', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)',
+              fontFamily: 'var(--font-family-base)', border: '1px solid var(--color-border)',
+              borderRadius: 'var(--border-radius-sm)', cursor: 'pointer',
+              background: 'var(--color-surface)', color: 'var(--color-text-primary)',
+            }}
+            title={planLanguage === '繁體中文' ? 'Switch to English' : '切換至繁體中文'}
+          >
+            {planLanguage === '繁體中文' ? '中 → EN' : 'EN → 中'}
+          </button>
         </div>
 
         <div style={toolbarRightStyle}>
@@ -416,7 +428,7 @@ function ConsultantTask() {
             </button>
           )}
 
-          {hasPlan && (
+          {plan?.html_content && (
             <button
               onClick={handleExportPDF}
               disabled={isExportingPDF}
@@ -443,18 +455,6 @@ function ConsultantTask() {
               {releaseQuery.data?.released ? `✓ ${t('plan.released')} v${releaseQuery.data.version}` : t('plan.releaseToStudent')}
             </button>
           )}
-
-          {/* Language toggle */}
-          <button
-            onClick={() => setPlanLanguage(l => l === '繁體中文' ? 'English' : '繁體中文')}
-            style={{
-              ...exportBtnStyle,
-              minWidth: '40px',
-            }}
-            title={planLanguage === '繁體中文' ? 'Switch to English' : '切換至繁體中文'}
-          >
-            {planLanguage === '繁體中文' ? 'EN' : '中'}
-          </button>
 
           {plan?.generated_at && (
             <span style={timestampStyle}>
