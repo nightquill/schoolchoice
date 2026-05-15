@@ -151,11 +151,13 @@ function ConsultantTask() {
   }, []);
 
   // --- Generate Plan handler (SSE streaming) ---
+  const doneHandledRef = useRef(false);
   const handleGenerate = useCallback(() => {
     setStreaming(true);
     setStreamTokens('');
     setStreamError(null);
-    streamTokensRef.current = ''; // reset ref
+    streamTokensRef.current = '';
+    doneHandledRef.current = false;
 
     const token = localStorage.getItem('token');
     const base = import.meta.env.VITE_API_BASE_URL || '';
@@ -164,19 +166,19 @@ function ConsultantTask() {
     eventSourceRef.current = source;
 
     source.onmessage = (event) => {
-      // Accumulate in BOTH state (for rendering) and ref (for done handler)
       streamTokensRef.current += event.data;
       setStreamTokens((prev) => prev + event.data);
     };
 
     source.addEventListener('done', async () => {
+      doneHandledRef.current = true;
       source.close();
       eventSourceRef.current = null;
-      // Use ref.current -- NOT streamTokens state (which would be stale)
       const accumulatedTokens = streamTokensRef.current;
       try {
         const result = await saveConsultantTask(taskId, id, accumulatedTokens);
         setPlan(result);
+        await loadPlan();
         toast.success(t('plan.planGenerated'));
       } catch (err) {
         setStreamError(t('consultant.saveFailed'));
@@ -187,12 +189,30 @@ function ConsultantTask() {
     });
 
     source.onerror = () => {
+      // EventSource fires onerror when server closes connection — ignore if done already handled
+      if (doneHandledRef.current) return;
       source.close();
       eventSourceRef.current = null;
-      setStreamError(t('consultant.interrupted'));
-      setStreaming(false);
+      // If we received tokens, the stream worked but connection closed before done event
+      if (streamTokensRef.current.length > 50) {
+        // Try to save what we have
+        (async () => {
+          try {
+            const result = await saveConsultantTask(taskId, id, streamTokensRef.current);
+            setPlan(result);
+            await loadPlan();
+            toast.success(t('plan.planGenerated'));
+          } catch {
+            setStreamError(t('consultant.interrupted'));
+          }
+          setStreaming(false);
+        })();
+      } else {
+        setStreamError(t('consultant.interrupted'));
+        setStreaming(false);
+      }
     };
-  }, [id, taskId, setPlan, t]);
+  }, [id, taskId, setPlan, loadPlan, t]);
   // NOTE: streamTokens is NOT in the dependency array -- we use the ref instead
 
   // Auto-start generation when navigated with ?generate=true
@@ -519,6 +539,7 @@ function ConsultantTask() {
                 gradesByCode={gradesByCode}
                 benchmarkByCode={benchmarkByCode}
                 subjects={radarSubjects}
+                benchmarkLabel={rank1Prog ? `${rank1Code} — ${rank1Prog.name}` : undefined}
               />
             </div>
           )}

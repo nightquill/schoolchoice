@@ -15,7 +15,7 @@ function gradeToNum(grade) {
  * @param {object} props.benchmarkByCode — { MATH: 6.2, PHYS: 5.5, ... } (numeric, from admission_stats median)
  * @param {string[]} props.subjects — subject codes to show
  */
-export default function PlanRadarChart({ gradesByCode, benchmarkByCode, subjects }) {
+export default function PlanRadarChart({ gradesByCode, benchmarkByCode, subjects, benchmarkLabel }) {
   const { t } = useTranslation();
 
   if (!subjects || subjects.length < 3) return null;
@@ -40,7 +40,7 @@ export default function PlanRadarChart({ gradesByCode, benchmarkByCode, subjects
           <PolarAngleAxis dataKey="subject" tick={{ fontSize: 13, fontWeight: 500 }} />
           <PolarRadiusAxis angle={90} domain={[0, 7]} tick={{ fontSize: 11 }} tickCount={8} />
           <Radar name={t('plan.yourGrades')} dataKey="student" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.3} strokeWidth={2} />
-          <Radar name={t('plan.bandABenchmark')} dataKey="benchmark" stroke="var(--color-error)" fill="none" strokeWidth={2} strokeDasharray="5 5" />
+          <Radar name={benchmarkLabel || t('plan.bandABenchmark')} dataKey="benchmark" stroke="var(--color-error)" fill="none" strokeWidth={2} strokeDasharray="5 5" />
           <Legend />
         </RadarChart>
       </ResponsiveContainer>
