@@ -336,7 +336,7 @@ class TaskEngine:
         # personal statement to limit data exposure.
         personal_stmt = getattr(student, "personal_statement", None) or ""
         return {
-            "name": f"Year {getattr(student, 'year_of_study', '?')} HKDSE candidate",
+            "name": "同學",  # Anonymous — real name injected by HTML renderer
             "grades_by_code": grades_by_code,
             "interests": student.interests or [],
             "strengths_weaknesses": student.strengths_weaknesses or "",

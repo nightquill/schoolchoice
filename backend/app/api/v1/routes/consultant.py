@@ -382,32 +382,52 @@ def save_consultant_task(
             "awards": getattr(student, "awards", None) or [],
         }
 
-    # Map AI recommended_schools to match_result-like dicts for plan_generator
+    # Map AI recommended_schools to match_result-like dicts for plan_generator.
+    # LLM does NOT output jupas_code or major_name — we fill them from DB by
+    # matching the LLM's school_name to our JupasProgramme records.
     ai_schools = output_dict.get("recommended_schools") or []
+    from app.modules.school_choice.models.models import JupasProgramme
+    from app.db.models import School
+
+    # Build lookup: school_name (lowercase) → list of programmes
+    all_progs = db.query(JupasProgramme).join(School, JupasProgramme.school_id == School.id).all()
+    school_prog_map: dict[str, list] = {}
+    for p in all_progs:
+        key = (p.school.name or "").lower()
+        school_prog_map.setdefault(key, []).append(p)
+
     match_results_for_render = []
+    used_codes = set()
     for s in ai_schools:
-        major_name = s.get("major_name")
-        jupas_code = s.get("jupas_code")
-        # Backfill major_name from JupasProgramme if LLM didn't provide it
-        if not major_name and jupas_code:
-            from app.modules.school_choice.models.models import JupasProgramme
-            prog = db.query(JupasProgramme).filter(JupasProgramme.jupas_code == jupas_code).first()
-            if prog:
-                major_name = prog.name
-            else:
-                # LLM may hallucinate JUPAS codes — try matching by school name
-                school_name = s.get("school_name", "")
-                if school_name:
-                    from app.db.models import School
-                    school = db.query(School).filter(School.name.ilike(f"%{school_name.split(' — ')[0].strip()}%")).first()
-                    if school:
-                        # Find any programme for this school
-                        prog = db.query(JupasProgramme).filter(JupasProgramme.school_id == school.id).first()
-                        if prog and not jupas_code:
-                            jupas_code = prog.jupas_code
-                            s["jupas_code"] = jupas_code
+        school_name_raw = s.get("school_name", "")
+        school_name_lower = school_name_raw.lower().strip()
+
+        # Find matching programmes for this school
+        matched_prog = None
+        candidates = school_prog_map.get(school_name_lower, [])
+        if not candidates:
+            # Fuzzy: try partial match
+            for key, progs in school_prog_map.items():
+                if school_name_lower in key or key in school_name_lower:
+                    candidates = progs
+                    break
+
+        # Pick the first unused programme for this school
+        for p in candidates:
+            if p.jupas_code not in used_codes:
+                matched_prog = p
+                used_codes.add(p.jupas_code)
+                break
+
+        jupas_code = matched_prog.jupas_code if matched_prog else None
+        major_name = matched_prog.name if matched_prog else None
+
+        # Persist into output_dict for DB storage
+        s["jupas_code"] = jupas_code
+        s["major_name"] = major_name
+
         match_results_for_render.append({
-            "school_name": s.get("school_name", ""),
+            "school_name": school_name_raw,
             "fit_score": s.get("fit_score", 0.0),
             "eligibility_pass": True,
             "rationale": s.get("rationale", ""),
@@ -419,9 +439,6 @@ def save_consultant_task(
             "major_name": major_name,
             "major_jupas_code": jupas_code,
         })
-        # Also backfill into the output_dict so it persists in recommended_schools JSON
-        if major_name and not s.get("major_name"):
-            s["major_name"] = major_name
 
     # Map AI action_plan to action_items format
     ai_actions = output_dict.get("action_plan") or []

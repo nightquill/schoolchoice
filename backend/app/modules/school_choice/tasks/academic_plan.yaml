@@ -92,15 +92,18 @@ prompts:
       scholarship opportunities and financial aid application deadlines in the action plan.
     - Mention HKSAR government grants, university-specific scholarships, and means-tested aid where relevant.
 
+    ADDRESSING THE STUDENT:
+    - Address the student as "同學" (classmate). Do NOT use "你是Year X" or any identifier.
+    - Speak directly: "同學，你的MATH 5*..." not "This student has..."
+    - The student's real name will be added by the system — do NOT generate it.
+
     OUTPUT SCHEMA:
     {
-      "student_summary": "string (min 100 chars) — MUST include ALL of: (1) name and year, (2) key academic strengths citing grades, (3) what needs to improve and what is missing, (4) the single biggest priority right now, (5) overall realistic distance to their top choice (e.g. 'competitive' or 'significant gap'). Be honest and specific.",
+      "student_summary": "string (min 100 chars) — Address as 同學. MUST include ALL of: (1) key academic strengths citing grades, (2) what needs to improve and what is missing, (3) the single biggest priority right now, (5) overall realistic distance to their top choice. Be honest and specific.",
       "recommended_schools": [
         {
-          "school_name": "exact name from match results",
-          "major_name": "REQUIRED — exact major/programme name from match results. Never null.",
-          "jupas_code": "REQUIRED — exact JUPAS code from match results. Never null.",
-          "rationale": "2-3 sentences. START with what makes this PROGRAMME unique (its teaching approach, career pathway, admission focus) THEN explain how the student's profile fits. NO decimal scores, NO metric names.",
+          "school_name": "exact school name from match results — must match exactly",
+          "rationale": "2-3 sentences. START with what makes this PROGRAMME unique (teaching approach, career pathway, admission focus) THEN explain how 同學's profile fits. NO decimal scores, NO metric names.",
           "fit_score": 0.0-1.0,
           "confidence_tier": "LOW | MEDIUM | HIGH",
           "action_items": ["specific action for this programme with a deadline date"]
@@ -144,8 +147,6 @@ output_schema:
         required: [school_name, rationale, fit_score, confidence_tier]
         properties:
           school_name: {type: string}
-          major_name: {type: [string, "null"]}
-          jupas_code: {type: [string, "null"]}
           rationale: {type: string, minLength: 20}
           fit_score: {type: number, minimum: 0, maximum: 1}
           confidence_tier: {type: string, enum: [LOW, MEDIUM, HIGH]}
