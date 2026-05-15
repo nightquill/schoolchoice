@@ -91,7 +91,7 @@ def list_groups(
         .first()
     )
     if not org_membership:
-        return []
+        return {"groups": []}
     groups = (
         db.query(TeacherGroup)
         .filter(TeacherGroup.organisation_id == org_membership.organisation_id)
@@ -113,7 +113,7 @@ def list_groups(
             "created_at": g.created_at,
             "updated_at": g.updated_at,
         })
-    return result
+    return {"groups": result}
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -223,7 +223,7 @@ def list_members(
             "display_name": u.display_name if u else None,
             "role": u.role if u else None,
         })
-    return result
+    return {"members": result}
 
 
 @router.post("/{group_id}/members", status_code=status.HTTP_201_CREATED)
@@ -338,7 +338,7 @@ def get_group_permissions(
         for f in TOOL_FIELDS:
             entry[f] = getattr(perm, f) if perm else "read_write"
         result.append(entry)
-    return result
+    return {"permissions": result}
 
 
 @router.put("/{group_id}/permissions", status_code=status.HTTP_200_OK)
@@ -377,4 +377,4 @@ def update_group_permissions(
             db.add(new_perm)
 
     db.commit()
-    return {"message": "Permissions updated", "count": len(payload.permissions)}
+    return {"updated": len(payload.permissions)}
