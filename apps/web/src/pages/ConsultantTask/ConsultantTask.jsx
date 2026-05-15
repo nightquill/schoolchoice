@@ -126,6 +126,9 @@ function ConsultantTask() {
     }
   }, [id, t]);
 
+  // --- Plan language toggle ---
+  const [planLanguage, setPlanLanguage] = useState('繁體中文');
+
   // --- SSE streaming state (ConsultantTask-unique) ---
   const [streaming, setStreaming] = useState(false);
   const [streamTokens, setStreamTokens] = useState('');
@@ -401,6 +404,18 @@ function ConsultantTask() {
               {isExportingPDF ? t('plan.exporting') : t('plan.exportPdf')}
             </button>
           )}
+
+          {/* Language toggle */}
+          <button
+            onClick={() => setPlanLanguage(l => l === '繁體中文' ? 'English' : '繁體中文')}
+            style={{
+              ...exportBtnStyle,
+              minWidth: '40px',
+            }}
+            title={planLanguage === '繁體中文' ? 'Switch to English' : '切換至繁體中文'}
+          >
+            {planLanguage === '繁體中文' ? 'EN' : '中'}
+          </button>
 
           {plan?.generated_at && (
             <span style={timestampStyle}>

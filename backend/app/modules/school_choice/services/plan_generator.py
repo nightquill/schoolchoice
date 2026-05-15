@@ -415,7 +415,8 @@ def _section_academic_profile(student: dict, colors: dict, benchmark_median: flo
     max_val = 7
 
     # Per-subject benchmark (uniform distribution of median across subjects)
-    bench_per = (benchmark_median / n) if benchmark_median else None
+    # Benchmark median is a best-5 total — divide by 5 (not n) to get per-subject level
+    bench_per = (benchmark_median / 5) if benchmark_median else None
 
     def polar(i, val):
         angle = (2 * math.pi * i / n) - math.pi / 2
@@ -475,9 +476,9 @@ def _section_academic_profile(student: dict, colors: dict, benchmark_median: flo
     return f'<div class="section"><h2>Your Academic Strengths</h2>{svg}</div>'
 
 
-def _section_target_schools(match_results: list, colors: dict, overrides: dict | None = None) -> str:
-    """Build target schools section. Framing: 'Your Target Schools' not 'Recommended Schools'."""
-    content = '<div class="section"><h2>Your Target Schools</h2>'
+def _section_target_programmes(match_results: list, colors: dict, overrides: dict | None = None) -> str:
+    """Build target programmes section."""
+    content = '<div class="section"><h2>Your Target Programmes</h2>'
 
     top_schools = [r for r in match_results if (
         r.get("eligibility_pass", True) if isinstance(r, dict) else getattr(r, "eligibility_pass", True)
@@ -509,9 +510,9 @@ def _section_target_schools(match_results: list, colors: dict, overrides: dict |
         if overrides and overrides.get(override_key):
             rationale = _esc(overrides[override_key])
 
-        # Build display name: "School — Major" when major exists
+        # Build display name: "Major (School)" when major exists, programme-first
         if major:
-            display_name = f"{school_name} — {_esc(major)}"
+            display_name = f"{_esc(major)}<span style='font-weight:400;font-size:0.85em;color:{colors['text-secondary']};'> — {school_name}</span>"
         else:
             display_name = school_name
 
@@ -857,12 +858,37 @@ def generate_html_plan(
 
     css = _build_css(colors, template_id)
 
+    # Get rank 1 programme benchmark for radar chart
+    rank1_median = None
+    rank1_label = "Band A Target"
+    try:
+        from app.modules.school_choice.models.models import JupasProgramme as _JP
+        from app.db.session import SessionLocal
+        import json as _jj
+        _bench_db = SessionLocal()
+        # Find rank 1 from match results by checking student's targets
+        for r in match_results:
+            jupas = r.get("major_jupas_code") or r.get("jupas_code") if isinstance(r, dict) else getattr(r, "major_jupas_code", None)
+            if jupas:
+                prog = _bench_db.query(_JP).filter(_JP.jupas_code == jupas).first()
+                if prog and prog.admission_stats:
+                    stats = _jj.loads(prog.admission_stats) if isinstance(prog.admission_stats, str) else prog.admission_stats
+                    if stats:
+                        latest = stats.get(max(stats.keys()), {})
+                        if "median" in latest:
+                            rank1_median = float(latest["median"])
+                            rank1_label = f"{jupas} — {prog.name}"
+                            break
+        _bench_db.close()
+    except Exception:
+        pass
+
     sections = "".join([
         _section_header(student, generated_at, best5),
         _section_metrics(student, best5, min(num_schools, 8), colors),
         _section_assessment(ai_assessment),
-        _section_academic_profile(student, colors, benchmark_median=best5 * 0.8 if best5 else None, benchmark_label="Band A Target"),
-        _section_target_schools(match_results, colors, overrides=overrides),
+        _section_academic_profile(student, colors, benchmark_median=rank1_median, benchmark_label=rank1_label),
+        _section_target_programmes(match_results, colors, overrides=overrides),
         _section_roadmap(action_items, colors),
         _section_growth_areas(student, skill_gaps, colors),
         _section_language(student, colors),

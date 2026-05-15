@@ -241,6 +241,9 @@ class TaskEngine:
         from app.modules.school_choice.data.jupas_calendar import get_all_milestones
         resolved["milestones"] = get_all_milestones()
 
+        # Default language — can be overridden per-plan via consultant endpoint
+        resolved.setdefault("language", "繁體中文")
+
         # Filter by plan detail level
         if "matchmaker" in resolved:
             max_rank = 3  # default Band A
