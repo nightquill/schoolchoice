@@ -26,6 +26,7 @@ from app.services.student_import_service import (
     ImportFileError,
     detect_encoding,
     map_headers,
+    normalize_grade,
     VALID_GRADES,
 )
 
@@ -124,7 +125,7 @@ class TestParseStudentCsv:
         row = result["rows"][0]
         assert row["grades"] == {"ENGL": "5**"}
         assert "MATH" not in row["grades"]
-        assert any("Invalid grade" in w and "MATH" in w for w in row["warnings"])
+        assert any("Could not convert" in w and "MATH" in w for w in row["warnings"])
 
     def test_unknown_column_ignored(self):
         """Columns that are not subject codes or known fields are ignored."""
@@ -407,3 +408,101 @@ class TestHeaderMapping:
         result = parse_student_csv(csv_content.encode("utf-8"))
         assert "favorite_color" in result.get("unmapped_columns", [])
         assert "shoe_size" in result.get("unmapped_columns", [])
+
+
+# ---------------------------------------------------------------------------
+# Tests: Grade Normalization
+# ---------------------------------------------------------------------------
+
+class TestGradeNormalization:
+    """Tests for normalize_grade function."""
+
+    def test_hkdse_passthrough(self):
+        assert normalize_grade("5**") == ("5**", None)
+        assert normalize_grade("5*") == ("5*", None)
+        assert normalize_grade("5") == ("5", None)
+        assert normalize_grade("4") == ("4", None)
+        assert normalize_grade("U") == ("U", None)
+        assert normalize_grade("A") == ("A", None)
+        assert normalize_grade("AD") == ("AD", None)
+
+    def test_percentage_to_hkdse(self):
+        assert normalize_grade("85")[0] == "5"
+        assert normalize_grade("92")[0] == "5"
+        assert normalize_grade("72")[0] == "4"
+        assert normalize_grade("55")[0] == "3"
+        assert normalize_grade("40")[0] == "2"
+        assert normalize_grade("25")[0] == "1"
+        assert normalize_grade("15")[0] == "U"
+
+    def test_percentage_has_conversion_note(self):
+        grade, note = normalize_grade("85")
+        assert grade == "5"
+        assert note is not None
+        assert "85" in note
+
+    def test_letter_to_hkdse(self):
+        assert normalize_grade("A+")[0] == "5"
+        assert normalize_grade("B+")[0] == "4"
+        assert normalize_grade("B")[0] == "4"
+        assert normalize_grade("C")[0] == "3"
+        assert normalize_grade("C+")[0] == "3"
+        assert normalize_grade("D")[0] == "2"
+        assert normalize_grade("E")[0] == "1"
+        assert normalize_grade("F")[0] == "U"
+
+    def test_whitespace_cleanup(self):
+        assert normalize_grade("5 **")[0] == "5**"
+        assert normalize_grade(" 4 ")[0] == "4"
+        assert normalize_grade(" u ")[0] == "U"
+
+    def test_case_insensitive(self):
+        assert normalize_grade("u")[0] == "U"
+        assert normalize_grade("ad")[0] == "AD"
+        assert normalize_grade("a")[0] == "A"
+
+    def test_csd_attained(self):
+        assert normalize_grade("Attained")[0] == "A"
+        assert normalize_grade("Attained with Distinction")[0] == "AD"
+        assert normalize_grade("attained")[0] == "A"
+
+    def test_numeric_string(self):
+        assert normalize_grade("1")[0] == "1"
+        assert normalize_grade("3")[0] == "3"
+        assert normalize_grade("4.0")[0] == "4"
+        assert normalize_grade("3.7")[0] == "4"
+
+    def test_unconvertible_returns_none(self):
+        grade, note = normalize_grade("XYZ")
+        assert grade is None
+        assert note is not None
+        assert "XYZ" in note
+
+    def test_empty_returns_none(self):
+        assert normalize_grade("") == (None, None)
+        assert normalize_grade("  ") == (None, None)
+
+    def test_percentage_csv_parses_correctly(self):
+        csv_content = "candidate_number,name,ENGL,MATH,CHLA\nT001,Alice,85,72,55\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        row = result["rows"][0]
+        assert row["grades"]["ENGL"] == "5"
+        assert row["grades"]["MATH"] == "4"
+        assert row["grades"]["CHLA"] == "3"
+        assert len(result.get("grade_conversions", [])) == 3
+
+    def test_letter_csv_parses_correctly(self):
+        csv_content = "candidate_number,name,ENGL,MATH\nT001,Alice,A+,B+\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        row = result["rows"][0]
+        assert row["grades"]["ENGL"] == "5"
+        assert row["grades"]["MATH"] == "4"
+
+    def test_mixed_csv_parses_correctly(self):
+        csv_content = "candidate_number,name,ENGL,MATH,CHLA,PHYS\nT001,Alice,5*,85,B,4\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        row = result["rows"][0]
+        assert row["grades"]["ENGL"] == "5*"
+        assert row["grades"]["MATH"] == "5"
+        assert row["grades"]["CHLA"] == "4"
+        assert row["grades"]["PHYS"] == "4"

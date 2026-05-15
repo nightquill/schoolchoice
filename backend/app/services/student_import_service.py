@@ -121,6 +121,87 @@ _KNOWN_INTERNAL: set[str] = (
 )
 
 
+_LETTER_TO_HKDSE: dict[str, str] = {
+    "a+": "5", "a": "5", "a-": "5",
+    "b+": "4", "b": "4", "b-": "3",
+    "c+": "3", "c": "3", "c-": "2",
+    "d+": "2", "d": "2", "d-": "1",
+    "e": "1",
+    "f": "U",
+}
+
+_CSD_MAP: dict[str, str] = {
+    "attained": "A",
+    "attained with distinction": "AD",
+    "att": "A",
+}
+
+
+def normalize_grade(raw: str) -> tuple[str | None, str | None]:
+    """Normalize a grade value to HKDSE format.
+
+    Returns (normalized_grade, conversion_note):
+    - Already valid: (grade, None)
+    - Converted: (grade, "original → converted")
+    - Empty: (None, None)
+    - Unconvertible: (None, error_message)
+    """
+    val = raw.strip()
+    if not val:
+        return (None, None)
+
+    # Whitespace cleanup: "5 **" → "5**"
+    collapsed = val.replace(" ", "")
+    upper = collapsed.upper()
+
+    # Already valid HKDSE grade
+    if upper in VALID_GRADES:
+        return (upper, None)
+
+    # CSD string values
+    lower = val.lower().strip()
+    if lower in _CSD_MAP:
+        mapped = _CSD_MAP[lower]
+        return (mapped, f"{val} → {mapped}")
+
+    # Try numeric parse
+    try:
+        num = float(collapsed)
+        # Integer 1-5: treat as HKDSE level directly
+        if num == int(num) and 1 <= int(num) <= 5:
+            return (str(int(num)), None)
+        # Percentage range (>7): convert to HKDSE
+        if num > 7:
+            if num >= 80:
+                grade = "5"
+            elif num >= 70:
+                grade = "4"
+            elif num >= 50:
+                grade = "3"
+            elif num >= 35:
+                grade = "2"
+            elif num >= 20:
+                grade = "1"
+            else:
+                grade = "U"
+            return (grade, f"{val} → {grade}")
+        # Decimal 0.5-5.5: round to nearest int if in range
+        if 0.5 <= num <= 5.5:
+            rounded = str(round(num))
+            if rounded in VALID_GRADES:
+                return (rounded, f"{val} → {rounded}" if rounded != collapsed else None)
+        return (None, f"Could not convert grade '{val}'")
+    except ValueError:
+        pass
+
+    # Letter grade
+    if lower in _LETTER_TO_HKDSE:
+        grade = _LETTER_TO_HKDSE[lower]
+        return (grade, f"{val} → {grade}")
+
+    return (None, f"Could not convert grade '{val}'")
+
+
 def map_headers(headers: list[str]) -> dict[str, str]:
     """Map Chinese/English full-name headers to internal codes.
 
@@ -320,6 +401,7 @@ def parse_student_csv(content: bytes) -> dict:
 
     rows: list[dict[str, Any]] = []
     seen_candidates: set[str] = set()
+    grade_conversions: list[dict] = []
 
     for row_idx, raw_row in enumerate(reader, start=2):  # row 1 = header
         warnings: list[str] = []
@@ -398,10 +480,19 @@ def parse_student_csv(content: bytes) -> dict:
             grade_val = cleaned.get(mapped_col, "").strip()
             if not grade_val:
                 continue
-            if grade_val in VALID_GRADES:
-                grades[mapped_col.upper()] = grade_val
+            normalized, note = normalize_grade(grade_val)
+            if normalized is not None:
+                grades[mapped_col.upper()] = normalized
+                if note:
+                    grade_conversions.append({
+                        "row": row_idx,
+                        "subject": mapped_col.upper(),
+                        "original": grade_val,
+                        "converted": normalized,
+                    })
             else:
-                warnings.append(f"Invalid grade '{grade_val}' for {mapped_col}; skipped")
+                if note:
+                    warnings.append(f"{note} for {mapped_col}; skipped")
 
         # --- profile fields ---
         profile: dict[str, Any] = {}
@@ -447,6 +538,7 @@ def parse_student_csv(content: bytes) -> dict:
         "rows": rows,
         "subject_columns": subject_columns,
         "unmapped_columns": unmapped_columns,
+        "grade_conversions": grade_conversions,
         "summary": {
             "total": len(rows),
             "valid": valid_count,
