@@ -274,3 +274,19 @@ def setup_organisation(
     db.commit()
     db.refresh(org)
     return {"id": str(org.id), "name": org.name, "already_existed": False}
+
+
+# ---------------------------------------------------------------------------
+# GET /account/permissions — cohort permission matrix for current user
+# ---------------------------------------------------------------------------
+
+@router.get("/permissions")
+def get_my_permissions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return the cohort permission matrix for the authenticated user."""
+    from app.services.permission_service import resolve_user_permissions
+    user = db.merge(current_user)
+    perms = resolve_user_permissions(user, db)
+    return {"cohorts": perms}

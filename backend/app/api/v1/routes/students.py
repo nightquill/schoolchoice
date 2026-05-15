@@ -107,6 +107,10 @@ def list_students(
         db, user_id=current_user.id, organisation_id=_org_id(current_user),
         q=q, unaccounted=unaccounted,
     )
+    from app.services.permission_service import get_visible_student_ids
+    visible_ids = get_visible_student_ids(current_user, db)
+    if visible_ids is not None:
+        all_students = [s for s in all_students if s.id in visible_ids]
     total = len(all_students)
     students = all_students[skip : skip + limit]
 
