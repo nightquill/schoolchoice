@@ -350,7 +350,92 @@ def detect_encoding(content: bytes) -> str:
     if result and result.get("encoding") and (result.get("confidence", 0) > 0.5):
         return result["encoding"]
 
+    # Common HK school encodings fallback
+    for enc in ("big5", "gb2312"):
+        try:
+            content.decode(enc)
+            return enc
+        except (UnicodeDecodeError, LookupError):
+            pass
+
     return "latin-1"
+
+
+# ---------------------------------------------------------------------------
+# Row merging for duplicate candidate_numbers
+# ---------------------------------------------------------------------------
+
+def merge_duplicate_rows(rows: list[dict]) -> list[dict]:
+    """Merge rows sharing the same candidate_number.
+
+    Profile: first occurrence wins, blanks filled from later rows.
+    Grades: collected across all rows as grade_entries.
+    Same subject+sitting+year: last row wins.
+    Error rows are never merged.
+    """
+    from collections import OrderedDict
+
+    groups: OrderedDict[str, list[dict]] = OrderedDict()
+    error_rows: list[dict] = []
+
+    for row in rows:
+        if row["status"] == "error":
+            error_rows.append(row)
+            continue
+        cand = row["candidate_number"]
+        if cand not in groups:
+            groups[cand] = []
+        groups[cand].append(row)
+
+    merged: list[dict] = []
+    for cand, group in groups.items():
+        if len(group) == 1:
+            r = group[0]
+            r["grade_entries"] = [
+                {"code": code, "grade": grade, "sitting": r["sitting"], "year_of_exam": r["year_of_exam"]}
+                for code, grade in r.get("grades", {}).items()
+            ]
+            r["merged_from"] = 1
+            merged.append(r)
+            continue
+
+        first = group[0]
+        result_row = {
+            "row_number": first["row_number"],
+            "candidate_number": cand,
+            "name": first["name"],
+            "status": first["status"],
+            "profile": dict(first.get("profile", {})),
+            "warnings": [],
+            "errors": [],
+            "merged_from": len(group),
+        }
+
+        # Fill blank profile fields from later rows
+        for later in group[1:]:
+            for key, val in later.get("profile", {}).items():
+                if val and key not in result_row["profile"]:
+                    result_row["profile"][key] = val
+
+        # Collect grades keyed by (code, sitting, year) — last wins
+        grade_map: dict[tuple, dict] = {}
+        for r in group:
+            sitting = r["sitting"]
+            year = r["year_of_exam"]
+            for code, grade in r.get("grades", {}).items():
+                grade_map[(code, sitting, year)] = {
+                    "code": code, "grade": grade, "sitting": sitting, "year_of_exam": year,
+                }
+            result_row["warnings"].extend(r.get("warnings", []))
+
+        result_row["grade_entries"] = list(grade_map.values())
+        result_row["grades"] = {e["code"]: e["grade"] for e in result_row["grade_entries"]}
+        result_row["sitting"] = group[-1]["sitting"]
+        result_row["year_of_exam"] = group[-1]["year_of_exam"]
+
+        merged.append(result_row)
+
+    return merged + error_rows
 
 
 # ---------------------------------------------------------------------------
@@ -400,7 +485,6 @@ def parse_student_csv(content: bytes) -> dict:
     current_year = datetime.now().year
 
     rows: list[dict[str, Any]] = []
-    seen_candidates: set[str] = set()
     grade_conversions: list[dict] = []
 
     for row_idx, raw_row in enumerate(reader, start=2):  # row 1 = header
@@ -441,23 +525,6 @@ def parse_student_csv(content: bytes) -> dict:
             cand = f"AUTO-{uuid.uuid4().hex[:8]}"
             warnings.append(f"Empty candidate_number; auto-generated {cand}")
 
-        # Duplicate check within this CSV
-        if cand in seen_candidates:
-            errors.append(f"Duplicate candidate_number '{cand}' in CSV")
-            rows.append({
-                "row_number": row_idx,
-                "candidate_number": cand,
-                "name": name,
-                "status": "error",
-                "grades": {},
-                "profile": {},
-                "sitting": "OFFICIAL",
-                "year_of_exam": current_year,
-                "warnings": warnings,
-                "errors": errors,
-            })
-            continue
-        seen_candidates.add(cand)
 
         # --- sitting ---
         raw_sitting = cleaned.get("sitting", "OFFICIAL").strip().upper()
@@ -530,8 +597,11 @@ def parse_student_csv(content: bytes) -> dict:
             "errors": errors,
         })
 
-    # Summary
-    valid_count = sum(1 for r in rows if r["status"] == "valid")
+    # Merge duplicate candidate_numbers
+    rows = merge_duplicate_rows(rows)
+
+    # Summary (recalculated after merge)
+    valid_count = sum(1 for r in rows if r["status"] != "error")
     error_count = sum(1 for r in rows if r["status"] == "error")
 
     return {
@@ -723,10 +793,22 @@ def commit_import(
                 continue
 
             # --- Grades ---
-            sitting = row["sitting"]
-            year_of_exam = row["year_of_exam"]
+            # Use grade_entries if available (merged rows), else build from flat grades
+            grade_entries = row.get("grade_entries")
+            if grade_entries is None:
+                sitting = row["sitting"]
+                year_of_exam = row["year_of_exam"]
+                grade_entries = [
+                    {"code": code, "grade": grade, "sitting": sitting, "year_of_exam": year_of_exam}
+                    for code, grade in row.get("grades", {}).items()
+                ]
 
-            for code, grade_val in row.get("grades", {}).items():
+            for entry in grade_entries:
+                code = entry["code"]
+                grade_val = entry["grade"]
+                sitting = entry["sitting"]
+                year_of_exam = entry["year_of_exam"]
+
                 subj = code_to_subject.get(code.upper())
                 if subj is None:
                     all_warnings.append(
