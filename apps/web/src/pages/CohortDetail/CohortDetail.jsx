@@ -27,15 +27,22 @@ function numericToGrade(n) {
 
 // ---- SubjectStatRow ----
 function SubjectStatRow({ stat }) {
+  const { t } = useTranslation();
   const distKeys = Object.keys(stat.grade_distribution).sort((a, b) => {
     const order = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
     return order.indexOf(a) - order.indexOf(b);
   });
 
+  const translatedName = (() => {
+    const key = `subjects.${stat.subject_code}`;
+    const tr = t(key);
+    return tr !== key ? tr : (stat.subject_name || stat.subject_code);
+  })();
+
   return (
     <tr>
       <td style={tdStyle}>{stat.subject_code}</td>
-      <td style={tdStyle}>{stat.subject_name}</td>
+      <td style={tdStyle}>{translatedName}</td>
       <td style={tdStyle}>{stat.sitting}</td>
       <td style={tdStyle}>{stat.count}</td>
       <td style={tdStyle}>{numericToGrade(stat.mean)} ({stat.mean.toFixed(2)})</td>
