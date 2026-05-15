@@ -86,7 +86,7 @@ function AlertsPanel() {
   }
 
   return (
-    <div style={{ padding: 'var(--space-3) var(--space-4)' }} role="region" aria-label="Alerts">
+    <div className="px-4 md:px-8" style={{ paddingTop: 'var(--space-3)', paddingBottom: 'var(--space-3)' }} role="region" aria-label="Alerts">
       <h2 style={{
         fontSize: 'var(--font-size-md)',
         fontWeight: 'var(--font-weight-bold)',

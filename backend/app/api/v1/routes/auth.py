@@ -74,4 +74,9 @@ def student_login(request: Request, payload: StudentLoginRequest, db: Session = 
     from app.core.config import settings
     from datetime import timedelta
     token = create_access_token(data=token_data, expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
-    return {"access_token": token, "token_type": "bearer", "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "must_change_password": bool(getattr(user, "must_change_password", False)),
+    }

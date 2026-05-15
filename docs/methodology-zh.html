@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolChoice — 評分方法</title>
+<style>
+  :root {
+    --bg: #fafbfc;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #0d9488;
+    --accent-light: #f0fdfa;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --green: #059669;
+    --green-light: #ecfdf5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'PingFang HK', 'Microsoft JhengHei', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 3rem 2rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; color: var(--accent); letter-spacing: 0.03em; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.25rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; font-size: 0.92rem; }
+  .subtitle { color: var(--muted); font-size: 0.92rem; margin-bottom: 2rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+  .card h3 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: var(--bg); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+  .note { border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; margin: 1rem 0; }
+  .note.green { background: var(--green-light); border: 1px solid #a7f3d0; }
+  .note.amber { background: var(--amber-light); border: 1px solid #fde68a; }
+
+  .step-box { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; margin-top: 0.15rem; }
+  .step-body { flex: 1; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  .example { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .example-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.5rem; color: var(--accent); }
+
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; vertical-align: middle; }
+  .badge.green { background: var(--green-light); color: var(--green); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+  .badge.red { background: var(--red-light); color: var(--red); }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>評分方法</h1>
+<p class="subtitle">SchoolChoice 如何計算大學入學概率——以及為何這些數字值得信賴</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>核心原則</h2>
+
+<p>系統中每一個入學概率均由兩項數據計算而來：</p>
+
+<ol style="margin: 0.5rem 0 1rem 1.5rem; font-size: 0.92rem;">
+  <li><strong>各大學就各課程公佈的確切計分公式</strong></li>
+  <li><strong>最近一個收生週期中實際取錄學生的入學統計數據</strong>（中位數及下四分位數）</li>
+</ol>
+
+<p>系統不使用機器學習、不使用訓練數據、不使用黑盒模型。系統將各課程公佈的計分規則套用於學生的成績，計算加權分數，再與實際取錄學生的分佈進行比較。結果為一個統計位置——「這個學生在實際獲取錄的學生中處於什麼位置？」</p>
+
+<div class="note green">
+  <strong>可追溯性：</strong>系統中每一個數字均可連結到具體的官方來源——JUPAS PDF、大學計分器網頁，或課程入學要求文件。應用內的方法報告直接引用這些來源。
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>評分流程</h2>
+
+<div class="step-box">
+  <div class="step-num">1</div>
+  <div class="step-body">
+    <h3>將成績轉換為分數</h3>
+    <p>學生的 DSE 等級轉換為數值分數，使用 2025 年起所有 JUPAS 院校採用的增強 8.5 分制。例如，5** 等級轉換為 8.5 分，4 級轉換為 4.0 分。</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">2</div>
+  <div class="step-body">
+    <h3>套用課程專屬比重</h3>
+    <p>每個課程指定哪些科目最重要。港大工程學院將數學比重設為 1.5 倍；城大生物醫學工程將物理、化學及生物比重設為 2 倍；中大計算機科學將 M1/M2 比重設為 1.75 倍。系統套用各課程公佈的確切乘數。</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">3</div>
+  <div class="step-body">
+    <h3>選取最佳科目</h3>
+    <p>大多數課程使用「最佳 N 科」公式——選取加權分數最高的 N 個科目。部分課程額外計入下一最佳科目的部分分數（如港大工管加計第 6 最佳科目的 0.2 倍分數）。系統處理所有已公佈的公式模式。</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">4</div>
+  <div class="step-body">
+    <h3>與已取錄學生比較</h3>
+    <p>學生的加權總分與該課程公佈的入學統計比較——具體為實際取錄學生的中位數及下四分位數。透過已知分位點之間的分段插值計算入學概率。</p>
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">5</div>
+  <div class="step-body">
+    <h3>標示風險等級</h3>
+    <p>分數低於下四分位數的學生被標示為「高風險」——其成績低於該課程大部分已取錄的學生。分數高於中位數的學生處於較強的競爭位置。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>計算範例</h2>
+
+<div class="example">
+  <div class="example-title">學生報讀港大工商管理學士 (JS6755)</div>
+
+  <p><strong>公佈計分公式：</strong>1.5 &times; 英文 + 1.5 &times; 數學 + 最佳 3 科 + 0.2 &times; 第 6 最佳科目</p>
+
+  <table>
+    <tr><th>科目</th><th>等級</th><th>分數</th><th>比重</th><th>加權分</th></tr>
+    <tr><td>數學</td><td>5**</td><td>8.5</td><td>&times;1.5</td><td>12.75</td></tr>
+    <tr><td>英文</td><td>5*</td><td>7.0</td><td>&times;1.5</td><td>10.50</td></tr>
+    <tr><td>中文</td><td>5</td><td>5.5</td><td>&times;1.0</td><td>5.50</td></tr>
+    <tr><td>物理</td><td>5</td><td>5.5</td><td>&times;1.0</td><td>5.50</td></tr>
+    <tr><td>化學</td><td>4</td><td>4.0</td><td>&times;1.0</td><td>4.00</td></tr>
+    <tr style="font-weight:700;"><td colspan="4">最佳 5 科合計</td><td>38.25</td></tr>
+    <tr><td>公社科</td><td>達標</td><td>1.0</td><td>&times;0.2</td><td>0.20</td></tr>
+    <tr style="font-weight:700;background:var(--accent-light);"><td colspan="4">最終分數</td><td>38.45</td></tr>
+  </table>
+
+  <p><strong>2025 年入學統計：</strong>中位數 = 37，下四分位數 = 36</p>
+  <p><strong>結果：</strong>分數 38.45 超過中位數 &rarr; <span class="badge green">97% 入學概率 — 安全</span></p>
+</div>
+
+<div class="example">
+  <div class="example-title">同一學生，不同課程：城大生物醫學工程 (JS1211)</div>
+
+  <p><strong>公佈計分公式：</strong>最佳 5 科，英文、數學、生物、化學、物理科目 2 倍比重</p>
+  <p>不同的比重令分數完全改變。該學生的物理及化學被加倍計算，總分達 55.5，對比中位數 39。</p>
+  <p><strong>結果：</strong><span class="badge green">99% 入學概率 — 安全</span></p>
+</div>
+
+<div class="example">
+  <div class="example-title">較弱學生（全部 3 級和 4 級）報讀港大工管</div>
+  <p>總分：22.2，對比中位數 37 及下四分位數 36。</p>
+  <p><strong>結果：</strong><span class="badge red">1% 入學概率 — 高風險</span></p>
+  <p>系統以紅色「高風險」標誌標示此目標，並提醒輔導員與學生討論替代選項。</p>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>數據來源</h2>
+
+<table>
+  <tr><th>來源</th><th>提供的數據</th><th>覆蓋範圍</th></tr>
+  <tr><td>JUPAS 2025 入學成績 PDF</td><td>全部 9 間教資會資助院校的中位數及下四分位數入學分數</td><td>370 個課程中 357 個 (96%)</td></tr>
+  <tr><td>JUPAS 2024 入學成績 PDF</td><td>上年度統計數據作趨勢比較</td><td>同上</td></tr>
+  <tr><td>港大計分器</td><td>各課程的確切科目比重及公式</td><td>54 個課程中 29 個有公佈比重</td></tr>
+  <tr><td>中大計分器</td><td>科目乘數（如數學 2 倍、M1/M2 1.75 倍）</td><td>70 個課程中 46 個</td></tr>
+  <tr><td>城大計分公式 PDF</td><td>相關科目的組別乘數</td><td>58 個課程中 39 個</td></tr>
+  <tr><td>理大課程 PDF</td><td>絕對科目比重</td><td>3 個已核實，41 個按課程類型估算</td></tr>
+  <tr><td>教大課程要求</td><td>教育類課程的科目比重</td><td>26 個課程中 24 個</td></tr>
+</table>
+
+<p>沒有公佈比重的課程使用標準無比重最佳 5 科公式。這是保守的做法——會稍微低估學生在強項科目上的優勢，但絕不會高估競爭力。</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>課程覆蓋範圍</h2>
+
+<table>
+  <tr><th>院校</th><th>課程數</th><th>分數已核實</th><th>比重已核實</th></tr>
+  <tr><td>香港大學</td><td>54</td><td>100%</td><td>29 個已公佈 + 25 個無比重</td></tr>
+  <tr><td>香港中文大學</td><td>70</td><td>100%</td><td>46 個已公佈 + 24 個無比重</td></tr>
+  <tr><td>香港科技大學</td><td>34</td><td>97%</td><td>優先科目保守採用 1.2 倍</td></tr>
+  <tr><td>香港城市大學</td><td>58</td><td>98%</td><td>39 個已公佈 + 19 個無比重</td></tr>
+  <tr><td>香港理工大學</td><td>44</td><td>100%</td><td>3 個已公佈 + 41 個估算</td></tr>
+  <tr><td>香港浸會大學</td><td>22</td><td>100%</td><td>確認為無比重</td></tr>
+  <tr><td>嶺南大學</td><td>24</td><td>96%</td><td>確認為無比重</td></tr>
+  <tr><td>香港教育大學</td><td>26</td><td>100%</td><td>24 個已公佈 + 2 個無比重</td></tr>
+  <tr><td>香港都會大學</td><td>28</td><td>100%</td><td>9 個已公佈 + 19 個無比重</td></tr>
+  <tr style="font-weight:700;"><td>合計</td><td>370</td><td>96%</td><td>235 個有已核實比重</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>概率計算方法</h2>
+
+<p>原始加權分數需要轉換為有意義的概率。我們使用已知分位點之間的分段插值——即已公佈的已取錄學生中位數及下四分位數。</p>
+
+<table>
+  <tr><th>學生分數位置</th><th>概率</th><th>含義</th></tr>
+  <tr><td>高於上四分位數</td><td>75%+</td><td>比大多數已取錄學生更強</td></tr>
+  <tr><td>等於中位數</td><td>~50%</td><td>與一般取錄學生相若</td></tr>
+  <tr><td>等於下四分位數</td><td>~25%</td><td>處於取錄範圍的底部</td></tr>
+  <tr><td>低於下四分位數</td><td>&lt;25%</td><td>低於大多數已取錄學生——高風險</td></tr>
+</table>
+
+<p>在已知分位點之間，系統使用線性插值。在已知範圍之外，使用指數衰減趨近（但不到達）99% 或 1%。概率始終限制在 [1%, 99%] 範圍內——系統從不聲稱絕對確定。</p>
+
+<div class="note amber">
+  <strong>概率的含義：</strong>「僅基於成績，這個學生在過去取錄學生的分佈中處於這個位置。」這不是保證。非學業因素（面試、作品集、個人陳述、Band 選擇）同樣影響收生結果，但因為沒有公佈的統計比重，故不納入量化模型。
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>風險分級</h2>
+
+<table>
+  <tr><th>等級</th><th>條件</th><th>輔導員看到的內容</th></tr>
+  <tr><td><span class="badge green">安全</span></td><td>分數 &ge; 課程中位數</td><td>綠色匹配百分比。正常顯示。</td></tr>
+  <tr><td><span class="badge amber">邊緣</span></td><td>分數介於下四分位數與中位數之間</td><td>黃色/琥珀色匹配百分比。在取錄範圍內但低於平均。</td></tr>
+  <tr><td><span class="badge red">高風險</span></td><td>分數 &lt; 課程下四分位數</td><td>紅色「高風險」標誌。學生目標頁面顯示警告橫幅。輔導員控制台顯示提醒。</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>AI 的使用範圍</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>AI 不用於</h3>
+    <p>成績轉分數、科目比重、概率計算、資格審查、風險分級。所有量化推薦均為確定性計算，使用已公佈的公式及已核實的數據。</p>
+  </div>
+  <div class="card">
+    <h3>AI 用於</h3>
+    <p>在升學計劃書中生成建議文字——解釋為何某課程適合、建議備考策略、撰寫行動項目。AI 基於量化結果撰寫易讀的評語。輔導員可在分享給學生前編輯 AI 生成的文字。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>已知局限</h2>
+
+<table>
+  <tr><th>局限</th><th>影響</th><th>緩解措施</th></tr>
+  <tr><td>未能模擬面試及作品集</td><td>需要面試的課程（醫科、法律、電影）有額外甄選環節</td><td>建議文字標示面試要求。輔導員運用專業判斷。</td></tr>
+  <tr><td>科大比重為估算</td><td>科大公佈「優先科目」但未公佈確切乘數</td><td>保守採用 1.2 倍——會稍微低估優勢，不會高估。</td></tr>
+  <tr><td>年度波動</td><td>課程中位數每年可波動 2-5 分</td><td>使用最新可用數據。建議輔導員將概率視為範圍而非精確預測。</td></tr>
+  <tr><td>Band 選擇效應</td><td>JUPAS 志願排列影響收生優先次序</td><td>未納入模型。已在方法文件中說明。</td></tr>
+  <tr><td>非學業因素</td><td>課外活動、獎項及個人陳述有實際但不可量化的影響</td><td>在 AI 生成的建議文字中呈現。概率標明為「僅基於成績」。</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>每年維護</h2>
+
+<p>系統每年需要一次更新，在 JUPAS 公佈新入學統計後進行（通常為 8 月）：</p>
+
+<ol style="margin: 0.5rem 0 1rem 1.5rem; font-size: 0.92rem;">
+  <li>下載新年度 JUPAS 入學成績 PDF</li>
+  <li>提取各課程的中位數及下四分位數（自動化腳本）</li>
+  <li>更新課程數據檔案</li>
+  <li>運行驗證測試（評分引擎共 46 個單元測試）</li>
+  <li>檢查各大學網站是否有公式更改（少見——通常年度穩定）</li>
+</ol>
+
+<p>整個更新流程大約需要 2 小時。計分公式甚少變動；入學統計數據為主要的年度更新項目。</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>課程競爭程度分級</h2>
+
+<p>每個課程按最近一屆取錄學生的中位數入學分數分級，讓輔導員即時了解匹配分數的背景。</p>
+
+<table>
+  <tr><th>等級</th><th>中位數分數</th><th>數量</th><th>範例</th></tr>
+  <tr><td><strong>頂尖</strong></td><td>&ge; 40</td><td>94</td><td>港大醫科 (44)、港大工管法學 (46)、中大醫科 (40.5)</td></tr>
+  <tr><td><strong>競爭</strong></td><td>30&ndash;39</td><td>85</td><td>港大工管 (37)、中大計算機科學 (36)、科大數據科學 (36)</td></tr>
+  <tr><td><strong>中等</strong></td><td>22&ndash;29</td><td>123</td><td>城大工管會計 (22)、浸大傳理 (23)、教大小學教育 (25)</td></tr>
+  <tr><td><strong>門檻較低</strong></td><td>&lt; 22</td><td>67</td><td>都大社工 (16)、嶺大哲學 (20)</td></tr>
+</table>
+
+<p>在頂尖課程（中位數 44）取得 50% 概率的學生，比在門檻較低課程（中位數 16）取得 50% 概率的學生實力強得多。分級背景幫助輔導員和學生正確解讀結果。</p>
+
+<footer>
+  SchoolChoice 評分方法 &mdash; 2026 年 5 月<br>
+  來源：JUPAS 2024/2025 入學成績 PDF、各大學課程入學要求
+</footer>
+
+</div>
+</body>
+</html>

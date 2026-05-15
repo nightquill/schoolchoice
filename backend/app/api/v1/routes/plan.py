@@ -644,6 +644,33 @@ def _load_student_and_results(db: Session, student_id: UUID, plan: AcademicPlan)
 # GET /students/{student_id}/plan/export-pdf
 # ---------------------------------------------------------------------------
 
+def _html_to_pdf(html_content: str) -> bytes:
+    """Convert HTML string to PDF bytes using PyMuPDF (fitz)."""
+    import tempfile
+    import fitz
+
+    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+        tmp_path = tmp.name
+
+    try:
+        story = fitz.Story(html=html_content)
+        writer = fitz.DocumentWriter(tmp_path)
+        mediabox = fitz.paper_rect("a4")
+        where = mediabox + fitz.Rect(36, 36, -36, -36)  # 0.5-inch margins
+        more = True
+        while more:
+            dev = writer.begin_page(mediabox)
+            more, _ = story.place(where)
+            story.draw(dev)
+            writer.end_page()
+        writer.close()
+
+        with open(tmp_path, "rb") as f:
+            return f.read()
+    finally:
+        os.unlink(tmp_path)
+
+
 @router.get("/{student_id}/plan/export-pdf")
 def export_plan_pdf(
     student_id: UUID,
@@ -656,8 +683,7 @@ def export_plan_pdf(
         raise HTTPException(status_code=404, detail="No plan found")
 
     try:
-        from weasyprint import HTML
-        pdf_bytes = HTML(string=plan.html_content).write_pdf()
+        pdf_bytes = _html_to_pdf(plan.html_content)
         student = db.query(Student).filter(Student.id == student_id).first()
         filename = f"plan-{(student.name or 'student').replace(' ', '_')}-v{plan.version or 1}.pdf"
         return Response(
@@ -690,8 +716,7 @@ def export_plan_history_pdf(
         raise HTTPException(status_code=404, detail="Plan version not found")
 
     try:
-        from weasyprint import HTML
-        pdf_bytes = HTML(string=plan.html_content).write_pdf()
+        pdf_bytes = _html_to_pdf(plan.html_content)
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",

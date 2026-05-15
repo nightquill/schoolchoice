@@ -10,10 +10,10 @@
  */
 
 const TIERS = [
-  { id: 'very_competitive', label: 'Very Competitive', min: 28, bg: '#fef2f2', color: '#dc2626' },
-  { id: 'competitive',      label: 'Competitive',      min: 24, bg: '#fef3c7', color: '#92400e' },
-  { id: 'moderate',          label: 'Moderate',          min: 20, bg: '#d1fae5', color: '#065f46' },
-  { id: 'accessible',       label: 'Accessible',       min: 0,  bg: '#eff6ff', color: '#1e40af' },
+  { id: 'very_competitive', label: 'Very Competitive', min: 28, bg: 'var(--color-error-bg)', color: 'var(--color-error-text)' },
+  { id: 'competitive',      label: 'Competitive',      min: 24, bg: 'var(--color-warning-bg)', color: 'var(--color-warning-text)' },
+  { id: 'moderate',          label: 'Moderate',          min: 20, bg: 'var(--color-success-bg)', color: 'var(--color-success-text)' },
+  { id: 'accessible',       label: 'Accessible',       min: 0,  bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' },
 ];
 
 export function getCompetitivenessTier(admissionStats) {

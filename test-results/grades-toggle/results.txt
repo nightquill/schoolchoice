@@ -1,0 +1,16 @@
+✓ Logged in
+Sitting toggle buttons: MOCK (8), TRIAL (1)
+✓ Sitting toggle visible with multiple options
+Default view rows: 8
+TRIAL view rows: 1
+✓ Switched to TRIAL sitting
+MOCK view rows: 8
+✓ Switched to MOCK sitting
+Table headers: Subject, Year, Grade, Predicted Grade, Transcript, Notes, Actions
+✓ Sitting column removed from table (implicit from toggle)
+
+School Directory check:
+Import button: ✓ removed
+
+=== SUMMARY ===
+Passes: 5, Failures: 0

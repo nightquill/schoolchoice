@@ -1,0 +1,40 @@
+Step 0: Login as teacher
+✓ Logged in
+
+Step 1: Go to submissions list
+
+Step 2: Navigate to a submission via alert
+  Navigated to: http://localhost:5173/submissions/d4ad8355-9858-4ec5-9a53-5ad96a080f00
+
+Test 1: 20-slot banded table
+  Table has 20 rows
+✓ 20-slot table renders correctly
+  Band labels found: A, B, C, D, E
+✓ All 5 band labels (A-E) present
+  Slot numbers: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20
+
+Test 2: Match scores
+✓ Match scores display: 63%, 96%, 99%
+
+Test 3: Risk badges
+  Risk badges visible: 0
+
+Test 4: Flag toggle
+✓ Flag toggle clicked
+✓ Flag note input appeared
+✓ Approve button disabled when items flagged
+✓ Flagged count shown in header
+✓ Send Back button shows flag count
+
+Test 5: Send Back modal
+✓ Modal shows flagged choices summary
+
+Test 6: Empty slots
+  Empty slot indicators: 17
+✓ Empty slots render with dash indicator
+
+Test 7: Student submission history
+ERROR: page.waitForURL: Timeout 15000ms exceeded.
+=========================== logs ===========================
+waiting for navigation to "**/dashboard**" until "load"
+============================================================

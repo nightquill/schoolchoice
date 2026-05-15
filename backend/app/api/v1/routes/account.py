@@ -10,6 +10,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
+
 from app.core.dependencies import get_current_user
 from app.core.security import get_password_hash, verify_password
 from app.db.models import Organisation, OrganisationMembership, User
@@ -52,13 +55,23 @@ def get_account(
                 "org_role": membership.role,
             }
 
+    # For student users, display_name should be their student record name
+    display_name = user.display_name
+    if user.role == "student" and user.student_id:
+        from app.modules.school_choice.models.models import Student as StudentModel
+        linked_student = db.query(StudentModel).filter(StudentModel.id == user.student_id).first()
+        if linked_student:
+            display_name = linked_student.name
+
     return AccountResponse.model_validate({
         "id": user.id,
         "email": user.email,
-        "display_name": user.display_name,
+        "display_name": display_name,
         "preferred_language": user.preferred_language,
         "role": user.role,
         "is_active": user.is_active,
+        "can_manage_cohorts": getattr(user, "can_manage_cohorts", False) or user.role == "admin",
+        "student_id": str(user.student_id) if user.student_id else None,
         "created_at": user.created_at,
         "updated_at": user.updated_at,
         **org_data,
@@ -108,7 +121,44 @@ def update_account(
 
     db.commit()
     db.refresh(user)
-    return user
+
+    # Build response through same path as get_account to handle student_id conversion
+    membership = (
+        db.query(OrganisationMembership)
+        .filter(OrganisationMembership.user_id == user.id)
+        .first()
+    )
+    org_data: dict = {}
+    if membership:
+        org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
+        if org:
+            org_data = {
+                "organisation_id": str(org.id),
+                "organisation_name": org.name,
+                "organisation_slug": org.slug,
+                "org_role": membership.role,
+            }
+
+    display_name = user.display_name
+    if user.role == "student" and user.student_id:
+        from app.modules.school_choice.models.models import Student as StudentModel
+        linked_student = db.query(StudentModel).filter(StudentModel.id == user.student_id).first()
+        if linked_student:
+            display_name = linked_student.name
+
+    return AccountResponse.model_validate({
+        "id": user.id,
+        "email": user.email,
+        "display_name": display_name,
+        "preferred_language": user.preferred_language,
+        "role": user.role,
+        "is_active": user.is_active,
+        "can_manage_cohorts": getattr(user, "can_manage_cohorts", False) or user.role == "admin",
+        "student_id": str(user.student_id) if user.student_id else None,
+        "created_at": user.created_at,
+        "updated_at": user.updated_at,
+        **org_data,
+    })
 
 
 # ---------------------------------------------------------------------------
@@ -166,3 +216,61 @@ def delete_account(
     user.is_active = False
     db.commit()
     return {"message": "Account deactivated successfully"}
+
+
+# ---------------------------------------------------------------------------
+# POST /account/setup-organisation — onboarding org creation
+# ---------------------------------------------------------------------------
+
+class SetupOrgRequest(BaseModel):
+    school_name: str
+
+
+@router.post("/setup-organisation", status_code=status.HTTP_201_CREATED)
+def setup_organisation(
+    payload: SetupOrgRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create organisation during onboarding and add current user as owner."""
+    user = db.merge(current_user)
+
+    # Check if user already belongs to an org
+    existing = (
+        db.query(OrganisationMembership)
+        .filter(OrganisationMembership.user_id == user.id)
+        .first()
+    )
+    if existing:
+        org = db.query(Organisation).filter(Organisation.id == existing.organisation_id).first()
+        if org:
+            return {"id": str(org.id), "name": org.name, "already_existed": True}
+        # Orphaned membership — clean it up
+        db.delete(existing)
+        db.flush()
+
+    # Create org
+    import re
+    slug = re.sub(r"[^a-z0-9]+", "-", payload.school_name.lower()).strip("-") or "school"
+    org = Organisation(name=payload.school_name, slug=slug)
+    db.add(org)
+    try:
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        # Slug conflict — append user id fragment
+        org = Organisation(name=payload.school_name, slug=f"{slug}-{str(user.id)[:8]}")
+        db.add(org)
+        db.flush()
+
+    # Add user as owner
+    membership = OrganisationMembership(
+        user_id=user.id,
+        organisation_id=org.id,
+        role="owner",
+        permission="read_write",
+    )
+    db.add(membership)
+    db.commit()
+    db.refresh(org)
+    return {"id": str(org.id), "name": org.name, "already_existed": False}

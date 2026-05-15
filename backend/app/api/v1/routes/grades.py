@@ -196,6 +196,26 @@ def create_grade(
     if not subject:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subject not found")
 
+    # Prevent duplicate grade for same student+subject+sitting+year
+    dup_filters = [
+        StudentSubjectGrade.student_id == student_id,
+        StudentSubjectGrade.subject_id == payload.subject_id,
+    ]
+    if payload.sitting is not None:
+        dup_filters.append(StudentSubjectGrade.sitting == payload.sitting)
+    else:
+        dup_filters.append(StudentSubjectGrade.sitting.is_(None))
+    if payload.year_of_exam is not None:
+        dup_filters.append(StudentSubjectGrade.year_of_exam == payload.year_of_exam)
+    else:
+        dup_filters.append(StudentSubjectGrade.year_of_exam.is_(None))
+    existing_grade = db.query(StudentSubjectGrade).filter(*dup_filters).first()
+    if existing_grade:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"A grade already exists for this student/subject/sitting/year. Use PUT to update it.",
+        )
+
     grade = StudentSubjectGrade(
         student_id=student_id,
         subject_id=payload.subject_id,

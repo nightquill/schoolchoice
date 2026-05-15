@@ -74,10 +74,27 @@ def create_student(
     When *organisation_id* is set, the student is also associated with the org.
     REQ-012, REQ-025, REQ-028, REQ-033
     """
+    # Prevent duplicate candidate_number within org
+    cand = getattr(data, "candidate_number", None)
+    if cand:
+        dup_filter = [Student.candidate_number == cand]
+        if organisation_id:
+            dup_filter.append(Student.organisation_id == organisation_id)
+        else:
+            dup_filter.append(Student.organisation_id.is_(None))
+        dup = db.query(Student).filter(*dup_filter).first()
+        if dup:
+            from fastapi import HTTPException
+            raise HTTPException(
+                status_code=409,
+                detail=f"A student with candidate number '{cand}' already exists.",
+            )
+
     student = Student(
         user_id=user_id,
         organisation_id=organisation_id,
         name=data.name,
+        candidate_number=cand,
         grades=data.grades,
         interests=data.interests,
         strengths_weaknesses=data.strengths_weaknesses,

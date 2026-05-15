@@ -1,0 +1,13 @@
+✓ Logged in
+
+Fix 1: School Directory — Import button removed
+✓ Import Data button removed
+✓ Export button still present
+
+Fix 2: Chan Siu Ming — duplicate grades removed
+  Grade rows: 9
+✓ No duplicate subjects in grades table
+  ECON mentions: 0 (expected: appears in table + possibly header)
+
+=== SUMMARY ===
+Passes: 4, Failures: 0

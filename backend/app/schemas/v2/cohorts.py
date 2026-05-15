@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 # ---------------------------------------------------------------------------
@@ -20,6 +20,13 @@ class CohortCreate(BaseModel):
     name: str
     description: Optional[str] = None
     academic_year: str | None = None
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("Cohort name is required.")
+        return v.strip()
 
 
 class CohortUpdate(BaseModel):

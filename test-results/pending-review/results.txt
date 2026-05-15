@@ -1,0 +1,21 @@
+Step 0: Login as teacher
+✓ Logged in as teacher, on dashboard
+Step 1: Check for Pending Reviews alert category
+✓ Alerts panel found
+  Alert panel text: AlertsPending Reviews2Missing / Incomplete6Too Conservative2Too Ambitious10
+✓ "Pending Reviews" category found in alerts panel
+✓ Expanded Pending Reviews category
+  Found 2 alert item(s) in expanded section
+  First alert: Ng Ka Yan submitted 3 choice(s) for review.
+  Navigated to: http://localhost:5173/submissions/d4ad8355-9858-4ec5-9a53-5ad96a080f00
+✓ Alert click navigated to /submissions/{id}
+✓ Approve button found on submission detail
+✓ Send Back button found on submission detail
+
+Step 2: Check /submissions page
+  Submissions page loaded: http://localhost:5173/submissions
+✓ Submissions list page shows pending submissions
+  Found 0 review link(s)
+
+Step 3: Verify API includes submission_id
+ERROR: page.evaluate: SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON

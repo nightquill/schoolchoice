@@ -1,0 +1,27 @@
+✓ Logged in
+
+=== School Profile (HKU) — Requirement Badges ===
+Interview badges on cards: ✓
+Portfolio badges on cards: ✓
+
+=== Programme Detail (HKU Medicine) — Full Badges ===
+Medicine has Interview badge: ✓
+
+=== Programme Detail (HKU Architecture) ===
+Architecture has Portfolio badge: ✓
+Architecture has Interview badge: ✓
+
+=== EdUHK — Must Interview ===
+EdUHK Interview badge count: 26 (expected: ≥20 for all programmes)
+✓ All EdUHK programmes show Interview badge
+
+=== ProgrammeChoicesTab — Requirement Chips ===
+Requirement badges in choices tab: ✓
+
+=== Cohort Detail — Default Sitting ===
+
+=== Data Analysis — Elective Combinations ===
+Core subjects in combinations: ✓ elective only
+
+=== SUMMARY ===
+Passes: 9, Failures: 0

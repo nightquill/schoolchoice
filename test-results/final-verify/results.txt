@@ -1,0 +1,18 @@
+✓ Logged in
+Dashboard horizontal overflow: ✓ none
+Nav "Submissions": ✓
+Nav "User Management": ✓
+Metric values tabular-nums: ✓
+Heading text-wrap balance: ✓
+School profile horizontal overflow: ✓ none
+Programme detail aria-expanded toggles: ✓
+Submissions horizontal overflow: ✓ none
+
+=== Mobile ===
+Mobile horizontal overflow: ✓ none
+✓ Hamburger has aria-expanded
+Mobile menu visible after click: ✓
+CSS variables loaded: ✓
+
+=== SUMMARY ===
+Passes: 13, Failures: 0

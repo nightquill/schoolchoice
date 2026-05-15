@@ -102,14 +102,20 @@ def list_targets(
             # If target has a JUPAS programme, use programme-level scoring
             if t.jupas_code and school_dict.get("jupas_programmes"):
                 from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
-                from app.modules.school_choice.services.hkdse_service import compute_best5_aggregate
                 prog = next((p for p in school_dict["jupas_programmes"] if p.get("jupas_code") == t.jupas_code), None)
                 if prog:
-                    student_grades = student_data.get("subject_grades_detail", [])
+                    student_grades = student_data.get("grades_by_code", {})
                     result = score_student_for_programme(student_grades, prog)
                     match_score = result.get("admission_probability", 0.0)
                     passes = result.get("eligible", True)
-                    failing = result.get("failures", [])
+                    failing = list(result.get("eligibility_failures", []))
+
+                    # Also run school-level eligibility (aggregate check)
+                    school_passes, school_failing = run_eligibility_filter(student_data, school_dict)
+                    if not school_passes:
+                        passes = False
+                        failing.extend(school_failing)
+
                     t.eligibility_pass = passes
                     t.match_score = match_score
                     t.at_risk = result.get("risk_level") == "at_risk"
@@ -204,11 +210,16 @@ def add_target(
         from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
         prog = next((p for p in school_dict["jupas_programmes"] if p.get("jupas_code") == payload.jupas_code), None)
         if prog:
-            student_grades = student_data.get("subject_grades_detail", [])
+            student_grades = student_data.get("grades_by_code", {})
             result = score_student_for_programme(student_grades, prog)
             match_score = result.get("admission_probability", 0.0)
             passes = result.get("eligible", True)
-            failing = result.get("failures", [])
+            failing = list(result.get("eligibility_failures", []))
+            # Also run school-level eligibility (aggregate check)
+            school_passes, school_failing = run_eligibility_filter(student_data, school_dict)
+            if not school_passes:
+                passes = False
+                failing.extend(school_failing)
             at_risk = result.get("risk_level") == "at_risk"
             risk_reasons = [result.get("risk_level", "")] if at_risk else []
         else:

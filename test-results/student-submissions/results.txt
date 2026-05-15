@@ -1,0 +1,23 @@
+Step 1: Login as Chan Siu Ming
+✓ Logged in as Chan Siu Ming
+✓ Dashboard shows pending submission status
+✓ Submit button shows correct state
+
+Step 2: Navigate to My Submissions
+✓ My Submissions page loaded
+✓ Submission statuses visible
+  Found 2 submission(s) in history
+✓ Submission history has entries
+
+Step 3: Teacher sends back with flags
+✓ Navigated to Chan Siu Ming's submission: http://localhost:5173/submissions/f0bec04e-e62e-42af-8c1c-49989b959203
+✓ Flagged choice #1 with note
+✓ Sent back for revision
+
+Step 4: Student sees flagged items
+✓ Student dashboard shows Revision Requested status
+✓ Student sees flagged choices in submission history
+✓ Student sees flag details (志願 number)
+
+=== SUMMARY ===
+Passes: 12, Failures: 0, Warnings: 0

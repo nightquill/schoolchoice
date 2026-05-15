@@ -33,6 +33,7 @@ class UserUpdateAdmin(BaseModel):
     display_name: Optional[str] = None
     role: Optional[str] = None
     password: Optional[str] = None
+    can_manage_cohorts: Optional[bool] = None
 
     @field_validator("role")
     @classmethod
@@ -51,6 +52,7 @@ class UserAdminResponse(BaseModel):
     display_name: Optional[str] = None
     role: str
     is_active: bool
+    can_manage_cohorts: bool = False
     created_at: datetime
     updated_at: datetime
 

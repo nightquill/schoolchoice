@@ -232,6 +232,37 @@ def delete_user(
 
 
 # ---------------------------------------------------------------------------
+# POST /admin/users/{user_id}/reset-password — generate new random password
+# ---------------------------------------------------------------------------
+
+@router.post("/users/{user_id}/reset-password")
+def reset_user_password(
+    user_id: UUID,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_role("admin")),
+):
+    """Reset a user's password to a new random value. Admin only. Returns the new password once."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    import secrets, string
+    alphabet = string.ascii_uppercase.replace("O", "").replace("I", "") + string.digits.replace("0", "").replace("1", "")
+    new_password = "".join(secrets.choice(alphabet) for _ in range(8))
+
+    user.hashed_password = get_password_hash(new_password)
+    user.must_change_password = True
+    db.commit()
+
+    return {
+        "user_id": str(user.id),
+        "email": user.email,
+        "display_name": user.display_name,
+        "new_password": new_password,
+    }
+
+
+# ---------------------------------------------------------------------------
 # POST /admin/data-refresh/preview
 # ---------------------------------------------------------------------------
 

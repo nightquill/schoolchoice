@@ -35,8 +35,14 @@ router = APIRouter(prefix="/submissions", tags=["submissions"])
 # Pydantic schemas
 # ---------------------------------------------------------------------------
 
+class FlaggedChoice(BaseModel):
+    rank: int
+    note: str = ""
+
+
 class ReviseRequest(BaseModel):
     notes: str
+    flagged_choices: list[FlaggedChoice] = []
 
 
 class RejectRequest(BaseModel):
@@ -119,6 +125,40 @@ def list_submissions(
 
 
 # ---------------------------------------------------------------------------
+# 1b. GET /submissions/student/{student_id} — all submissions for a student
+# ---------------------------------------------------------------------------
+
+@router.get("/student/{student_id}")
+def list_student_submissions(
+    student_id: UUID,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """All submissions for a specific student (teacher view). Newest first."""
+    subs = (
+        db.query(StudentChoiceSubmission)
+        .filter(StudentChoiceSubmission.student_id == student_id)
+        .order_by(StudentChoiceSubmission.updated_at.desc())
+        .all()
+    )
+    return {
+        "submissions": [
+            {
+                "id": str(s.id),
+                "status": s.status,
+                "choices": s.choices,
+                "counsellor_notes": s.counsellor_notes,
+                "flagged_choices": s.flagged_choices,
+                "submitted_at": s.submitted_at.isoformat() if s.submitted_at else None,
+                "reviewed_at": s.reviewed_at.isoformat() if s.reviewed_at else None,
+                "created_at": s.created_at.isoformat() if s.created_at else None,
+            }
+            for s in subs
+        ]
+    }
+
+
+# ---------------------------------------------------------------------------
 # 2. GET /submissions/{submission_id} — detail with match scores
 # ---------------------------------------------------------------------------
 
@@ -187,6 +227,7 @@ def get_submission_detail(
         "status": sub.status,
         "choices": choices_out,
         "counsellor_notes": sub.counsellor_notes,
+        "flagged_choices": sub.flagged_choices,
         "submitted_at": sub.submitted_at.isoformat() if sub.submitted_at else None,
     }
 
@@ -324,6 +365,7 @@ def revise_submission(
 
     sub.status = "revision_requested"
     sub.counsellor_notes = body.notes
+    sub.flagged_choices = [fc.model_dump() for fc in body.flagged_choices] if body.flagged_choices else None
     sub.reviewed_at = datetime.now(timezone.utc)
     sub.reviewed_by = user.id
 

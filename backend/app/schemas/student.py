@@ -9,17 +9,25 @@ from datetime import date, datetime
 from typing import Any, Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class StudentCreate(BaseModel):
     """Request body for POST /students."""
 
     name: str
+    candidate_number: Optional[str] = None
     grades: Optional[dict] = {}
     interests: Optional[list[str]] = []
     strengths_weaknesses: Optional[str] = ""
     target_region: Optional[str] = "local"
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("Student name is required.")
+        return v.strip()
 
 
 class StudentUpdate(BaseModel):

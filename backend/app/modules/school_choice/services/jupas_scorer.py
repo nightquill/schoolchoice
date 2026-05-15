@@ -462,6 +462,23 @@ def score_student_for_programme(
     -------
     dict with scoring results, eligibility, probability, risk, provenance.
     """
+    # Guard: empty or invalid grades input
+    if not student_grades or not isinstance(student_grades, dict):
+        return {
+            "jupas_code": programme.get("jupas_code", ""),
+            "programme_name": programme.get("name", ""),
+            "tier": programme.get("tier", "unclassified"),
+            "eligible": False,
+            "eligibility_failures": ["no_grades"],
+            "weighted_score": 0.0,
+            "included_subjects": [],
+            "subject_details": [],
+            "bonus_points": 0.0,
+            "admission_probability": 0.01,
+            "risk_level": "at_risk",
+            "provenance": {"scale": "", "formula_text": "", "stat_year": None},
+        }
+
     formula = programme.get("scoring_formula", {})
     requirements = programme.get("minimum_requirements", {})
     admission_stats = programme.get("admission_stats", {})

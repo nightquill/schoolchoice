@@ -1,0 +1,36 @@
+✓ Logged in
+
+=== Dashboard — Nav & Layout ===
+Nav "Submissions" label: ✓
+Nav "User Management" (was "Manage"): ✓
+Nav "School Directory": ✓
+Active nav link has highlight: ✗ (rgba(0, 0, 0, 0))
+
+=== Alerts Panel ===
+✓ Alerts panel found with proper aria-label
+
+=== School Profile (HKU) — Color Tokens ===
+Competitiveness tier badges: ✓
+Requirement badges visible: ✓
+
+=== Programme Detail (HKU Medicine) ===
+Stat cards render: ✓
+Student tier sections: ✗
+
+=== Submissions Page ===
+Submissions page loads: ✓
+
+=== CSS Variable Verification ===
+--color-error-bg: #FEF2F2
+--color-success-bg: #F0FDF4
+--color-warning-bg: #FFFBEB
+--color-info-bg: #EFF6FF
+--color-purple-bg: #F5F3FF
+--color-border-hover: #94A3B8
+All new CSS variables loaded: ✓
+
+=== Mobile Nav ===
+Mobile nav has "Submissions": ✓
+
+=== SUMMARY ===
+Passes: 11, Failures: 2

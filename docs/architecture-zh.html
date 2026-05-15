@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolChoice — 產品架構</title>
+<style>
+  :root {
+    --bg: #fafbfc;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --accent: #0d9488;
+    --accent-light: #f0fdfa;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --green: #059669;
+    --green-light: #ecfdf5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, 'PingFang HK', 'Microsoft JhengHei', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; padding: 3rem 2rem; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.25rem; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; color: var(--accent); letter-spacing: 0.03em; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 1.25rem 0 0.5rem; }
+  p { margin-bottom: 0.75rem; font-size: 0.92rem; }
+  .subtitle { color: var(--muted); font-size: 0.92rem; margin-bottom: 2rem; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+  .card h3 { margin-top: 0; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .stat-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.25rem; flex: 1; min-width: 140px; text-align: center; }
+  .stat-num { font-size: 1.75rem; font-weight: 800; color: var(--accent); }
+  .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.15rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: var(--bg); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; color: var(--muted); border-bottom: 2px solid var(--border); }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+
+  .flow { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+  .flow-step { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; }
+  .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+
+  .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .badge.green { background: var(--green-light); color: var(--green); }
+  .badge.blue { background: var(--blue-light); color: var(--blue); }
+
+  .note { background: var(--accent-light); border: 1px solid #99f6e4; border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; margin: 1rem 0; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 3rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>SchoolChoice</h1>
+<p class="subtitle">專為香港中學而設的智能升學輔導平台</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>產品概述</h2>
+
+<p>SchoolChoice 為學校升學輔導員提供一站式工作平台，整合學生學業數據管理、以真實 JUPAS 入學計分公式評估大學匹配度，以及生成個人化升學計劃書——取代試算表、主觀估算和人手交叉比對，以數據驅動的工作流程提升輔導效率。</p>
+
+<div class="stat-row">
+  <div class="stat"><div class="stat-num">370+</div><div class="stat-label">已收錄 JUPAS 課程</div></div>
+  <div class="stat"><div class="stat-num">9</div><div class="stat-label">教資會資助院校全覆蓋</div></div>
+  <div class="stat"><div class="stat-num">96%</div><div class="stat-label">課程數據已從官方 PDF 核實</div></div>
+  <div class="stat"><div class="stat-num">150</div><div class="stat-label">每位輔導員管理學生數（已測試）</div></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>核心功能</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>學生數據管理</h3>
+    <p>完整的學業檔案：支援多次應考（模擬試、校內試、正式考試）的 DSE 成績、IELTS 分數、教師評語、課外活動及獎項紀錄。支援 CSV/Excel 批量匯入，方便全班資料輸入。</p>
+  </div>
+  <div class="card">
+    <h3>大學匹配分析</h3>
+    <p>依據每個 JUPAS 課程公佈的計分公式計算入學概率。每個課程有獨立的科目比重、最佳 N 科選取規則及評分量表。結果以實際公佈的入學統計數據（中位數、下四分位數）作校準。</p>
+  </div>
+  <div class="card">
+    <h3>升學計劃書生成</h3>
+    <p>生成結合量化匹配數據與 AI 撰寫建議的個人化 HTML 計劃書。三種範本風格可選。支援逐段編輯、AI 對話微調，以及列印輸出。</p>
+  </div>
+  <div class="card">
+    <h3>群組分析</h3>
+    <p>班級成績分佈、目標院校熱門度、高風險學生識別。可按考試類別篩選，追蹤從模擬試到正式考試的進步情況。批量成績輸入格可高效處理數據。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>運作流程</h2>
+
+<h3>輔導員工作流程</h3>
+
+<div class="flow">
+  <div class="flow-step">輸入成績</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">選擇目標院校</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">檢視匹配分數</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">生成計劃書</div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step">列印及輔導</div>
+</div>
+
+<p>當輔導員為學生選擇目標大學時，系統會即時運行匹配引擎。每個目標院校會顯示色彩編碼的匹配百分比、資格狀態（合格/不合格及具體未達標項目），以及當學生預測分數低於該課程已取錄學生的下四分位數時，會顯示「高風險」警示。</p>
+
+<p>匹配引擎使用各大學就各課程公佈的專屬計分公式——而非通用演算法。同一學生報讀港大工程學院與中大商學院，會因為兩個課程的科目比重不同而得出不同的分數。</p>
+
+<h3>多年成績追蹤</h3>
+
+<p>學生通常在中五應考模擬試，中六應考正式 DSE。系統追蹤多次應考及多年的成績，以最新數據計算預測成績，並以最佳可用分數進行大學匹配。輔導員可查看成績趨勢，據此調整建議。</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>系統設計</h2>
+
+<table>
+  <tr><th>層次</th><th>技術</th><th>備註</th></tr>
+  <tr><td>前端</td><td>React, Vite, TailwindCSS</td><td>單頁應用。響應式設計。計劃書生成支援即時串流。</td></tr>
+  <tr><td>後端</td><td>Python (FastAPI)</td><td>105+ API 端點。JWT 認證。速率限制。</td></tr>
+  <tr><td>資料庫</td><td>SQLite（開發）/ PostgreSQL（正式環境）</td><td>12 個資料表。可攜式 UUID。JSONB 彈性欄位。</td></tr>
+  <tr><td>AI 整合</td><td>LiteLLM（供應商無關）</td><td>用於計劃書建議文字及對話。不用於評分——評分為確定性計算。</td></tr>
+  <tr><td>部署</td><td>Vercel（前端）+ Railway（後端）</td><td>標準雲端託管。不需 GPU 或特殊基礎設施。</td></tr>
+</table>
+
+<div class="note">
+  <strong>關鍵設計決策：</strong>評分引擎完全採用確定性計算——無機器學習、無訓練數據、無黑盒模型。每個分數均可追溯至大學公佈的計分公式及已核實的入學統計數據。AI 僅用於生成升學計劃書中的建議文字，不影響量化推薦的準確性。
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>數據架構</h2>
+
+<h3>系統儲存的數據</h3>
+
+<table>
+  <tr><th>數據</th><th>來源</th><th>用途</th></tr>
+  <tr><td>學生檔案</td><td>輔導員輸入 / CSV 匯入</td><td>姓名、班別、年級、聯絡資料、興趣、個人陳述</td></tr>
+  <tr><td>DSE 成績</td><td>輔導員輸入 / 成績表上載</td><td>各科成績（模擬試、校內試、正式考試）</td></tr>
+  <tr><td>IELTS 分數</td><td>輔導員輸入</td><td>有英語要求的課程所需的語言能力證明</td></tr>
+  <tr><td>目標院校</td><td>輔導員選擇 + 系統推薦</td><td>首選大學及其匹配分數、資格狀態、申請進度</td></tr>
+  <tr><td>JUPAS 課程數據</td><td>大學官方公佈資料</td><td>370+ 課程的計分公式、科目比重、入學統計</td></tr>
+  <tr><td>升學計劃書</td><td>系統生成（AI 增強）</td><td>包含推薦、行動項目、輔導員備註的 HTML 文件</td></tr>
+</table>
+
+<h3>多租戶架構</h3>
+
+<p>每間學校在獨立的數據空間中運作。A 校的輔導員無法查看 B 校的學生資料。數據隔離透過機構範圍的 JWT 令牌在 API 層強制執行——每個資料庫查詢均自動按輔導員所屬機構過濾。</p>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>私隱及合規</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>《個人資料（私隱）條例》合規</h3>
+    <p>逐學生追蹤同意紀錄（資料處理、AI 分析、匯出、共享）。同意可授予及撤回，附完整審計軌跡。學生姓名在傳送至第三方 AI 供應商前會進行匿名化處理。</p>
+  </div>
+  <div class="card">
+    <h3>數據保護</h3>
+    <p>個人識別資料（PII）封鎖清單防止敏感欄位（醫療記錄、紀律處分記錄、身份證號碼、出生日期）被納入 AI 提示。所有 AI 輸出均經注入攻擊消毒。密碼以 bcrypt 雜湊處理。JWT 令牌 60 分鐘後過期。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>與現行做法的比較</h2>
+
+<table>
+  <tr><th></th><th>SchoolChoice</th><th>試算表 / 人手處理</th></tr>
+  <tr><td><strong>評分準確度</strong></td><td>使用各課程公佈的計分公式及已核實的科目比重</td><td>輔導員憑經驗及大概的收生分數線估算</td></tr>
+  <tr><td><strong>覆蓋範圍</strong></td><td>9 間院校 370+ 課程，每年更新</td><td>輔導員通常熟悉 20-30 個課程</td></tr>
+  <tr><td><strong>速度</strong></td><td>輸入成績後即時計算匹配分數</td><td>人手對照 PDF 表格需每名學生 15-30 分鐘</td></tr>
+  <tr><td><strong>成績追蹤</strong></td><td>多次應考、跨年度、含預測成績及進度分析</td><td>每次考試另建試算表，人手合併</td></tr>
+  <tr><td><strong>風險偵測</strong></td><td>分數低於課程下四分位數時自動標示「高風險」</td><td>輔導員須逐一人手對照入學統計</td></tr>
+  <tr><td><strong>計劃書輸出</strong></td><td>專業格式、個人化文件，數分鐘內完成</td><td>每名學生需數小時人手撰寫</td></tr>
+</table>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2>目前狀態</h2>
+
+<div class="card">
+  <p><span class="badge green">已完成</span> 完整學生生命週期：入門引導 → 數據輸入 → 成績追蹤 → 大學匹配 → 計劃書生成 → 畢業追蹤</p>
+  <p><span class="badge green">已完成</span> 370+ JUPAS 課程，附已核實的計分公式及 2024/2025 年入學統計</p>
+  <p><span class="badge green">已完成</span> 多租戶架構，機構範圍數據隔離</p>
+  <p><span class="badge green">已完成</span> 群組管理，含批量成績輸入、班級分析及報告</p>
+  <p><span class="badge green">已完成</span> AI 驅動升學計劃書生成，支援即時串流、範本切換、段落編輯及對話微調</p>
+  <p><span class="badge green">已完成</span> CSV/Excel 匯入、PDF 成績表解析、HTML 計劃書匯出</p>
+  <p><span class="badge blue">已測試</span> 29 個後端測試套件、22+ Playwright 端對端測試，以 155 名模擬學生驗證</p>
+</div>
+
+<footer>
+  SchoolChoice &mdash; 2026 年 5 月<br>
+  如需示範，歡迎聯絡
+</footer>
+
+</div>
+</body>
+</html>

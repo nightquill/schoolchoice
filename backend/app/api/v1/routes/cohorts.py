@@ -106,6 +106,17 @@ def list_cohorts(
     )
 
 
+def _require_cohort_management(user: User) -> None:
+    """Raise 403 if user is not admin and doesn't have can_manage_cohorts."""
+    if getattr(user, "role", "") == "admin":
+        return
+    if not getattr(user, "can_manage_cohorts", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to manage cohorts. Ask an admin to grant cohort management access.",
+        )
+
+
 # ---------------------------------------------------------------------------
 # POST /cohorts  — create a cohort
 # ---------------------------------------------------------------------------
@@ -117,6 +128,7 @@ def create_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new student cohort."""
+    _require_cohort_management(current_user)
     cohort = StudentCohort(
         user_id=current_user.id,
         organisation_id=_org_id(current_user),
@@ -224,6 +236,7 @@ def update_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Update cohort name or description."""
+    _require_cohort_management(current_user)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     if payload.name is not None:
         cohort.name = payload.name
@@ -247,6 +260,7 @@ def delete_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a cohort (members are unlinked, not deleted)."""
+    _require_cohort_management(current_user)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     db.delete(cohort)
     db.commit()

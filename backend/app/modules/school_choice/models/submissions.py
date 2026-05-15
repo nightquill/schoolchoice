@@ -23,6 +23,7 @@ class StudentChoiceSubmission(Base):
     status = Column(String(20), nullable=False, default="draft", server_default="'draft'")
     choices = Column(JSON, nullable=False, server_default="'[]'")
     counsellor_notes = Column(Text, nullable=True)
+    flagged_choices = Column(JSON, nullable=True)  # [{rank: int, note: str}, ...]
     submitted_at = Column(TIMESTAMP(timezone=True), nullable=True)
     reviewed_at = Column(TIMESTAMP(timezone=True), nullable=True)
     reviewed_by = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL", name="fk_scs_reviewed_by"), nullable=True)

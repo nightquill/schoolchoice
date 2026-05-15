@@ -27,6 +27,8 @@ class AccountResponse(BaseModel):
     organisation_name: Optional[str] = None
     organisation_slug: Optional[str] = None
     org_role: Optional[str] = None
+    can_manage_cohorts: bool = False
+    student_id: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

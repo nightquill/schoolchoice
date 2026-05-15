@@ -27,6 +27,7 @@ from app.services.student_import_service import (
     detect_encoding,
     map_headers,
     normalize_grade,
+    merge_duplicate_rows,
     VALID_GRADES,
 )
 
@@ -96,8 +97,8 @@ class TestParseStudentCsv:
         assert row["status"] == "valid"
         assert any("auto-generated" in w.lower() for w in row["warnings"])
 
-    def test_duplicate_candidate_number_rejected(self):
-        """Duplicate candidate_number in same CSV is rejected."""
+    def test_duplicate_candidate_number_merged(self):
+        """Duplicate candidate_number in same CSV is merged, not rejected."""
         csv_bytes = _make_csv(
             ["candidate_number", "name", "ENGL"],
             [
@@ -106,13 +107,10 @@ class TestParseStudentCsv:
             ],
         )
         result = parse_student_csv(csv_bytes)
-
-        assert result["summary"]["valid"] == 1
-        assert result["summary"]["error"] == 1
-
-        dup_row = result["rows"][1]
-        assert dup_row["status"] == "error"
-        assert any("Duplicate" in e for e in dup_row["errors"])
+        valid_rows = [r for r in result["rows"] if r["status"] != "error"]
+        assert len(valid_rows) == 1
+        assert valid_rows[0]["merged_from"] == 2
+        assert valid_rows[0]["name"] == "First Student"  # first row wins
 
     def test_invalid_grade_skipped_with_warning(self):
         """Invalid grades are skipped and a warning is added."""
@@ -506,3 +504,132 @@ class TestGradeNormalization:
         assert row["grades"]["MATH"] == "5"
         assert row["grades"]["CHLA"] == "4"
         assert row["grades"]["PHYS"] == "4"
+
+
+# ---------------------------------------------------------------------------
+# Tests: Row Merging
+# ---------------------------------------------------------------------------
+
+class TestRowMerging:
+    def test_no_duplicates_unchanged(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "5"}, "profile": {"class_name": "5A"}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A002", "name": "Bob", "status": "valid", "grades": {"ENGL": "4"}, "profile": {"class_name": "5B"}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert len(result) == 2
+
+    def test_profile_from_first_row(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {}, "profile": {"class_name": "5A"}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice Updated", "status": "valid", "grades": {}, "profile": {"class_name": "5B"}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert len(result) == 1
+        assert result[0]["name"] == "Alice"
+        assert result[0]["profile"]["class_name"] == "5A"
+
+    def test_profile_fills_blanks(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {}, "profile": {"class_name": "5A", "gender": "F"}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert result[0]["profile"]["class_name"] == "5A"
+        assert result[0]["profile"]["gender"] == "F"
+
+    def test_grades_merged_across_sittings(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "4", "MATH": "3"}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "5*", "MATH": "4"}, "profile": {}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert len(result[0]["grade_entries"]) == 4  # 2 subjects x 2 sittings
+
+    def test_same_sitting_last_row_wins(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "4"}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "5"}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 3, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        engl = [e for e in result[0]["grade_entries"] if e["code"] == "ENGL"]
+        assert len(engl) == 1
+        assert engl[0]["grade"] == "5"
+
+    def test_merged_from_count(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "4"}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"MATH": "3"}, "profile": {}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"PHYS": "5"}, "profile": {}, "sitting": "TRIAL", "year_of_exam": 2025, "row_number": 4, "warnings": [], "errors": []},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert result[0]["merged_from"] == 3
+
+    def test_error_rows_not_merged(self):
+        rows = [
+            {"candidate_number": "A001", "name": "Alice", "status": "valid", "grades": {"ENGL": "4"}, "profile": {}, "sitting": "MOCK", "year_of_exam": 2025, "row_number": 2, "warnings": [], "errors": []},
+            {"candidate_number": "A001", "name": "", "status": "error", "grades": {}, "profile": {}, "sitting": "OFFICIAL", "year_of_exam": 2026, "row_number": 3, "warnings": [], "errors": ["name is required"]},
+        ]
+        result = merge_duplicate_rows(rows)
+        assert len(result) == 2
+
+    def test_duplicate_csv_parses_with_merge(self):
+        csv_content = (
+            "candidate_number,name,class_name,ENGL,MATH,sitting,year_of_exam\n"
+            "T001,Chan Ka Wai,5A,4,3,MOCK,2025\n"
+            "T001,Chan Ka Wai,,5*,4,OFFICIAL,2026\n"
+        )
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        valid_rows = [r for r in result["rows"] if r["status"] != "error"]
+        assert len(valid_rows) == 1
+        assert valid_rows[0]["merged_from"] == 2
+        assert valid_rows[0]["profile"]["class_name"] == "5A"
+
+
+# ---------------------------------------------------------------------------
+# Tests: Partial Data Import
+# ---------------------------------------------------------------------------
+
+class TestPartialDataImport:
+    def test_profile_only_csv(self):
+        csv_content = "candidate_number,name,class_name,gender,year_of_study\nT001,Alice,5A,F,5\nT002,Bob,5B,M,5\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert result["summary"]["valid"] == 2
+        assert result["subject_columns"] == []
+        assert result["rows"][0]["grades"] == {}
+        assert result["rows"][0]["profile"]["class_name"] == "5A"
+
+    def test_name_only_minimum(self):
+        csv_content = "name\nAlice Wong\nBob Lee\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert result["summary"]["valid"] == 2
+        assert result["rows"][0]["name"] == "Alice Wong"
+        assert result["rows"][0]["candidate_number"].startswith("AUTO-")
+
+    def test_grades_only_no_name_is_error(self):
+        csv_content = "candidate_number,ENGL,MATH,CHLA\nT001,5*,4,3\nT002,5,5,5*\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert result["summary"]["error"] == 2
+
+    def test_grades_with_name_no_profile(self):
+        csv_content = "candidate_number,name,ENGL,MATH,CHLA\nT001,Alice,5*,4,3\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert result["summary"]["valid"] == 1
+        assert result["rows"][0]["profile"] == {}
+        assert result["rows"][0]["grades"] == {"ENGL": "5*", "MATH": "4", "CHLA": "3"}
+
+    def test_sparse_data_csv(self):
+        csv_content = "candidate_number,name,class_name,ENGL,MATH,CHLA,PHYS,CHEM\nT001,Alice,,5*,,,,\nT002,Bob,5A,,,3,,\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert result["summary"]["valid"] == 2
+        assert result["rows"][0]["grades"] == {"ENGL": "5*"}
+        assert "class_name" not in result["rows"][0]["profile"]
+        assert result["rows"][1]["grades"] == {"CHLA": "3"}
+        assert result["rows"][1]["profile"]["class_name"] == "5A"
+
+    def test_extra_columns_reported(self):
+        csv_content = "candidate_number,name,ENGL,favorite_color,shoe_size\nT001,Alice,5,blue,42\n"
+        result = parse_student_csv(csv_content.encode("utf-8"))
+        assert "favorite_color" in result["unmapped_columns"]
+        assert "shoe_size" in result["unmapped_columns"]
+        assert result["summary"]["valid"] == 1

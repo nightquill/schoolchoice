@@ -1,0 +1,37 @@
+✓ Logged in
+
+=== SF Institution (HKCC) ===
+Institution name: ✓
+Chinese name: ✓
+Sub-degree badge: ✓
+Tier badge: ✓
+Articulation rate: ✓
+Parent uni: ✓
+Programme rows: 36
+✓ All 36 programmes rendered
+AD badges: 32, HD badges: 4
+Real admission scores: ✓
+Data source shown: ✓
+Search "engineering": 9 results
+HD filter: 4 results
+✓ HD filter shows exactly 4 higher diploma programmes
+
+=== SF Programme Detail ===
+Programme name: ✓
+Level badge: ✓
+Mean score stat: ✓
+UQ stat: ✓
+Strong tier: ✓
+Possible tier: ✓
+Student profile links: 10
+✓ Students scored and linked
+✓ Match percentages: 95%, 95%, 95%, 95%, 95%
+Best 5 column: ✓
+Breadcrumb back: ✓
+
+=== JUPAS Unaffected ===
+JUPAS school loads: ✓
+No SF data in JUPAS: ✓
+
+=== SUMMARY ===
+Passes: 23, Failures: 0

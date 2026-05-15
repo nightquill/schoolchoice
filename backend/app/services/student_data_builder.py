@@ -41,7 +41,10 @@ def build_student_data(student, db: Session) -> dict:
             continue
         raw = g.raw_grade or g.predicted_grade or "U"
         numeric = grade_to_int(raw)
-        grades_by_code[subj.code] = raw
+        # Keep the best grade per subject (highest numeric value)
+        existing_grade = grades_by_code.get(subj.code)
+        if existing_grade is None or numeric > grade_to_int(existing_grade):
+            grades_by_code[subj.code] = raw
         grade_dicts_for_agg.append({
             "subject_code": subj.code,
             "numeric_value": numeric,

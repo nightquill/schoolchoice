@@ -168,6 +168,11 @@ class User(Base):
         server_default="false",
         comment="Force password change on next login",
     )
+    can_manage_cohorts = Column(
+        Boolean, nullable=False, default=False,
+        server_default="false",
+        comment="If true, this teacher can create/edit/delete cohorts",
+    )
 
     # Relationships
     students = relationship(
