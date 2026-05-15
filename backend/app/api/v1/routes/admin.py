@@ -375,28 +375,31 @@ def list_cohort_permissions(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
 ):
-    """List users with their permission level for a cohort. Admin only."""
+    """List groups with their permission levels for a cohort. Admin only.
+    (Migrated from user-based to group-based permissions.)
+    """
+    from app.db.models import TeacherGroup
     cohort = db.query(StudentCohort).filter(StudentCohort.id == cohort_id).first()
     if not cohort:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cohort not found")
 
     perms = (
-        db.query(CohortPermission, User)
-        .join(User, CohortPermission.user_id == User.id)
+        db.query(CohortPermission, TeacherGroup)
+        .join(TeacherGroup, CohortPermission.group_id == TeacherGroup.id)
         .filter(CohortPermission.cohort_id == cohort_id)
         .all()
     )
 
+    from app.services.permission_service import TOOL_FIELDS
     return {
         "permissions": [
             {
-                "user_id": str(u.id),
-                "email": u.email,
-                "display_name": u.display_name,
-                "role": u.role,
-                "permission": cp.permission,
+                "group_id": str(g.id),
+                "group_name": g.name,
+                "visible": cp.visible,
+                **{f: getattr(cp, f) for f in TOOL_FIELDS},
             }
-            for cp, u in perms
+            for cp, g in perms
         ]
     }
 
@@ -408,61 +411,75 @@ def set_cohort_permission(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
 ):
-    """Set or update a user's permission on a cohort. Admin only."""
-    user_id_str = payload.get("user_id")
-    permission = payload.get("permission")
-
-    if not user_id_str or permission not in ("read_write", "read_only"):
+    """Set or update a group's permission on a cohort. Admin only.
+    (Migrated from user-based to group-based permissions.)
+    Accepts: {group_id, visible, programme_choices, grades, ...}
+    """
+    from app.db.models import TeacherGroup
+    from app.services.permission_service import TOOL_FIELDS
+    group_id_str = payload.get("group_id")
+    if not group_id_str:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Required: user_id (UUID) and permission ('read_write' | 'read_only')",
+            detail="Required: group_id (UUID)",
         )
 
     try:
-        target_user_id = UUID(str(user_id_str))
+        target_group_id = UUID(str(group_id_str))
     except (ValueError, TypeError):
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid user_id")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid group_id")
 
     cohort = db.query(StudentCohort).filter(StudentCohort.id == cohort_id).first()
     if not cohort:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cohort not found")
 
-    user = db.query(User).filter(User.id == target_user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    group = db.query(TeacherGroup).filter(TeacherGroup.id == target_group_id).first()
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
 
     existing = (
         db.query(CohortPermission)
-        .filter(CohortPermission.user_id == target_user_id, CohortPermission.cohort_id == cohort_id)
+        .filter(CohortPermission.group_id == target_group_id, CohortPermission.cohort_id == cohort_id)
         .first()
     )
 
     if existing:
-        existing.permission = permission
+        if "visible" in payload:
+            existing.visible = payload["visible"]
+        for f in TOOL_FIELDS:
+            if f in payload:
+                setattr(existing, f, payload[f])
     else:
-        cp = CohortPermission(user_id=target_user_id, cohort_id=cohort_id, permission=permission)
+        cp = CohortPermission(group_id=target_group_id, cohort_id=cohort_id)
+        if "visible" in payload:
+            cp.visible = payload["visible"]
+        for f in TOOL_FIELDS:
+            if f in payload:
+                setattr(cp, f, payload[f])
         db.add(cp)
 
     db.commit()
 
-    return {"user_id": str(target_user_id), "cohort_id": str(cohort_id), "permission": permission}
+    return {"group_id": str(target_group_id), "cohort_id": str(cohort_id), "status": "updated"}
 
 
-@router.delete("/cohorts/{cohort_id}/permissions/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/cohorts/{cohort_id}/permissions/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_cohort_permission(
     cohort_id: UUID,
-    user_id: UUID,
+    group_id: UUID,
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
 ):
-    """Remove a user's cohort-specific permission override. Admin only."""
+    """Remove a group's cohort-specific permission. Admin only.
+    (Migrated from user-based to group-based permissions.)
+    """
     cp = (
         db.query(CohortPermission)
-        .filter(CohortPermission.user_id == user_id, CohortPermission.cohort_id == cohort_id)
+        .filter(CohortPermission.group_id == group_id, CohortPermission.cohort_id == cohort_id)
         .first()
     )
     if not cp:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission override not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Permission not found")
 
     db.delete(cp)
     db.commit()
@@ -473,7 +490,10 @@ def list_users_with_permissions(
     db: Session = Depends(get_db),
     _: User = Depends(require_role("admin")),
 ):
-    """List all counsellor/admin users with org-level permission and cohort overrides. Admin only."""
+    """List all counsellor/admin users with org-level permission and group memberships. Admin only.
+    (Migrated from user-based to group-based permissions.)
+    """
+    from app.db.models import TeacherGroup, TeacherGroupMember
     users = (
         db.query(User)
         .filter(User.is_active == True, User.role.in_(["admin", "counsellor"]))  # noqa: E712
@@ -486,11 +506,11 @@ def list_users_with_permissions(
         membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == u.id).first()
         org_permission = membership.permission if membership else "read_write"
 
-        # Get cohort-level overrides
-        cohort_perms = (
-            db.query(CohortPermission, StudentCohort)
-            .join(StudentCohort, CohortPermission.cohort_id == StudentCohort.id)
-            .filter(CohortPermission.user_id == u.id)
+        # Get group memberships
+        group_memberships = (
+            db.query(TeacherGroupMember, TeacherGroup)
+            .join(TeacherGroup, TeacherGroupMember.group_id == TeacherGroup.id)
+            .filter(TeacherGroupMember.user_id == u.id)
             .all()
         )
 
@@ -500,13 +520,12 @@ def list_users_with_permissions(
             "display_name": u.display_name,
             "role": u.role,
             "org_permission": org_permission,
-            "cohort_permissions": [
+            "groups": [
                 {
-                    "cohort_id": str(sc.id),
-                    "cohort_name": sc.name,
-                    "permission": cp.permission,
+                    "group_id": str(g.id),
+                    "group_name": g.name,
                 }
-                for cp, sc in cohort_perms
+                for _, g in group_memberships
             ],
         })
 
