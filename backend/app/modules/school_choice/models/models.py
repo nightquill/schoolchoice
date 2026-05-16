@@ -434,6 +434,7 @@ class JupasProgramme(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid(), nullable=False)
     jupas_code = Column(String(10), nullable=False, index=True, comment="JUPAS programme code e.g. JS6456")
     name = Column(String(255), nullable=False, comment="Programme name")
+    name_zh = Column(String(255), nullable=True, comment="Chinese programme name")
     institution_code = Column(String(10), nullable=False, index=True, comment="Short code e.g. HKU, CUHK")
     school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id", ondelete="SET NULL"), nullable=True, comment="FK to schools table")
     faculty = Column(String(255), nullable=True)

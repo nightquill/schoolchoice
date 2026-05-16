@@ -141,8 +141,10 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
   const allSfProgs = (Array.isArray(rawSfProgs) ? rawSfProgs : rawSfProgs.programmes ?? []).map(p => ({
     jupas_code: p.programme_code || p.id,
     name: p.name,
+    name_zh: p.name_zh,
     school_id: p.id,
     school_name: p.institution_name,
+    school_name_zh: p.institution_name_zh,
     faculty: p.faculty,
     level: p.level,
     admission_stats: p.admission_score_mean ? { mean: p.admission_score_mean, lq: p.admission_score_lq, uq: p.admission_score_uq } : null,
@@ -156,7 +158,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
 
   // Client-side filtering: each chip narrows results (AND logic)
   const filteredProgs = allProgs.filter((p) => {
-    const searchable = `${p.jupas_code || ''} ${p.name} ${p.school_name} ${p.faculty}`.toLowerCase();
+    const searchable = `${p.jupas_code || ''} ${p.name} ${p.name_zh || ''} ${p.school_name} ${p.school_name_zh || ''} ${p.faculty}`.toLowerCase();
     for (const f of filters) {
       if (f.type === 'uni' && p.school_name !== f.value) return false;
       if (f.type === 'text' && !searchable.includes(f.value.toLowerCase())) return false;

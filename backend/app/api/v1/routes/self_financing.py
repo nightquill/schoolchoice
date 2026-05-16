@@ -35,11 +35,17 @@ def _row_to_dict(row, keys):
 # ---------------------------------------------------------------------------
 
 @router.get("/institutions")
-def list_institutions(db: Session = Depends(get_db)):
-    rows = db.execute(text(
+def list_institutions(q: str = None, db: Session = Depends(get_db)):
+    sql = (
         "SELECT id, code, name, name_zh, parent_university, location, website, tier, articulation_rate, notes "
-        "FROM sf_institutions ORDER BY tier, name"
-    )).fetchall()
+        "FROM sf_institutions"
+    )
+    params = {}
+    if q:
+        sql += " WHERE (name ILIKE :q OR name_zh ILIKE :q)"
+        params["q"] = f"%{q}%"
+    sql += " ORDER BY tier, name"
+    rows = db.execute(text(sql), params).fetchall()
     keys = ["id", "code", "name", "name_zh", "parent_university", "location", "website", "tier", "articulation_rate", "notes"]
     return {
         "institutions": [_row_to_dict(r, keys) for r in rows],
@@ -89,10 +95,11 @@ def get_institution(code: str, db: Session = Depends(get_db)):
 def list_programmes(
     level: str = None,  # filter: associate_degree, higher_diploma, etc.
     institution: str = None,  # filter by institution code
+    q: str = None,  # search by programme or institution name (en/zh)
     db: Session = Depends(get_db),
 ):
     sql = """
-        SELECT p.id, p.programme_code, p.name, p.level, p.faculty,
+        SELECT p.id, p.programme_code, p.name, p.name_zh, p.level, p.faculty,
                p.admission_score_mean, p.admission_score_lq, p.admission_score_uq, p.admission_score_highest,
                p.admission_year, i.code as institution_code, i.name as institution_name, i.name_zh as institution_name_zh
         FROM sf_programmes p
@@ -106,10 +113,13 @@ def list_programmes(
     if institution:
         sql += " AND i.code = :inst"
         params["inst"] = institution.upper()
+    if q:
+        sql += " AND (p.name ILIKE :q OR p.name_zh ILIKE :q OR i.name ILIKE :q OR i.name_zh ILIKE :q)"
+        params["q"] = f"%{q}%"
     sql += " ORDER BY i.name, p.level, p.name"
 
     rows = db.execute(text(sql), params).fetchall()
-    keys = ["id", "programme_code", "name", "level", "faculty",
+    keys = ["id", "programme_code", "name", "name_zh", "level", "faculty",
             "admission_score_mean", "admission_score_lq", "admission_score_uq", "admission_score_highest",
             "admission_year", "institution_code", "institution_name", "institution_name_zh"]
 

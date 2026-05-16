@@ -32,7 +32,13 @@ def get_students(
     else:
         query = db.query(Student).filter(Student.user_id == user_id)
     if q:
-        query = query.filter(Student.name.ilike(f"%{q}%"))
+        from sqlalchemy import or_
+        pattern = f"%{q}%"
+        query = query.filter(or_(
+            Student.name.ilike(pattern),
+            Student.email.ilike(pattern),
+            Student.candidate_number.ilike(pattern),
+        ))
     if unaccounted:
         from sqlalchemy import select
         from app.db.models import User as UserModel

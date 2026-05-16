@@ -42,8 +42,10 @@ def list_all_programmes(
             {
                 "jupas_code": p.jupas_code,
                 "name": p.name,
+                "name_zh": p.name_zh,
                 "school_id": str(p.school_id),
                 "school_name": p.school.name if p.school else None,
+                "school_name_zh": p.school.name_zh if p.school else None,
                 "faculty": p.faculty,
                 "admission_stats": p.admission_stats,
                 "non_grade_requirements": p.non_grade_requirements,
@@ -68,12 +70,14 @@ def search_programmes(
         # JUPAS code search — prefix match
         query = query.filter(JupasProgramme.jupas_code.ilike(f"{q}%"))
     else:
-        # Search across programme name, school name, faculty, and institution code
+        # Search across programme name (en+zh), school name (en+zh), faculty, and institution code
         pattern = f"%{q}%"
         query = query.filter(
             or_(
                 JupasProgramme.name.ilike(pattern),
+                JupasProgramme.name_zh.ilike(pattern),
                 School.name.ilike(pattern),
+                School.name_zh.ilike(pattern),
                 JupasProgramme.faculty.ilike(pattern),
                 JupasProgramme.institution_code.ilike(pattern),
             )
@@ -84,8 +88,10 @@ def search_programmes(
         {
             "jupas_code": p.jupas_code,
             "name": p.name,
+            "name_zh": p.name_zh,
             "school_id": str(p.school_id),
             "school_name": p.school.name if p.school else None,
+            "school_name_zh": p.school.name_zh if p.school else None,
             "faculty": p.faculty,
             "non_grade_requirements": p.non_grade_requirements,
             "website_url": _programme_url(p),
@@ -177,6 +183,7 @@ def get_programme_students(
         "programme": {
             "jupas_code": programme.jupas_code,
             "name": programme.name,
+            "name_zh": programme.name_zh,
             "faculty": programme.faculty,
             "institution_code": programme.institution_code,
             "admission_stats": latest_stats,
@@ -206,6 +213,7 @@ def get_programme_deadlines(
     return {
         "jupas_code": programme.jupas_code,
         "programme_name": programme.name,
+        "programme_name_zh": programme.name_zh,
         "website_url": _programme_url(programme),
         "milestones": get_all_milestones(),
         "next_milestone": get_next_milestone(today),

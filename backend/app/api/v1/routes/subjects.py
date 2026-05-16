@@ -28,6 +28,7 @@ def list_subjects(
             "id": str(s.id),
             "code": s.code,
             "name": s.name,
+            "name_zh": getattr(s, "name_zh", None),
             "category": s.category,
             "is_compulsory": s.is_compulsory,
         }
