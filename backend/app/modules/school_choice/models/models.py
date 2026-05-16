@@ -761,6 +761,11 @@ class Subject(Base):
         nullable=False,
         comment="Display name e.g. 'English Language'",
     )
+    name_zh = Column(
+        String(255),
+        nullable=True,
+        comment="Chinese display name e.g. '英國語文'",
+    )
     code = Column(
         String(20),
         nullable=False,
