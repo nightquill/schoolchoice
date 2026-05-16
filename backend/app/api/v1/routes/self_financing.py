@@ -42,7 +42,7 @@ def list_institutions(q: str = None, db: Session = Depends(get_db)):
     )
     params = {}
     if q:
-        sql += " WHERE (name ILIKE :q OR name_zh ILIKE :q)"
+        sql += " WHERE (name LIKE :q OR name_zh LIKE :q)"
         params["q"] = f"%{q}%"
     sql += " ORDER BY tier, name"
     rows = db.execute(text(sql), params).fetchall()
@@ -114,7 +114,7 @@ def list_programmes(
         sql += " AND i.code = :inst"
         params["inst"] = institution.upper()
     if q:
-        sql += " AND (p.name ILIKE :q OR p.name_zh ILIKE :q OR i.name ILIKE :q OR i.name_zh ILIKE :q)"
+        sql += " AND (p.name LIKE :q OR p.name_zh LIKE :q OR i.name LIKE :q OR i.name_zh LIKE :q)"
         params["q"] = f"%{q}%"
     sql += " ORDER BY i.name, p.level, p.name"
 
