@@ -2,6 +2,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import client from '@schoolchoice/ui/api/client';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const cellStyle = {
   padding: 0,
@@ -70,6 +71,7 @@ const stickyCornerStyle = {
 };
 
 function GradeGrid({ students, subjects, sitting, onSaved }) {
+  const { t } = useTranslation();
   const [edits, setEdits] = useState({});
   const [saving, setSaving] = useState(false);
   const tableRef = useRef(null);
@@ -127,10 +129,10 @@ function GradeGrid({ students, subjects, sitting, onSaved }) {
       }
 
       if (failed > 0) {
-        toast.error(`${failed} grade(s) failed to save.`);
+        toast.error(t('gradeGrid.saveFailed', { count: failed }));
       }
       if (saved > 0) {
-        toast.success(`${saved} grade(s) saved.`);
+        toast.success(t('gradeGrid.saveSuccess', { count: saved }));
         setEdits({});
         if (onSaved) onSaved();
       }
@@ -206,7 +208,7 @@ function GradeGrid({ students, subjects, sitting, onSaved }) {
           }}
         >
           <span style={{ fontWeight: 'var(--font-weight-medium)' }}>
-            {changeCount} unsaved change{changeCount !== 1 ? 's' : ''}
+            {t('gradeGrid.unsavedChanges', { count: changeCount })}
           </span>
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <button
@@ -222,7 +224,7 @@ function GradeGrid({ students, subjects, sitting, onSaved }) {
                 fontFamily: 'var(--font-family-base)',
               }}
             >
-              Discard
+              {t('gradeGrid.discard')}
             </button>
             <button
               onClick={handleSave}
@@ -238,7 +240,7 @@ function GradeGrid({ students, subjects, sitting, onSaved }) {
                 fontFamily: 'var(--font-family-base)',
               }}
             >
-              {saving ? 'Saving...' : 'Save All'}
+              {saving ? t('gradeGrid.saving') : t('gradeGrid.saveAll')}
             </button>
           </div>
         </div>
@@ -263,7 +265,7 @@ function GradeGrid({ students, subjects, sitting, onSaved }) {
         >
           <thead>
             <tr>
-              <th style={stickyCornerStyle}>Student</th>
+              <th style={stickyCornerStyle}>{t('gradeGrid.student')}</th>
               {subjects.map((subj) => (
                 <th key={subj.code} style={stickyHeaderStyle} title={subj.name}>
                   {subj.code}

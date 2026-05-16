@@ -12,16 +12,20 @@ import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getSubmission, approveSubmission, reviseSubmission, rejectSubmission } from '../../api/submissions';
 
-const BANDS = [
-  { id: 'A', slots: [1, 2, 3], bg: '#fff1f2', border: '#fecdd3', fg: '#be123c', tip: 'Top picks — very confident' },
-  { id: 'B', slots: [4, 5, 6], bg: '#fef9c3', border: '#fde68a', fg: '#a16207', tip: 'Strong interest, good chance' },
-  { id: 'C', slots: [7, 8, 9, 10], bg: '#d1fae5', border: '#a7f3d0', fg: '#047857', tip: 'Interested, reasonable chance' },
-  { id: 'D', slots: [11, 12, 13, 14], bg: '#dbeafe', border: '#bfdbfe', fg: '#1d4ed8', tip: 'Backup choices' },
-  { id: 'E', slots: [15, 16, 17, 18, 19, 20], bg: '#f1f5f9', border: '#e2e8f0', fg: '#475569', tip: 'Safety net' },
-];
+function useBands() {
+  const { t } = useTranslation();
+  return [
+    { id: 'A', slots: [1, 2, 3], bg: '#fff1f2', border: '#fecdd3', fg: '#be123c', tip: t('submissions.topPicks') },
+    { id: 'B', slots: [4, 5, 6], bg: '#fef9c3', border: '#fde68a', fg: '#a16207', tip: t('submissions.strongInterest') },
+    { id: 'C', slots: [7, 8, 9, 10], bg: '#d1fae5', border: '#a7f3d0', fg: '#047857', tip: t('submissions.interestedReasonable') },
+    { id: 'D', slots: [11, 12, 13, 14], bg: '#dbeafe', border: '#bfdbfe', fg: '#1d4ed8', tip: t('submissions.backupChoices') },
+    { id: 'E', slots: [15, 16, 17, 18, 19, 20], bg: '#f1f5f9', border: '#e2e8f0', fg: '#475569', tip: t('submissions.safetyNet') },
+  ];
+}
 
 function SubmissionDetail() {
   const { t } = useTranslation();
+  const BANDS = useBands();
   const { id } = useParams();
   const navigate = useNavigate();
   const [reviseOpen, setReviseOpen] = useState(false);
@@ -121,10 +125,10 @@ function SubmissionDetail() {
 
   const statusBadge = (status) => {
     const colors = {
-      pending: { bg: '#fef3c7', color: '#92400e', label: 'Pending' },
-      approved: { bg: '#d1fae5', color: '#065f46', label: 'Approved' },
-      revision_requested: { bg: '#fee2e2', color: '#991b1b', label: 'Revision Requested' },
-      rejected: { bg: '#fee2e2', color: '#991b1b', label: 'Rejected' },
+      pending: { bg: '#fef3c7', color: '#92400e', label: t('submissions.pending') },
+      approved: { bg: '#d1fae5', color: '#065f46', label: t('submissions.approved') },
+      revision_requested: { bg: '#fee2e2', color: '#991b1b', label: t('submissions.revisionRequested') },
+      rejected: { bg: '#fee2e2', color: '#991b1b', label: t('submissions.rejected') },
     };
     const c = colors[status] || colors.pending;
     return (
@@ -171,7 +175,7 @@ function SubmissionDetail() {
                 {statusBadge(submission.status)}
                 {isPending && flaggedCount > 0 && (
                   <span style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600, background: '#fef3c7', color: '#92400e' }}>
-                    {flaggedCount} flagged
+                    {t('submissions.flagged', { count: flaggedCount })}
                   </span>
                 )}
               </div>
@@ -179,7 +183,7 @@ function SubmissionDetail() {
                 {submission.class_name && `${t('submissions.classLabel')} ${submission.class_name}`}
                 {submission.class_name && submission.submitted_at && ' · '}
                 {submission.submitted_at && `${t('submissions.submitted')} ${new Date(submission.submitted_at).toLocaleDateString()}`}
-                {' · '}{choices.length} choice{choices.length !== 1 ? 's' : ''}
+                {' · '}{t('submissions.choices', { count: choices.length })}
               </p>
             </div>
 
@@ -190,7 +194,7 @@ function SubmissionDetail() {
                 background: '#fef3c7', border: '1px solid #fde68a', borderRadius: 'var(--border-radius-md)',
                 fontSize: 'var(--font-size-sm)', color: '#92400e',
               }}>
-                <strong>Counsellor Notes:</strong> {submission.counsellor_notes}
+                <strong>{t('submissions.counsellorNotes')}</strong> {submission.counsellor_notes}
               </div>
             )}
 
@@ -205,7 +209,7 @@ function SubmissionDetail() {
                     <th style={thStyle}>{t('submissions.programmeName')}</th>
                     <th style={{ ...thStyle, width: '80px' }}>{t('submissions.matchPct')}</th>
                     <th style={{ ...thStyle, width: '70px' }}>{t('submissions.risk')}</th>
-                    {isPending && <th style={{ ...thStyle, width: '50px', textAlign: 'center' }}>Flag</th>}
+                    {isPending && <th style={{ ...thStyle, width: '50px', textAlign: 'center' }}>{t('submissions.flag')}</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -271,7 +275,7 @@ function SubmissionDetail() {
                                     aria-label={`Flag note for choice ${slot}`}
                                     value={flags[slot]}
                                     onChange={(e) => setFlagNote(slot, e.target.value)}
-                                    placeholder="Why is this questionable?"
+                                    placeholder={t('submissions.flagPlaceholder')}
                                     style={{
                                       marginTop: '4px', width: '100%', boxSizing: 'border-box',
                                       padding: '3px 6px', fontSize: 'var(--font-size-xs)',
@@ -322,7 +326,7 @@ function SubmissionDetail() {
                                     color: isFlagged ? '#fff' : 'var(--color-text-secondary)',
                                     display: 'inline-flex', alignItems: 'center',
                                   }}
-                                  aria-label={isFlagged ? 'Remove flag' : 'Flag as questionable'}
+                                  aria-label={isFlagged ? t('submissions.removeFlag') : t('submissions.flagAsQuestionable')}
                                 >
                                   <Flag size={12} aria-hidden="true" />
                                 </button>
@@ -353,7 +357,7 @@ function SubmissionDetail() {
                   disabled={actionLoading}
                 >
                   {flaggedCount > 0
-                    ? `Send Back (${flaggedCount} flagged)`
+                    ? t('submissions.sendBackFlagged', { count: flaggedCount })
                     : t('submissions.sendBackRevision')}
                 </Button>
                 <Button
@@ -366,7 +370,7 @@ function SubmissionDetail() {
                 </Button>
                 {flaggedCount > 0 && (
                   <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                    Clear all flags to approve
+                    {t('submissions.clearFlagsToApprove')}
                   </span>
                 )}
               </div>
@@ -388,7 +392,7 @@ function SubmissionDetail() {
               background: '#fef3c7', borderRadius: 'var(--border-radius-sm)',
               fontSize: 'var(--font-size-xs)', color: '#92400e',
             }}>
-              <strong>{flaggedCount} choice(s) flagged:</strong>
+              <strong>{t('submissions.choicesFlagged', { count: flaggedCount })}</strong>
               <ul style={{ margin: 'var(--space-1) 0 0', paddingLeft: 'var(--space-4)' }}>
                 {Object.entries(flags).map(([rank, note]) => {
                   const choice = slotMap[parseInt(rank, 10)];
@@ -403,7 +407,7 @@ function SubmissionDetail() {
             </div>
           )}
           <label htmlFor="revise-notes" style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-            {flaggedCount > 0 ? 'Additional notes (optional)' : t('submissions.notesRequired')}
+            {flaggedCount > 0 ? t('submissions.additionalNotes') : t('submissions.notesRequired')}
           </label>
           <textarea
             id="revise-notes"

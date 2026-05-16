@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { TextInput } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
-function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, submitLabel = 'Save' }) {
+function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, submitLabel }) {
+  const { t } = useTranslation();
+  const resolvedSubmitLabel = submitLabel || t('common.save');
   const parseGrades = (gradesObj) => {
     if (!gradesObj || typeof gradesObj !== 'object') return [];
     return Object.entries(gradesObj).map(([subject, grade]) => ({ subject, grade: String(grade) }));
@@ -35,15 +38,15 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
 
   const validate = () => {
     const newErrors = {};
-    if (!name.trim()) newErrors.name = 'Student name is required.';
-    if (!targetRegion) newErrors.targetRegion = 'Please select a target region.';
-    if (!strengthsWeaknesses.trim()) newErrors.strengthsWeaknesses = 'Please describe the student\'s strengths and weaknesses.';
+    if (!name.trim()) newErrors.name = t('studentForm.nameRequired');
+    if (!targetRegion) newErrors.targetRegion = t('studentForm.regionRequired');
+    if (!strengthsWeaknesses.trim()) newErrors.strengthsWeaknesses = t('studentForm.strengthsRequired');
     gradeRows.forEach((row, index) => {
       if (row.subject.trim() && !row.grade.trim()) {
-        newErrors[`grade_${index}`] = `Please enter a grade for ${row.subject}.`;
+        newErrors[`grade_${index}`] = t('studentForm.gradeRequired', { subject: row.subject });
       }
       if (!row.subject.trim() && row.grade.trim()) {
-        newErrors[`subject_${index}`] = 'Please enter a subject name.';
+        newErrors[`subject_${index}`] = t('studentForm.subjectRequired');
       }
     });
     return newErrors;
@@ -152,7 +155,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
   return (
     <form onSubmit={handleSubmit} noValidate>
       <TextInput
-        label="Student Name"
+        label={t('studentForm.studentName')}
         name="name"
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -161,13 +164,13 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
       />
 
       <div style={fieldGroupStyle}>
-        <span style={labelStyle}>Grades</span>
+        <span style={labelStyle}>{t('studentForm.grades')}</span>
         {gradeRows.map((row, index) => (
           <div key={index} style={gradeRowStyle}>
             <div style={{ flex: 1 }}>
               <input
                 type="text"
-                placeholder="Subject"
+                placeholder={t('studentForm.subject')}
                 value={row.subject}
                 onChange={(e) => updateGradeRow(index, 'subject', e.target.value)}
                 style={{
@@ -182,7 +185,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
             <div style={{ flex: 1 }}>
               <input
                 type="text"
-                placeholder="Grade"
+                placeholder={t('studentForm.grade')}
                 value={row.grade}
                 onChange={(e) => updateGradeRow(index, 'grade', e.target.value)}
                 style={{
@@ -206,7 +209,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
           </div>
         ))}
         <Button
-          label="Add Subject"
+          label={t('studentForm.addSubject')}
           variant="secondary"
           onClick={addGradeRow}
           disabled={loading}
@@ -214,7 +217,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
       </div>
 
       <TextInput
-        label="Interests"
+        label={t('studentForm.interests')}
         name="interests"
         value={interests}
         onChange={(e) => setInterests(e.target.value)}
@@ -223,7 +226,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
 
       <div style={fieldGroupStyle}>
         <label htmlFor="strengths_weaknesses" style={labelStyle}>
-          Strengths and Weaknesses <span aria-hidden="true">*</span>
+          {t('studentForm.strengthsWeaknesses')} <span aria-hidden="true">*</span>
         </label>
         <textarea
           id="strengths_weaknesses"
@@ -240,7 +243,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
       </div>
 
       <div style={fieldGroupStyle}>
-        <span style={labelStyle}>Target Region <span aria-hidden="true">*</span></span>
+        <span style={labelStyle}>{t('studentForm.targetRegion')} <span aria-hidden="true">*</span></span>
         <div>
           <button
             type="button"
@@ -249,7 +252,7 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
             aria-pressed={targetRegion === 'local'}
             disabled={loading}
           >
-            Local
+            {t('studentForm.local')}
           </button>
           <button
             type="button"
@@ -258,16 +261,16 @@ function StudentForm({ initialData = {}, onSubmit, onCancel, loading = false, su
             aria-pressed={targetRegion === 'international'}
             disabled={loading}
           >
-            International
+            {t('studentForm.international')}
           </button>
         </div>
         {errors.targetRegion && <span style={errorTextStyle}>{errors.targetRegion}</span>}
       </div>
 
       <div style={footerStyle}>
-        <Button label={submitLabel} variant="primary" type="submit" onClick={() => {}} loading={loading} disabled={loading} />
+        <Button label={resolvedSubmitLabel} variant="primary" type="submit" onClick={() => {}} loading={loading} disabled={loading} />
         {onCancel && (
-          <Button label="Cancel" variant="secondary" onClick={onCancel} disabled={loading} />
+          <Button label={t('studentForm.cancel')} variant="secondary" onClick={onCancel} disabled={loading} />
         )}
       </div>
     </form>

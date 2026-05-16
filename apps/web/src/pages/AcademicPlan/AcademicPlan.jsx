@@ -106,12 +106,12 @@ function AcademicPlan() {
           toast.success(t('plan.planReady'));
         } else if (statusValue === 'FAILED') {
           stopPolling();
-          setError('Plan generation failed. Please try again.');
+          setError(t('plan.genFailed'));
           toast.error(t('plan.saveFailed'));
         }
       } catch {
         stopPolling();
-        setError('Failed to check plan status.');
+        setError(t('plan.statusCheckFailed'));
       }
     }, POLL_INTERVAL_MS);
   }, [id, stopPolling, setPlan, setError, t]);
@@ -151,7 +151,7 @@ function AcademicPlan() {
       setPlan(null);
       startPolling();
     } catch {
-      toast.error('Failed to start plan generation.');
+      toast.error(t('plan.startFailed'));
     } finally {
       setGenerating(false);
     }

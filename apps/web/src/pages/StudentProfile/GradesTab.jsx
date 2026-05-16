@@ -72,7 +72,7 @@ export default function GradesTab({ studentId, subjects }) {
       setNewBuildName('');
       setShowNewBuild(false);
     } catch (err) {
-      toast.error(err?.response?.data?.detail || 'Failed to create build');
+      toast.error(err?.response?.data?.detail || t('grades.addFailed'));
     }
   };
 
@@ -95,7 +95,7 @@ export default function GradesTab({ studentId, subjects }) {
       setBuildGrades({});
       setLiveScores([]);
       buildsQuery.refetch();
-    } catch { toast.error('Failed to delete'); }
+    } catch { toast.error(t('grades.deleteFailed')); }
   };
 
   useEffect(() => {

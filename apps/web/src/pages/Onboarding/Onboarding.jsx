@@ -173,7 +173,7 @@ function Onboarding() {
                     await client.post('/api/v1/account/setup-organisation', { school_name: schoolName.trim() });
                     setStep(3);
                   } catch {
-                    toast.error('Failed to create organisation.');
+                    toast.error(t('onboarding.orgCreateFailed'));
                   } finally {
                     setSetupLoading(false);
                   }

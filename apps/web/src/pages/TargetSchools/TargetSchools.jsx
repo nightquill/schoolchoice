@@ -398,7 +398,7 @@ function TargetSchools() {
       toast.success(t('targets.updateSuccess'));
     } catch {
       const detail = err?.response?.data?.detail;
-      const msg = Array.isArray(detail) ? detail[0]?.msg : (typeof detail === 'string' ? detail : 'Failed to update target.');
+      const msg = Array.isArray(detail) ? detail[0]?.msg : (typeof detail === 'string' ? detail : t('targets.updateFailed'));
       toast.error(msg);
     } finally {
       setEditSaving(false);
@@ -432,7 +432,7 @@ function TargetSchools() {
       toast.success(t('targets.addSuccess'));
     } catch {
       const detail = err?.response?.data?.detail;
-      toast.error(typeof detail === 'string' ? detail : 'Failed to add school.');
+      toast.error(typeof detail === 'string' ? detail : t('targets.addFailed'));
     } finally {
       setAddingTarget(false);
     }
@@ -551,7 +551,7 @@ function TargetSchools() {
             ) : (
               <ul
                 style={targetListStyle}
-                aria-label="Target school preference list"
+                aria-label={t('targets.preferenceList')}
                 role="list"
               >
                 {targets.map((target, index) => (
@@ -776,7 +776,7 @@ function TargetSchools() {
                 value={editConfidence}
                 onChange={(e) => setEditConfidence(parseInt(e.target.value, 10))}
                 style={{ flex: 1, accentColor: 'var(--color-primary)' }}
-                aria-label="Student confidence level"
+                aria-label={t('targets.confidenceLevel')}
               />
               <span style={{
                 fontSize: 'var(--font-size-sm)',

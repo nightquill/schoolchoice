@@ -203,7 +203,7 @@ function StudentListPage() {
               whiteSpace: 'nowrap',
             }}
           >
-            {showUnaccounted ? 'Showing Unaccounted' : 'Unaccounted'}
+            {showUnaccounted ? t('studentList.showingUnaccounted') : t('studentList.unaccounted')}
           </button>
         </div>
 
@@ -226,7 +226,7 @@ function StudentListPage() {
                 <th style={thStyle}>{t('common.name')}</th>
                 <th style={thStyle}>{t('studentList.targetRegion')}</th>
                 <th style={thStyle}>{t('studentList.created')}</th>
-                <th style={thStyle}>Account</th>
+                <th style={thStyle}>{t('studentList.account')}</th>
                 <th style={thStyle}></th>
               </tr>
             </thead>

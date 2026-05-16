@@ -15,13 +15,17 @@ import {
   SelectValue,
 } from '@schoolchoice/ui/primitives/select';
 import { importParse, importParseSheet, importValidate, importCommit } from '../../api/entities';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
-const STEPS = [
-  { key: 'upload', label: 'Upload File', number: 1 },
-  { key: 'sheetSelect', label: 'Select Sheet', number: 2 },
-  { key: 'columnMapping', label: 'Map Columns', number: 3 },
-  { key: 'validationPreview', label: 'Review and Import', number: 4 },
-];
+function useSteps() {
+  const { t } = useTranslation();
+  return [
+    { key: 'upload', label: t('importWizard.uploadFile'), number: 1 },
+    { key: 'sheetSelect', label: t('importWizard.selectSheet'), number: 2 },
+    { key: 'columnMapping', label: t('importWizard.mapColumns'), number: 3 },
+    { key: 'validationPreview', label: t('importWizard.reviewAndImport'), number: 4 },
+  ];
+}
 
 const stepIndicatorStyle = {
   display: 'flex',
@@ -69,12 +73,14 @@ const stepDividerStyle = {
 };
 
 function StepIndicator({ currentStep }) {
+  const { t } = useTranslation();
+  const STEPS = useSteps();
   const currentIndex = STEPS.findIndex((s) => s.key === currentStep);
   // Hide sheetSelect from indicator since it only shows for Excel
   const visibleSteps = STEPS.filter((s) => s.key !== 'sheetSelect');
 
   return (
-    <nav aria-label="Import wizard steps" style={stepIndicatorStyle}>
+    <nav aria-label={t('importWizard.wizardSteps')} style={stepIndicatorStyle}>
       {visibleSteps.map((step, idx) => {
         const stepIndex = STEPS.findIndex((s) => s.key === step.key);
         const isActive = step.key === currentStep;
@@ -97,6 +103,7 @@ function StepIndicator({ currentStep }) {
 }
 
 export default function ImportWizard({ entityName, schema }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [step, setStep] = useState('upload');
@@ -126,7 +133,7 @@ export default function ImportWizard({ entityName, schema }) {
         setStep('columnMapping');
       }
     },
-    onError: () => toast.error('Failed to parse file. Please check the file format and try again.'),
+    onError: () => toast.error(t('importWizard.parseFailed')),
   });
 
   const parseSheetMutation = useMutation({
@@ -140,7 +147,7 @@ export default function ImportWizard({ entityName, schema }) {
       setMapping(initialMapping);
       setStep('columnMapping');
     },
-    onError: () => toast.error('Failed to load sheet. Please try again.'),
+    onError: () => toast.error(t('importWizard.sheetFailed')),
   });
 
   const validateMutation = useMutation({
@@ -150,7 +157,7 @@ export default function ImportWizard({ entityName, schema }) {
       setValidationResult(data);
       setStep('validationPreview');
     },
-    onError: () => toast.error('Validation failed. Please check your column mapping and try again.'),
+    onError: () => toast.error(t('importWizard.validationFailed')),
   });
 
   const commitMutation = useMutation({
@@ -161,12 +168,10 @@ export default function ImportWizard({ entityName, schema }) {
         duplicate_decisions: {},
       }),
     onSuccess: (data) => {
-      toast.success(
-        `Successfully imported ${data.imported_count} row${data.imported_count !== 1 ? 's' : ''}.`
-      );
+      toast.success(t('importWizard.importedRows', { count: data.imported_count }));
       setStep('done');
     },
-    onError: () => toast.error('Import failed. Please try again.'),
+    onError: () => toast.error(t('importWizard.importFailed')),
   });
 
   const cardStyle = {
@@ -198,7 +203,7 @@ export default function ImportWizard({ entityName, schema }) {
               marginBottom: 'var(--space-4)',
             }}
           >
-            Upload a CSV or Excel file to import data into <strong>{entityName}</strong>.
+            {t('importWizard.uploadDesc', { entityName })}
           </p>
           <FileUpload
             accept=".csv,.xlsx,.xls"
@@ -211,7 +216,7 @@ export default function ImportWizard({ entityName, schema }) {
               disabled={!file || parseMutation.isPending}
               onClick={() => parseMutation.mutate(file)}
             >
-              {parseMutation.isPending ? 'Parsing…' : 'Next'}
+              {parseMutation.isPending ? t('importWizard.parsing') : t('common.next')}
             </Button>
           </div>
         </div>
@@ -226,7 +231,7 @@ export default function ImportWizard({ entityName, schema }) {
               marginBottom: 'var(--space-4)',
             }}
           >
-            This Excel file contains multiple sheets. Select the sheet to import.
+            {t('importWizard.multipleSheets')}
           </p>
           <div style={{ marginBottom: 'var(--space-4)' }}>
             <label
@@ -238,14 +243,14 @@ export default function ImportWizard({ entityName, schema }) {
                 color: 'var(--color-text-primary)',
               }}
             >
-              Sheet
+              {t('importWizard.sheet')}
             </label>
             <Select
               value={selectedSheet}
               onValueChange={(val) => setSelectedSheet(val)}
             >
               <SelectTrigger style={{ minWidth: '200px' }}>
-                <SelectValue placeholder="Select a sheet" />
+                <SelectValue placeholder={t('importWizard.selectASheet')} />
               </SelectTrigger>
               <SelectContent>
                 {(parseResult?.sheets ?? []).map((sheet) => (
@@ -258,14 +263,14 @@ export default function ImportWizard({ entityName, schema }) {
           </div>
           <div style={footerStyle}>
             <Button variant="outline" onClick={() => setStep('upload')}>
-              Back
+              {t('common.back')}
             </Button>
             <Button
               variant="default"
               disabled={!selectedSheet || parseSheetMutation.isPending}
               onClick={() => parseSheetMutation.mutate({ f: file, sheet: selectedSheet })}
             >
-              {parseSheetMutation.isPending ? 'Loading…' : 'Next'}
+              {parseSheetMutation.isPending ? t('importWizard.loading') : t('common.next')}
             </Button>
           </div>
         </div>
@@ -280,7 +285,7 @@ export default function ImportWizard({ entityName, schema }) {
               marginBottom: 'var(--space-4)',
             }}
           >
-            Map the columns from your file to {entityName} fields. Auto-mapped columns are pre-filled.
+            {t('importWizard.mapDesc', { entityName })}
           </p>
           <ColumnMapper
             columns={parseResult?.columns ?? []}
@@ -297,14 +302,14 @@ export default function ImportWizard({ entityName, schema }) {
                 setStep(parseResult?.sheets?.length > 1 ? 'sheetSelect' : 'upload')
               }
             >
-              Back
+              {t('common.back')}
             </Button>
             <Button
               variant="default"
               disabled={validateMutation.isPending}
               onClick={() => validateMutation.mutate()}
             >
-              {validateMutation.isPending ? 'Validating…' : 'Next'}
+              {validateMutation.isPending ? t('importWizard.validating') : t('common.next')}
             </Button>
           </div>
         </div>
@@ -338,7 +343,7 @@ export default function ImportWizard({ entityName, schema }) {
               marginBottom: 'var(--space-2)',
             }}
           >
-            Import complete
+            {t('importWizard.importComplete')}
           </h2>
           <p
             style={{
@@ -347,10 +352,10 @@ export default function ImportWizard({ entityName, schema }) {
               marginBottom: 'var(--space-6)',
             }}
           >
-            Your data has been imported into {entityName}.
+            {t('importWizard.importedDesc', { entityName })}
           </p>
           <Button variant="default" onClick={() => navigate(`/entities/${entityName}`)}>
-            Go to list
+            {t('importWizard.goToList')}
           </Button>
         </div>
       )}

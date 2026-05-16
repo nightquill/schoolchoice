@@ -7,8 +7,10 @@ import { Modal } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import client from '@schoolchoice/ui/api/client';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function AdminDataRefresh() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -34,7 +36,7 @@ function AdminDataRefresh() {
       .then((data) => {
         setAccount(data);
         if (data.role !== 'admin') {
-          toast.error('You do not have permission to access that page.');
+          toast.error(t('dataRefresh.noPermission'));
           navigate('/dashboard');
         }
       })
@@ -52,13 +54,13 @@ function AdminDataRefresh() {
       setLastRefreshAt(triggeredAt);
       setLastRefreshBy(triggeredBy);
       setSourceStatuses({ subjects: 'pending', schools: 'pending', jupas: 'pending' });
-      setMessages((prev) => [...prev, `[${triggeredAt.slice(0, 19).replace('T', ' ')}] Triggered by ${triggeredBy}`]);
-      toast.success('Data refresh triggered.');
+      setMessages((prev) => [...prev, `[${triggeredAt.slice(0, 19).replace('T', ' ')}] ${t('dataRefresh.triggeredBy')} ${triggeredBy}`]);
+      toast.success(t('dataRefresh.triggerSuccess'));
     } catch (err) {
       if (err?.response?.status === 403) {
-        toast.error('You do not have permission to trigger a data refresh.');
+        toast.error(t('dataRefresh.triggerNoPermission'));
       } else {
-        toast.error('Failed to trigger data refresh.');
+        toast.error(t('dataRefresh.triggerFailed'));
       }
     } finally {
       setTriggering(false);
@@ -67,7 +69,7 @@ function AdminDataRefresh() {
 
   const handlePreview = async () => {
     if (!csvFile) {
-      toast.error('Please select a CSV file first.');
+      toast.error(t('dataRefresh.selectCsvFirst'));
       return;
     }
     setPreviewing(true);
@@ -81,12 +83,12 @@ function AdminDataRefresh() {
         { headers: { 'Content-Type': 'multipart/form-data' } },
       ).then((r) => r.data);
       setPreviewResult(response);
-      toast.success('Preview generated.');
+      toast.success(t('dataRefresh.previewSuccess'));
     } catch (err) {
       if (err?.response?.status === 403) {
-        toast.error('You do not have permission to preview data.');
+        toast.error(t('dataRefresh.previewNoPermission'));
       } else {
-        toast.error('Failed to generate preview.');
+        toast.error(t('dataRefresh.previewFailed'));
       }
     } finally {
       setPreviewing(false);
@@ -178,9 +180,9 @@ function AdminDataRefresh() {
   };
 
   const sources = [
-    { key: 'subjects', label: 'Subjects (HKEAA data)' },
-    { key: 'schools', label: 'Schools (University profiles)' },
-    { key: 'jupas', label: 'JUPAS Scores' },
+    { key: 'subjects', label: t('dataRefresh.subjectsSource') },
+    { key: 'schools', label: t('dataRefresh.schoolsSource') },
+    { key: 'jupas', label: t('dataRefresh.jupasSource') },
   ];
 
   return (
@@ -189,16 +191,16 @@ function AdminDataRefresh() {
 
       <main id="main-content" style={contentStyle}>
         <div style={pageHeaderStyle}>
-          <h1 style={headingStyle}>Data Refresh</h1>
-          <span style={adminBadgeStyle}>Admin</span>
+          <h1 style={headingStyle}>{t('dataRefresh.title')}</h1>
+          <span style={adminBadgeStyle}>{t('dataRefresh.admin')}</span>
         </div>
 
         <div style={cardStyle}>
-          <h2 style={cardTitleStyle}>Refresh Status</h2>
+          <h2 style={cardTitleStyle}>{t('dataRefresh.refreshStatus')}</h2>
           <div style={{ marginBottom: 'var(--space-4)' }}>
-            <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Last Refresh: </span>
+            <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.lastRefresh')} </span>
             <span style={{ fontSize: 'var(--font-size-sm)', color: lastRefreshAt ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>
-              {lastRefreshAt ? lastRefreshAt.slice(0, 19).replace('T', ' ') : 'Never'}
+              {lastRefreshAt ? lastRefreshAt.slice(0, 19).replace('T', ' ') : t('dataRefresh.never')}
             </span>
           </div>
           {sources.map(({ key, label }) => {
@@ -213,15 +215,15 @@ function AdminDataRefresh() {
         </div>
 
         <div style={cardStyle}>
-          <h2 style={cardTitleStyle}>CSV Diff Preview</h2>
+          <h2 style={cardTitleStyle}>{t('dataRefresh.csvDiffPreview')}</h2>
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
-            Upload a CSV file to preview changes before publishing. Compare against existing school or subject records.
+            {t('dataRefresh.csvDiffDesc')}
           </p>
 
           <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'flex-end', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
             <div style={{ flex: '1 1 200px' }}>
               <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
-                Entity Type
+                {t('dataRefresh.entityType')}
               </label>
               <select
                 value={entityType}
@@ -236,13 +238,13 @@ function AdminDataRefresh() {
                   color: 'var(--color-text-primary)',
                 }}
               >
-                <option value="schools">Schools</option>
-                <option value="subjects">Subjects</option>
+                <option value="schools">{t('dataRefresh.schools')}</option>
+                <option value="subjects">{t('dataRefresh.subjects')}</option>
               </select>
             </div>
             <div style={{ flex: '2 1 300px' }}>
               <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-1)' }}>
-                CSV File
+                {t('dataRefresh.csvFile')}
               </label>
               <input
                 type="file"
@@ -252,7 +254,7 @@ function AdminDataRefresh() {
               />
             </div>
             <Button onClick={handlePreview} disabled={previewing || !csvFile}>
-              {previewing ? 'Previewing...' : 'Preview Changes'}
+              {previewing ? t('dataRefresh.previewing') : t('dataRefresh.previewChanges')}
             </Button>
           </div>
 
@@ -260,30 +262,30 @@ function AdminDataRefresh() {
             <div style={{ marginTop: 'var(--space-4)' }}>
               <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
                 <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#dcfce7', color: '#166534', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-                  + {previewResult.added} added
+                  + {previewResult.added} {t('dataRefresh.added')}
                 </div>
                 <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#fef3c7', color: '#92400e', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-                  ~ {previewResult.updated} updated
+                  ~ {previewResult.updated} {t('dataRefresh.updated')}
                 </div>
                 <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: '#f3f4f6', color: '#6b7280', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>
-                  = {previewResult.unchanged} unchanged
+                  = {previewResult.unchanged} {t('dataRefresh.unchanged')}
                 </div>
                 <div style={{ padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                  Total rows: {previewResult.total_rows}
+                  {t('dataRefresh.totalRows')} {previewResult.total_rows}
                 </div>
               </div>
 
               {previewResult.added_preview.length > 0 && (
                 <div style={{ marginBottom: 'var(--space-4)' }}>
                   <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', color: '#166534', marginBottom: 'var(--space-2)' }}>
-                    New Records (showing up to 20)
+                    {t('dataRefresh.newRecords')}
                   </h3>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--font-size-xs)' }}>
                       <thead>
                         <tr>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Key</th>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Fields</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.key')}</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.fields')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -304,16 +306,16 @@ function AdminDataRefresh() {
               {previewResult.updated_preview.length > 0 && (
                 <div style={{ marginBottom: 'var(--space-4)' }}>
                   <h3 style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-bold)', color: '#92400e', marginBottom: 'var(--space-2)' }}>
-                    Updated Records (showing up to 20)
+                    {t('dataRefresh.updatedRecords')}
                   </h3>
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--font-size-xs)' }}>
                       <thead>
                         <tr>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Key</th>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Field</th>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>Old</th>
-                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>New</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.key')}</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.field')}</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.old')}</th>
+                          <th style={{ textAlign: 'left', padding: 'var(--space-2)', borderBottom: '2px solid var(--color-border)', color: 'var(--color-text-secondary)' }}>{t('dataRefresh.new')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -338,27 +340,27 @@ function AdminDataRefresh() {
               )}
 
               <Button onClick={() => setConfirmModalOpen(true)}>
-                Publish Changes
+                {t('dataRefresh.publishChanges')}
               </Button>
             </div>
           )}
         </div>
 
         <div style={cardStyle}>
-          <h2 style={cardTitleStyle}>Trigger Data Refresh</h2>
+          <h2 style={cardTitleStyle}>{t('dataRefresh.triggerTitle')}</h2>
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', lineHeight: 'var(--line-height-normal)' }}>
-            Running a data refresh will update school profiles, JUPAS entry scores, and subject lists from external sources. This may take several minutes.
+            {t('dataRefresh.triggerDesc')}
           </p>
           <Button disabled={triggered} onClick={() => setConfirmModalOpen(true)}>
-            {triggered ? 'Refresh Triggered' : 'Trigger Data Refresh'}
+            {triggered ? t('dataRefresh.refreshTriggered') : t('dataRefresh.triggerRefresh')}
           </Button>
         </div>
 
         <div style={cardStyle}>
-          <h2 style={cardTitleStyle}>Recent Messages</h2>
-          <div style={consoleStyle} aria-label="Refresh log messages" role="log" aria-live="polite">
+          <h2 style={cardTitleStyle}>{t('dataRefresh.recentMessages')}</h2>
+          <div style={consoleStyle} aria-label={t('dataRefresh.refreshLog')} role="log" aria-live="polite">
             {messages.length === 0
-              ? 'No refresh messages yet.'
+              ? t('dataRefresh.noMessages')
               : messages.join('\n')}
           </div>
         </div>
@@ -366,13 +368,13 @@ function AdminDataRefresh() {
 
       <Modal
         isOpen={confirmModalOpen}
-        title="Confirm Data Refresh"
+        title={t('dataRefresh.confirmTitle')}
         onClose={() => setConfirmModalOpen(false)}
         onConfirm={handleTriggerRefresh}
-        confirmLabel={triggering ? 'Triggering…' : 'Yes, Trigger Refresh'}
+        confirmLabel={triggering ? t('dataRefresh.triggering') : t('dataRefresh.confirmButton')}
         confirmVariant="primary"
       >
-        <p>This will queue a full data re-import. Continue?</p>
+        <p>{t('dataRefresh.confirmDesc')}</p>
       </Modal>
 
     </div>
