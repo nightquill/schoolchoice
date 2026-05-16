@@ -3,24 +3,26 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { LoadingSpinner } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getGroupPermissions, setGroupPermissions } from '../../api/teacherGroups';
 
-const TOOLS = [
-  { key: 'programme_choices', label: 'Programmes' },
-  { key: 'grades', label: 'Grades' },
-  { key: 'plan_generation', label: 'Plans' },
-  { key: 'submissions', label: 'Submissions' },
-  { key: 'reports', label: 'Reports' },
-  { key: 'cohort_management', label: 'Cohort Mgmt' },
-];
-
-const ACCESS_OPTIONS = [
-  { value: 'none', label: 'None' },
-  { value: 'read_only', label: 'View' },
-  { value: 'read_write', label: 'Edit' },
-];
-
 export default function GroupPermissions({ groupId }) {
+  const { t } = useTranslation();
+
+  const TOOLS = [
+    { key: 'programme_choices', label: t('groupPermissions.programmes') },
+    { key: 'grades', label: t('groupPermissions.grades') },
+    { key: 'plan_generation', label: t('groupPermissions.plans') },
+    { key: 'submissions', label: t('groupPermissions.submissions') },
+    { key: 'reports', label: t('groupPermissions.reports') },
+    { key: 'cohort_management', label: t('groupPermissions.cohortMgmt') },
+  ];
+
+  const ACCESS_OPTIONS = [
+    { value: 'none', label: t('groupPermissions.none') },
+    { value: 'read_only', label: t('groupPermissions.view') },
+    { value: 'read_write', label: t('groupPermissions.edit') },
+  ];
   const [localPerms, setLocalPerms] = useState([]);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -50,21 +52,21 @@ export default function GroupPermissions({ groupId }) {
     setSaving(true);
     try {
       await setGroupPermissions(groupId, localPerms);
-      toast.success('Permissions saved');
+      toast.success(t('groupPermissions.saved'));
       setDirty(false);
     } catch {
-      toast.error('Failed to save permissions');
+      toast.error(t('groupPermissions.failedSave'));
     } finally {
       setSaving(false);
     }
   };
 
-  if (isLoading) return <div style={{ padding: 'var(--space-4)' }}><LoadingSpinner label="Loading permissions..." /></div>;
+  if (isLoading) return <div style={{ padding: 'var(--space-4)' }}><LoadingSpinner label={t('groupPermissions.loading')} /></div>;
 
   if (!localPerms.length) {
     return (
       <div style={{ padding: 'var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-        No cohorts available. Create cohorts first to configure permissions.
+        {t('groupPermissions.noCohorts')}
       </div>
     );
   }
@@ -104,8 +106,8 @@ export default function GroupPermissions({ groupId }) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={thStyle}>Cohort</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>Visible</th>
+              <th style={thStyle}>{t('groupPermissions.cohort')}</th>
+              <th style={{ ...thStyle, textAlign: 'center' }}>{t('groupPermissions.visible')}</th>
               {TOOLS.map(t => (
                 <th key={t.key} style={{ ...thStyle, textAlign: 'center' }}>{t.label}</th>
               ))}
@@ -152,7 +154,7 @@ export default function GroupPermissions({ groupId }) {
 
       <div style={{ padding: 'var(--space-3) var(--space-4)', borderTop: 'var(--border-width) solid var(--color-border)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
         <Button onClick={handleSave} disabled={!dirty || saving}>
-          {saving ? 'Saving...' : 'Save Permissions'}
+          {saving ? t('groupPermissions.saving') : t('groupPermissions.save')}
         </Button>
       </div>
     </div>

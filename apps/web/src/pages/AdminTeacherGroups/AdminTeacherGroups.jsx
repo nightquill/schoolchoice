@@ -6,6 +6,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { Input } from '@schoolchoice/ui/primitives/input';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import {
   getTeacherGroups,
   createTeacherGroup,
@@ -18,6 +19,7 @@ import { listUsers } from '../../api/admin';
 import GroupPermissions from './GroupPermissions';
 
 function AdminTeacherGroups() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [newGroupName, setNewGroupName] = useState('');
@@ -53,10 +55,10 @@ function AdminTeacherGroups() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['teacher-groups'] });
       setNewGroupName('');
-      toast.success('Group created');
+      toast.success(t('teacherGroups.groupCreated'));
       if (result?.id) setSelectedGroupId(result.id);
     },
-    onError: () => toast.error('Failed to create group'),
+    onError: () => toast.error(t('teacherGroups.failedCreate')),
   });
 
   const deleteMutation = useMutation({
@@ -64,9 +66,9 @@ function AdminTeacherGroups() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teacher-groups'] });
       if (selectedGroupId === deleteMutation.variables) setSelectedGroupId(null);
-      toast.success('Group deleted');
+      toast.success(t('teacherGroups.groupDeleted'));
     },
-    onError: () => toast.error('Failed to delete group'),
+    onError: () => toast.error(t('teacherGroups.failedDelete')),
   });
 
   const addMemberMutation = useMutation({
@@ -75,9 +77,9 @@ function AdminTeacherGroups() {
       queryClient.invalidateQueries({ queryKey: ['group-members', selectedGroupId] });
       queryClient.invalidateQueries({ queryKey: ['teacher-groups'] });
       setAddMemberEmail('');
-      toast.success('Member added');
+      toast.success(t('teacherGroups.memberAdded'));
     },
-    onError: () => toast.error('Failed to add member'),
+    onError: () => toast.error(t('teacherGroups.failedAddMember')),
   });
 
   const removeMemberMutation = useMutation({
@@ -85,9 +87,9 @@ function AdminTeacherGroups() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-members', selectedGroupId] });
       queryClient.invalidateQueries({ queryKey: ['teacher-groups'] });
-      toast.success('Member removed');
+      toast.success(t('teacherGroups.memberRemoved'));
     },
-    onError: () => toast.error('Failed to remove member'),
+    onError: () => toast.error(t('teacherGroups.failedRemoveMember')),
   });
 
   const handleCreateGroup = () => {
@@ -101,11 +103,11 @@ function AdminTeacherGroups() {
     if (!email) return;
     const user = teachers.find(u => u.email.toLowerCase() === email);
     if (!user) {
-      toast.error('Teacher not found. Enter an exact email of an existing teacher.');
+      toast.error(t('teacherGroups.teacherNotFound'));
       return;
     }
     if (members.some(m => m.user_id === user.id || m.id === user.id)) {
-      toast.error('Already a member of this group');
+      toast.error(t('teacherGroups.alreadyMember'));
       return;
     }
     addMemberMutation.mutate({ groupId: selectedGroupId, userIds: [user.id] });
@@ -140,7 +142,7 @@ function AdminTeacherGroups() {
 
       <div style={{ maxWidth: '100%', margin: '0 auto', padding: 'var(--space-6) var(--space-8)' }}>
         <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-6) 0' }}>
-          Teacher Groups
+          {t('teacherGroups.title')}
         </h1>
 
         <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
@@ -152,21 +154,21 @@ function AdminTeacherGroups() {
                 value={newGroupName}
                 onChange={(e) => setNewGroupName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateGroup()}
-                placeholder="New group name..."
+                placeholder={t('teacherGroups.newGroupPlaceholder')}
                 style={{ flex: 1 }}
               />
               <Button onClick={handleCreateGroup} disabled={!newGroupName.trim() || createMutation.isPending}>
-                {createMutation.isPending ? 'Creating...' : 'Create'}
+                {createMutation.isPending ? t('teacherGroups.creating') : t('teacherGroups.create')}
               </Button>
             </div>
 
             {groupsQuery.isLoading ? (
-              <LoadingSpinner label="Loading groups..." />
+              <LoadingSpinner label={t('teacherGroups.loadingGroups')} />
             ) : (
               <div style={{ ...cardStyle, maxHeight: '70vh', overflowY: 'auto' }}>
                 {groups.length === 0 && (
                   <p style={{ padding: 'var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                    No groups yet. Create one above.
+                    {t('teacherGroups.noGroups')}
                   </p>
                 )}
                 {groups.map((g) => {
@@ -212,7 +214,7 @@ function AdminTeacherGroups() {
                         }}
                         aria-label={`Delete group ${g.name}`}
                       >
-                        Delete
+                        {t('teacherGroups.delete')}
                       </button>
                     </div>
                   );
@@ -226,7 +228,7 @@ function AdminTeacherGroups() {
             {!selectedGroup ? (
               <div style={{ ...cardStyle, padding: 'var(--space-8)', textAlign: 'center' }}>
                 <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                  Select a group to manage members and permissions.
+                  {t('teacherGroups.selectGroup')}
                 </p>
               </div>
             ) : (
@@ -241,24 +243,24 @@ function AdminTeacherGroups() {
                 {/* Members */}
                 <div style={{ ...cardStyle, marginBottom: 'var(--space-4)' }}>
                   <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                    Members ({members.length})
+                    {t('teacherGroups.members')} ({members.length})
                   </div>
 
                   {membersQuery.isLoading ? (
-                    <div style={{ padding: 'var(--space-4)' }}><LoadingSpinner label="Loading members..." /></div>
+                    <div style={{ padding: 'var(--space-4)' }}><LoadingSpinner label={t('teacherGroups.loadingMembers')} /></div>
                   ) : members.length === 0 ? (
                     <p style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                      No members yet. Add a teacher below.
+                      {t('teacherGroups.noMembers')}
                     </p>
                   ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                           <tr>
-                            <th style={thStyle}>Name</th>
-                            <th style={thStyle}>Email</th>
-                            <th style={thStyle}>Role</th>
-                            <th style={thStyle}>Actions</th>
+                            <th style={thStyle}>{t('teacherGroups.name')}</th>
+                            <th style={thStyle}>{t('teacherGroups.email')}</th>
+                            <th style={thStyle}>{t('teacherGroups.role')}</th>
+                            <th style={thStyle}>{t('teacherGroups.actions')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -293,7 +295,7 @@ function AdminTeacherGroups() {
                                     fontFamily: 'var(--font-family-base)',
                                   }}
                                 >
-                                  Remove
+                                  {t('teacherGroups.remove')}
                                 </button>
                               </td>
                             </tr>
@@ -309,11 +311,11 @@ function AdminTeacherGroups() {
                       value={addMemberEmail}
                       onChange={(e) => setAddMemberEmail(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
-                      placeholder="Teacher email..."
+                      placeholder={t('teacherGroups.addMemberPlaceholder')}
                       style={{ flex: 1 }}
                     />
                     <Button onClick={handleAddMember} disabled={!addMemberEmail.trim() || addMemberMutation.isPending}>
-                      {addMemberMutation.isPending ? 'Adding...' : 'Add'}
+                      {addMemberMutation.isPending ? t('teacherGroups.adding') : t('teacherGroups.add')}
                     </Button>
                   </div>
                 </div>
@@ -321,7 +323,7 @@ function AdminTeacherGroups() {
                 {/* Permissions */}
                 <div style={cardStyle}>
                   <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                    Permissions
+                    {t('teacherGroups.permissions')}
                   </div>
                   <GroupPermissions groupId={selectedGroupId} />
                 </div>
