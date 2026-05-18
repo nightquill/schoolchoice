@@ -10,7 +10,13 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.session import get_db
-from app.db.models import User
+from app.db.models import User, OrganisationMembership
+from app.db.models_v2 import StudentCohort
+from app.services.permission_service import (
+    _get_user_group_ids,
+    _get_cohort_permissions_for_groups,
+    merge_permissions,
+)
 from app.services.student_import_service import (
     parse_student_csv,
     validate_file,
@@ -20,6 +26,49 @@ from app.services.student_import_service import (
 )
 
 router = APIRouter(prefix="/import/students", tags=["student-import"])
+
+_ACCESS_RANK = {"none": 0, "read_only": 1, "read_write": 2}
+
+
+def _check_import_permission(user: User, db: Session, level: str = "read_write"):
+    """Check that the user has data_import permission at the required level.
+
+    Admin always passes. Non-admin users need at least one org cohort
+    where their group grants data_import >= level.
+    """
+    if user.role == "admin":
+        return
+
+    group_ids = _get_user_group_ids(user.id, db)
+    if not group_ids:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No group membership — cannot import")
+
+    # Find all cohorts in the user's org
+    org_id = getattr(user, "active_organisation_id", None)
+    if not org_id:
+        membership = db.query(OrganisationMembership).filter(
+            OrganisationMembership.user_id == user.id
+        ).first()
+        if membership:
+            org_id = membership.organisation_id
+
+    if not org_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No organisation context")
+
+    cohorts = db.query(StudentCohort).filter(StudentCohort.organisation_id == org_id).all()
+    required_rank = _ACCESS_RANK.get(level, 2)
+
+    for cohort in cohorts:
+        perm_rows = _get_cohort_permissions_for_groups(group_ids, cohort.id, db)
+        if perm_rows:
+            merged = merge_permissions(perm_rows)
+            if _ACCESS_RANK.get(merged.get("data_import", "none"), 0) >= required_rank:
+                return
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You do not have data import permission for any cohort",
+    )
 
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
@@ -56,6 +105,7 @@ async def preview_import(
 ):
     """Parse and validate a student CSV without committing. Returns preview data."""
     content = await _read_and_validate_file(file)
+    _check_import_permission(current_user, db, "read_only")
 
     parsed = parse_student_csv(content)
     rows = parsed["rows"]
@@ -96,6 +146,7 @@ async def commit_student_import(
 ):
     """Parse, validate, and commit a student CSV import."""
     content = await _read_and_validate_file(file)
+    _check_import_permission(current_user, db, "read_write")
 
     parsed = parse_student_csv(content)
     rows = parsed["rows"]
