@@ -28,6 +28,8 @@ TOOL_FIELDS = (
     "submissions",
     "reports",
     "cohort_management",
+    "data_import",
+    "account_assignment",
 )
 
 _ACCESS_RANK = {"none": 0, "read_only": 1, "read_write": 2}
@@ -42,6 +44,8 @@ ROLE_DEFAULTS: dict[str, dict] = {
         "submissions": "read_write",
         "reports": "read_only",
         "cohort_management": "none",
+        "data_import": "none",
+        "account_assignment": "none",
     },
     "student": {
         "visible": True,
@@ -51,6 +55,8 @@ ROLE_DEFAULTS: dict[str, dict] = {
         "submissions": "read_write",
         "reports": "none",
         "cohort_management": "none",
+        "data_import": "none",
+        "account_assignment": "none",
     },
 }
 

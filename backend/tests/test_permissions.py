@@ -61,3 +61,18 @@ class TestRoleDefaults:
     def test_student_defaults(self):
         d = ROLE_DEFAULTS["student"]
         assert d["grades"] == "read_only" and d["plan_generation"] == "none"
+
+    def test_counsellor_no_elevated(self):
+        d = ROLE_DEFAULTS["counsellor"]
+        assert d["data_import"] == "none"
+        assert d["account_assignment"] == "none"
+
+    def test_student_no_elevated(self):
+        d = ROLE_DEFAULTS["student"]
+        assert d["data_import"] == "none"
+        assert d["account_assignment"] == "none"
+
+    def test_tool_fields_count(self):
+        assert len(TOOL_FIELDS) == 8
+        assert "data_import" in TOOL_FIELDS
+        assert "account_assignment" in TOOL_FIELDS

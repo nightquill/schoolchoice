@@ -366,6 +366,8 @@ class CohortPermission(Base):
     submissions = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
     reports = Column(String(10), nullable=False, default="read_only", server_default="'read_only'")
     cohort_management = Column(String(10), nullable=False, default="none", server_default="'none'")
+    data_import = Column(String(10), nullable=False, default="none", server_default="'none'")
+    account_assignment = Column(String(10), nullable=False, default="none", server_default="'none'")
     group = relationship("TeacherGroup", back_populates="permissions")
 
 
