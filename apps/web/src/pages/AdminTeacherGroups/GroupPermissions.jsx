@@ -16,6 +16,8 @@ export default function GroupPermissions({ groupId }) {
     { key: 'submissions', label: t('groupPermissions.submissions') },
     { key: 'reports', label: t('groupPermissions.reports') },
     { key: 'cohort_management', label: t('groupPermissions.cohortMgmt') },
+    { key: 'data_import', label: t('groupPermissions.dataImport') },
+    { key: 'account_assignment', label: t('groupPermissions.accountAssign') },
   ];
 
   const ACCESS_OPTIONS = [

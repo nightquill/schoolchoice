@@ -1097,6 +1097,8 @@
     "submissions": "Submissions",
     "reports": "Reports",
     "cohortMgmt": "Cohort Mgmt",
+    "dataImport": "Data Import",
+    "accountAssign": "Account Assign",
     "none": "None",
     "view": "View",
     "edit": "Edit"
