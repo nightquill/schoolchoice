@@ -105,9 +105,9 @@
 <body>
 <div class="container">
 
-<h1>SchoolChoice — UX Walkthrough</h1>
+<h1>SchoolChoice &mdash; UX Walkthrough</h1>
 <p class="subtitle">How school counsellors actually use the platform, step by step</p>
-<p class="meta">Hong Kong secondary school context &bull; HKDSE &amp; JUPAS system &bull; As of 2026-05-12</p>
+<p class="meta">Hong Kong secondary school context &bull; HKDSE &amp; JUPAS system &bull; Bilingual (EN / &#20013;&#25991;) &bull; As of 2026-05-18</p>
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <h2>Who Uses This</h2>
@@ -117,12 +117,25 @@
   <div class="persona-info">
     <div class="persona-name">Ms. Chan &mdash; School Counsellor</div>
     <div class="persona-role">St Paul's College, Hong Kong &bull; Form 5&ndash;6 students &bull; HKDSE university guidance</div>
-    <div class="persona-desc">Ms. Chan manages 150 students across 5 classes (5A&ndash;5E). She tracks their HKDSE mock/trial/official grades, helps them pick target universities via JUPAS, generates personalised academic plans, and monitors cohort-level analytics to spot at-risk students before it's too late. She uses SchoolChoice daily during the academic year.</div>
+    <div class="persona-desc">Ms. Chan manages 150 students across 5 classes (5A&ndash;5E). She tracks their HKDSE mock/trial/official grades, helps them pick target universities via JUPAS and self-financing pathways, generates personalised academic plans, and monitors cohort-level analytics to spot at-risk students before it&rsquo;s too late. She uses SchoolChoice daily during the academic year.</div>
+  </div>
+</div>
+
+<div class="persona">
+  <div class="persona-avatar" style="background:var(--action);">LK</div>
+  <div class="persona-info">
+    <div class="persona-name">Li Ka Ho &mdash; Form 6 Student</div>
+    <div class="persona-role">St Paul's College &bull; Class 6B &bull; Invited by Ms. Chan</div>
+    <div class="persona-desc">Ka Ho received an invite email from his counsellor, set his password, and now logs in with his candidate number. He views his programme choices (Band A&ndash;E), checks his academic plan, reviews submission history, and browses the school directory to research backup options.</div>
   </div>
 </div>
 
 <div class="info tip">
-  <strong>Context:</strong> In Hong Kong, Form 5&ndash;6 students sit the HKDSE exam (4 compulsory + 2&ndash;4 electives). Universities admit via JUPAS using a "best 5" aggregate score. Each programme has its own formula, weights, and admission statistics. Counsellors help students pick realistic targets and prepare competitive applications.
+  <strong>Context:</strong> In Hong Kong, Form 5&ndash;6 students sit the HKDSE exam (4 compulsory + 2&ndash;4 electives). Universities admit via JUPAS using a &ldquo;best 5&rdquo; aggregate score. Each programme has its own formula, weights, and admission statistics. Counsellors help students pick realistic targets and prepare competitive applications. Students who don&rsquo;t qualify for JUPAS programmes may pursue self-financing sub-degree pathways at Tier 1 institutions (e.g. HKCC, HKU SPACE CC).
+</div>
+
+<div class="info note">
+  <strong>Bilingual:</strong> The entire UI is available in English and Traditional Chinese (zh-HK). All JUPAS programme names, subject names, self-financing programmes, and search are localised. Users switch language via a toggle in the sidebar. 1,125 translation keys across 13+ components.
 </div>
 
 <!-- ═══════════════════════════════════════════════════════ -->
@@ -131,7 +144,7 @@
 <div class="journey-header">
   <div class="journey-icon">&#128640;</div>
   <div><div class="journey-title">New school year &mdash; getting started</div>
-  <div class="journey-desc">Ms. Chan registers, sets up her school, and imports her student roster.</div></div>
+  <div class="journey-desc">Ms. Chan registers, sets up her school, imports students, creates teacher groups, and configures permissions.</div></div>
 </div>
 
 <div class="flow">
@@ -141,7 +154,7 @@
       <div class="step-title">Register &amp; Login</div>
       <div class="step-desc">Creates account with school email. Receives JWT token, stored in browser.</div>
       <div class="screen">
-        <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/register → /login</span></div>
+        <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/register &rarr; /login</span></div>
         <div class="screen-body">
           <div class="label">Fields</div>
           <div class="value">Email &bull; Password &bull; Confirm Password</div>
@@ -161,13 +174,13 @@
         <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/onboarding</span></div>
         <div class="screen-body">
           <div class="label">Step 1 &mdash; Welcome</div>
-          <div class="value">"Let's get your account set up in just a few steps."</div>
+          <div class="value">&ldquo;Let&rsquo;s get your account set up in just a few steps.&rdquo;</div>
           <div class="label">Step 2 &mdash; School Info</div>
           <div class="value">Enter school name (creates Organisation for multi-tenancy isolation)</div>
           <div class="label">Step 3 &mdash; Import Students</div>
-          <div class="value">Upload CSV/Excel file, or "Skip for now" to add students manually later</div>
+          <div class="value">Upload CSV/Excel file, or &ldquo;Skip for now&rdquo; to add students manually later</div>
           <div class="label">Step 4 &mdash; Ready</div>
-          <div class="value">"Your account is ready." → <strong>Go to Dashboard</strong></div>
+          <div class="value">&ldquo;Your account is ready.&rdquo; &rarr; <strong>Go to Dashboard</strong></div>
         </div>
       </div>
     </div>
@@ -176,9 +189,45 @@
   <div class="step">
     <div class="step-marker action">3</div>
     <div class="step-body">
-      <div class="step-title">Bulk Import (CSV/Excel)</div>
-      <div class="step-desc">Import wizard: Upload → Select Sheet (Excel) → Map Columns → Review &amp; Commit.</div>
-      <div class="step-detail">Auto-maps columns by header name. Preview shows validation errors before committing. Supports student records with name, class, year, gender, DOB.</div>
+      <div class="step-title">Bulk Import (CSV/Excel) &mdash; Data Only</div>
+      <div class="step-desc">Import wizard: Upload &rarr; Select Sheet (Excel) &rarr; Map Columns &rarr; Review &amp; Commit. Import creates <strong>student data records only</strong> &mdash; no user accounts are auto-created. Students appear as &ldquo;unaccounted&rdquo; until invited.</div>
+      <div class="step-detail">
+        <strong>Import hardening:</strong> Chinese header support (&#22995;&#21517;, &#33521;&#25991;, &#25976;&#23416; &rarr; auto-mapped) &bull; Grade normalisation (percentages, letter grades &rarr; HKDSE scale) &bull; Encoding detection (Big5, GB2312 via chardet) &bull; Row merging for duplicate candidate numbers &bull; Profile-only and partial data import &bull; File validation (rejects PDFs, corrupt files, &gt;2,000 rows) &bull; Requires <code>data_import</code> permission on the cohort.
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker action">4</div>
+    <div class="step-body">
+      <div class="step-title">Create Teacher Groups &amp; Set Permissions</div>
+      <div class="step-desc">Admin navigates to <strong>/admin/teacher-groups</strong> to create groups (e.g. &ldquo;Form 5 Teachers&rdquo;, &ldquo;Science Dept&rdquo;) and assign teachers to each group.</div>
+      <div class="step-detail">
+        Per-group, per-cohort permissions: <strong>Visibility toggle</strong> + 8 tool access levels (None / View / Edit).<br>
+        Tools: Programme Choices &bull; Grades &bull; Plans &bull; Submissions &bull; Reports &bull; Cohort Mgmt &bull; Data Import &bull; Account Assignment.<br>
+        When a teacher belongs to multiple groups, the <strong>most permissive</strong> level wins.
+      </div>
+      <div class="screen">
+        <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/admin/teacher-groups</span></div>
+        <div class="screen-body">
+          <div class="label">Group List</div>
+          <div class="value" style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <span style="background:var(--bg);padding:0.5rem 1rem;border-radius:8px;font-size:0.82rem;"><strong>Form 5 Teachers</strong><br>4 members &bull; 3 cohorts</span>
+            <span style="background:var(--bg);padding:0.5rem 1rem;border-radius:8px;font-size:0.82rem;"><strong>Science Dept</strong><br>2 members &bull; 5 cohorts</span>
+            <span style="background:var(--bg);padding:0.5rem 1rem;border-radius:8px;font-size:0.82rem;"><strong>All Staff</strong><br>8 members &bull; 5 cohorts</span>
+          </div>
+          <div class="label" style="margin-top:1rem;">Permission Matrix (per cohort)</div>
+          <div class="value" style="font-size:0.8rem;">
+            <table>
+              <tr><th>Tool</th><th>Form 5 Teachers</th><th>Science Dept</th></tr>
+              <tr><td>Programme Choices</td><td><span class="badge green">Edit</span></td><td><span class="badge blue">View</span></td></tr>
+              <tr><td>Grades</td><td><span class="badge green">Edit</span></td><td><span class="badge green">Edit</span></td></tr>
+              <tr><td>Plans</td><td><span class="badge blue">View</span></td><td><span class="badge blue">View</span></td></tr>
+              <tr><td>Account Assignment</td><td><span class="badge green">Edit</span></td><td><span class="badge red">None</span></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -209,23 +258,30 @@
       <div style="padding:0.4rem 0.75rem;background:#eff6ff;border-left:3px solid #2563eb;border-radius:4px;font-size:0.8rem;">&#8505; <strong>Li Ka Ho</strong> has no target schools set.</div>
     </div>
 
-    <div class="label" style="margin-top:1rem;">Search &amp; Filter</div>
+    <div class="label" style="margin-top:1rem;">Search, Filter &amp; Account Status</div>
     <div class="value">
       <span style="background:var(--bg);padding:0.3rem 0.75rem;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;">Search by name&hellip;</span>
       <span style="background:var(--bg);padding:0.3rem 0.5rem;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;">All Classes &#9662;</span>
       <span style="background:var(--bg);padding:0.3rem 0.5rem;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;">All Years &#9662;</span>
+      <span style="background:var(--bg);padding:0.3rem 0.5rem;border-radius:4px;border:1px solid var(--border);font-size:0.8rem;">&#9744; Show Unaccounted</span>
     </div>
 
     <div class="label" style="margin-top:1rem;">Student Cards (3-column grid)</div>
     <div class="value" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
       <div style="background:var(--bg);padding:0.75rem;border-radius:8px;font-size:0.8rem;">
-        <strong>Liu Pui Yi</strong><br>Class 5A &bull; Year 5<br><span style="color:var(--muted);">Last plan: No plan yet</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile →</span>
+        <strong>Liu Pui Yi</strong><br>Class 5A &bull; Year 5<br>
+        <span class="badge green">Active</span><br>
+        <span style="color:var(--muted);">Last plan: No plan yet</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile &rarr;</span>
       </div>
       <div style="background:var(--bg);padding:0.75rem;border-radius:8px;font-size:0.8rem;">
-        <strong>Chan Siu Ming</strong><br>Class 5B &bull; Year 5<br><span style="color:var(--muted);">Last plan: 2026-05-10</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile →</span>
+        <strong>Chan Siu Ming</strong><br>Class 5B &bull; Year 5<br>
+        <span class="badge blue">Invited</span><br>
+        <span style="color:var(--muted);">Last plan: 2026-05-10</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile &rarr;</span>
       </div>
       <div style="background:var(--bg);padding:0.75rem;border-radius:8px;font-size:0.8rem;">
-        <strong>Wong Mei Ling</strong><br>Class 5C &bull; Year 5<br><span style="color:var(--muted);">Last plan: No plan yet</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile →</span>
+        <strong>Wong Mei Ling</strong><br>Class 5C &bull; Year 5<br>
+        <span class="badge yellow">No Account</span> <span style="color:var(--action);font-size:0.72rem;font-weight:600;cursor:pointer;">Invite</span><br>
+        <span style="color:var(--muted);">Last plan: No plan yet</span><br><span style="color:var(--action);font-weight:600;font-size:0.75rem;">View Profile &rarr;</span>
       </div>
     </div>
   </div>
@@ -238,20 +294,28 @@
   <span class="badge blue">Info</span> No target schools set
 </div>
 
+<div class="info note">
+  <strong>Account column:</strong> Each student card now shows account status &mdash;
+  <span class="badge green">Active</span> (logged in at least once),
+  <span class="badge blue">Invited</span> (email sent, pending),
+  <span class="badge yellow">No Account</span> (unaccounted &mdash; imported but not yet invited).
+  The &ldquo;Show Unaccounted&rdquo; filter isolates students who still need invitations.
+</div>
+
 <!-- ═══════════════════════════════════════════════════════ -->
 <h2>Journey 3: Building a Student Profile</h2>
 
 <div class="journey-header">
   <div class="journey-icon">&#128221;</div>
   <div><div class="journey-title">Entering student data &mdash; the 7-tab profile</div>
-  <div class="journey-desc">Ms. Chan clicks "View Profile" on a student card to enter their academic data.</div></div>
+  <div class="journey-desc">Ms. Chan clicks &ldquo;View Profile&rdquo; on a student card to enter their academic data.</div></div>
 </div>
 
 <div class="screen">
   <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/students/{id}/profile</span></div>
   <div class="screen-body">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-      <div><strong style="font-size:1.1rem;">Liu Pui Yi</strong> <span style="color:var(--muted);">Year 5</span></div>
+      <div><strong style="font-size:1.1rem;">Liu Pui Yi</strong> <span style="color:var(--muted);">Year 5</span> <span class="badge green">Active</span></div>
       <div style="display:flex;gap:0.5rem;">
         <span style="background:var(--action);color:white;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.8rem;font-weight:600;">Target Schools</span>
         <span style="background:var(--accent);color:white;padding:0.3rem 0.75rem;border-radius:6px;font-size:0.8rem;font-weight:600;">Generate Plan</span>
@@ -270,16 +334,20 @@
   </div>
 </div>
 
+<div class="info note">
+  <strong>Invite flow:</strong> If the student has no linked user account (<span class="badge yellow">No Account</span>), the counsellor with <code>account_assignment</code> permission can enter the student&rsquo;s email and click <strong>&ldquo;Invite&rdquo;</strong>. A signed invite link is sent via email. The student opens the link, sets a password, and their account is auto-created and linked.
+</div>
+
 <table>
   <tr><th>Tab</th><th>What the Counsellor Enters</th><th>Save Behaviour</th></tr>
   <tr>
     <td><strong>Personal</strong></td>
-    <td>Full name, preferred name, DOB (auto-computes age), gender, address, phone, email, class, year, candidate number, preferred language (EN/中文), financial aid flag, personal statement</td>
+    <td>Full name, preferred name, DOB (auto-computes age), gender, address, phone, email, class, year, candidate number, preferred language (EN/&#20013;&#25991;), financial aid flag, personal statement</td>
     <td><span class="badge green">Autosave</span> drafts to localStorage every 2s &bull; manual <strong>Save</strong> button commits to server</td>
   </tr>
   <tr>
     <td><strong>Grades</strong></td>
-    <td>Upload transcript PDF/image → auto-parse grades → accept/dismiss. Or manually add: subject dropdown, sitting (MOCK/TRIAL/OFFICIAL), grade (5** to U), notes. Table shows all grades with predicted grade badges.</td>
+    <td>Upload transcript PDF/image &rarr; auto-parse grades &rarr; accept/dismiss. Or manually add: subject dropdown, sitting (MOCK/TRIAL/OFFICIAL), grade (5** to U), notes. Table shows all grades with predicted grade badges.</td>
     <td>Manual <strong>Save Grade</strong> per entry. Transcript upload is async with polling.</td>
   </tr>
   <tr>
@@ -289,7 +357,7 @@
   </tr>
   <tr>
     <td><strong>Teacher Evaluations</strong></td>
-    <td>Card per evaluation: subject code, teacher name, star rating (1&ndash;5), comment (textarea), date. "Add Evaluation" creates blank card.</td>
+    <td>Card per evaluation: subject code, teacher name, star rating (1&ndash;5), comment (textarea), date. &ldquo;Add Evaluation&rdquo; creates blank card.</td>
     <td>Manual <strong>Save</strong> per card</td>
   </tr>
   <tr>
@@ -300,7 +368,7 @@
   <tr>
     <td><strong>Notes</strong></td>
     <td>Large textarea for counsellor notes. Free-form.</td>
-    <td><span class="badge green">Autosave</span> debounced 1.5s after typing stops. Status: "Saving&hellip;" → "✓ Saved"</td>
+    <td><span class="badge green">Autosave</span> debounced 1.5s after typing stops. Status: &ldquo;Saving&hellip;&rdquo; &rarr; &ldquo;&#10003; Saved&rdquo;</td>
   </tr>
   <tr>
     <td><strong>Plans</strong></td>
@@ -310,7 +378,7 @@
 </table>
 
 <div class="info tip">
-  <strong>Transcript parsing:</strong> Counsellor uploads a PDF or photo of a student's report card. The system auto-detects subject names and grades, shows confidence scores, and lets the counsellor accept or dismiss each detected grade.
+  <strong>Transcript parsing:</strong> Counsellor uploads a PDF or photo of a student&rsquo;s report card. The system auto-detects subject names and grades, shows confidence scores, and lets the counsellor accept or dismiss each detected grade.
 </div>
 
 <!-- ═══════════════════════════════════════════════════════ -->
@@ -338,7 +406,7 @@
             <span class="badge green">ELIGIBLE</span>
             <span style="color:var(--success);font-weight:600;">78%</span>
             <span class="badge green">APPLIED</span>
-            <span style="font-size:0.75rem;color:var(--muted);">↑ ↓ View Edit Remove</span>
+            <span style="font-size:0.75rem;color:var(--muted);">&uarr; &darr; View Edit Remove</span>
           </div>
           <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:#fef2f2;border-radius:8px;margin-bottom:0.5rem;">
             <span style="background:var(--accent);color:white;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">2</span>
@@ -347,7 +415,7 @@
             <span class="badge red">INELIGIBLE</span>
             <span style="color:var(--danger);font-weight:600;">35%</span>
             <span class="badge red">AT RISK</span>
-            <span style="font-size:0.75rem;color:var(--muted);">↑ ↓ View Edit Remove</span>
+            <span style="font-size:0.75rem;color:var(--muted);">&uarr; &darr; View Edit Remove</span>
           </div>
           <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;">
             <span style="background:var(--accent);color:white;width:24px;height:24px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">3</span>
@@ -356,7 +424,7 @@
             <span class="badge green">ELIGIBLE</span>
             <span style="color:var(--warn);font-weight:600;">55%</span>
             <span class="badge blue">CONSIDERING</span>
-            <span style="font-size:0.75rem;color:var(--muted);">↑ ↓ View Edit Remove</span>
+            <span style="font-size:0.75rem;color:var(--muted);">&uarr; &darr; View Edit Remove</span>
           </div>
         </div>
       </div>
@@ -367,9 +435,9 @@
     <div class="step-marker action">2</div>
     <div class="step-body">
       <div class="step-title">Add a new target school</div>
-      <div class="step-desc">Click <strong>"Add School"</strong> → modal shows AI-powered recommendations filtered by the student's grades and interests. Each recommendation shows the specific JUPAS programme, fit score, and match percentage. Alternatively, search all 15+ schools manually.</div>
+      <div class="step-desc">Click <strong>&ldquo;Add School&rdquo;</strong> &rarr; modal shows AI-powered recommendations filtered by the student&rsquo;s grades and interests. Each recommendation shows the specific JUPAS programme, fit score, and match percentage. Alternatively, search all 15+ schools manually.</div>
       <div class="step-detail">
-        <strong>Recommendation example:</strong> "City University — Electrical Engineering (JS1221) — 71% fit — 71% match"<br>
+        <strong>Recommendation example:</strong> &ldquo;City University &mdash; Electrical Engineering (JS1221) &mdash; 71% fit &mdash; 71% match&rdquo;<br>
         After selecting, enter intended major(s) and year of entry. Schools already in the target list are excluded from recommendations.
       </div>
     </div>
@@ -379,15 +447,15 @@
     <div class="step-marker warn">3</div>
     <div class="step-body">
       <div class="step-title">Review eligibility &amp; risk</div>
-      <div class="step-desc">Each target shows colour-coded signals to guide the counsellor's advice:</div>
+      <div class="step-desc">Each target shows colour-coded signals to guide the counsellor&rsquo;s advice:</div>
       <table>
         <tr><th>Signal</th><th>What It Means</th><th>Counsellor Action</th></tr>
         <tr><td><span class="badge green">ELIGIBLE</span></td><td>Meets all minimum requirements (best-5, subject grades, IELTS)</td><td>Viable target &mdash; review competitiveness</td></tr>
         <tr><td><span class="badge red">INELIGIBLE</span></td><td>Fails one or more hard requirements (tooltip shows which)</td><td>Discuss with student; consider backup or improvement plan</td></tr>
-        <tr><td><span style="color:var(--success);font-weight:600;">≥70%</span></td><td>Strong match &mdash; scores competitive for this programme</td><td>Encourage as top choice</td></tr>
+        <tr><td><span style="color:var(--success);font-weight:600;">&ge;70%</span></td><td>Strong match &mdash; scores competitive for this programme</td><td>Encourage as top choice</td></tr>
         <tr><td><span style="color:var(--warn);font-weight:600;">40&ndash;69%</span></td><td>Moderate match &mdash; possible but not guaranteed</td><td>Keep as realistic option; suggest improvements</td></tr>
         <tr><td><span style="color:var(--danger);font-weight:600;">&lt;40%</span></td><td>Weak match &mdash; scores below programme norms</td><td>Discuss risks; suggest alternatives</td></tr>
-        <tr><td><span class="badge red">AT RISK</span></td><td>Predicted score below programme's lower quartile</td><td>Flag to student; plan grade improvement strategy</td></tr>
+        <tr><td><span class="badge red">AT RISK</span></td><td>Predicted score below programme&rsquo;s lower quartile</td><td>Flag to student; plan grade improvement strategy</td></tr>
       </table>
     </div>
   </div>
@@ -396,8 +464,8 @@
     <div class="step-marker">4</div>
     <div class="step-body">
       <div class="step-title">Reorder preferences, edit details, track status</div>
-      <div class="step-desc">Use ↑/↓ to reorder preference ranking. Edit each target to update: intended majors, year of entry, application status (Considering → Applied → Admitted/Rejected/Withdrawn), and student confidence level (slider: Unsure → Decided).</div>
-      <div class="step-detail">Toggle <strong>"By Major"</strong> view to see all targets grouped by intended major instead of by school.</div>
+      <div class="step-desc">Use &uarr;/&darr; to reorder preference ranking. Edit each target to update: intended majors, year of entry, application status (Considering &rarr; Applied &rarr; Admitted/Rejected/Withdrawn), and student confidence level (slider: Unsure &rarr; Decided).</div>
+      <div class="step-detail">Toggle <strong>&ldquo;By Major&rdquo;</strong> view to see all targets grouped by intended major instead of by school.</div>
     </div>
   </div>
 </div>
@@ -416,7 +484,7 @@
     <div class="step-marker purple">1</div>
     <div class="step-body">
       <div class="step-title">Trigger generation</div>
-      <div class="step-desc">Click <strong>"Generate Plan"</strong> from student profile. System collects all student data (grades, IELTS, activities, awards, targets) and starts an async background job.</div>
+      <div class="step-desc">Click <strong>&ldquo;Generate Plan&rdquo;</strong> from student profile. System collects all student data (grades, IELTS, activities, awards, targets) and starts an async background job.</div>
     </div>
   </div>
 
@@ -424,7 +492,7 @@
     <div class="step-marker purple">2</div>
     <div class="step-body">
       <div class="step-title">Watch it stream (SSE)</div>
-      <div class="step-desc">On the Consultant Task page, AI-generated content streams in real-time token-by-token via Server-Sent Events. The counsellor sees the plan being written live. A <strong>"Stop Generation"</strong> button is available to abort.</div>
+      <div class="step-desc">On the Consultant Task page, AI-generated content streams in real-time token-by-token via Server-Sent Events. The counsellor sees the plan being written live. A <strong>&ldquo;Stop Generation&rdquo;</strong> button is available to abort.</div>
       <div class="screen">
         <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/students/{id}/consultant</span></div>
         <div class="screen-body" style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;">
@@ -432,7 +500,7 @@
             <div class="label">Plan Output (streaming)</div>
             <div style="background:var(--bg);padding:0.75rem;border-radius:8px;font-size:0.8rem;line-height:1.7;">
               <strong>Student Summary</strong><br>
-              Liu Pui Yi is a Year 5 student at St Paul's College with a best-5 HKDSE aggregate of 22. Her strongest subjects are Chinese Language (5*) and English (5), with solid performance in Mathematics (4). She has expressed interest in&hellip;<span style="background:var(--accent);color:white;padding:0 2px;border-radius:2px;animation:blink 1s infinite;">▋</span>
+              Liu Pui Yi is a Year 5 student at St Paul&rsquo;s College with a best-5 HKDSE aggregate of 22. Her strongest subjects are Chinese Language (5*) and English (5), with solid performance in Mathematics (4). She has expressed interest in&hellip;<span style="background:var(--accent);color:white;padding:0 2px;border-radius:2px;">&#9612;</span>
             </div>
           </div>
           <div>
@@ -458,15 +526,15 @@
         </div>
         <div class="card">
           <div class="card-title">Edit Sections</div>
-          <div class="card-desc">Click <strong>"Edit Sections"</strong> → select a section (student summary, school rationales, action items) → rich text editor (bold, italic, lists) → Save or Reset to Default.</div>
+          <div class="card-desc">Click <strong>&ldquo;Edit Sections&rdquo;</strong> &rarr; select a section (student summary, school rationales, action items) &rarr; rich text editor (bold, italic, lists) &rarr; Save or Reset to Default.</div>
         </div>
         <div class="card">
           <div class="card-title">AI Chat</div>
-          <div class="card-desc">Type natural language instructions: "Make the summary shorter" or "Add more detail about IELTS preparation." AI returns a JSON patch applied to the plan. Limited to 20 requests per plan per 24 hours.</div>
+          <div class="card-desc">Type natural language instructions: &ldquo;Make the summary shorter&rdquo; or &ldquo;Add more detail about IELTS preparation.&rdquo; AI returns a JSON patch applied to the plan. Limited to 20 requests per plan per 24 hours.</div>
         </div>
         <div class="card">
-          <div class="card-title">Export HTML</div>
-          <div class="card-desc">Download the plan as a standalone HTML file. Prints cleanly via @media print CSS. Counsellor view (with scores/metrics) vs student view (encouraging language, no raw numbers).</div>
+          <div class="card-title">Export HTML &amp; PDF</div>
+          <div class="card-desc">Download the plan as a standalone HTML file or PDF (generated via PyMuPDF). Prints cleanly via @media print CSS. Counsellor view (with scores/metrics) vs student view (encouraging language, no raw numbers).</div>
         </div>
       </div>
     </div>
@@ -491,7 +559,7 @@
     <div class="step-marker success">1</div>
     <div class="step-body">
       <div class="step-title">Create cohorts</div>
-      <div class="step-desc">Navigate to <strong>Cohorts</strong> → <strong>"New Cohort"</strong>. Enter name (e.g., "5A 2025-26") and description. Typically one cohort per class per academic year.</div>
+      <div class="step-desc">Navigate to <strong>Cohorts</strong> &rarr; <strong>&ldquo;New Cohort&rdquo;</strong>. Enter name (e.g., &ldquo;5A 2025-26&rdquo;) and description. Typically one cohort per class per academic year.</div>
     </div>
   </div>
 
@@ -499,7 +567,7 @@
     <div class="step-marker success">2</div>
     <div class="step-body">
       <div class="step-title">Add students to cohort</div>
-      <div class="step-desc">Open cohort detail → <strong>"Add Students"</strong>. Search by name, class, or year. Checkbox-select multiple students → <strong>"Add Selected"</strong>. Typically 30 students per class.</div>
+      <div class="step-desc">Open cohort detail &rarr; <strong>&ldquo;Add Students&rdquo;</strong>. Search by name, class, or year. Checkbox-select multiple students &rarr; <strong>&ldquo;Add Selected&rdquo;</strong>. Typically 30 students per class.</div>
     </div>
   </div>
 
@@ -507,7 +575,7 @@
     <div class="step-marker success">3</div>
     <div class="step-body">
       <div class="step-title">Bulk edit grades</div>
-      <div class="step-desc">Click <strong>"Bulk Edit Grades"</strong> → grid view: rows = students, columns = subjects. Switch between MOCK / TRIAL / OFFICIAL sittings via tab. Edit grades directly in the grid. Ideal for entering mock exam results for an entire class at once.</div>
+      <div class="step-desc">Click <strong>&ldquo;Bulk Edit Grades&rdquo;</strong> &rarr; grid view: rows = students, columns = subjects. Switch between MOCK / TRIAL / OFFICIAL sittings via tab. Edit grades directly in the grid. Ideal for entering mock exam results for an entire class at once.</div>
     </div>
   </div>
 
@@ -515,7 +583,7 @@
     <div class="step-marker success">4</div>
     <div class="step-body">
       <div class="step-title">View cohort report</div>
-      <div class="step-desc">Click <strong>"View Report"</strong> → cohort analytics showing:</div>
+      <div class="step-desc">Click <strong>&ldquo;View Report&rdquo;</strong> &rarr; cohort analytics showing:</div>
       <div class="card-grid" style="margin-top:0.5rem;">
         <div class="card">
           <div class="card-title">Target Distribution</div>
@@ -575,8 +643,8 @@
 
 <div class="journey-header">
   <div class="journey-icon">&#127963;</div>
-  <div><div class="journey-title">Browsing universities &mdash; research and explore</div>
-  <div class="journey-desc">Ms. Chan or a student explores the school database to learn about programmes.</div></div>
+  <div><div class="journey-title">Browsing universities &mdash; JUPAS and self-financing pathways</div>
+  <div class="journey-desc">Ms. Chan or a student explores the school database to learn about programmes across both JUPAS and self-financing institutions.</div></div>
 </div>
 
 <div class="flow">
@@ -584,18 +652,29 @@
     <div class="step-marker">1</div>
     <div class="step-body">
       <div class="step-title">Search &amp; Filter</div>
-      <div class="step-desc">Full-text search + filter by type (University/Polytechnic/Community College/Vocational/High School) and location. Shows 15+ seeded Hong Kong institutions. Counsellors can add custom schools.</div>
+      <div class="step-desc">Full-text search (English and Chinese) + filter by type (University/Polytechnic/Community College/Vocational/High School) and location. Shows 15+ seeded Hong Kong institutions. Counsellors can add custom schools.</div>
     </div>
   </div>
   <div class="step">
     <div class="step-marker">2</div>
     <div class="step-body">
       <div class="step-title">School Profile</div>
-      <div class="step-desc">Click a school to see: location, programmes, acceptance rates, minimum entry requirements, language requirements. <strong>"Add to Targets"</strong> button with student picker to quickly assign the school to a student's target list.</div>
+      <div class="step-desc">Click a school to see: location, programmes, acceptance rates, minimum entry requirements, language requirements. <strong>&ldquo;Add to Targets&rdquo;</strong> button with student picker to quickly assign the school to a student&rsquo;s target list.</div>
     </div>
   </div>
   <div class="step">
-    <div class="step-marker">3</div>
+    <div class="step-marker action">3</div>
+    <div class="step-body">
+      <div class="step-title">Toggle: JUPAS / Self-Financing</div>
+      <div class="step-desc">Switch between <strong>JUPAS programmes</strong> (370+ degree programmes at UGC-funded institutions) and <strong>Self-Financing programmes</strong> (105 sub-degree programmes across 5 Tier 1 institutions).</div>
+      <div class="step-detail">
+        <strong>Self-financing Tier 1 institutions:</strong> HKCC &bull; HKU SPACE CC &bull; HKBU CIE &bull; Lingnan LIFE &bull; UOWCHK<br>
+        Each SF programme includes admission score data (best-5 HKDSE aggregate). Students are scored against SF programmes the same way as JUPAS &mdash; match percentage and eligibility badges apply.
+      </div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-marker">4</div>
     <div class="step-body">
       <div class="step-title">Export</div>
       <div class="step-desc">Export filtered school list as CSV for offline reference or sharing with colleagues.</div>
@@ -617,7 +696,7 @@
     <div class="step-marker success">1</div>
     <div class="step-body">
       <div class="step-title">Mark as Graduated</div>
-      <div class="step-desc">On student profile, click <strong>"Mark as Graduated"</strong>. Modal asks for: final school (dropdown), final major (text), graduation year (number). Records the actual outcome for institutional analytics.</div>
+      <div class="step-desc">On student profile, click <strong>&ldquo;Mark as Graduated&rdquo;</strong>. Modal asks for: final school (dropdown), final major (text), graduation year (number). Records the actual outcome for institutional analytics.</div>
     </div>
   </div>
   <div class="step">
@@ -630,29 +709,230 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════ -->
+<h2>Journey 10: Student Onboarding &amp; Accounts</h2>
+
+<div class="journey-header">
+  <div class="journey-icon">&#128100;</div>
+  <div><div class="journey-title">Invite-based student accounts &mdash; from import to first login</div>
+  <div class="journey-desc">Students don&rsquo;t self-register. The counsellor imports data, then explicitly invites students to create their own accounts.</div></div>
+</div>
+
+<div class="flow">
+  <div class="step">
+    <div class="step-marker">1</div>
+    <div class="step-body">
+      <div class="step-title">Import CSV creates data only</div>
+      <div class="step-desc">When Ms. Chan imports a student roster, the system creates student data records but <strong>no user accounts</strong>. All imported students appear as <span class="badge yellow">No Account</span> (unaccounted) in the student list.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker action">2</div>
+    <div class="step-body">
+      <div class="step-title">Teacher enters student email</div>
+      <div class="step-desc">A teacher with <code>account_assignment</code> permission on the cohort opens a student&rsquo;s profile and enters their email address in the Account section. Clicks <strong>&ldquo;Send Invite&rdquo;</strong>.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker action">3</div>
+    <div class="step-body">
+      <div class="step-title">Signed invite link sent via email</div>
+      <div class="step-desc">The system generates a signed, time-limited invite URL and emails it to the student. Student status changes to <span class="badge blue">Invited</span>.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker success">4</div>
+    <div class="step-body">
+      <div class="step-title">Student opens link &amp; sets password</div>
+      <div class="step-desc">Student clicks the invite link in their email, is taken to a registration page pre-filled with their details. They set a password. Account is auto-created and linked to the existing student data record.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker success">5</div>
+    <div class="step-body">
+      <div class="step-title">Student logs in</div>
+      <div class="step-desc">Student can now log in via <strong>candidate number</strong> or <strong>email</strong>. Status changes to <span class="badge green">Active</span>. They see their own student portal with programme choices, plans, submissions, and school directory.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker">6</div>
+    <div class="step-body">
+      <div class="step-title">Password reset</div>
+      <div class="step-desc">Standard password reset flow via email for students who forget their credentials.</div>
+    </div>
+  </div>
+</div>
+
+<div class="info tip">
+  <strong>Unaccounted filter:</strong> On the dashboard, the &ldquo;Show Unaccounted&rdquo; toggle isolates students imported via CSV who have not yet been invited. This helps the counsellor batch-invite remaining students efficiently.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Journey 11: Teacher Group Permissions (Admin)</h2>
+
+<div class="journey-header">
+  <div class="journey-icon">&#128274;</div>
+  <div><div class="journey-title">Role-based access &mdash; who sees what</div>
+  <div class="journey-desc">The admin creates teacher groups, assigns members, and configures per-cohort tool access so each teacher sees only what they need.</div></div>
+</div>
+
+<div class="flow">
+  <div class="step">
+    <div class="step-marker purple">1</div>
+    <div class="step-body">
+      <div class="step-title">Create a teacher group</div>
+      <div class="step-desc">Admin navigates to <strong>/admin/teacher-groups</strong> &rarr; <strong>&ldquo;New Group&rdquo;</strong>. Enters group name (e.g. &ldquo;Form 5 Teachers&rdquo;, &ldquo;Science Dept&rdquo;).</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker purple">2</div>
+    <div class="step-body">
+      <div class="step-title">Add teachers to the group</div>
+      <div class="step-desc">Select from registered teacher accounts and assign them to the group. A teacher can belong to multiple groups.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker purple">3</div>
+    <div class="step-body">
+      <div class="step-title">Set per-cohort permissions</div>
+      <div class="step-desc">For each cohort, configure:</div>
+      <div class="step-detail">
+        <strong>Visibility toggle:</strong> Can the group see this cohort at all?<br>
+        <strong>8 tool access levels</strong> (None / View / Edit):
+      </div>
+      <table style="margin-top:0.5rem;">
+        <tr><th>Tool</th><th>None</th><th>View</th><th>Edit</th></tr>
+        <tr><td>Programme Choices</td><td>Hidden</td><td>Read-only list</td><td>Add/remove/reorder targets</td></tr>
+        <tr><td>Grades</td><td>Hidden</td><td>See grade table</td><td>Enter/modify grades</td></tr>
+        <tr><td>Plans</td><td>Hidden</td><td>Read generated plans</td><td>Generate &amp; edit plans</td></tr>
+        <tr><td>Submissions</td><td>Hidden</td><td>View submission history</td><td>Accept/reject submissions</td></tr>
+        <tr><td>Reports</td><td>Hidden</td><td>View cohort reports</td><td>Export reports</td></tr>
+        <tr><td>Cohort Mgmt</td><td>Hidden</td><td>See member list</td><td>Add/remove students</td></tr>
+        <tr><td>Data Import</td><td>Hidden</td><td>&mdash;</td><td>Import CSV/Excel</td></tr>
+        <tr><td>Account Assignment</td><td>Hidden</td><td>&mdash;</td><td>Invite students, link accounts</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker success">4</div>
+    <div class="step-body">
+      <div class="step-title">Most permissive wins</div>
+      <div class="step-desc">When a teacher belongs to multiple groups, the system applies the <strong>most permissive</strong> access level across all their groups for each tool on each cohort. The teacher sees only their allowed cohorts and the tools they have access to.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<h2>Journey 12: Student Self-Service</h2>
+
+<div class="journey-header">
+  <div class="journey-icon">&#127891;</div>
+  <div><div class="journey-title">The student portal &mdash; what students see after logging in</div>
+  <div class="journey-desc">Li Ka Ho logs in with his candidate number and accesses his own data through a focused, read-oriented interface.</div></div>
+</div>
+
+<div class="flow">
+  <div class="step">
+    <div class="step-marker action">1</div>
+    <div class="step-body">
+      <div class="step-title">Student login</div>
+      <div class="step-desc">Student logs in via candidate number or email at <strong>/login</strong>. Redirected to the student dashboard.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker">2</div>
+    <div class="step-body">
+      <div class="step-title">Dashboard &mdash; Programme Choices</div>
+      <div class="step-desc">The student&rsquo;s home screen shows their programme choices organised by JUPAS band (A&ndash;E). Each choice shows the programme name, institution, match percentage, and eligibility status. Students can see their counsellor&rsquo;s recommendations but cannot modify the list.</div>
+      <div class="screen">
+        <div class="screen-header"><div class="screen-dot r"></div><div class="screen-dot y"></div><div class="screen-dot g"></div><span class="screen-url">/student/dashboard</span></div>
+        <div class="screen-body">
+          <div class="label">Band A (top choices)</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;margin-bottom:0.25rem;font-size:0.82rem;">
+            <span style="font-weight:700;color:var(--accent);">A1</span>
+            <span style="flex:1;">HKU &mdash; BSc Computer Science (JS6688)</span>
+            <span class="badge green">ELIGIBLE</span>
+            <span style="color:var(--success);font-weight:600;">72%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;margin-bottom:0.25rem;font-size:0.82rem;">
+            <span style="font-weight:700;color:var(--accent);">A2</span>
+            <span style="flex:1;">CUHK &mdash; BEng Information Engineering (JS4460)</span>
+            <span class="badge green">ELIGIBLE</span>
+            <span style="color:var(--warn);font-weight:600;">58%</span>
+          </div>
+          <div class="label" style="margin-top:0.75rem;">Band B</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;font-size:0.82rem;">
+            <span style="font-weight:700;color:var(--action);">B1</span>
+            <span style="flex:1;">CityU &mdash; BSc Computing Mathematics (JS1042)</span>
+            <span class="badge green">ELIGIBLE</span>
+            <span style="color:var(--success);font-weight:600;">81%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker">3</div>
+    <div class="step-body">
+      <div class="step-title">My Plan</div>
+      <div class="step-desc">View the latest academic plan generated by the counsellor. Student view uses encouraging language and omits raw score metrics. Download as HTML or PDF.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker">4</div>
+    <div class="step-body">
+      <div class="step-title">My Submissions</div>
+      <div class="step-desc">View and manage submission history. Students can submit updated preferences or materials within the rate limit (once per X days cooldown &mdash; applies to actual submissions only, not draft saves). Submission status shows as Pending / Reviewed / Approved / Rejected.</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-marker">5</div>
+    <div class="step-body">
+      <div class="step-title">School Directory</div>
+      <div class="step-desc">Browse the same school directory as counsellors &mdash; search JUPAS and self-financing programmes, view institution profiles, and research backup options. Students can toggle between JUPAS and Self-Financing views.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
 <h2>Navigation Map</h2>
 
 <div class="card" style="padding:1.5rem;">
 <pre style="font-family: monospace; font-size: 0.78rem; line-height: 1.8; overflow-x: auto;">
-<strong>Sidebar Navigation</strong>                          <strong>Student Context Pages</strong>
+<strong>Sidebar Navigation (Counsellor/Teacher)</strong>        <strong>Student Context Pages</strong>
 
-┌─────────────────────────┐                 ┌──────────────────────────────┐
-│ ● Dashboard             │─── View Profile ──→│ Student Profile (7 tabs)    │
-│ ● School Directory      │                 │   ├─ → Target Schools          │
-│ ● Cohorts               │                 │   ├─ → Academic Plan (polling) │
-│ ● Data Analysis         │                 │   └─ → Consultant Task (SSE)   │
-│                         │                 └──────────────────────────────┘
-│ ─────────────────────── │
-│ user@school.hk          │                 ┌──────────────────────────────┐
-│ St Paul's College       │                 │ Cohort Context Pages          │
-│ ● Account Settings      │                 │   ├─ Cohort Detail             │
-│ ● Logout                │                 │   ├─ → Cohort Report           │
-└─────────────────────────┘                 │   └─ → Bulk Edit Grades        │
-                                            └──────────────────────────────┘
-<strong>Admin-only</strong>
-● Settings (global config)
-● Admin Data Refresh (CSV diff preview + commit)
-● Entity Management (CRUD for any entity type)
+&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;                 &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474; &#9679; Dashboard             &#9474;&#9472;&#9472;&#9472; View Profile &#9472;&#9472;&#9658;&#9474; Student Profile (7 tabs)    &#9474;
+&#9474; &#9679; School Directory      &#9474;                 &#9474;   &#9500;&#9472; &rarr; Target Schools          &#9474;
+&#9474; &#9679; Cohorts               &#9474;                 &#9474;   &#9500;&#9472; &rarr; Academic Plan (polling) &#9474;
+&#9474; &#9679; Data Analysis         &#9474;                 &#9474;   &#9492;&#9472; &rarr; Consultant Task (SSE)   &#9474;
+&#9474; &#9679; Submissions           &#9474;                 &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+&#9474;                         &#9474;
+&#9474; &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472; &#9474;                 &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474; user@school.hk          &#9474;                 &#9474; Cohort Context Pages          &#9474;
+&#9474; St Paul's College       &#9474;                 &#9474;   &#9500;&#9472; Cohort Detail             &#9474;
+&#9474; &#9679; Account Settings      &#9474;                 &#9474;   &#9500;&#9472; &rarr; Cohort Report           &#9474;
+&#9474; &#9679; Logout                &#9474;                 &#9474;   &#9492;&#9472; &rarr; Bulk Edit Grades        &#9474;
+&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;                 &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
+
+<strong>Admin-only</strong>                                    <strong>Student Portal</strong>
+&#9679; Settings (global config)                      &#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9679; User Management (invite/manage accounts)      &#9474; &#9679; Dashboard (programme choices) &#9474;
+&#9679; Teacher Groups (/admin/teacher-groups)        &#9474; &#9679; My Submissions              &#9474;
+&#9679; Admin Data Refresh (CSV diff + commit)        &#9474; &#9679; My Plan                     &#9474;
+&#9679; Entity Management (CRUD for any entity)       &#9474; &#9679; School Directory             &#9474;
+                                                  &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;
 </pre>
 </div>
 
@@ -661,16 +941,16 @@
 
 <table>
   <tr><th>Day</th><th>Activity</th><th>Pages Used</th></tr>
-  <tr><td><strong>Monday</strong></td><td>Check alerts, review students flagged at-risk. Update target school statuses for students who submitted applications over the weekend.</td><td>Dashboard → Student Profile → Target Schools</td></tr>
-  <tr><td><strong>Tuesday</strong></td><td>Mock exam results come in. Bulk-enter grades for class 5A using cohort bulk edit. Review grade distributions.</td><td>Cohorts → Bulk Edit → Cohort Report</td></tr>
-  <tr><td><strong>Wednesday</strong></td><td>One-on-one student meetings. Generate personalised academic plans. Edit plan sections based on conversation. Print plans for students.</td><td>Student Profile → Consultant Task → Export HTML</td></tr>
-  <tr><td><strong>Thursday</strong></td><td>Review data analysis: which subjects are underperforming across the year group? Which programmes are over-subscribed? Adjust advice strategy.</td><td>Data Analysis (all 4 tabs)</td></tr>
-  <tr><td><strong>Friday</strong></td><td>New transfer student arrives. Create profile, enter grades, set up initial target schools. Add to appropriate cohort.</td><td>Dashboard (Add Student) → Student Profile → Target Schools → Cohorts</td></tr>
+  <tr><td><strong>Monday</strong></td><td>Check alerts, review students flagged at-risk. Update target school statuses for students who submitted applications over the weekend. Invite unaccounted students who were imported last week.</td><td>Dashboard &rarr; Student Profile &rarr; Target Schools</td></tr>
+  <tr><td><strong>Tuesday</strong></td><td>Mock exam results come in. Bulk-enter grades for class 5A using cohort bulk edit. Review grade distributions. Import new CSV with Chinese headers &mdash; auto-mapped and normalised.</td><td>Cohorts &rarr; Bulk Edit &rarr; Cohort Report</td></tr>
+  <tr><td><strong>Wednesday</strong></td><td>One-on-one student meetings. Generate personalised academic plans. Edit plan sections based on conversation. Export as PDF for students to take home.</td><td>Student Profile &rarr; Consultant Task &rarr; Export PDF</td></tr>
+  <tr><td><strong>Thursday</strong></td><td>Review data analysis: which subjects are underperforming across the year group? Which programmes are over-subscribed? Check self-financing options for borderline students. Adjust advice strategy.</td><td>Data Analysis (all 4 tabs) &rarr; School Directory (SF toggle)</td></tr>
+  <tr><td><strong>Friday</strong></td><td>New transfer student arrives. Import profile-only CSV. Set up teacher group permissions for the new term teacher. Review student submissions from the week.</td><td>Dashboard (Add Student) &rarr; Admin/Teacher Groups &rarr; Submissions</td></tr>
 </table>
 
 <p style="margin-top: 2rem; font-size: 0.85rem; color: var(--muted); text-align: center;">
-  SchoolChoice UX Walkthrough &mdash; reflects app state as of 2026-05-12<br>
-  150 students &bull; 5 cohorts &bull; 15 schools &bull; 370+ JUPAS programmes
+  SchoolChoice UX Walkthrough &mdash; reflects app state as of 2026-05-18<br>
+  150 students &bull; 5 cohorts &bull; 10+ schools &bull; 370 JUPAS + 105 SF programmes &bull; 1,125 i18n keys
 </p>
 
 </div>
