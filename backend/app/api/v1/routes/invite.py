@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.dependencies import get_current_user, require_role
 from app.db.models import User, OrganisationMembership
+from app.services.permission_service import check_feature_permission
 from app.db.session import get_db
 from app.modules.school_choice.models.models import Student
 from app.services.invite_service import (
@@ -89,6 +90,16 @@ def _get_org_id(user: User, db: Session) -> str | None:
     return None
 
 
+def _check_account_assignment(user: User, db: Session, student_id):
+    """Check that the user has account_assignment permission for a student."""
+    if user.role == "admin":
+        return
+    from uuid import UUID
+    perm = check_feature_permission(user, db, student_id=UUID(str(student_id)), feature="account_assignment")
+    if perm != "read_write":
+        raise HTTPException(status_code=403, detail="You do not have permission to assign accounts for this student.")
+
+
 # ---------------------------------------------------------------------------
 # Admin endpoints
 # ---------------------------------------------------------------------------
@@ -98,7 +109,7 @@ def _get_org_id(user: User, db: Session) -> str | None:
 def bulk_invite_students(
     payload: InviteRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin")),
+    current_user: User = Depends(get_current_user),
 ):
     """Bulk invite students — generate invite tokens and URLs."""
     org_id = _get_org_id(current_user, db)
@@ -106,6 +117,12 @@ def bulk_invite_students(
     errors = []
 
     for sid in payload.student_ids:
+        try:
+            _check_account_assignment(current_user, db, sid)
+        except HTTPException:
+            errors.append({"student_id": sid, "error": "No account assignment permission for this student"})
+            continue
+
         student = db.query(Student).filter(Student.id == sid).first()
         if not student:
             errors.append({"student_id": sid, "error": "Student not found"})
@@ -146,7 +163,7 @@ def single_invite_student(
     student_id: str,
     payload: SingleInviteRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin")),
+    current_user: User = Depends(get_current_user),
 ):
     """Invite a single student — optionally set email from body."""
     org_id = _get_org_id(current_user, db)
@@ -154,8 +171,13 @@ def single_invite_student(
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
+    _check_account_assignment(current_user, db, student_id)
+
     if payload.email:
         student.email = payload.email
+        import re
+        if not re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', student.email):
+            raise HTTPException(status_code=400, detail="Invalid email format")
 
     if not student.email:
         raise HTTPException(status_code=400, detail="Student has no email address")
@@ -185,13 +207,16 @@ def single_invite_student(
 def reinvite_student(
     student_id: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_role("admin")),
+    current_user: User = Depends(get_current_user),
 ):
     """Regenerate invite token for a student (invalidates previous)."""
     org_id = _get_org_id(current_user, db)
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
+
+    _check_account_assignment(current_user, db, student_id)
+
     if not student.email:
         raise HTTPException(status_code=400, detail="Student has no email address")
 
