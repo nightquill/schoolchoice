@@ -541,21 +541,21 @@ def get_submission_rate_limit(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("admin")),
 ):
-    """Get the current submission rate limit per student per 24h."""
+    """Get the submission cooldown (days between submissions)."""
     from app.db.models import Organisation, OrganisationMembership
     import json as _json
 
     membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
     if not membership:
-        return {"rate_limit": 3}
+        return {"cooldown_days": 3}
     org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
     if not org or not org.metadata_:
-        return {"rate_limit": 3}
+        return {"cooldown_days": 3}
     try:
         meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else {}
-        return {"rate_limit": meta.get("submission_rate_limit", 3)}
+        return {"cooldown_days": meta.get("submission_cooldown_days", 3)}
     except (ValueError, TypeError):
-        return {"rate_limit": 3}
+        return {"cooldown_days": 3}
 
 
 @router.put("/settings/submission-rate-limit")
@@ -564,13 +564,13 @@ def set_submission_rate_limit(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role("admin")),
 ):
-    """Set submission rate limit per student per 24h. Admin only."""
+    """Set submission cooldown in days. Admin only."""
     from app.db.models import Organisation, OrganisationMembership
     import json as _json
 
-    limit = payload.get("rate_limit")
-    if not isinstance(limit, int) or limit < 1 or limit > 100:
-        raise HTTPException(status_code=422, detail="rate_limit must be an integer between 1 and 100")
+    days = payload.get("cooldown_days", payload.get("rate_limit"))
+    if not isinstance(days, int) or days < 1 or days > 365:
+        raise HTTPException(status_code=422, detail="cooldown_days must be an integer between 1 and 365")
 
     membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
     if not membership:
@@ -585,11 +585,11 @@ def set_submission_rate_limit(
     except (ValueError, TypeError):
         meta = {}
 
-    meta["submission_rate_limit"] = limit
+    meta["submission_cooldown_days"] = days
     org.metadata_ = _json.dumps(meta)
     db.commit()
 
-    return {"rate_limit": limit}
+    return {"cooldown_days": days}
 
 
 # ---------------------------------------------------------------------------

@@ -48,6 +48,8 @@ class CohortPermissionSet(BaseModel):
     submissions: str = "read_write"
     reports: str = "read_only"
     cohort_management: str = "none"
+    data_import: str = "none"
+    account_assignment: str = "none"
 
 
 class PermissionsUpdate(BaseModel):

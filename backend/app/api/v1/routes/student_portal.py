@@ -202,35 +202,42 @@ def submit_choices(
     """Submit draft/revision_requested submission for counsellor approval. Rate limited."""
     from app.db.models import Organisation, OrganisationMembership
 
-    # Rate limit: check how many submissions in the last N hours (configurable per org)
+    # Rate limit: once per N days (configurable per org). Only counts actual submissions, not drafts.
     membership = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == user.id).first()
-    max_per_day = 3  # default
+    cooldown_days = 3  # default: can submit once every 3 days
     if membership:
         org = db.query(Organisation).filter(Organisation.id == membership.organisation_id).first()
         if org and org.metadata_:
             import json as _json
             try:
                 meta = _json.loads(org.metadata_) if isinstance(org.metadata_, str) else org.metadata_
-                max_per_day = meta.get("submission_rate_limit", 3) if isinstance(meta, dict) else 3
+                cooldown_days = meta.get("submission_cooldown_days", 3) if isinstance(meta, dict) else 3
             except (ValueError, TypeError):
                 pass
 
     from datetime import timedelta
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
-    recent_count = (
+    # Find the most recent actual submission (not draft saves)
+    last_submission = (
         db.query(StudentChoiceSubmission)
         .filter(
             StudentChoiceSubmission.student_id == user.student_id,
-            StudentChoiceSubmission.submitted_at != None,  # noqa: E711
-            StudentChoiceSubmission.submitted_at >= cutoff,
+            StudentChoiceSubmission.submitted_at.isnot(None),
+            StudentChoiceSubmission.status.in_(["pending", "approved", "rejected"]),
         )
-        .count()
+        .order_by(StudentChoiceSubmission.submitted_at.desc())
+        .first()
     )
-    if recent_count >= max_per_day:
-        raise HTTPException(
-            status_code=429,
-            detail=f"Submission rate limit reached ({max_per_day} per 24 hours). Please try again later.",
-        )
+    if last_submission and last_submission.submitted_at:
+        cooldown_until = last_submission.submitted_at + timedelta(days=cooldown_days)
+        now = datetime.now(timezone.utc)
+        if now < cooldown_until:
+            remaining = cooldown_until - now
+            days_left = remaining.days
+            hours_left = remaining.seconds // 3600
+            raise HTTPException(
+                status_code=429,
+                detail=f"You can submit again in {days_left} day(s) and {hours_left} hour(s). Cooldown: once every {cooldown_days} days.",
+            )
 
     submission = (
         db.query(StudentChoiceSubmission)
