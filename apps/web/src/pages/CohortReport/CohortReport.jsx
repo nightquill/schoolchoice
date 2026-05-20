@@ -8,6 +8,7 @@ import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import client from '@schoolchoice/ui/api/client';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useLocalizedName } from '../../utils/localizedName';
 
 // API helpers
 const getTargetDistribution = (cohortId) =>
@@ -25,7 +26,9 @@ function numericToGrade(n) {
 }
 
 function CohortReport() {
-  const { t } = useTranslation();  const { cohortId } = useParams();
+  const { t } = useTranslation();
+  const ln = useLocalizedName();
+  const { cohortId } = useParams();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -167,7 +170,7 @@ function CohortReport() {
                 {targetDist.distribution.map((d) => (
                   <div key={d.school} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
                     <div style={{ width: '200px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', textAlign: 'right', flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {d.school}
+                      {ln(d, 'school')}
                     </div>
                     <div style={{ flex: 1, background: 'var(--color-background)', borderRadius: 'var(--border-radius-sm)', overflow: 'hidden', height: '24px' }}>
                       <div
@@ -281,7 +284,7 @@ function CohortReport() {
                     {perfData.subjects.map((s) => (
                       <tr key={s.code}>
                         <td style={tdStyle}>{s.code}</td>
-                        <td style={tdStyle}>{s.name}</td>
+                        <td style={tdStyle}>{(() => { const trKey = `subjects.${s.code}`; const tr = t(trKey); return tr !== trKey ? tr : s.name; })()}</td>
                         <td style={tdStyle}>{s.count}</td>
                         <td style={tdStyle}>{numericToGrade(s.mean)} ({s.mean})</td>
                         <td style={tdStyle}>{numericToGrade(s.min)} ({s.min})</td>
