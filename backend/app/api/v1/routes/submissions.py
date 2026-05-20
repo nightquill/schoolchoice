@@ -25,6 +25,7 @@ from app.modules.school_choice.models.models import (
 )
 from app.modules.school_choice.models.submissions import StudentChoiceSubmission
 from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+from app.services.permission_service import check_feature_permission
 
 logger = logging.getLogger(__name__)
 
@@ -271,6 +272,9 @@ def approve_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 
     if sub.status != "pending":
         raise HTTPException(
@@ -384,6 +388,9 @@ def revise_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 
     if sub.status != "pending":
         raise HTTPException(
@@ -414,6 +421,9 @@ def reject_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 
     if sub.status != "pending":
         raise HTTPException(
