@@ -97,7 +97,6 @@ class StudentFullResponse(BaseModel):
     updated_at: datetime
     # v2 identity fields
     full_name: Optional[str] = None
-    name_zh: Optional[str] = None
     preferred_name: Optional[str] = None
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None

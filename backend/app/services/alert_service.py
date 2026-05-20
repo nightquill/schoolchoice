@@ -119,6 +119,7 @@ def generate_alerts(
     for student in students:
         sid = student.id
         sname = student.name or "Unnamed"
+        sname_zh = getattr(student, "name_zh", None)
 
         # Missing grades
         if grade_counts.get(sid, 0) == 0:
@@ -127,6 +128,7 @@ def generate_alerts(
                 "severity": "warning",
                 "student_id": str(sid),
                 "student_name": sname,
+                "student_name_zh": sname_zh,
                 "message": f"{sname} has no subject grades recorded.",
             })
 
@@ -137,6 +139,7 @@ def generate_alerts(
                 "severity": "info",
                 "student_id": str(sid),
                 "student_name": sname,
+                "student_name_zh": sname_zh,
                 "message": f"{sname} has no target schools set.",
             })
 
@@ -147,6 +150,7 @@ def generate_alerts(
                 "severity": "error",
                 "student_id": str(sid),
                 "student_name": sname,
+                "student_name_zh": sname_zh,
                 "message": f"{sname} has at-risk target school(s) below admission threshold.",
             })
 
@@ -191,6 +195,7 @@ def generate_alerts(
                         "severity": "info",
                         "student_id": str(sid),
                         "student_name": sname,
+                "student_name_zh": sname_zh,
                         "message": f"{sname}: choice #{rank} {choice_label} (median {this_median:.0f}) — student may qualify for more competitive programmes (e.g. median {best_achievable_median:.0f}). Consider aiming higher for Band A.",
                     })
                 elif score > 0.90:
@@ -200,6 +205,7 @@ def generate_alerts(
                         "severity": "info",
                         "student_id": str(sid),
                         "student_name": sname,
+                "student_name_zh": sname_zh,
                         "message": f"{sname}: choice #{rank} {choice_label} ({int(score*100)}% match) — very safe choice for Band A. Consider a more competitive option.",
                     })
 
@@ -210,6 +216,7 @@ def generate_alerts(
                     "severity": "warning",
                     "student_id": str(sid),
                     "student_name": sname,
+                "student_name_zh": sname_zh,
                     "message": f"{sname}: {choice_label} ({int(score*100)}% match) — may be too ambitious. Consider a safer alternative.",
                 })
 
@@ -225,6 +232,7 @@ def generate_alerts(
                     "severity": "warning",
                     "student_id": str(sid),
                     "student_name": sname,
+                "student_name_zh": sname_zh,
                     "message": f"{sname}'s grade data has not been updated in over 30 days.",
                 })
 
@@ -243,6 +251,7 @@ def generate_alerts(
                 "severity": "info",
                 "student_id": str(student.id),
                 "student_name": student.name or "Unnamed",
+                "student_name_zh": getattr(student, "name_zh", None),
                 "message": f"{student.name or 'Unnamed'} has no academic plan generated yet.",
             })
 
@@ -262,6 +271,7 @@ def generate_alerts(
             "severity": "warning",
             "student_id": str(student.id),
             "student_name": student.name or "Unnamed",
+            "student_name_zh": getattr(student, "name_zh", None),
             "submission_id": str(sub.id),
             "message": f"{student.name or 'Unnamed'} submitted {choice_count} choice(s) for review.",
         })
