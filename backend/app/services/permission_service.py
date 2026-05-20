@@ -30,6 +30,8 @@ TOOL_FIELDS = (
     "cohort_management",
     "data_import",
     "account_assignment",
+    "student_delete",
+    "student_profile",
 )
 
 _ACCESS_RANK = {"none": 0, "read_only": 1, "read_write": 2}
@@ -37,15 +39,12 @@ _ACCESS_RANK = {"none": 0, "read_only": 1, "read_write": 2}
 ROLE_DEFAULTS: dict[str, dict] = {
     "admin": {"visible": True, **{f: "read_write" for f in TOOL_FIELDS}},
     "counsellor": {
-        "visible": True,
-        "programme_choices": "read_write",
-        "grades": "read_write",
-        "plan_generation": "read_write",
-        "submissions": "read_write",
-        "reports": "read_only",
-        "cohort_management": "none",
-        "data_import": "none",
-        "account_assignment": "none",
+        "visible": False,
+        **{f: "none" for f in (
+            "programme_choices", "grades", "plan_generation", "submissions",
+            "reports", "cohort_management", "data_import", "account_assignment",
+            "student_delete", "student_profile",
+        )},
     },
     "student": {
         "visible": True,
@@ -57,6 +56,8 @@ ROLE_DEFAULTS: dict[str, dict] = {
         "cohort_management": "none",
         "data_import": "none",
         "account_assignment": "none",
+        "student_delete": "none",
+        "student_profile": "read_only",
     },
 }
 
