@@ -10,6 +10,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { getStudent, updateStudent } from '../../api/students';
 import { generateRecommendations } from '../../api/recommendations';
 import { generateActionPlan, getActionPlan } from '../../api/actionPlan';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function StudentDetailPage() {
   const { id } = useParams();
@@ -32,6 +33,7 @@ function StudentDetailPage() {
   const [actionPlanSuccess, setActionPlanSuccess] = useState('');
 
   const anyLoading = genLoading || actionPlanLoading || editLoading;
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -42,9 +44,9 @@ function StudentDetailPage() {
         setStudent(data);
       } catch (err) {
         const status = err.response?.status;
-        if (status === 404) setStudentError('Student not found.');
-        else if (status === 403) setStudentError('You do not have access to this student record.');
-        else setStudentError('Could not load student data. Please try again.');
+        if (status === 404) setStudentError(t('studentDetail.notFound'));
+        else if (status === 403) setStudentError(t('studentDetail.noAccess'));
+        else setStudentError(t('studentDetail.loadFailed'));
       } finally {
         setStudentLoading(false);
       }
@@ -69,7 +71,7 @@ function StudentDetailPage() {
       const updated = await updateStudent(id, formData);
       setStudent(updated);
       setIsEditing(false);
-      setSuccessMessage('Changes saved.');
+      setSuccessMessage(t('studentDetail.changesSaved'));
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch {
       // Error is surfaced via form
@@ -88,11 +90,11 @@ function StudentDetailPage() {
     } catch (err) {
       const status = err.response?.status;
       if (status === 422) {
-        setActionError('The student profile is incomplete. Please ensure all required fields are filled in before generating recommendations.');
+        setActionError(t('studentDetail.profileIncompleteRecs'));
       } else if (status === 404) {
-        setActionError('Student not found.');
+        setActionError(t('studentDetail.recsNotFound'));
       } else {
-        setActionError('Could not generate recommendations. Please try again.');
+        setActionError(t('studentDetail.recsFailed'));
       }
     } finally {
       setGenLoading(false);
@@ -105,14 +107,14 @@ function StudentDetailPage() {
     try {
       const data = await generateActionPlan(id);
       setActionPlan(data);
-      setActionPlanSuccess('Action plan generated.');
+      setActionPlanSuccess(t('studentDetail.actionPlanGenerated'));
       setTimeout(() => setActionPlanSuccess(''), 3000);
     } catch (err) {
       const status = err.response?.status;
       if (status === 422) {
-        setActionError('The student profile is incomplete. Please ensure all fields are filled in before generating an action plan.');
+        setActionError(t('studentDetail.profileIncompleteAction'));
       } else {
-        setActionError('Could not generate action plan. Please try again.');
+        setActionError(t('studentDetail.actionFailed'));
       }
     } finally {
       setActionPlanLoading(false);
@@ -210,7 +212,7 @@ function StudentDetailPage() {
       <div style={pageStyle}>
         <NavBar />
         <div style={contentStyle}>
-          <LoadingSpinner label="Loading…" />
+          <LoadingSpinner label={t('studentDetail.loading')} />
         </div>
       </div>
     );
@@ -222,7 +224,7 @@ function StudentDetailPage() {
         <NavBar />
         <div style={contentStyle}>
           <ErrorMessage message={studentError} />
-          <Link to="/students" style={backLinkStyle}>Back to Students</Link>
+          <Link to="/students" style={backLinkStyle}>{t('studentDetail.backToStudents')}</Link>
         </div>
       </div>
     );
@@ -232,7 +234,7 @@ function StudentDetailPage() {
     <div style={pageStyle}>
       <NavBar />
       <div style={contentStyle}>
-        <Link to="/students" style={backLinkStyle}>{'< Back to Students'}</Link>
+        <Link to="/students" style={backLinkStyle}>{t('studentDetail.backToStudents')}</Link>
         <h1 style={headingStyle}>{student.name}</h1>
 
         {successMessage && <p style={successStyle}>{successMessage}</p>}
@@ -244,48 +246,48 @@ function StudentDetailPage() {
               onSubmit={handleEdit}
               onCancel={() => setIsEditing(false)}
               loading={editLoading}
-              submitLabel="Save Changes"
+              submitLabel={t('studentDetail.saveChanges')}
             />
           </div>
         ) : (
           <>
             <div style={infoCardStyle}>
               <div>
-                <span style={labelStyle}>Name</span>
+                <span style={labelStyle}>{t('studentDetail.name')}</span>
                 <div style={valueStyle}>{student.name}</div>
               </div>
               <div>
-                <span style={labelStyle}>Target Region</span>
+                <span style={labelStyle}>{t('studentDetail.targetRegion')}</span>
                 <div style={valueStyle}>
-                  {student.target_region === 'local' ? 'Local' : 'International'}
+                  {student.target_region === 'local' ? t('studentDetail.local') : t('studentDetail.international')}
                 </div>
               </div>
               <div>
-                <span style={labelStyle}>Grades</span>
+                <span style={labelStyle}>{t('studentDetail.grades')}</span>
                 <div style={valueStyle}>
                   {student.grades && Object.keys(student.grades).length > 0
                     ? Object.entries(student.grades).map(([subject, grade]) => (
                         <div key={subject}>{subject}: {grade}</div>
                       ))
-                    : <span style={{ color: 'var(--color-text-secondary)' }}>No grades recorded</span>
+                    : <span style={{ color: 'var(--color-text-secondary)' }}>{t('studentDetail.noGrades')}</span>
                   }
                 </div>
               </div>
               <div>
-                <span style={labelStyle}>Interests</span>
+                <span style={labelStyle}>{t('studentDetail.interests')}</span>
                 <div style={valueStyle}>
                   {student.interests && student.interests.length > 0
                     ? student.interests.map((interest) => (
                         <span key={interest} style={tagStyle}>{interest}</span>
                       ))
-                    : <span style={{ color: 'var(--color-text-secondary)' }}>No interests recorded</span>
+                    : <span style={{ color: 'var(--color-text-secondary)' }}>{t('studentDetail.noInterests')}</span>
                   }
                 </div>
               </div>
               <div>
-                <span style={labelStyle}>Strengths and Weaknesses</span>
+                <span style={labelStyle}>{t('studentDetail.strengthsWeaknesses')}</span>
                 <div style={{ ...valueStyle, lineHeight: 'var(--line-height-normal)' }}>
-                  {student.strengths_weaknesses || <span style={{ color: 'var(--color-text-secondary)' }}>Not recorded</span>}
+                  {student.strengths_weaknesses || <span style={{ color: 'var(--color-text-secondary)' }}>{t('studentDetail.notRecorded')}</span>}
                 </div>
               </div>
             </div>
@@ -294,20 +296,20 @@ function StudentDetailPage() {
 
             <div style={buttonRowStyle}>
               <Button variant="outline" onClick={() => { setIsEditing(true); setActionError(''); }} disabled={anyLoading}>
-                Edit Student
+                {t('studentDetail.editStudent')}
               </Button>
               <Button onClick={handleGenerateRecommendations} disabled={anyLoading}>
-                {genLoading ? 'Generating...' : 'Generate Recommendations'}
+                {genLoading ? t('studentDetail.generating') : t('studentDetail.generateRecommendations')}
               </Button>
               <Button variant="outline" onClick={handleGenerateActionPlan} disabled={anyLoading}>
-                {actionPlanLoading ? 'Generating...' : 'Generate Action Plan'}
+                {actionPlanLoading ? t('studentDetail.generating') : t('studentDetail.generateActionPlan')}
               </Button>
             </div>
 
             {actionPlan && (
               <div style={actionPlanSectionStyle}>
                 {actionPlanSuccess && <p style={successStyle}>{actionPlanSuccess}</p>}
-                <h2 style={sectionHeadingStyle}>Action Plan</h2>
+                <h2 style={sectionHeadingStyle}>{t('studentDetail.actionPlanTitle')}</h2>
                 <ActionPlanDisplay actionPlan={actionPlan} />
               </div>
             )}

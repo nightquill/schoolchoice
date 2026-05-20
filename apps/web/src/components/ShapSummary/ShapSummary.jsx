@@ -1,7 +1,10 @@
 // ShapSummary — displays top SHAP feature explanations for a match score
 // Enhanced to surface admission probability and subject weight multipliers
 // when richer JUPAS scorer data is present.
+import { useTranslation } from '@schoolchoice/ui/i18n';
+
 function ShapSummary({ shapExplanation, maxFeatures = 3 }) {
+  const { t } = useTranslation();
   if (!shapExplanation) return null;
 
   const features = Array.isArray(shapExplanation.features)
@@ -63,7 +66,7 @@ function ShapSummary({ shapExplanation, maxFeatures = 3 }) {
       const pct = feature.probability != null
         ? `${Math.round(feature.probability * 100)}%`
         : feature.explanation || '';
-      return { isProbability: true, label: `Admission probability: ${pct}` };
+      return { isProbability: true, label: t('shap.admissionProbability', { pct }) };
     }
 
     // Subject detail feature with weight multiplier
@@ -71,7 +74,7 @@ function ShapSummary({ shapExplanation, maxFeatures = 3 }) {
       const code = feature.subject_code.toUpperCase();
       const weightStr = `\u00d7${feature.weight}`;
       const pts = feature.weighted_pts != null
-        ? ` = ${feature.weighted_pts.toFixed(2)}pts`
+        ? ` = ${feature.weighted_pts.toFixed(2)}${t('shap.pts')}`
         : '';
       return { isProbability: false, label: `${code}`, weightBadge: weightStr, pts };
     }

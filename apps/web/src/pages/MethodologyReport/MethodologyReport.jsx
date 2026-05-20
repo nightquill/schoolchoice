@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getMethodology } from '../../api/methodology';
 import { getAccount } from '@schoolchoice/ui/api/account';
 
@@ -12,6 +13,7 @@ function MethodologyReport() {
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     Promise.all([getMethodology(), getAccount()])
@@ -20,7 +22,7 @@ function MethodologyReport() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load methodology report.');
+        setError(err?.response?.data?.detail || t('methodology.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -205,13 +207,13 @@ function MethodologyReport() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
-      <Link to="/dashboard" style={backLinkStyle}>← Back to Dashboard</Link>
+      <Link to="/dashboard" style={backLinkStyle}>{t('methodology.backToDashboard')}</Link>
 
-      {loading && <LoadingSpinner label="Loading methodology report..." />}
+      {loading && <LoadingSpinner label={t('methodology.loading')} />}
       {error && (
         <div style={{ padding: 'var(--space-6) var(--space-8)' }}>
           <ErrorMessage message={error} />
-          <Link to="/dashboard" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>Back to Dashboard</Link>
+          <Link to="/dashboard" style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)' }}>{t('methodology.backToDashboard')}</Link>
         </div>
       )}
 
@@ -226,15 +228,15 @@ function MethodologyReport() {
           <div style={contentStyle}>
             {/* Data Coverage */}
             <section aria-label="Data Coverage">
-              <h2 style={sectionHeadingStyle}>Data Coverage</h2>
+              <h2 style={sectionHeadingStyle}>{t('methodology.dataCoverage')}</h2>
               <div style={statsRowStyle}>
                 <div style={statCardStyle}>
                   <span style={statValueStyle}>{report.data_coverage.total_programmes.toLocaleString()}</span>
-                  <div style={statLabelStyle}>JUPAS Programmes</div>
+                  <div style={statLabelStyle}>{t('methodology.jupasCount')}</div>
                 </div>
                 <div style={statCardStyle}>
                   <span style={statValueStyle}>{report.data_coverage.total_institutions}</span>
-                  <div style={statLabelStyle}>Institutions</div>
+                  <div style={statLabelStyle}>{t('methodology.institutionCount')}</div>
                 </div>
               </div>
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
@@ -244,7 +246,7 @@ function MethodologyReport() {
 
             {/* Methodology Steps */}
             <section aria-label="Methodology Steps">
-              <h2 style={sectionHeadingStyle}>How It Works</h2>
+              <h2 style={sectionHeadingStyle}>{t('methodology.howItWorks')}</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
                 {report.methodology_steps.map((step) => (
                   <div key={step.step} style={stepCardStyle}>
@@ -260,7 +262,7 @@ function MethodologyReport() {
 
             {/* Data Sources */}
             <section aria-label="Data Sources">
-              <h2 style={sectionHeadingStyle}>Data Sources</h2>
+              <h2 style={sectionHeadingStyle}>{t('methodology.dataSources')}</h2>
               <div>
                 {report.data_sources.map((src, i) => (
                   <div key={i} style={{ ...sourceRowStyle, ...(i === report.data_sources.length - 1 ? { borderBottom: 'none' } : {}) }}>
@@ -282,7 +284,7 @@ function MethodologyReport() {
 
             {/* Confidence Levels */}
             <section aria-label="Confidence Levels">
-              <h2 style={sectionHeadingStyle}>Data Confidence Levels</h2>
+              <h2 style={sectionHeadingStyle}>{t('methodology.confidenceLevels')}</h2>
               <div>
                 {Object.entries(report.confidence_levels).map(([key, description], i, arr) => (
                   <div key={key} style={{ ...confidenceRowStyle, ...(i === arr.length - 1 ? { borderBottom: 'none' } : {}) }}>
@@ -295,7 +297,7 @@ function MethodologyReport() {
 
             {/* Limitations */}
             <section aria-label="Limitations">
-              <h2 style={sectionHeadingStyle}>Limitations</h2>
+              <h2 style={sectionHeadingStyle}>{t('methodology.limitations')}</h2>
               <div>
                 {report.limitations.map((limitation, i) => (
                   <div key={i} style={{ ...limitationItemStyle, ...(i === report.limitations.length - 1 ? { borderBottom: 'none' } : {}) }}>

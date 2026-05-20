@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Badge } from '@schoolchoice/ui/primitives/badge';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { exportErrorCSV } from '../../api/entities';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const cardStyle = {
   background: 'var(--color-surface)',
@@ -68,11 +69,7 @@ const footerStyle = {
   flexWrap: 'wrap',
 };
 
-const DUPLICATE_OPTIONS = [
-  { value: 'skip', label: 'Skip' },
-  { value: 'overwrite', label: 'Overwrite existing' },
-  { value: 'new', label: 'Import as new' },
-];
+// DUPLICATE_OPTIONS moved inside component to use t()
 
 export default function ValidationSummary({
   validationResult,
@@ -81,8 +78,15 @@ export default function ValidationSummary({
   onBack,
   isCommitting,
 }) {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [globalDuplicateChoice, setGlobalDuplicateChoice] = useState('skip');
+
+  const DUPLICATE_OPTIONS = [
+    { value: 'skip', label: t('validation.skip') },
+    { value: 'overwrite', label: t('validation.overwrite') },
+    { value: 'new', label: t('validation.importAsNew') },
+  ];
   const [applyToAll, setApplyToAll] = useState(false);
   const [rowDuplicateChoices, setRowDuplicateChoices] = useState({});
 
@@ -113,16 +117,16 @@ export default function ValidationSummary({
       {/* Summary banner */}
       <div role="alert" style={bannerStyle}>
         <Badge variant="default" style={{ background: '#16A34A', color: '#fff' }}>
-          <span style={{ fontSize: '14px', fontWeight: '500' }}>{validCount} valid</span>
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>{t('validation.validCount', { count: validCount })}</span>
         </Badge>
         {errorCount > 0 && (
           <Badge variant="destructive">
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>{errorCount} error{errorCount !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>{t('validation.errorCount', { count: errorCount })}</span>
           </Badge>
         )}
         {warningCount > 0 && (
           <Badge style={{ background: '#D97706', color: '#fff' }}>
-            <span style={{ fontSize: '14px', fontWeight: '500' }}>{warningCount} warning{warningCount !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: '14px', fontWeight: '500' }}>{t('validation.warningCount', { count: warningCount })}</span>
           </Badge>
         )}
       </div>
@@ -130,15 +134,15 @@ export default function ValidationSummary({
       {/* Error rows table */}
       {errorRows.length > 0 && (
         <>
-          <div style={sectionHeadingStyle}>Rows with errors</div>
+          <div style={sectionHeadingStyle}>{t('validation.rowsWithErrors')}</div>
           <div style={{ overflowX: 'auto', maxHeight: '320px', overflowY: 'auto', marginBottom: 'var(--space-3)' }}>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Row #</th>
-                  <th style={thStyle}>Field</th>
-                  <th style={thStyle}>Value</th>
-                  <th style={thStyle}>Reason</th>
+                  <th style={thStyle}>{t('validation.rowNumber')}</th>
+                  <th style={thStyle}>{t('validation.field')}</th>
+                  <th style={thStyle}>{t('validation.value')}</th>
+                  <th style={thStyle}>{t('validation.reason')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +172,7 @@ export default function ValidationSummary({
               textDecoration: 'underline',
             }}
           >
-            {isDownloading ? 'Downloading…' : 'Download error rows as CSV'}
+            {isDownloading ? t('validation.downloading') : t('validation.downloadErrors')}
           </button>
         </>
       )}
@@ -176,7 +180,7 @@ export default function ValidationSummary({
       {/* Duplicate rows section */}
       {duplicateRows.length > 0 && (
         <>
-          <div style={sectionHeadingStyle}>Duplicate rows ({duplicateRows.length})</div>
+          <div style={sectionHeadingStyle}>{t('validation.duplicateRows', { count: duplicateRows.length })}</div>
           <div style={{ marginBottom: 'var(--space-3)' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-sm)', cursor: 'pointer' }}>
               <input
@@ -184,7 +188,7 @@ export default function ValidationSummary({
                 checked={applyToAll}
                 onChange={(e) => setApplyToAll(e.target.checked)}
               />
-              Apply this choice to all duplicates:
+              {t('validation.applyToAll')}
               <select
                 value={globalDuplicateChoice}
                 onChange={(e) => setGlobalDuplicateChoice(e.target.value)}
@@ -241,14 +245,14 @@ export default function ValidationSummary({
       {/* Footer */}
       <div style={footerStyle}>
         <Button variant="outline" onClick={onBack} disabled={isCommitting}>
-          Back
+          {t('validation.back')}
         </Button>
         <Button
           variant="default"
           disabled={validCount === 0 || isCommitting}
           onClick={onConfirm}
         >
-          {isCommitting ? 'Importing…' : `Import ${validCount} Valid Row${validCount !== 1 ? 's' : ''}`}
+          {isCommitting ? t('validation.importing') : t('validation.importValid', { count: validCount })}
         </Button>
       </div>
     </div>
