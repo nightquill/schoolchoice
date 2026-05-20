@@ -1,5 +1,8 @@
+import { useTranslation } from '@schoolchoice/ui/i18n';
+
 function ActionPlanDisplay({ actionPlan }) {
   const { academic_targets, extracurricular_direction, preparation_steps } = actionPlan;
+  const { t } = useTranslation();
 
   const containerStyle = {
     background: 'var(--color-surface)',
@@ -29,17 +32,17 @@ function ActionPlanDisplay({ actionPlan }) {
   };
 
   return (
-    <div style={containerStyle} role="region" aria-label="Action Plan">
+    <div style={containerStyle} role="region" aria-label={t('actionPlan.title')}>
       <div style={sectionStyle}>
-        <span style={labelStyle}>Academic Targets</span>
+        <span style={labelStyle}>{t('actionPlan.academicTargets')}</span>
         <p style={contentStyle}>{academic_targets}</p>
       </div>
       <div style={sectionStyle}>
-        <span style={labelStyle}>Extracurricular Direction</span>
+        <span style={labelStyle}>{t('actionPlan.extracurricularDirection')}</span>
         <p style={contentStyle}>{extracurricular_direction}</p>
       </div>
       <div style={{ ...sectionStyle, marginBottom: 0 }}>
-        <span style={labelStyle}>Preparation Steps</span>
+        <span style={labelStyle}>{t('actionPlan.preparationSteps')}</span>
         <p style={contentStyle}>{preparation_steps}</p>
       </div>
     </div>

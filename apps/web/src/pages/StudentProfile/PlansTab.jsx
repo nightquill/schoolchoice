@@ -50,7 +50,7 @@ export default function PlansTab({ studentId }) {
     marginTop: 'var(--space-4)',
   };
 
-  if (loading) return <LoadingSpinner label="Loading plan history…" />;
+  if (loading) return <LoadingSpinner label={t('plans.loadingHistory')} />;
 
   return (
     <div>
@@ -106,7 +106,7 @@ export default function PlansTab({ studentId }) {
               sandbox=""
             />
           ) : (
-            <EmptyState message="Plan content was not stored for this entry." />
+            <EmptyState message={t('plans.noContentStored')} />
           )}
         </div>
       )}

@@ -1,5 +1,8 @@
+import { useTranslation } from '@schoolchoice/ui/i18n';
+
 function RecommendationCard({ recommendation }) {
   const { rank, school_name, score, explanation, gaps } = recommendation;
+  const { t } = useTranslation();
 
   const cardStyle = {
     background: 'var(--color-surface)',
@@ -74,15 +77,15 @@ function RecommendationCard({ recommendation }) {
     >
       <div style={headerStyle}>
         <h3 style={schoolNameStyle}>{rankPrefix}{school_name}</h3>
-        <span style={scoreStyle}>Score: {scorePercent}</span>
+        <span style={scoreStyle}>{t('recommendation.score', { score: scorePercent })}</span>
       </div>
       <hr style={dividerStyle} />
       <div style={sectionStyle}>
-        <span style={sectionLabelStyle}>Why it matches</span>
+        <span style={sectionLabelStyle}>{t('recommendation.whyMatches')}</span>
         <p style={sectionContentStyle}>{explanationText}</p>
       </div>
       <div style={sectionStyle}>
-        <span style={sectionLabelStyle}>Gaps</span>
+        <span style={sectionLabelStyle}>{t('recommendation.gaps')}</span>
         <p style={sectionContentStyle}>{gapsText}</p>
       </div>
     </article>
