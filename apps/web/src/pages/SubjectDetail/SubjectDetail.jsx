@@ -4,12 +4,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { getHkdseTrends, getHkdsePopulationStats } from '../../api/analytics';
 import { getCohorts } from '../../api/cohorts';
 
 const GRADE_ORDER = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
-const CATEGORY_LABELS = { CORE: 'Core', ELECTIVE: 'Elective', OTHER_LANGUAGE: 'Other Language', APPLIED_LEARNING: 'Applied Learning' };
+// CATEGORY_LABELS moved inside component to use t()
 const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
 
 function numericToGrade(n) {
@@ -63,7 +64,7 @@ function deriveChartStats(distribution) {
   return { mean: meanGrade, meanNum: meanNum.toFixed(1), mode: modeEntry.g, totalN };
 }
 
-function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
+function VerticalBarChart({ distribution, title, mean, mode, totalN, statsLabel }) {
   const [hoveredGrade, setHoveredGrade] = useState(null);
   if (!distribution) return null;
 
@@ -150,9 +151,9 @@ function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
         </div>
       </div>
       {/* Summary line */}
-      {stats.totalN > 0 && (
+      {stats.totalN > 0 && statsLabel && (
         <div style={{ marginTop: '12px', fontSize: '12px', color: '#9ca3af' }}>
-          Mean: {stats.mean}{stats.meanNum ? ` (${stats.meanNum})` : ''} | Mode: {stats.mode} | n={stats.totalN}
+          {statsLabel}
         </div>
       )}
     </div>
@@ -193,6 +194,13 @@ function SubjectDetail() {
   const [cohortFilter, setCohortFilter] = useState('');
   const [sittingFilter, setSittingFilter] = useState('');
   const [populationData, setPopulationData] = useState(null);
+  const { t } = useTranslation();
+  const CATEGORY_LABELS = {
+    CORE: t('subjectDetail.categoryCore'),
+    ELECTIVE: t('subjectDetail.categoryElective'),
+    OTHER_LANGUAGE: t('subjectDetail.categoryOtherLanguage'),
+    APPLIED_LEARNING: t('subjectDetail.categoryAppliedLearning'),
+  };
 
   const loadData = (cohort, sitting) => {
     setLoading(true);
@@ -220,7 +228,7 @@ function SubjectDetail() {
           setSubjectCategory(popSubject.category || '');
         }
       })
-      .catch((err) => setError(err?.response?.data?.detail || 'Failed to load subject data.'))
+      .catch((err) => setError(err?.response?.data?.detail || t('subjectDetail.noData')))
       .finally(() => setLoading(false));
   };
 
@@ -253,7 +261,7 @@ function SubjectDetail() {
           onClick={() => navigate('/data-analysis')}
           style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-base)', padding: 0, marginBottom: 'var(--space-3)', display: 'block' }}
         >
-          &larr; Back to Data Analysis
+          {t('subjectDetail.backToAnalysis')}
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
           <div>
@@ -277,32 +285,32 @@ function SubjectDetail() {
         {/* Filters */}
         <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-6)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Cohort:</label>
+            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('subjectDetail.cohortFilter')}</label>
             <select value={cohortFilter} onChange={(e) => setCohortFilter(e.target.value)} style={inputStyle}>
-              <option value="">All Students</option>
+              <option value="">{t('subjectDetail.allStudents')}</option>
               {cohorts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>Sitting:</label>
+            <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('subjectDetail.sittingFilter')}</label>
             <select value={sittingFilter} onChange={(e) => setSittingFilter(e.target.value)} style={inputStyle}>
-              <option value="">All</option>
-              <option value="MOCK">MOCK</option>
-              <option value="TRIAL">TRIAL</option>
-              <option value="OFFICIAL">OFFICIAL</option>
+              <option value="">{t('subjectDetail.all')}</option>
+              <option value="MOCK">{t('common.mock')}</option>
+              <option value="TRIAL">{t('common.trial')}</option>
+              <option value="OFFICIAL">{t('common.official')}</option>
             </select>
           </div>
           <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-            {filteredSittings.length} sitting{filteredSittings.length !== 1 ? 's' : ''}
+            {t('subjectDetail.sittingCount', { count: filteredSittings.length })}
           </span>
         </div>
 
-        {loading && <LoadingSpinner label="Loading subject data…" />}
+        {loading && <LoadingSpinner label={t('common.loading')} />}
         {error && <ErrorMessage message={error} />}
 
         {!loading && !error && filteredSittings.length === 0 && (
           <div style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-            No data available for this subject with the selected filters.
+            {t('subjectDetail.noData')}
           </div>
         )}
 
@@ -312,20 +320,20 @@ function SubjectDetail() {
             <div key={row.sitting} style={{ background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-5)', marginBottom: 'var(--space-5)', boxShadow: 'var(--shadow-sm)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                  {row.sitting} Sitting
+                  {t('subjectDetail.sittingLabel', { sitting: row.sitting })}
                 </h2>
                 <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                  {row.count} student{row.count !== 1 ? 's' : ''}
+                  {t('subjectDetail.studentCount', { count: row.count })}
                 </span>
               </div>
 
               {/* Stats summary pills */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
                 {[
-                  { label: 'Mean', value: `${numericToGrade(row.mean)} (${row.mean.toFixed(2)})` },
-                  { label: 'Variance', value: row.variance.toFixed(2) },
+                  { label: t('subjectDetail.mean'), value: `${numericToGrade(row.mean)} (${row.mean.toFixed(2)})` },
+                  { label: t('subjectDetail.variance'), value: row.variance.toFixed(2) },
                   { label: 'n=', value: String(row.count) },
-                  ...(row.grade_rates?.['5'] != null ? [{ label: 'Grade 5+', value: `${row.grade_rates['5']}%` }] : []),
+                  ...(row.grade_rates?.['5'] != null ? [{ label: t('subjectDetail.gradeFivePlus'), value: `${row.grade_rates['5']}%` }] : []),
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '4px 12px', fontSize: '12px', color: '#6b7280', display: 'flex', gap: '4px', alignItems: 'center' }}>
                     <span>{label}</span>
@@ -338,15 +346,16 @@ function SubjectDetail() {
               {row.grade_distribution && (
                 <VerticalBarChart
                   distribution={row.grade_distribution}
-                  title="Grade Distribution"
+                  title={t('subjectDetail.gradeDistribution')}
                   mean={chartStats?.mean}
                   mode={chartStats?.mode}
                   totalN={chartStats?.totalN}
+                  statsLabel={chartStats?.totalN > 0 ? t('subjectDetail.meanModeN', { mean: chartStats.mean, meanNum: chartStats.meanNum || '', mode: chartStats.mode, totalN: chartStats.totalN }) : null}
                 />
               )}
 
               <div style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-medium)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Grade Rates (% achieving grade or above)
+                {t('subjectDetail.gradeRates')}
               </div>
               <GradeRates rates={row.grade_rates} />
             </div>
@@ -356,7 +365,7 @@ function SubjectDetail() {
         {!loading && !error && populationData && (
           <div style={{ marginTop: 'var(--space-6)' }}>
             <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>
-              HK Population Data (HKDSE)
+              {t('subjectDetail.populationData')}
             </h2>
             {(populationData.sittings ?? []).map((sitting) => {
               const popChartStats = sitting.grade_distribution ? deriveChartStats(sitting.grade_distribution) : null;
@@ -367,15 +376,15 @@ function SubjectDetail() {
                       {sitting.year} {sitting.sitting_type}
                     </h3>
                     <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                      {sitting.total_candidates != null ? `${sitting.total_candidates.toLocaleString()} candidates` : ''}
+                      {sitting.total_candidates != null ? t('subjectDetail.candidates', { count: sitting.total_candidates.toLocaleString() }) : ''}
                     </span>
                   </div>
 
                   {/* Stats summary pills */}
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: 'var(--space-4)' }}>
                     {[
-                      ...(sitting.mean_numeric != null ? [{ label: 'Mean', value: `${numericToGrade(sitting.mean_numeric)} (${sitting.mean_numeric.toFixed(2)})` }] : []),
-                      ...(sitting.variance != null ? [{ label: 'Variance', value: sitting.variance.toFixed(2) }] : []),
+                      ...(sitting.mean_numeric != null ? [{ label: t('subjectDetail.mean'), value: `${numericToGrade(sitting.mean_numeric)} (${sitting.mean_numeric.toFixed(2)})` }] : []),
+                      ...(sitting.variance != null ? [{ label: t('subjectDetail.variance'), value: sitting.variance.toFixed(2) }] : []),
                       ...(sitting.total_candidates != null ? [{ label: 'n=', value: sitting.total_candidates.toLocaleString() }] : []),
                     ].map(({ label, value }) => (
                       <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '4px 12px', fontSize: '12px', color: '#6b7280', display: 'flex', gap: '4px', alignItems: 'center' }}>
@@ -388,10 +397,11 @@ function SubjectDetail() {
                   {sitting.grade_distribution && (
                     <VerticalBarChart
                       distribution={sitting.grade_distribution}
-                      title="Grade Distribution (%)"
+                      title={t('subjectDetail.gradeDistributionPct')}
                       mean={popChartStats?.mean}
                       mode={popChartStats?.mode}
                       totalN={popChartStats?.totalN}
+                      statsLabel={popChartStats?.totalN > 0 ? t('subjectDetail.meanModeN', { mean: popChartStats.mean, meanNum: popChartStats.meanNum || '', mode: popChartStats.mode, totalN: popChartStats.totalN }) : null}
                     />
                   )}
                 </div>
