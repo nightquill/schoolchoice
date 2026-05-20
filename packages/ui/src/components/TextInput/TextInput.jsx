@@ -1,4 +1,4 @@
-function TextInput({ label, name, value, onChange, type = 'text', error, required = false }) {
+function TextInput({ label, name, value, onChange, type = 'text', error, required = false, placeholder }) {
   const inputId = `input-${name}`;
   const errorId = `error-${name}`;
 
@@ -45,6 +45,7 @@ function TextInput({ label, name, value, onChange, type = 'text', error, require
         aria-required={required}
         aria-invalid={!!error}
         aria-describedby={error ? errorId : undefined}
+        placeholder={placeholder}
         style={inputStyle}
       />
       {error && (
