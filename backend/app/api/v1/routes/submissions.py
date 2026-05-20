@@ -134,6 +134,7 @@ def list_submissions(
             "id": str(sub.id),
             "student_id": str(sub.student_id),
             "student_name": student.name,
+            "student_name_zh": getattr(student, "name_zh", None),
             "class_name": student.class_name,
             "status": sub.status,
             "choice_count": len(choices),
@@ -252,6 +253,7 @@ def get_submission_detail(
         "id": str(sub.id),
         "student_id": str(sub.student_id),
         "student_name": student.name,
+        "student_name_zh": getattr(student, "name_zh", None),
         "class_name": student.class_name,
         "status": sub.status,
         "choices": choices_out,
@@ -272,7 +274,7 @@ def approve_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
-    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="programme_choices")
     if perm != "read_write":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 
@@ -388,7 +390,7 @@ def revise_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
-    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="programme_choices")
     if perm != "read_write":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 
@@ -421,7 +423,7 @@ def reject_submission(
     db: Session = Depends(get_db),
 ):
     sub = _get_submission_or_404(db, submission_id, user)
-    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="submissions")
+    perm = check_feature_permission(user, db, student_id=sub.student_id, feature="programme_choices")
     if perm != "read_write":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Submissions write permission required.")
 

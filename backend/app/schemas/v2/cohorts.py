@@ -49,6 +49,7 @@ class CohortMemberResponse(BaseModel):
 
     id: UUID
     full_name: str
+    name_zh: Optional[str] = None
     class_name: Optional[str] = None
     year_of_study: Optional[int] = None
 
@@ -119,6 +120,7 @@ class StudentSearchResult(BaseModel):
 
     id: UUID
     full_name: str
+    name_zh: Optional[str] = None
     class_name: Optional[str] = None
     year_of_study: Optional[int] = None
     candidate_number: Optional[str] = None

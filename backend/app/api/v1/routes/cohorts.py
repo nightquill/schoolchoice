@@ -80,6 +80,7 @@ def _member_to_response(student: Student) -> CohortMemberResponse:
     return CohortMemberResponse(
         id=student.id,
         full_name=student.name or "",
+        name_zh=getattr(student, "name_zh", None),
         class_name=getattr(student, "class_name", None),
         year_of_study=getattr(student, "year_of_study", None),
     )
@@ -236,6 +237,7 @@ def search_students(
             StudentSearchResult(
                 id=s.id,
                 full_name=s.name or "",
+                name_zh=getattr(s, "name_zh", None),
                 class_name=getattr(s, "class_name", None),
                 year_of_study=getattr(s, "year_of_study", None),
                 candidate_number=getattr(s, "candidate_number", None),
