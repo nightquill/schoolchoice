@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { useLocalizedName } from '../../utils/localizedName';
 
 function StatusBadge({ student, t }) {
   if (!student.has_account) {
     return (
       <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', background: '#fef3c7', color: '#92400e' }}>
-        {t('account.noAccount')}
+        {t('accountStatus.noAccount')}
       </span>
     );
   }
@@ -21,7 +22,7 @@ function StatusBadge({ student, t }) {
   const s = styles[status] || styles.active;
   return (
     <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', ...s }}>
-      {t(`account.${status}`)}
+      {t(`accountStatus.${status}`)}
     </span>
   );
 }
@@ -36,7 +37,7 @@ function ThreeDotMenu({ items }) {
         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: 'var(--border-radius-sm)', color: 'var(--color-text-secondary)' }}
         aria-label="Actions"
       >
-        <MoreHorizontal size={16} />
+        <MoreHorizontal size={20} />
       </button>
       {open && (
         <>
@@ -74,6 +75,7 @@ function ThreeDotMenu({ items }) {
 function StudentRow({ student, onInvite, onAssignAccount, onDelete, canDelete, onStatusChange, queryClient, selected, onToggleSelect }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const ln = useLocalizedName();
   const { id, name, class_name, candidate_number } = student;
 
   const handleClick = () => navigate(`/students/${id}/profile`);
@@ -88,14 +90,14 @@ function StudentRow({ student, onInvite, onAssignAccount, onDelete, canDelete, o
 
   if (student.has_account) {
     if (status === 'active') {
-      menuItems.push({ label: t('account.suspend'), onClick: () => onStatusChange?.(student, 'suspended') });
-      menuItems.push({ label: t('account.archive'), onClick: () => onStatusChange?.(student, 'archived') });
+      menuItems.push({ label: t('accountStatus.suspend'), onClick: () => onStatusChange?.(student, 'suspended') });
+      menuItems.push({ label: t('accountStatus.archive'), onClick: () => onStatusChange?.(student, 'archived') });
     } else if (status === 'suspended') {
-      menuItems.push({ label: t('account.reactivate'), onClick: () => onStatusChange?.(student, 'active') });
-      menuItems.push({ label: t('account.archive'), onClick: () => onStatusChange?.(student, 'archived') });
+      menuItems.push({ label: t('accountStatus.reactivate'), onClick: () => onStatusChange?.(student, 'active') });
+      menuItems.push({ label: t('accountStatus.archive'), onClick: () => onStatusChange?.(student, 'archived') });
     } else if (status === 'archived') {
-      menuItems.push({ label: t('account.reactivate'), onClick: () => onStatusChange?.(student, 'active') });
-      menuItems.push({ label: t('account.delete'), onClick: () => onDelete?.(id), danger: true });
+      menuItems.push({ label: t('accountStatus.reactivate'), onClick: () => onStatusChange?.(student, 'active') });
+      menuItems.push({ label: t('accountStatus.delete'), onClick: () => onDelete?.(id), danger: true });
     }
   }
 
@@ -114,7 +116,7 @@ function StudentRow({ student, onInvite, onAssignAccount, onDelete, canDelete, o
         </td>
       )}
       <td style={tdName}>
-        {name}
+        {ln(student, 'name')}
         {student.has_at_risk_targets && (
           <span style={{ display: 'inline-block', background: '#dc2626', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', marginLeft: '8px', verticalAlign: 'middle' }}>AT RISK</span>
         )}
@@ -139,7 +141,25 @@ function StudentRow({ student, onInvite, onAssignAccount, onDelete, canDelete, o
           {!student.has_account && onAssignAccount && (
             <button onClick={(e) => { e.stopPropagation(); onAssignAccount(student); }}
               style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
-              {t('account.assignAccount')}
+              {t('accountStatus.assignAccount')}
+            </button>
+          )}
+          {student.has_account && onInvite && (
+            <button onClick={async (e) => {
+              e.stopPropagation();
+              const email = student.email || window.prompt(t('accountStatus.invite') + ' — email:');
+              if (!email) return;
+              try {
+                const result = await onInvite(student.id, email);
+                toast.success(t('accountStatus.invite') + ' ✓');
+                if (navigator.clipboard && result?.invite_url) navigator.clipboard.writeText(window.location.origin + result.invite_url);
+                queryClient?.invalidateQueries({ queryKey: ['students'] });
+              } catch (err) {
+                toast.error(err?.response?.data?.detail || 'Failed');
+              }
+            }}
+              style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
+              {t('accountStatus.invite')}
             </button>
           )}
         </div>
@@ -149,11 +169,11 @@ function StudentRow({ student, onInvite, onAssignAccount, onDelete, canDelete, o
           {!student.has_account && canDelete && onDelete && (
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(id); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--color-text-secondary)' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px', color: 'var(--color-text-secondary)', borderRadius: 'var(--border-radius-sm)' }}
               aria-label={`Delete ${name}`}
-              title={t('account.delete')}
+              title={t('accountStatus.delete')}
             >
-              <Trash2 size={14} />
+              <Trash2 size={18} />
             </button>
           )}
           <ThreeDotMenu items={menuItems} />
