@@ -23,6 +23,7 @@ from app.schemas.v2.grades import (
     SubjectGradeUpdate,
 )
 from app.services import student_service
+from app.services.permission_service import check_feature_permission
 from app.modules.school_choice.services.hkdse_service import compute_predicted_grade
 
 router = APIRouter(prefix="/students", tags=["grades-v2"])
@@ -157,6 +158,10 @@ def create_grade(
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
 
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="grades")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Grades write permission required.")
+
     # Resolve subject_name → subject_id when subject_id not provided
     if payload.subject_id is None and payload.subject_name:
         # Exact match first
@@ -258,6 +263,10 @@ def update_grade(
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
 
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="grades")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Grades write permission required.")
+
     grade = (
         db.query(StudentSubjectGrade)
         .filter(
@@ -307,6 +316,10 @@ def delete_grade(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
+
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="grades")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Grades write permission required.")
 
     grade = (
         db.query(StudentSubjectGrade)
