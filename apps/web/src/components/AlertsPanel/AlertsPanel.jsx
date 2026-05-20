@@ -13,9 +13,18 @@ const SEVERITY_CONFIG = {
 
 const CATEGORIES_CONFIG = [
   {
+    id: 'pendingReview',
+    labelKey: 'alerts.pendingReview',
+    types: ['pending_review'],
+    color: 'var(--color-primary)',
+    bg: 'rgba(37,99,235,0.06)',
+    border: 'rgba(37,99,235,0.2)',
+    Icon: FileCheck,
+  },
+  {
     id: 'dataQuality',
-    labelKey: 'alerts.missing',
-    types: ['missing_grades', 'missing_targets', 'stale_data'],
+    labelKey: 'alerts.studentDataQuality',
+    types: ['missing_grades', 'missing_targets', 'stale_data', 'missing_plan'],
     color: 'var(--color-warning-text)',
     bg: 'var(--color-warning-bg)',
     border: 'var(--color-warning-border)',
