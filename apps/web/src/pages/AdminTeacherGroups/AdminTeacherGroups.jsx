@@ -195,7 +195,7 @@ function AdminTeacherGroups({ embedded = false }) {
                           {g.name}
                         </div>
                         <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                          {g.member_count ?? 0} member{(g.member_count ?? 0) !== 1 ? 's' : ''}
+                          {t('teacherGroups.members')} ({g.member_count ?? 0})
                         </div>
                       </div>
                       <button
@@ -276,7 +276,7 @@ function AdminTeacherGroups({ embedded = false }) {
                                   background: m.role === 'admin' ? '#dbeafe' : '#f3f4f6',
                                   color: m.role === 'admin' ? '#1d4ed8' : '#6b7280',
                                 }}>
-                                  {m.role || 'teacher'}
+                                  {m.role === 'admin' ? t('adminManage.admin') : t('adminManage.counsellor')}
                                 </span>
                               </td>
                               <td style={tdStyle}>
