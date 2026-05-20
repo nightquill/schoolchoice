@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-function StudentRow({ student, onInvite, queryClient }) {
+function StudentRow({ student, onInvite, onAssignAccount, queryClient, selected, onToggleSelect }) {
   const navigate = useNavigate();
   const { id, name, target_region, created_at } = student;
 
@@ -45,6 +45,20 @@ function StudentRow({ student, onInvite, queryClient }) {
       role="row"
       aria-label={`View student ${name}`}
     >
+      {onToggleSelect && (
+        <td style={{ ...tdBase, width: 40, textAlign: 'center' }}>
+          <input
+            type="checkbox"
+            checked={!!selected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onToggleSelect(id);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Select ${name}`}
+          />
+        </td>
+      )}
       <td style={tdName}>
         {name}
         {student.has_at_risk_targets && (
@@ -63,6 +77,21 @@ function StudentRow({ student, onInvite, queryClient }) {
       </td>
       <td style={tdSecondary}>{regionDisplay}</td>
       <td style={tdSecondary}>{createdDisplay}</td>
+      <td style={tdSecondary}>
+        {student.best5 != null && (
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 8px',
+            borderRadius: '10px',
+            fontSize: 'var(--font-size-xs)',
+            fontWeight: 'var(--font-weight-medium)',
+            background: student.best5 >= 25 ? '#dcfce7' : student.best5 >= 20 ? '#fef9c3' : '#fee2e2',
+            color: student.best5 >= 25 ? '#166534' : student.best5 >= 20 ? '#854d0e' : '#991b1b',
+          }}>
+            {student.best5}
+          </span>
+        )}
+      </td>
       <td style={tdBase}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
           {student.has_account ? (
@@ -72,6 +101,17 @@ function StudentRow({ student, onInvite, queryClient }) {
           ) : (
             <>
               <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', background: '#fef3c7', color: '#92400e' }}>No Account</span>
+              {onAssignAccount && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAssignAccount(student);
+                  }}
+                  style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)' }}
+                >
+                  Assign Account
+                </button>
+              )}
               <button
                 onClick={async (e) => {
                   e.stopPropagation();

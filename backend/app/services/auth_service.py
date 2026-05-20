@@ -32,13 +32,13 @@ def authenticate_user(db: Session, email: str, password: str) -> tuple[User | No
     return user, None
 
 
-def register_user(db: Session, email: str, password: str) -> User:
+def register_user(db: Session, email: str, password: str, role: str = "counsellor") -> User:
     """
-    Create a new counselor account.
+    Create a new user account.
     Raises HTTP 409 if the email is already registered.
     """
     hashed = get_password_hash(password)
-    user = User(email=email, hashed_password=hashed)
+    user = User(email=email, hashed_password=hashed, role=role)
     db.add(user)
     try:
         db.commit()

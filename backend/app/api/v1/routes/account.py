@@ -227,6 +227,7 @@ def delete_account(
 
 class SetupOrgRequest(BaseModel):
     school_name: str
+    email_domain: str | None = None
 
 
 @router.post("/setup-organisation", status_code=status.HTTP_201_CREATED)
@@ -247,6 +248,10 @@ def setup_organisation(
     if existing:
         org = db.query(Organisation).filter(Organisation.id == existing.organisation_id).first()
         if org:
+            # Update email_domain if provided on subsequent calls
+            if payload.email_domain and not org.email_domain:
+                org.email_domain = payload.email_domain
+                db.commit()
             return {"id": str(org.id), "name": org.name, "already_existed": True}
         # Orphaned membership — clean it up
         db.delete(existing)
@@ -255,14 +260,14 @@ def setup_organisation(
     # Create org
     import re
     slug = re.sub(r"[^a-z0-9]+", "-", payload.school_name.lower()).strip("-") or "school"
-    org = Organisation(name=payload.school_name, slug=slug)
+    org = Organisation(name=payload.school_name, slug=slug, email_domain=payload.email_domain)
     db.add(org)
     try:
         db.flush()
     except IntegrityError:
         db.rollback()
         # Slug conflict — append user id fragment
-        org = Organisation(name=payload.school_name, slug=f"{slug}-{str(user.id)[:8]}")
+        org = Organisation(name=payload.school_name, slug=f"{slug}-{str(user.id)[:8]}", email_domain=payload.email_domain)
         db.add(org)
         db.flush()
 

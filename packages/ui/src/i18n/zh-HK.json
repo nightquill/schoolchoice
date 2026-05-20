@@ -43,7 +43,14 @@
     "student": "學生",
     "candidateNumber": "考生編號",
     "candidateRequired": "請輸入考生編號。",
-    "noStudentFound": "找不到此考生編號的學生。"
+    "noStudentFound": "找不到此考生編號的學生。",
+    "registerTitle": "註冊",
+    "registrationToken": "註冊令牌",
+    "confirmPassword": "確認密碼",
+    "tokenRequired": "請輸入註冊令牌。",
+    "passwordMismatch": "密碼不一致。",
+    "registerHere": "持有註冊令牌？在此註冊",
+    "loginHere": "已有帳戶？在此登入"
   },
   "onboarding": {
     "welcome": "歡迎",
@@ -66,7 +73,19 @@
     "readyDesc": "帳戶已準備就緒，前往主頁開始管理學生資料。",
     "goToDashboard": "前往主頁",
     "onboardingComplete": "設定完成！歡迎使用。",
-    "orgCreateFailed": "建立機構失敗。"
+    "orgCreateFailed": "建立機構失敗。",
+    "emailDomain": "電郵域名",
+    "emailDomainPlaceholder": "例如 stpauls.edu.hk",
+    "emailDomainDesc": "用於自動產生學生登入帳戶",
+    "createTeachers": "新增教師",
+    "createTeachersDesc": "新增教師以協助管理學生。他們可使用電郵和臨時密碼登入。你可以略過此步驟，稍後再新增。",
+    "teacherName": "教師姓名",
+    "teacherEmail": "教師電郵",
+    "addTeacher": "新增教師",
+    "teacherAdded": "已新增教師",
+    "teacherAddFailed": "新增教師失敗",
+    "skipTeachers": "略過",
+    "removeTeacher": "移除"
   },
   "dashboard": {
     "totalStudents": "學生總數",
@@ -1158,7 +1177,14 @@
     "invite": "邀請",
     "local": "本地",
     "international": "海外",
-    "inviteFailed": "邀請失敗"
+    "inviteFailed": "邀請失敗",
+    "assignAccount": "建立帳戶",
+    "assignAccountTitle": "建立登入帳戶",
+    "customUsername": "自訂用戶名（選填）",
+    "leaveBlankAuto": "留空以自動產生",
+    "accountCreated": "帳戶建立成功",
+    "generatedUsername": "用戶名",
+    "generatedPassword": "密碼"
   },
   "teacherGroups": {
     "title": "教師群組",
@@ -1492,6 +1518,24 @@
   },
   "emptyState": {
     "planNotReady": "你的輔導老師會在計劃準備好後發佈。你可以先查看你的選科志願。"
+  },
+  "filters": {
+    "searchByName": "搜尋姓名",
+    "class": "班別",
+    "year": "年級",
+    "subject": "修讀科目",
+    "best5Range": "Best-5 成績範圍",
+    "min": "最低",
+    "max": "最高",
+    "all": "全部",
+    "quickPresets": "快速篩選",
+    "unaccounted": "未對帳",
+    "results": "結果",
+    "students": "學生",
+    "selectAll": "全選",
+    "addToCohort": "加入群組",
+    "batchAssign": "批量指定",
+    "best5": "Best-5"
   },
   "planEditor": {
     "editing": "編輯：{section}",

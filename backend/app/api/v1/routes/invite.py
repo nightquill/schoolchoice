@@ -44,6 +44,14 @@ class SingleInviteRequest(BaseModel):
     email: str | None = None
 
 
+class AssignAccountRequest(BaseModel):
+    username: str | None = None
+
+
+class BulkAssignRequest(BaseModel):
+    student_ids: list[str]
+
+
 class AcceptInviteRequest(BaseModel):
     password: str
 
@@ -235,6 +243,44 @@ def reinvite_student(
         "invite_url": invite_url,
         "expires_at": datetime.fromtimestamp(token_payload["exp"], tz=timezone.utc).isoformat(),
     }
+
+
+@router.post("/admin/students/{student_id}/assign-account")
+def assign_student_account(
+    student_id: str,
+    payload: AssignAccountRequest = AssignAccountRequest(),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a login account for a student with auto-generated credentials."""
+    _check_account_assignment(current_user, db, student_id)
+    from app.services.account_assignment_service import assign_account
+    try:
+        result = assign_account(student_id, db, current_user, payload.username)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return result
+
+
+@router.post("/admin/students/assign-accounts")
+def bulk_assign_accounts(
+    payload: BulkAssignRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Bulk create login accounts for multiple students."""
+    from app.services.account_assignment_service import assign_account
+    results = []
+    errors = []
+    for sid in payload.student_ids:
+        try:
+            _check_account_assignment(current_user, db, sid)
+            result = assign_account(sid, db, current_user)
+            results.append(result)
+        except (ValueError, HTTPException) as e:
+            detail = str(e) if isinstance(e, ValueError) else e.detail
+            errors.append({"student_id": sid, "error": detail})
+    return {"results": results, "errors": errors}
 
 
 # ---------------------------------------------------------------------------

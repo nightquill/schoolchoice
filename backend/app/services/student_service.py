@@ -16,15 +16,41 @@ from app.schemas.student import StudentCreate, StudentUpdate
 from app.services.student_data_builder import build_student_data, build_student_dict_for_plan
 
 
+# HKDSE grade-to-numeric mapping for best-5 computation
+GRADE_TO_NUMERIC = {"5**": 7, "5*": 6, "5": 5, "4": 4, "3": 3, "2": 2, "1": 1, "U": 0}
+
+
+def compute_best5(grades_dict: dict | None) -> int | None:
+    """Compute best-5 score from MOCK grades. Returns None if insufficient data."""
+    if not grades_dict or not isinstance(grades_dict, dict):
+        return None
+    mock = grades_dict.get("MOCK")
+    if not mock or not isinstance(mock, dict):
+        return None
+    numerics = []
+    for grade_str in mock.values():
+        val = GRADE_TO_NUMERIC.get(str(grade_str).strip())
+        if val is not None:
+            numerics.append(val)
+    if len(numerics) < 5:
+        return None
+    numerics.sort(reverse=True)
+    return sum(numerics[:5])
+
+
 def get_students(
     db: Session, user_id: UUID, *, organisation_id: UUID | None = None,
     q: str | None = None, unaccounted: bool = False,
+    class_name: str | None = None, year_of_study: int | None = None,
+    subject_code: str | None = None, best5_min: int | None = None,
+    best5_max: int | None = None,
 ) -> list[Student]:
     """
     Return all student profiles owned by the given counselor.
     When *organisation_id* is set, scope by organisation instead of user.
     When *q* is provided, filter by student name (case-insensitive).
     When *unaccounted* is True, filter to students with no active linked User account.
+    Additional filters: class_name, year_of_study, subject_code, best5_min, best5_max.
     REQ-015, REQ-032
     """
     if organisation_id is not None:
@@ -47,7 +73,38 @@ def get_students(
             UserModel.is_active.is_(True),
         ).subquery()
         query = query.filter(~Student.id.in_(select(linked_ids_subq)))
-    return query.all()
+    if class_name:
+        query = query.filter(Student.class_name == class_name)
+    if year_of_study is not None:
+        query = query.filter(Student.year_of_study == year_of_study)
+
+    results = query.all()
+
+    # Post-filter for JSON-based fields (subject_code, best5 range)
+    if subject_code:
+        def _has_subject(s):
+            grades = s.grades
+            if not grades or not isinstance(grades, dict):
+                return False
+            for exam_type_grades in grades.values():
+                if isinstance(exam_type_grades, dict) and subject_code in exam_type_grades:
+                    return True
+            return False
+        results = [s for s in results if _has_subject(s)]
+
+    if best5_min is not None or best5_max is not None:
+        def _in_best5_range(s):
+            score = compute_best5(s.grades)
+            if score is None:
+                return False
+            if best5_min is not None and score < best5_min:
+                return False
+            if best5_max is not None and score > best5_max:
+                return False
+            return True
+        results = [s for s in results if _in_best5_range(s)]
+
+    return results
 
 
 def get_student(

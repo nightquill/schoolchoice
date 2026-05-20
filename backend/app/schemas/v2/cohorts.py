@@ -59,6 +59,7 @@ class CohortResponse(BaseModel):
     id: UUID
     name: str
     description: Optional[str] = None
+    is_default: bool = False
     academic_year: str | None = None
     member_count: int
     created_at: datetime
@@ -71,6 +72,7 @@ class CohortDetailResponse(BaseModel):
     id: UUID
     name: str
     description: Optional[str] = None
+    is_default: bool = False
     members: list[CohortMemberResponse]
     created_at: datetime
     updated_at: datetime

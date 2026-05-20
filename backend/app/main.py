@@ -349,6 +349,9 @@ app.include_router(invite_router, prefix="/api/v1")
 from app.api.v1.routes.teacher_groups import router as teacher_groups_router
 app.include_router(teacher_groups_router, prefix="/api/v1")
 
+from app.api.v1.routes.admin_users import router as admin_users_router
+app.include_router(admin_users_router, prefix="/api/v1")
+
 # ---------------------------------------------------------------------------
 # Task YAML validation at startup (Pitfall 4 prevention)
 # ---------------------------------------------------------------------------

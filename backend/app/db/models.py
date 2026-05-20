@@ -248,6 +248,11 @@ class Organisation(Base):
         default=_utcnow,
     )
 
+    email_domain = Column(
+        String(255), nullable=True,
+        comment="Email domain for student accounts",
+    )
+
     # Relationships
     memberships = relationship(
         "OrganisationMembership",
@@ -324,6 +329,23 @@ class OrganisationMembership(Base):
             f"<OrganisationMembership id={self.id!s} "
             f"org={self.organisation_id!s} user={self.user_id!s} role={self.role!r} perm={self.permission!r}>"
         )
+
+
+# ---------------------------------------------------------------------------
+# registration_tokens — single-use tokens for admin registration
+# ---------------------------------------------------------------------------
+
+
+class RegistrationToken(Base):
+    """Single-use token for admin registration."""
+    __tablename__ = "registration_tokens"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    token = Column(String(64), unique=True, index=True, nullable=False)
+    organisation_id = Column(UUID(as_uuid=True), ForeignKey("organisations.id"), nullable=False)
+    consumed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    consumed_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now(), default=_utcnow)
 
 
 # ---------------------------------------------------------------------------

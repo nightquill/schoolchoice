@@ -1,5 +1,5 @@
 // REQ-032: Student Profile Management - Student list with search, import/export
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { EmptyState, LoadingSpinner, ErrorMessage } from '@schoolchoice/ui';
 import { Input } from '@schoolchoice/ui/primitives/input';
@@ -8,8 +8,11 @@ import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
+import StudentFilterBar from '../../components/StudentFilterBar/StudentFilterBar';
 import { getStudents, createStudent, deleteStudent } from '../../api/students';
 import { inviteStudent } from '../../api/invite';
+import { assignAccount } from '../../api/accountAssignment';
+import { getCohorts, addCohortMembers } from '../../api/cohorts';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { useTranslation } from '@schoolchoice/ui/i18n';
@@ -24,24 +27,46 @@ function StudentListPage() {
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
-  const [searchText, setSearchText] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [showUnaccounted, setShowUnaccounted] = useState(false);
   const [account, setAccount] = useState(null);
+  const [assignTarget, setAssignTarget] = useState(null);
+  const [assignUsername, setAssignUsername] = useState('');
+  const [assignResult, setAssignResult] = useState(null);
+  const [assignLoading, setAssignLoading] = useState(false);
+
+  // Filter state
+  const [filters, setFilters] = useState({});
+  const [debouncedFilters, setDebouncedFilters] = useState({});
+
+  // Selection state
+  const [selectedIds, setSelectedIds] = useState(new Set());
+
+  // Add-to-cohort modal
+  const [showCohortModal, setShowCohortModal] = useState(false);
+  const [selectedCohortId, setSelectedCohortId] = useState('');
+  const [cohortAddLoading, setCohortAddLoading] = useState(false);
 
   useEffect(() => { getAccount().then(setAccount).catch(() => {}); }, []);
 
+  // Debounce text search (q) by 300ms, pass other filters instantly
   useEffect(() => {
-    const handle = setTimeout(() => setDebouncedSearch(searchText), 300);
+    const { q, ...rest } = filters;
+    const handle = setTimeout(() => {
+      setDebouncedFilters({ ...rest, q });
+    }, q !== debouncedFilters.q ? 300 : 0);
     return () => clearTimeout(handle);
-  }, [searchText]);
+  }, [filters]);
 
   const studentsQuery = useQuery({
-    queryKey: ['students', debouncedSearch, showUnaccounted],
+    queryKey: ['students', debouncedFilters],
     queryFn: () => {
       const params = {};
-      if (debouncedSearch) params.q = debouncedSearch;
-      if (showUnaccounted) params.unaccounted = true;
+      if (debouncedFilters.q) params.q = debouncedFilters.q;
+      if (debouncedFilters.unaccounted) params.unaccounted = true;
+      if (debouncedFilters.class_name) params.class_name = debouncedFilters.class_name;
+      if (debouncedFilters.year_of_study != null) params.year_of_study = debouncedFilters.year_of_study;
+      if (debouncedFilters.subject_code) params.subject_code = debouncedFilters.subject_code;
+      if (debouncedFilters.best5_min != null) params.best5_min = debouncedFilters.best5_min;
+      if (debouncedFilters.best5_max != null) params.best5_max = debouncedFilters.best5_max;
       return getStudents(params);
     },
   });
@@ -49,6 +74,27 @@ function StudentListPage() {
   const students = Array.isArray(studentsQuery.data)
     ? studentsQuery.data
     : (studentsQuery.data?.items ?? []);
+
+  // Derive class and year options from current student list
+  const classOptions = useMemo(() => {
+    const classes = new Set();
+    students.forEach((s) => { if (s.class_name) classes.add(s.class_name); });
+    return [...classes].sort();
+  }, [students]);
+
+  const yearOptions = useMemo(() => {
+    const years = new Set();
+    students.forEach((s) => { if (s.year_of_study) years.add(s.year_of_study); });
+    return [...years].sort((a, b) => a - b);
+  }, [students]);
+
+  // Cohorts for batch action
+  const cohortsQuery = useQuery({
+    queryKey: ['cohorts'],
+    queryFn: getCohorts,
+    enabled: showCohortModal,
+  });
+  const cohorts = cohortsQuery.data?.cohorts ?? [];
 
   const handleCreateStudent = async (formData) => {
     setFormLoading(true);
@@ -64,6 +110,61 @@ function StudentListPage() {
       setFormLoading(false);
     }
   };
+
+  const handleAssignAccount = async () => {
+    setAssignLoading(true);
+    try {
+      const result = await assignAccount(assignTarget.id, assignUsername || null);
+      setAssignResult(result);
+      queryClient.invalidateQueries({ queryKey: ['students'] });
+      toast.success(t('studentList.accountCreated'));
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'Failed to assign account');
+    } finally {
+      setAssignLoading(false);
+    }
+  };
+
+  const closeAssignModal = () => {
+    setAssignTarget(null);
+    setAssignUsername('');
+    setAssignResult(null);
+  };
+
+  const toggleSelect = useCallback((id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const selectAll = () => {
+    if (selectedIds.size === students.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(students.map((s) => s.id)));
+    }
+  };
+
+  const handleAddToCohort = async () => {
+    if (!selectedCohortId || selectedIds.size === 0) return;
+    setCohortAddLoading(true);
+    try {
+      await addCohortMembers(selectedCohortId, [...selectedIds]);
+      toast.success(`${selectedIds.size} student(s) added to cohort`);
+      setShowCohortModal(false);
+      setSelectedIds(new Set());
+      setSelectedCohortId('');
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'Failed to add to cohort');
+    } finally {
+      setCohortAddLoading(false);
+    }
+  };
+
+  const hasActiveFilters = Object.values(filters).some((v) => v !== undefined && v !== '' && v !== false);
 
   const pageStyle = {
     minHeight: '100vh',
@@ -87,20 +188,6 @@ function StudentListPage() {
     margin: 0,
   };
 
-  const searchBarStyle = {
-    display: 'flex',
-    gap: 'var(--space-3)',
-    alignItems: 'center',
-    marginBottom: 'var(--space-4)',
-    flexWrap: 'wrap',
-  };
-
-  const searchWrapStyle = {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-  };
-
   const tableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
@@ -120,6 +207,8 @@ function StudentListPage() {
     borderBottom: 'var(--border-width) solid var(--color-border)',
   };
 
+  const colSpan = 7; // checkbox + name + region + created + best5 + account + arrow
+
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
@@ -131,55 +220,53 @@ function StudentListPage() {
           )}
         </div>
 
-        <div style={searchBarStyle}>
-          <div style={searchWrapStyle}>
-            <span style={{ position: 'absolute', left: '10px', color: 'var(--color-text-secondary)', pointerEvents: 'none', zIndex: 1 }}>
-              <Search size={16} />
+        <StudentFilterBar
+          filters={filters}
+          onFiltersChange={setFilters}
+          classOptions={classOptions}
+          yearOptions={yearOptions}
+        />
+
+        {/* Batch action bar */}
+        {(selectedIds.size > 0 || hasActiveFilters) && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-3)',
+            marginBottom: 'var(--space-4)',
+            padding: 'var(--space-2) var(--space-3)',
+            background: 'var(--color-background)',
+            borderRadius: 'var(--border-radius-sm)',
+            border: 'var(--border-width) solid var(--color-border)',
+            fontSize: 'var(--font-size-sm)',
+          }}>
+            <span style={{ color: 'var(--color-text-secondary)' }}>
+              {students.length} {t('filters.results')} · {selectedIds.size} selected
             </span>
-            <Input
-              type="text"
-              role="searchbox"
-              aria-label={t('studentList.searchLabel')}
-              placeholder={t('studentList.searchPlaceholder')}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ maxWidth: 320, minHeight: 44, paddingLeft: 34 }}
-            />
-          </div>
-          {searchText && (
             <button
               type="button"
-              onClick={() => setSearchText('')}
+              onClick={selectAll}
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: 'var(--font-size-sm)',
-                color: 'var(--color-primary)',
-                padding: 'var(--space-1) var(--space-2)',
-                fontFamily: 'var(--font-family-base)',
-                textDecoration: 'underline',
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'var(--color-primary)', fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-base)', textDecoration: 'underline',
               }}
             >
-              {t('studentList.clearSearch')}
+              {selectedIds.size === students.length ? 'Deselect All' : t('filters.selectAll')}
             </button>
-          )}
-          <button
-            onClick={() => setShowUnaccounted(!showUnaccounted)}
-            style={{
-              padding: '6px 12px',
-              borderRadius: 'var(--border-radius-sm)',
-              border: 'var(--border-width) solid var(--color-border)',
-              background: showUnaccounted ? 'var(--color-primary)' : 'var(--color-surface)',
-              color: showUnaccounted ? 'white' : 'var(--color-text-secondary)',
-              fontSize: 'var(--font-size-sm)',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {showUnaccounted ? t('studentList.showingUnaccounted') : t('studentList.unaccounted')}
-          </button>
-        </div>
+            {selectedIds.size > 0 && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCohortModal(true)}
+                  style={{ fontSize: 'var(--font-size-sm)', padding: '4px 12px' }}
+                >
+                  {t('filters.addToCohort')}
+                </Button>
+              </>
+            )}
+          </div>
+        )}
 
         {showForm && (
           <div style={{ marginBottom: 'var(--space-6)' }}>
@@ -197,9 +284,18 @@ function StudentListPage() {
           <table style={tableStyle}>
             <thead>
               <tr>
+                <th scope="col" style={{ ...thStyle, width: 40, textAlign: 'center' }}>
+                  <input
+                    type="checkbox"
+                    checked={students.length > 0 && selectedIds.size === students.length}
+                    onChange={selectAll}
+                    aria-label={t('filters.selectAll')}
+                  />
+                </th>
                 <th scope="col" style={thStyle}>{t('common.name')}</th>
                 <th scope="col" style={thStyle}>{t('studentList.targetRegion')}</th>
                 <th scope="col" style={thStyle}>{t('studentList.created')}</th>
+                <th scope="col" style={thStyle}>{t('filters.best5')}</th>
                 <th scope="col" style={thStyle}>{t('studentList.account')}</th>
                 <th scope="col" style={thStyle}></th>
               </tr>
@@ -207,22 +303,22 @@ function StudentListPage() {
             <tbody>
               {studentsQuery.isLoading ? (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={colSpan}>
                     <LoadingSpinner label={t('studentList.loading')} />
                   </td>
                 </tr>
               ) : studentsQuery.isError ? (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={colSpan}>
                     <ErrorMessage message={t('studentList.loadFailed')} />
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={5}>
+                  <td colSpan={colSpan}>
                     <EmptyState
                       message={
-                        debouncedSearch
+                        hasActiveFilters
                           ? t('studentList.noSearchResults')
                           : t('studentList.emptyState')
                       }
@@ -234,7 +330,10 @@ function StudentListPage() {
                   <StudentRow
                     key={student.id}
                     student={student}
+                    selected={selectedIds.has(student.id)}
+                    onToggleSelect={toggleSelect}
                     onInvite={canInvite ? inviteStudent : undefined}
+                    onAssignAccount={canInvite ? setAssignTarget : undefined}
                     onDelete={async (sid) => {
                       try {
                         await deleteStudent(sid);
@@ -253,6 +352,121 @@ function StudentListPage() {
           </table>
         </div>
       </div>
+
+      {/* Assign Account Modal */}
+      {assignTarget && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          onClick={closeAssignModal}
+        >
+          <div
+            style={{
+              background: 'var(--color-surface)', borderRadius: 'var(--border-radius-lg)',
+              padding: 'var(--space-6)', minWidth: 360, maxWidth: 480,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ margin: '0 0 var(--space-4)', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
+              {t('studentList.assignAccountTitle')}
+            </h2>
+            <p style={{ margin: '0 0 var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+              {assignTarget.name}
+            </p>
+
+            {!assignResult ? (
+              <>
+                <label style={{ display: 'block', marginBottom: 'var(--space-1)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                  {t('studentList.customUsername')}
+                </label>
+                <Input
+                  type="text"
+                  value={assignUsername}
+                  onChange={(e) => setAssignUsername(e.target.value)}
+                  placeholder={t('studentList.leaveBlankAuto')}
+                  style={{ width: '100%', marginBottom: 'var(--space-4)' }}
+                />
+                <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
+                  <Button variant="outline" onClick={closeAssignModal}>{t('common.cancel')}</Button>
+                  <Button onClick={handleAssignAccount} disabled={assignLoading}>
+                    {assignLoading ? '...' : t('common.confirm')}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ background: 'var(--color-background)', padding: 'var(--space-4)', borderRadius: 'var(--border-radius-md)', marginBottom: 'var(--space-4)' }}>
+                  <div style={{ marginBottom: 'var(--space-2)' }}>
+                    <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('studentList.generatedUsername')}: </span>
+                    <strong style={{ color: 'var(--color-text-primary)' }}>{assignResult.email}</strong>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('studentList.generatedPassword')}: </span>
+                    <strong style={{ color: 'var(--color-text-primary)', fontFamily: 'monospace' }}>{assignResult.password}</strong>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button onClick={closeAssignModal}>{t('common.close')}</Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add to Cohort Modal */}
+      {showCohortModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          onClick={() => setShowCohortModal(false)}
+        >
+          <div
+            style={{
+              background: 'var(--color-surface)', borderRadius: 'var(--border-radius-lg)',
+              padding: 'var(--space-6)', minWidth: 360, maxWidth: 480,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ margin: '0 0 var(--space-4)', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
+              {t('filters.addToCohort')}
+            </h2>
+            <p style={{ margin: '0 0 var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+              {selectedIds.size} {t('filters.students')} selected
+            </p>
+            <select
+              value={selectedCohortId}
+              onChange={(e) => setSelectedCohortId(e.target.value)}
+              style={{
+                width: '100%', padding: '8px 12px', marginBottom: 'var(--space-4)',
+                borderRadius: 'var(--border-radius-sm)',
+                border: 'var(--border-width) solid var(--color-border)',
+                fontSize: 'var(--font-size-sm)',
+                fontFamily: 'var(--font-family-base)',
+              }}
+            >
+              <option value="">Select cohort...</option>
+              {cohorts.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+            <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
+              <Button variant="outline" onClick={() => setShowCohortModal(false)}>{t('common.cancel')}</Button>
+              <Button onClick={handleAddToCohort} disabled={!selectedCohortId || cohortAddLoading}>
+                {cohortAddLoading ? '...' : t('common.confirm')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

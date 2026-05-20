@@ -9,12 +9,14 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 
+from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException
 from app.db.session import get_db
-from app.db.models import User
+from app.db.models import OrganisationMembership, RegistrationToken, User
 from app.schemas.user import Token, UserCreate, UserResponse
 from app.services import auth_service
 from app.core.security import verify_password, create_access_token
+from app.core.config import settings
 from pydantic import BaseModel
 
 # Limiter instance — attached to the FastAPI app in main.py
@@ -23,13 +25,59 @@ limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+class RegisterWithToken(BaseModel):
+    email: str
+    password: str
+    registration_token: str
+
+
 # REQ-010, REQ-011, REQ-024
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/minute")
-def register(request: Request, payload: UserCreate, db: Session = Depends(get_db)):
-    """Register a new counselor account. REQ-010, REQ-011, REQ-024"""
-    user = auth_service.register_user(db, email=payload.email, password=payload.password)
-    return user
+def register(request: Request, payload: RegisterWithToken, db: Session = Depends(get_db)):
+    """Register a new admin account using a registration token."""
+    # Look up the token
+    reg_token = (
+        db.query(RegistrationToken)
+        .filter(RegistrationToken.token == payload.registration_token)
+        .first()
+    )
+    if not reg_token:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid registration token.")
+    if reg_token.consumed_by is not None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Registration token has already been used.")
+
+    # Create user with admin role
+    user = auth_service.register_user(db, email=payload.email, password=payload.password, role="admin")
+
+    # Link user to the token's organisation
+    membership = OrganisationMembership(
+        user_id=user.id,
+        organisation_id=reg_token.organisation_id,
+        role="owner",
+    )
+    db.add(membership)
+
+    # Mark token as consumed
+    reg_token.consumed_by = user.id
+    reg_token.consumed_at = datetime.now(timezone.utc)
+    db.commit()
+
+    # Return access token so frontend can auto-login
+    token_data = {
+        "sub": str(user.id),
+        "org_id": str(reg_token.organisation_id),
+    }
+    access_token = create_access_token(
+        data=token_data,
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "must_change_password": False,
+    }
 
 
 # REQ-010, REQ-011, REQ-031

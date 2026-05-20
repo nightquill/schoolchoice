@@ -204,6 +204,47 @@ def search_students(
 
 
 # ---------------------------------------------------------------------------
+# GET /cohorts/{cohort_id}/search-students  — search students with already_member flag
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/{cohort_id}/search-students",
+    status_code=status.HTTP_200_OK,
+)
+def search_students_for_cohort(
+    cohort_id: UUID,
+    q: Optional[str] = Query(None),
+    class_name: Optional[str] = Query(None),
+    year_of_study: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Search students to add to a cohort, with already_member flag."""
+    from app.services.student_service import get_students
+    org_id = _org_id(current_user)
+    all_students = get_students(
+        db, current_user.id, organisation_id=org_id,
+        q=q, class_name=class_name, year_of_study=year_of_study,
+    )
+
+    cohort = db.query(StudentCohort).filter(StudentCohort.id == cohort_id).first()
+    if not cohort:
+        raise HTTPException(status_code=404, detail="Cohort not found")
+    member_ids = {m.student_id for m in cohort.memberships}
+
+    result = []
+    for s in all_students[:100]:
+        result.append({
+            "id": str(s.id),
+            "name": s.name,
+            "class_name": s.class_name,
+            "year_of_study": s.year_of_study,
+            "already_member": s.id in member_ids,
+        })
+    return result
+
+
+# ---------------------------------------------------------------------------
 # GET /cohorts/{cohort_id}  — get cohort detail with members
 # ---------------------------------------------------------------------------
 

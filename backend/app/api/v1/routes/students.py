@@ -97,16 +97,24 @@ def list_students(
     limit: int = Query(50, ge=1, le=500),
     q: str | None = Query(None, description="Text search across student name"),
     unaccounted: bool = Query(False, description="Filter to students with no active user account"),
+    class_name: str | None = Query(None, description="Filter by class name"),
+    year_of_study: int | None = Query(None, description="Filter by year of study"),
+    subject_code: str | None = Query(None, description="Filter to students with this subject in grades"),
+    best5_min: int | None = Query(None, description="Minimum best-5 MOCK score"),
+    best5_max: int | None = Query(None, description="Maximum best-5 MOCK score"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
     from sqlalchemy import select
     from app.db.models import User as UserModel
+    from app.services.student_service import compute_best5
 
     all_students = student_service.get_students(
         db, user_id=current_user.id, organisation_id=_org_id(current_user),
-        q=q, unaccounted=unaccounted,
+        q=q, unaccounted=unaccounted, class_name=class_name,
+        year_of_study=year_of_study, subject_code=subject_code,
+        best5_min=best5_min, best5_max=best5_max,
     )
     from app.services.permission_service import get_visible_student_ids
     visible_ids = get_visible_student_ids(current_user, db)
@@ -162,6 +170,7 @@ def list_students(
             else "none"
         )
         item_dict["email"] = getattr(s, "email", None)
+        item_dict["best5"] = compute_best5(s.grades)
         result.append(item_dict)
     return {"items": result, "total": total}
 

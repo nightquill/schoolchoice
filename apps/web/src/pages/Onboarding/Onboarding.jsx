@@ -1,4 +1,4 @@
-// REQ: Onboarding wizard — first-login detection + multi-step flow (Decision #9)
+// REQ: Onboarding wizard — 3-step flow: School Info → Create Teachers → Summary
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
@@ -62,13 +62,19 @@ function Onboarding() {
   const [step, setStep] = useState(1);
 
   const STEPS = [
-    { number: 1, label: t('onboarding.welcome') },
-    { number: 2, label: t('onboarding.schoolInfo') },
-    { number: 3, label: t('onboarding.import') },
-    { number: 4, label: t('onboarding.ready') },
+    { number: 1, label: t('onboarding.schoolInfo') },
+    { number: 2, label: t('onboarding.createTeachers') },
+    { number: 3, label: t('onboarding.ready') },
   ];
   const [schoolName, setSchoolName] = useState('');
+  const [emailDomain, setEmailDomain] = useState('');
   const [setupLoading, setSetupLoading] = useState(false);
+
+  // Teacher creation state
+  const [teacherName, setTeacherName] = useState('');
+  const [teacherEmail, setTeacherEmail] = useState('');
+  const [addingTeacher, setAddingTeacher] = useState(false);
+  const [teachers, setTeachers] = useState([]);
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const account = accountQuery.data ?? null;
@@ -109,10 +115,60 @@ function Onboarding() {
     marginTop: 'var(--space-6)',
   };
 
+  const labelStyle = {
+    display: 'block',
+    fontSize: 'var(--font-size-sm)',
+    fontWeight: 'var(--font-weight-medium)',
+    color: 'var(--color-text-primary)',
+    marginBottom: 'var(--space-1)',
+  };
+
   const handleFinish = () => {
     localStorage.setItem('onboarding_complete', 'true');
     toast.success(t('onboarding.onboardingComplete'));
     navigate('/dashboard');
+  };
+
+  const handleSetupOrg = async () => {
+    if (!schoolName.trim()) return;
+    setSetupLoading(true);
+    try {
+      const { default: client } = await import('@schoolchoice/ui/api/client');
+      await client.post('/api/v1/account/setup-organisation', {
+        school_name: schoolName.trim(),
+        email_domain: emailDomain.trim() || undefined,
+      });
+      setStep(2);
+    } catch {
+      toast.error(t('onboarding.orgCreateFailed'));
+    } finally {
+      setSetupLoading(false);
+    }
+  };
+
+  const handleAddTeacher = async () => {
+    if (!teacherName.trim() || !teacherEmail.trim()) return;
+    setAddingTeacher(true);
+    try {
+      const { default: client } = await import('@schoolchoice/ui/api/client');
+      const res = await client.post('/api/v1/admin/users/create-teacher', {
+        display_name: teacherName.trim(),
+        email: teacherEmail.trim(),
+        password: 'changeme123',
+      });
+      setTeachers((prev) => [...prev, { id: res.data.id, display_name: res.data.display_name, email: res.data.email }]);
+      setTeacherName('');
+      setTeacherEmail('');
+      toast.success(t('onboarding.teacherAdded'));
+    } catch {
+      toast.error(t('onboarding.teacherAddFailed'));
+    } finally {
+      setAddingTeacher(false);
+    }
+  };
+
+  const removeTeacher = (id) => {
+    setTeachers((prev) => prev.filter((t) => t.id !== id));
   };
 
   return (
@@ -122,83 +178,139 @@ function Onboarding() {
         <div style={cardStyle}>
           <StepIndicator currentStep={step} steps={STEPS} />
 
-          {/* Step 1: Welcome */}
+          {/* Step 1: School Info + Email Domain */}
           {step === 1 && (
-            <div>
-              <h1 style={titleStyle}>{t('onboarding.welcomeTitle')}</h1>
-              <p style={descStyle}>
-                {t('onboarding.welcomeDesc')}
-              </p>
-              <div style={buttonRowStyle}>
-                <Button onClick={() => setStep(2)}>{t('onboarding.getStarted')}</Button>
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: School Info */}
-          {step === 2 && (
             <div>
               <h1 style={titleStyle}>{t('onboarding.schoolInformation')}</h1>
               <p style={descStyle}>
                 {t('onboarding.enterSchoolName')}
               </p>
               <div style={{ maxWidth: 400, margin: '0 auto' }}>
-                <label
-                  htmlFor="school-name"
-                  style={{
-                    display: 'block',
-                    fontSize: 'var(--font-size-sm)',
-                    fontWeight: 'var(--font-weight-medium)',
-                    color: 'var(--color-text-primary)',
-                    marginBottom: 'var(--space-1)',
-                  }}
-                >
+                <label htmlFor="school-name" style={labelStyle}>
                   {t('onboarding.schoolName')}
                 </label>
                 <Input
                   id="school-name"
-                  placeholder={t("onboarding.schoolNamePlaceholder")}
+                  placeholder={t('onboarding.schoolNamePlaceholder')}
                   value={schoolName}
                   onChange={(e) => setSchoolName(e.target.value)}
                   autoFocus
                 />
+                <div style={{ marginTop: 'var(--space-4)' }}>
+                  <label htmlFor="email-domain" style={labelStyle}>
+                    {t('onboarding.emailDomain')}
+                  </label>
+                  <Input
+                    id="email-domain"
+                    placeholder={t('onboarding.emailDomainPlaceholder')}
+                    value={emailDomain}
+                    onChange={(e) => setEmailDomain(e.target.value)}
+                  />
+                  <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)' }}>
+                    {t('onboarding.emailDomainDesc')}
+                  </p>
+                </div>
+              </div>
+              <div style={buttonRowStyle}>
+                <Button
+                  onClick={handleSetupOrg}
+                  disabled={!schoolName.trim() || setupLoading}
+                >
+                  {setupLoading ? t('common.loading') : t('onboarding.next')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Create Teachers */}
+          {step === 2 && (
+            <div>
+              <h1 style={titleStyle}>{t('onboarding.createTeachers')}</h1>
+              <p style={descStyle}>
+                {t('onboarding.createTeachersDesc')}
+              </p>
+              <div style={{ maxWidth: 400, margin: '0 auto' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexDirection: 'column' }}>
+                  <div>
+                    <label htmlFor="teacher-name" style={labelStyle}>{t('onboarding.teacherName')}</label>
+                    <Input
+                      id="teacher-name"
+                      value={teacherName}
+                      onChange={(e) => setTeacherName(e.target.value)}
+                      placeholder={t('onboarding.teacherName')}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="teacher-email" style={labelStyle}>{t('onboarding.teacherEmail')}</label>
+                    <Input
+                      id="teacher-email"
+                      type="email"
+                      value={teacherEmail}
+                      onChange={(e) => setTeacherEmail(e.target.value)}
+                      placeholder={t('onboarding.teacherEmail')}
+                    />
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={handleAddTeacher}
+                    disabled={addingTeacher || !teacherName.trim() || !teacherEmail.trim()}
+                    style={{ alignSelf: 'flex-start' }}
+                  >
+                    {addingTeacher ? t('common.loading') : t('onboarding.addTeacher')}
+                  </Button>
+                </div>
+
+                {/* Teacher list */}
+                {teachers.length > 0 && (
+                  <div style={{ marginTop: 'var(--space-4)' }}>
+                    {teachers.map((teacher) => (
+                      <div
+                        key={teacher.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: 'var(--space-2) var(--space-3)',
+                          border: 'var(--border-width) solid var(--color-border)',
+                          borderRadius: 'var(--border-radius-sm)',
+                          marginBottom: 'var(--space-2)',
+                          background: 'var(--color-background)',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>{teacher.display_name}</div>
+                          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{teacher.email}</div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeTeacher(teacher.id)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--color-danger)',
+                            cursor: 'pointer',
+                            fontSize: 'var(--font-size-xs)',
+                          }}
+                        >
+                          {t('onboarding.removeTeacher')}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div style={buttonRowStyle}>
                 <Button variant="outline" onClick={() => setStep(1)}>{t('onboarding.back')}</Button>
-                <Button onClick={async () => {
-                  if (!schoolName.trim()) return;
-                  setSetupLoading(true);
-                  try {
-                    const { default: client } = await import('@schoolchoice/ui/api/client');
-                    await client.post('/api/v1/account/setup-organisation', { school_name: schoolName.trim() });
-                    setStep(3);
-                  } catch {
-                    toast.error(t('onboarding.orgCreateFailed'));
-                  } finally {
-                    setSetupLoading(false);
-                  }
-                }} disabled={!schoolName.trim() || setupLoading}>{setupLoading ? t('common.loading') : t('onboarding.next')}</Button>
+                <Button variant="secondary" onClick={() => setStep(3)}>{t('onboarding.skipTeachers')}</Button>
+                {teachers.length > 0 && (
+                  <Button onClick={() => setStep(3)}>{t('onboarding.next')}</Button>
+                )}
               </div>
             </div>
           )}
 
-          {/* Step 3: Import Students */}
+          {/* Step 3: Summary + Go to Dashboard */}
           {step === 3 && (
-            <div>
-              <h1 style={titleStyle}>{t('onboarding.importStudents')}</h1>
-              <p style={descStyle}>
-                {t('onboarding.importDesc')}
-              </p>
-              <div style={buttonRowStyle}>
-                <Button variant="outline" onClick={() => setStep(2)}>{t('onboarding.back')}</Button>
-                <Button variant="secondary" onClick={() => setStep(4)}>{t('onboarding.skipForNow')}</Button>
-                <Button onClick={() => navigate('/entities/student/import')}>{t('onboarding.importStudents')}</Button>
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Ready */}
-          {step === 4 && (
             <div>
               <h1 style={titleStyle}>{t('onboarding.allSet')}</h1>
               <p style={descStyle}>

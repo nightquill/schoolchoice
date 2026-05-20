@@ -43,7 +43,14 @@
     "student": "Student",
     "candidateNumber": "Candidate Number",
     "candidateRequired": "Candidate number is required.",
-    "noStudentFound": "No student found with this candidate number."
+    "noStudentFound": "No student found with this candidate number.",
+    "registerTitle": "Register",
+    "registrationToken": "Registration Token",
+    "confirmPassword": "Confirm Password",
+    "tokenRequired": "Registration token is required.",
+    "passwordMismatch": "Passwords do not match.",
+    "registerHere": "Have a registration token? Register here",
+    "loginHere": "Already have an account? Log in here"
   },
   "onboarding": {
     "welcome": "Welcome",
@@ -66,7 +73,19 @@
     "readyDesc": "Your account is ready. Head to the dashboard to start working with your students.",
     "goToDashboard": "Go to Dashboard",
     "onboardingComplete": "Onboarding complete! Welcome aboard.",
-    "orgCreateFailed": "Failed to create organisation."
+    "orgCreateFailed": "Failed to create organisation.",
+    "emailDomain": "Email Domain",
+    "emailDomainPlaceholder": "e.g. stpauls.edu.hk",
+    "emailDomainDesc": "Used for auto-generating student login accounts",
+    "createTeachers": "Create Teachers",
+    "createTeachersDesc": "Add teachers who will help manage students. They can log in with the email and a temporary password. You can skip this and add teachers later.",
+    "teacherName": "Teacher Name",
+    "teacherEmail": "Teacher Email",
+    "addTeacher": "Add Teacher",
+    "teacherAdded": "Teacher added",
+    "teacherAddFailed": "Failed to add teacher",
+    "skipTeachers": "Skip",
+    "removeTeacher": "Remove"
   },
   "profile": {
     "backToDashboard": "Back to Dashboard",
@@ -1158,7 +1177,14 @@
     "invite": "Invite",
     "local": "Local",
     "international": "International",
-    "inviteFailed": "Failed to invite"
+    "inviteFailed": "Failed to invite",
+    "assignAccount": "Assign Account",
+    "assignAccountTitle": "Assign Login Account",
+    "customUsername": "Custom Username (optional)",
+    "leaveBlankAuto": "Leave blank to auto-generate",
+    "accountCreated": "Account created successfully",
+    "generatedUsername": "Username",
+    "generatedPassword": "Password"
   },
   "teacherGroups": {
     "title": "Teacher Groups",
@@ -1492,6 +1518,24 @@
   },
   "emptyState": {
     "planNotReady": "Your counsellor will release your plan when it's ready. Review your programme choices in the meantime."
+  },
+  "filters": {
+    "searchByName": "Search by name",
+    "class": "Class",
+    "year": "Year",
+    "subject": "Subject",
+    "best5Range": "Best-5 Score Range",
+    "min": "Min",
+    "max": "Max",
+    "all": "All",
+    "quickPresets": "Quick Presets",
+    "unaccounted": "Unaccounted",
+    "results": "Results",
+    "students": "students",
+    "selectAll": "Select All",
+    "addToCohort": "Add to Cohort",
+    "batchAssign": "Batch Assign",
+    "best5": "Best-5"
   },
   "planEditor": {
     "editing": "Editing: {section}",

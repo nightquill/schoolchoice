@@ -22,7 +22,7 @@ import { useFeatureAccess, useHasAnyAccess } from '../../hooks/usePermission';
 import { Users } from 'lucide-react';
 
 function Dashboard() {
-  const { t } = useTranslation();
+  const { t, setLocale } = useTranslation();
   const { canEdit: canImport } = useFeatureAccess('data_import');
   const { hasAccess, isLoading: accessLoading } = useHasAnyAccess();
   const navigate = useNavigate();
@@ -61,6 +61,18 @@ function Dashboard() {
     }
   }, [navigate, studentsLoaded, studentCount]);
   const account = accountQuery.data ?? null;
+
+  // Sync locale from user's preferred_language on first load
+  useEffect(() => {
+    if (account?.preferred_language) {
+      const loc = account.preferred_language === 'zh-HK' ? 'zh-HK' : 'en';
+      if (localStorage.getItem('locale') !== loc) {
+        localStorage.setItem('locale', loc);
+        setLocale(loc);
+      }
+    }
+  }, [account?.preferred_language, setLocale]);
+
   const loading = studentsQuery.isLoading || accountQuery.isLoading;
   const error = studentsQuery.error || accountQuery.error;
 
