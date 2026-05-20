@@ -474,6 +474,9 @@ def plan_chat(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="plan_generation")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Plan generation permission required.")
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -499,6 +502,9 @@ def set_plan_template(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="plan_generation")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Plan generation permission required.")
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -543,6 +549,9 @@ def edit_plan_section(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="plan_generation")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Plan generation permission required.")
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
@@ -589,6 +598,9 @@ def reset_plan_section(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
     )
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="plan_generation")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Plan generation permission required.")
     plan = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="No plan found for this student")
