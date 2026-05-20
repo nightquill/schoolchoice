@@ -20,6 +20,7 @@ from app.core.security import get_password_hash
 from app.db.models import CohortPermission, OrganisationMembership, User
 from app.db.session import get_db
 from app.modules.school_choice.models.models import StudentCohort
+from pydantic import BaseModel
 from app.schemas.v2.admin_users import (
     UserAdminResponse,
     UserCreateAdmin,
@@ -250,6 +251,53 @@ def delete_user(
     user.is_active = False
     user.deleted_at = datetime.now(timezone.utc)
     db.commit()
+
+
+class UserStatusUpdate(BaseModel):
+    status: str
+
+
+@router.put("/users/{user_id}/status", status_code=status.HTTP_200_OK)
+def update_user_status(
+    user_id: UUID,
+    payload: UserStatusUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role("admin")),
+):
+    """Change a user's account lifecycle status. Admin only."""
+    valid_statuses = {"active", "suspended", "archived", "deleted"}
+    if payload.status not in valid_statuses:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid status. Must be one of: {', '.join(sorted(valid_statuses))}",
+        )
+    if str(user_id) == str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot change your own account status",
+        )
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    current_status = getattr(user, "account_status", "active")
+    if current_status == "deleted":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change status of a deleted account",
+        )
+
+    user.account_status = payload.status
+    user.is_active = (payload.status == "active")
+    if payload.status == "deleted":
+        user.deleted_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(user)
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "account_status": user.account_status,
+    }
 
 
 # ---------------------------------------------------------------------------

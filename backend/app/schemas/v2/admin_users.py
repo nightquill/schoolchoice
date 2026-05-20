@@ -53,6 +53,7 @@ class UserAdminResponse(BaseModel):
     role: str
     is_active: bool
     can_manage_cohorts: bool = False
+    account_status: str = "active"
     created_at: datetime
     updated_at: datetime
 
