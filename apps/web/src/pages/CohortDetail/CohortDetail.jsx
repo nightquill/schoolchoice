@@ -20,6 +20,7 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { useFeatureAccess } from '../../hooks/usePermission';
+import { useLocalizedName } from '../../utils/localizedName';
 
 // ---- Grade-numeric display helpers ----
 const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
@@ -76,7 +77,8 @@ const tdStyle = {
 
 // ---- Main ----
 function CohortDetail() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const ln = useLocalizedName();
   const { canEdit: canEditCohort } = useFeatureAccess('cohort_management');
   const { id } = useParams();
   const navigate = useNavigate();
@@ -314,13 +316,8 @@ function CohortDetail() {
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <Button onClick={() => navigate(`/cohorts/${id}/report`)}>{t('cohortDetail.viewReport')}</Button>
               <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>{t('cohortDetail.bulkEditGrades')}</Button>
-              {!cohort.is_default && (
-                <Button
-                  onClick={() => setAddModalOpen(true)}
-                  disabled={!canEditCohort}
-                  title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
-                  style={{ opacity: !canEditCohort ? 0.5 : undefined, cursor: !canEditCohort ? 'not-allowed' : undefined }}
-                >{t('cohortDetail.addStudents')}</Button>
+              {!cohort.is_default && canEditCohort && (
+                <Button onClick={() => setAddModalOpen(true)}>{t('cohortDetail.addStudents')}</Button>
               )}
             </div>
           </div>
@@ -354,13 +351,13 @@ function CohortDetail() {
                               to={`/students/${member.id}/profile`}
                               style={{ color: 'var(--color-primary)', textDecoration: 'none' }}
                             >
-                              {member.full_name}
+                              {(locale === 'zh-HK' && member.name_zh) ? member.name_zh : member.full_name}
                             </Link>
                           </td>
                           <td style={tdStyle}>{member.class_name || '—'}</td>
                           <td style={tdStyle}>{member.year_of_study ?? '—'}</td>
                           <td style={tdStyle}>
-                            {!cohort.is_default && (
+                            {!cohort.is_default && canEditCohort && (
                               <button
                                 style={{
                                   background: 'none',
@@ -369,13 +366,10 @@ function CohortDetail() {
                                   color: 'var(--color-error)',
                                   fontSize: 'var(--font-size-xs)',
                                   padding: 'var(--space-1) var(--space-2)',
-                                  cursor: !canEditCohort ? 'not-allowed' : 'pointer',
+                                  cursor: 'pointer',
                                   fontFamily: 'var(--font-family-base)',
-                                  opacity: !canEditCohort ? 0.5 : undefined,
                                 }}
-                                onClick={() => canEditCohort && setRemoveTarget(member)}
-                                disabled={!canEditCohort}
-                                title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
+                                onClick={() => setRemoveTarget(member)}
                                 aria-label={`Remove ${member.full_name} from cohort`}
                               >
                                 {t('cohortDetail.remove')}
@@ -409,7 +403,7 @@ function CohortDetail() {
                     <option value="TRIAL">{t('common.trial')}</option>
                     <option value="OFFICIAL">{t('common.official')}</option>
                   </select>
-                  {statsLoading && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Loading…</span>}
+                  {statsLoading && <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('common.loading')}</span>}
                 </div>
               </div>
 
@@ -515,7 +509,7 @@ function CohortDetail() {
                     aria-disabled={alreadyMember}
                   >
                     <span>
-                      {s.full_name}
+                      {(locale === 'zh-HK' && s.name_zh) ? s.name_zh : s.full_name}
                       {s.class_name && <span style={{ color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>{s.class_name}</span>}
                       {s.year_of_study && <span style={{ color: 'var(--color-text-secondary)', marginLeft: 'var(--space-2)' }}>Y{s.year_of_study}</span>}
                     </span>

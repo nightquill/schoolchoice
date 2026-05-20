@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import PermissionGate from '../../components/PermissionGate/PermissionGate';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
@@ -10,11 +11,13 @@ import { getAccount } from '@schoolchoice/ui/api/account';
 import { getSubmissions } from '../../api/submissions';
 import { getSubmissionHistory } from '../../api/analytics';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useLocalizedName } from '../../utils/localizedName';
 
 const GRANULARITIES = ['daily', 'weekly', 'monthly'];
 
 function SubmissionList() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const ln = useLocalizedName();
   const [granularity, setGranularity] = useState('daily');
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const submissionsQuery = useQuery({ queryKey: ['submissions'], queryFn: getSubmissions });
@@ -72,6 +75,7 @@ function SubmissionList() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
+      <PermissionGate feature="programme_choices">
       <main className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         <h1 style={{ ...headingStyle, marginBottom: 'var(--space-4)' }}>
           {t('analytics.submissionHistory')}
@@ -82,7 +86,7 @@ function SubmissionList() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
             {historyQuery.data && (
               <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 0, fontVariantNumeric: 'tabular-nums' }}>
-                {t('analytics.total')}: {historyQuery.data.total_submissions} submitted, {historyQuery.data.total_approved} approved
+                {t('analytics.total')}: {historyQuery.data.total_submissions} {t('submissions.submitted')}, {historyQuery.data.total_approved} {t('submissions.approved')}
               </p>
             )}
             <div style={{ display: 'flex', gap: '2px', background: 'var(--color-background)', borderRadius: 'var(--border-radius-sm)', padding: '2px', border: 'var(--border-width) solid var(--color-border)' }}>
@@ -142,7 +146,7 @@ function SubmissionList() {
               <tbody>
                 {submissions.map((sub) => (
                   <tr key={sub.id}>
-                    <td style={tdStyle}>{sub.student_name || t('submissions.unknownStudent')}</td>
+                    <td style={tdStyle}>{(locale === 'zh-HK' && sub.student_name_zh) ? sub.student_name_zh : (sub.student_name || t('submissions.unknownStudent'))}</td>
                     <td style={tdStyle}>{sub.class_name || '-'}</td>
                     <td style={{ ...tdStyle, fontVariantNumeric: 'tabular-nums' }}>{sub.choice_count ?? sub.choices?.length ?? '-'}</td>
                     <td style={tdStyle}>
@@ -167,6 +171,7 @@ function SubmissionList() {
           </div>
         )}
       </main>
+      </PermissionGate>
     </div>
   );
 }
