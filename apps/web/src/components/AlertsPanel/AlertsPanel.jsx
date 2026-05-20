@@ -108,7 +108,7 @@ function AlertsPanel() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         {CATEGORIES.map((cat) => {
           const alerts = grouped[cat.id] || [];
-          const count = alerts.length;
+          const count = new Set(alerts.map(a => a.student_id)).size;
           const isExpanded = expandedTab === cat.id;
           const CatIcon = cat.Icon;
 
