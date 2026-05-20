@@ -126,6 +126,10 @@ class Student(Base):
         String(255), nullable=True,
         comment="Preferred/display name distinct from full name",
     )
+    name_zh = Column(
+        String(255), nullable=True,
+        comment="Chinese name (e.g. 陳美玲)",
+    )
     date_of_birth = Column(
         Date, nullable=True,
         comment="PII — encrypted at rest (ADR-008)",
