@@ -61,6 +61,18 @@ export default function PersonalTab({ studentId, student, onSaved }) {
             onChange={handleChange}
           />
         </div>
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <label htmlFor="input-name_zh" style={labelStyle}>
+            {t('personal.chineseName')}
+          </label>
+          <Input
+            id="input-name_zh"
+            name="name_zh"
+            value={form.name_zh || ''}
+            onChange={handleChange}
+            placeholder="e.g. 陳美玲"
+          />
+        </div>
         <div>
           <label style={labelStyle}>{t('personal.dateOfBirth')}</label>
           <input
