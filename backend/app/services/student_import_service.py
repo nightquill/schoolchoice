@@ -124,6 +124,57 @@ _KNOWN_INTERNAL: set[str] = (
 )
 
 
+# ---------------------------------------------------------------------------
+# Smart name detection — Chinese ↔ English
+# ---------------------------------------------------------------------------
+
+def _is_chinese(text: str) -> bool:
+    """Return True if text contains CJK Unified Ideographs."""
+    return any("\u4e00" <= ch <= "\u9fff" for ch in text)
+
+
+def _romanize_chinese_name(chinese: str) -> str:
+    """
+    Convert a Chinese name to romanized form using pypinyin.
+    Produces title-cased pinyin without tones, surname first.
+    E.g. "陳美玲" → "Chen Meiling"  (first char = surname, rest = given name)
+    """
+    try:
+        from pypinyin import pinyin, Style
+        parts = pinyin(chinese, style=Style.NORMAL, heteronym=False)
+        syllables = [p[0] for p in parts if p and p[0]]
+        if not syllables:
+            return chinese
+        # HK convention: surname (first char) separate, given name joined
+        surname = syllables[0].capitalize()
+        given = "".join(syllables[1:]).capitalize() if len(syllables) > 1 else ""
+        return f"{surname} {given}".strip()
+    except ImportError:
+        return chinese
+
+
+def _smart_name_split(raw_name: str) -> tuple[str, str | None]:
+    """
+    Given a raw name string, detect whether it's Chinese or English and return
+    (english_name, chinese_name).
+
+    Rules:
+    - If the name contains CJK characters and NO latin letters: treat as Chinese only.
+      Auto-romanize to English.
+    - If mixed or pure Latin: treat as English. Return (name, None).
+    """
+    has_cjk = _is_chinese(raw_name)
+    has_latin = bool(re.search(r"[a-zA-Z]", raw_name))
+
+    if has_cjk and not has_latin:
+        # Pure Chinese name — auto-romanize for the English field
+        english = _romanize_chinese_name(raw_name)
+        return (english, raw_name)
+
+    # Latin or mixed — treat as English
+    return (raw_name, None)
+
+
 _LETTER_TO_HKDSE: dict[str, str] = {
     "a+": "5", "a": "5", "a-": "5",
     "b+": "4", "b": "4", "b-": "3",
@@ -510,8 +561,10 @@ def parse_student_csv(content: bytes) -> dict:
             cleaned[mapped_key] = _strip_control_chars(val.strip())
 
         # --- name (required) ---
-        name = cleaned.get("name", "").strip()
-        if not name:
+        raw_name = cleaned.get("name", "").strip()
+        explicit_name_zh = cleaned.get("name_zh", "").strip()
+
+        if not raw_name and not explicit_name_zh:
             errors.append("name is required")
             rows.append({
                 "row_number": row_idx,
@@ -526,6 +579,24 @@ def parse_student_csv(content: bytes) -> dict:
                 "errors": errors,
             })
             continue
+
+        # Smart name detection: if raw_name is Chinese, split into
+        # (romanized_english, chinese). If name_zh was provided explicitly
+        # in a separate column, that takes priority.
+        if raw_name:
+            english_name, detected_zh = _smart_name_split(raw_name)
+        elif explicit_name_zh:
+            # Only Chinese name column provided, no "name" column
+            english_name, detected_zh = _romanize_chinese_name(explicit_name_zh), explicit_name_zh
+        else:
+            english_name, detected_zh = raw_name, None
+
+        name = english_name
+        # Resolve name_zh: explicit column wins, then auto-detected
+        name_zh = explicit_name_zh or detected_zh
+
+        if detected_zh and not explicit_name_zh:
+            warnings.append(f"Chinese name detected; auto-romanized to '{english_name}'")
 
         # --- candidate_number ---
         raw_cand = cleaned.get("candidate_number", "")
@@ -587,6 +658,10 @@ def parse_student_csv(content: bytes) -> dict:
                         warnings.append(f"Invalid date_of_birth '{val}'; skipped")
                 else:
                     profile[field] = val
+
+        # Inject auto-detected name_zh into profile if not already set
+        if name_zh and "name_zh" not in profile:
+            profile["name_zh"] = name_zh
 
         # --- cohort (optional) ---
         cohort_name = cleaned.get("cohort", "").strip()

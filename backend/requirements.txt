@@ -25,3 +25,5 @@ openpyxl==3.0.9
 jsonschema>=4.23.0
 slowapi>=0.1.9
 chardet>=5.0
+pypinyin>=0.55
+resend>=2.0
