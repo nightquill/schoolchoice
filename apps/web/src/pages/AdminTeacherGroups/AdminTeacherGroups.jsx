@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { Input } from '@schoolchoice/ui/primitives/input';
-import { LoadingSpinner } from '@schoolchoice/ui';
+import { LoadingSpinner, Modal } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import {
@@ -18,12 +18,13 @@ import {
 import { listUsers } from '../../api/admin';
 import GroupPermissions from './GroupPermissions';
 
-function AdminTeacherGroups() {
+function AdminTeacherGroups({ embedded = false }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedGroupId, setSelectedGroupId] = useState(null);
   const [newGroupName, setNewGroupName] = useState('');
-  const [addMemberEmail, setAddMemberEmail] = useState('');
+  const [addMemberSearch, setAddMemberSearch] = useState('');
+  const [confirmRemove, setConfirmRemove] = useState(null);
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount, staleTime: 5 * 60 * 1000 });
   const groupsQuery = useQuery({ queryKey: ['teacher-groups'], queryFn: getTeacherGroups });
@@ -76,7 +77,7 @@ function AdminTeacherGroups() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-members', selectedGroupId] });
       queryClient.invalidateQueries({ queryKey: ['teacher-groups'] });
-      setAddMemberEmail('');
+      setAddMemberSearch('');
       toast.success(t('teacherGroups.memberAdded'));
     },
     onError: () => toast.error(t('teacherGroups.failedAddMember')),
@@ -98,20 +99,26 @@ function AdminTeacherGroups() {
     createMutation.mutate({ name });
   };
 
-  const handleAddMember = () => {
-    const email = addMemberEmail.trim().toLowerCase();
-    if (!email) return;
-    const user = teachers.find(u => u.email.toLowerCase() === email);
-    if (!user) {
-      toast.error(t('teacherGroups.teacherNotFound'));
-      return;
-    }
+  const handleAddMember = (user) => {
+    if (!user) return;
     if (members.some(m => m.user_id === user.id || m.id === user.id)) {
       toast.error(t('teacherGroups.alreadyMember'));
       return;
     }
     addMemberMutation.mutate({ groupId: selectedGroupId, userIds: [user.id] });
+    setAddMemberSearch('');
   };
+
+  // Filter teachers for the search dropdown — exclude existing members
+  const memberIds = new Set(members.map(m => m.user_id || m.id));
+  const availableTeachers = teachers.filter(u => !memberIds.has(u.id));
+  const searchActive = addMemberSearch.trim().length > 0;
+  const filteredTeachers = searchActive
+    ? availableTeachers.filter(u => {
+        const q = addMemberSearch.toLowerCase();
+        return (u.display_name || '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q);
+      })
+    : [];
 
   const cardStyle = {
     background: 'var(--color-surface)',
@@ -136,15 +143,7 @@ function AdminTeacherGroups() {
     borderBottom: 'var(--border-width) solid var(--color-border)',
   };
 
-  return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
-      <NavBarV2 account={account} />
-
-      <div style={{ maxWidth: '100%', margin: '0 auto', padding: 'var(--space-6) var(--space-8)' }}>
-        <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-6) 0' }}>
-          {t('teacherGroups.title')}
-        </h1>
-
+  const innerContent = (
         <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
           {/* Left panel: group list */}
           <div style={{ flex: '1 1 280px', minWidth: '260px' }}>
@@ -179,7 +178,7 @@ function AdminTeacherGroups() {
                       onClick={() => setSelectedGroupId(g.id)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => e.key === 'Enter' && setSelectedGroupId(g.id)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedGroupId(g.id); } }}
                       style={{
                         padding: 'var(--space-3) var(--space-4)',
                         cursor: 'pointer',
@@ -257,10 +256,10 @@ function AdminTeacherGroups() {
                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <thead>
                           <tr>
-                            <th style={thStyle}>{t('teacherGroups.name')}</th>
-                            <th style={thStyle}>{t('teacherGroups.email')}</th>
-                            <th style={thStyle}>{t('teacherGroups.role')}</th>
-                            <th style={thStyle}>{t('teacherGroups.actions')}</th>
+                            <th scope="col" style={thStyle}>{t('teacherGroups.name')}</th>
+                            <th scope="col" style={thStyle}>{t('teacherGroups.email')}</th>
+                            <th scope="col" style={thStyle}>{t('teacherGroups.role')}</th>
+                            <th scope="col" style={thStyle}>{t('teacherGroups.actions')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -282,7 +281,7 @@ function AdminTeacherGroups() {
                               </td>
                               <td style={tdStyle}>
                                 <button
-                                  onClick={() => removeMemberMutation.mutate({ groupId: selectedGroupId, userId: m.user_id || m.id })}
+                                  onClick={() => setConfirmRemove(m)}
                                   disabled={removeMemberMutation.isPending}
                                   style={{
                                     background: 'none',
@@ -305,18 +304,51 @@ function AdminTeacherGroups() {
                     </div>
                   )}
 
-                  {/* Add member */}
-                  <div style={{ padding: 'var(--space-3) var(--space-4)', borderTop: 'var(--border-width) solid var(--color-border)', display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                  {/* Add member — type to search, results appear below */}
+                  <div style={{ padding: 'var(--space-3) var(--space-4)', borderTop: 'var(--border-width) solid var(--color-border)' }}>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
+                      {t('teacherGroups.addTeacher')}
+                    </div>
                     <Input
-                      value={addMemberEmail}
-                      onChange={(e) => setAddMemberEmail(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
-                      placeholder={t('teacherGroups.addMemberPlaceholder')}
-                      style={{ flex: 1 }}
+                      value={addMemberSearch}
+                      onChange={(e) => setAddMemberSearch(e.target.value)}
+                      placeholder={t('teacherGroups.searchTeacherPlaceholder')}
+                      style={{ width: '100%' }}
                     />
-                    <Button onClick={handleAddMember} disabled={!addMemberEmail.trim() || addMemberMutation.isPending}>
-                      {addMemberMutation.isPending ? t('teacherGroups.adding') : t('teacherGroups.add')}
-                    </Button>
+                    {searchActive && (
+                      <div style={{
+                        maxHeight: '200px', overflowY: 'auto', marginTop: 'var(--space-2)',
+                        border: 'var(--border-width) solid var(--color-border)',
+                        borderRadius: 'var(--border-radius-sm)',
+                      }}>
+                        {filteredTeachers.length > 0 ? filteredTeachers.map(u => (
+                          <div
+                            key={u.id}
+                            style={{
+                              padding: 'var(--space-2) var(--space-3)',
+                              fontSize: 'var(--font-size-sm)', borderBottom: 'var(--border-width) solid var(--color-border)',
+                              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
+                                {u.display_name || u.email.split('@')[0]}
+                              </div>
+                              <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
+                                {u.email}
+                              </div>
+                            </div>
+                            <Button onClick={() => handleAddMember(u)} disabled={addMemberMutation.isPending}>
+                              {t('teacherGroups.add')}
+                            </Button>
+                          </div>
+                        )) : (
+                          <div style={{ padding: 'var(--space-3)', textAlign: 'center', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                            {t('teacherGroups.noTeachersMatch')}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -331,7 +363,41 @@ function AdminTeacherGroups() {
             )}
           </div>
         </div>
+  );
+
+  const confirmRemoveModal = (
+    <Modal
+      isOpen={!!confirmRemove}
+      title={t('teacherGroups.remove')}
+      onClose={() => setConfirmRemove(null)}
+      onConfirm={() => {
+        if (confirmRemove) {
+          removeMemberMutation.mutate({ groupId: selectedGroupId, userId: confirmRemove.user_id || confirmRemove.id });
+        }
+        setConfirmRemove(null);
+      }}
+      confirmLabel={t('confirmation.confirm')}
+      confirmVariant="danger"
+      cancelLabel={t('confirmation.cancel')}
+    >
+      <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
+        {t('confirmation.removeFromGroup', { name: confirmRemove?.display_name || confirmRemove?.email?.split('@')[0] || '' })}
+      </p>
+    </Modal>
+  );
+
+  if (embedded) return <>{innerContent}{confirmRemoveModal}</>;
+
+  return (
+    <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
+      <NavBarV2 account={account} />
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: 'var(--space-6) var(--space-8)' }}>
+        <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-6) 0' }}>
+          {t('teacherGroups.title')}
+        </h1>
+        {innerContent}
       </div>
+      {confirmRemoveModal}
     </div>
   );
 }

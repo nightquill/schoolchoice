@@ -197,11 +197,11 @@ function StudentListPage() {
           <table style={tableStyle}>
             <thead>
               <tr>
-                <th style={thStyle}>{t('common.name')}</th>
-                <th style={thStyle}>{t('studentList.targetRegion')}</th>
-                <th style={thStyle}>{t('studentList.created')}</th>
-                <th style={thStyle}>{t('studentList.account')}</th>
-                <th style={thStyle}></th>
+                <th scope="col" style={thStyle}>{t('common.name')}</th>
+                <th scope="col" style={thStyle}>{t('studentList.targetRegion')}</th>
+                <th scope="col" style={thStyle}>{t('studentList.created')}</th>
+                <th scope="col" style={thStyle}>{t('studentList.account')}</th>
+                <th scope="col" style={thStyle}></th>
               </tr>
             </thead>
             <tbody>

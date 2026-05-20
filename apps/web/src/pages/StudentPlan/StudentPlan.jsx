@@ -22,7 +22,7 @@ export default function StudentPlan() {
         {planQuery.isLoading && <LoadingSpinner />}
 
         {planQuery.isError && (
-          <EmptyState message={t('studentPlan.notReleased')} />
+          <EmptyState message={t('emptyState.planNotReady')} />
         )}
 
         {planQuery.data && (

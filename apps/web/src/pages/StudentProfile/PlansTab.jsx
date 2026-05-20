@@ -5,6 +5,7 @@ import { useFeatureAccess } from '../../hooks/usePermission';
 import { usePlansTab } from '../../hooks/usePlansTab';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
+import { Modal } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { exportPlanHistoryPDF } from '../../api/plan';
 import { FileDown } from 'lucide-react';
@@ -21,6 +22,7 @@ export default function PlansTab({ studentId }) {
   } = usePlansTab(studentId);
   const { t } = useTranslation();
   const { canEdit: canGenerate } = useFeatureAccess('plan_generation');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [downloadingPdf, setDownloadingPdf] = useState(null);
   const handleDownloadPdf = useCallback(async (e, planId) => {
     e.stopPropagation();
@@ -92,7 +94,7 @@ export default function PlansTab({ studentId }) {
               </Button>
               <Button
                 variant="destructive"
-                onClick={(e) => handleDelete(e, selected.id)}
+                onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(selected.id); }}
                 disabled={deleting === selected.id}
               >
                 {deleting === selected.id ? t('plans.deleting') : t('plans.deletePlan')}
@@ -118,6 +120,20 @@ export default function PlansTab({ studentId }) {
         </div>
       )}
 
+      <Modal
+        isOpen={!!confirmDeleteId}
+        title={t('plans.deletePlan')}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={() => { handleDelete(null, confirmDeleteId); setConfirmDeleteId(null); }}
+        confirmLabel={t('confirmation.confirm')}
+        confirmVariant="danger"
+        cancelLabel={t('confirmation.cancel')}
+      >
+        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
+          {t('confirmation.deletePlan')}
+        </p>
+      </Modal>
+
       {!selected && plans.map((plan) => (
         <div
           key={plan.id}
@@ -126,7 +142,7 @@ export default function PlansTab({ studentId }) {
           role="button"
           tabIndex={0}
           aria-label={`View ${plan.plan_label}`}
-          onKeyDown={(e) => e.key === 'Enter' && setSelected(plan)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(plan); } }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
             <div>
@@ -154,7 +170,7 @@ export default function PlansTab({ studentId }) {
                 {downloadingPdf === plan.id ? '…' : t('plans.downloadPdf')}
               </button>
               <button
-                onClick={(e) => handleDelete(e, plan.id)}
+                onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(plan.id); }}
                 disabled={deleting === plan.id}
                 style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-xs)', fontFamily: 'var(--font-family-base)', padding: 'var(--space-1)' }}
               >

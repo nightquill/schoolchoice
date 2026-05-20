@@ -59,6 +59,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
   const [searchInput, setSearchInput] = useState('');
   const [filterMenuOpen, setFilterMenuOpen] = useState(null); // null | 'uni' | 'faculty'
   const [filterSearch, setFilterSearch] = useState('');
+  const [confirmRemoveTarget, setConfirmRemoveTarget] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [editMajors, setEditMajors] = useState('');
   const [editYear, setEditYear] = useState('');
@@ -418,7 +419,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                           {tgt && (
                             <div style={{ display: 'flex', gap: '2px' }}>
                               <button style={{ ...iconBtnStyle, opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && handleOpenEdit(tgt)} disabled={!canEditChoices} aria-label="Edit" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Edit'}>✎</button>
-                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)', opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && handleRemove(tgt)} disabled={!canEditChoices} aria-label="Remove" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Remove'}>×</button>
+                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)', opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && setConfirmRemoveTarget(tgt)} disabled={!canEditChoices} aria-label="Remove" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Remove'}>×</button>
                             </div>
                           )}
                         </td>
@@ -730,6 +731,27 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
           </div>
         </div>
       )}
+
+      {/* Remove programme confirmation */}
+      <Modal
+        isOpen={!!confirmRemoveTarget}
+        title={t('targets.remove')}
+        onClose={() => setConfirmRemoveTarget(null)}
+        onConfirm={() => {
+          if (confirmRemoveTarget) handleRemove(confirmRemoveTarget);
+          setConfirmRemoveTarget(null);
+        }}
+        confirmLabel={t('confirmation.confirm')}
+        confirmVariant="danger"
+        cancelLabel={t('confirmation.cancel')}
+      >
+        <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
+          {t('confirmation.removeProgramme', {
+            programme: confirmRemoveTarget?.programme_name || confirmRemoveTarget?.school_name || '',
+            band: getBand(confirmRemoveTarget?.match_score) || '—',
+          })}
+        </p>
+      </Modal>
 
       {/* Edit target modal */}
       <Modal

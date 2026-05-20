@@ -153,6 +153,7 @@ function LoginPage() {
               value={candidateNumber}
               onChange={(e) => { setCandidateNumber(e.target.value); clearErrors(); }}
               required
+              placeholder="e.g. HKDSE-2026-A001"
               error={fieldErrors.candidateNumber}
             />
           )}

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Card, CardHeader, CardTitle, CardContent } from '@schoolchoice/ui/primitives/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@schoolchoice/ui/primitives/dialog';
 import { Input } from '@schoolchoice/ui/primitives/input';
@@ -260,7 +261,7 @@ function Dashboard() {
                 a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
                 a.click();
                 URL.revokeObjectURL(url);
-              } catch { /* ignore */ }
+              } catch { toast.error(t('dashboard.exportFailed')); }
             }}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
@@ -280,6 +281,9 @@ function Dashboard() {
         {showAddForm && (
           <form onSubmit={handleCreateStudent} style={{ marginBottom: 'var(--space-6)', display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: '200px' }}>
+              <label htmlFor="new-student-name" style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>
+                {t('dashboard.studentFullName')} <span style={{ color: 'var(--color-error)' }} aria-hidden="true">*</span>
+              </label>
               <input
                 autoFocus
                 type="text"
@@ -342,7 +346,7 @@ function Dashboard() {
                           onClick={() => navigate(`/students/${student.id}/profile`)}
                           role="button"
                           tabIndex={0}
-                          onKeyDown={(e) => e.key === 'Enter' && navigate(`/students/${student.id}/profile`)}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/students/${student.id}/profile`); } }}
                           style={{
                             background: 'var(--color-surface)',
                             border: 'var(--border-width) solid var(--color-border)',
@@ -387,7 +391,7 @@ function Dashboard() {
                       ...(cohort.is_default ? { borderColor: 'var(--color-primary)', borderWidth: '2px' } : {}),
                     }}
                     onClick={() => navigate(`/cohorts/${cohort.id}`)}
-                    onKeyDown={(e) => e.key === 'Enter' && navigate(`/cohorts/${cohort.id}`)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/cohorts/${cohort.id}`); } }}
                     tabIndex={0}
                   >
                     <CardHeader>

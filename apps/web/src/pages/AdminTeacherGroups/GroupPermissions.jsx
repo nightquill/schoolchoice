@@ -110,10 +110,10 @@ export default function GroupPermissions({ groupId }) {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={thStyle}>{t('groupPermissions.cohort')}</th>
-              <th style={{ ...thStyle, textAlign: 'center' }}>{t('groupPermissions.visible')}</th>
+              <th scope="col" style={thStyle}>{t('groupPermissions.cohort')}</th>
+              <th scope="col" style={{ ...thStyle, textAlign: 'center' }}>{t('groupPermissions.visible')}</th>
               {TOOLS.map(t => (
-                <th key={t.key} style={{ ...thStyle, textAlign: 'center' }}>{t.label}</th>
+                <th scope="col" key={t.key} style={{ ...thStyle, textAlign: 'center' }}>{t.label}</th>
               ))}
             </tr>
           </thead>

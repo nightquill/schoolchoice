@@ -338,10 +338,10 @@ function CohortDetail() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={thStyle}>{t('cohortDetail.name')}</th>
-                        <th style={thStyle}>{t('cohortDetail.class')}</th>
-                        <th style={thStyle}>{t('cohortDetail.year')}</th>
-                        <th style={thStyle}>{t('cohortDetail.actions')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.name')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.class')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.year')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -418,13 +418,13 @@ function CohortDetail() {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={thStyle}>{t('cohortDetail.subjectCode')}</th>
-                        <th style={thStyle}>{t('cohortDetail.subjectName')}</th>
-                        <th style={thStyle}>{t('cohortDetail.sitting')}</th>
-                        <th style={thStyle}>{t('cohortDetail.students')}</th>
-                        <th style={thStyle}>{t('cohortDetail.meanGrade')}</th>
-                        <th style={thStyle}>{t('cohortDetail.variance')}</th>
-                        <th style={thStyle}>{t('cohortDetail.distribution')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.subjectCode')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.subjectName')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.sitting')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.students')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.meanGrade')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.variance')}</th>
+                        <th scope="col" style={thStyle}>{t('cohortDetail.distribution')}</th>
                       </tr>
                     </thead>
                     <tbody>

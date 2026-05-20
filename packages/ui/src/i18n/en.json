@@ -767,7 +767,8 @@
     "missingPlan": "missing plan",
     "awaitingReview": "awaiting review",
     "studentDataImport": "Student Data Import",
-    "default": "Default"
+    "default": "Default",
+    "exportFailed": "Export failed. Please try again."
   },
   "targets": {
     "backToProfile": "Back to Profile",
@@ -1469,6 +1470,16 @@
     "accountAssignment": "account assignment",
     "studentDelete": "student delete",
     "studentProfile": "student profile"
+  },
+  "confirmation": {
+    "deletePlan": "Delete this plan? This cannot be undone.",
+    "removeFromGroup": "Remove {name} from this group?",
+    "removeProgramme": "Remove {programme} from Band {band}?",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  },
+  "emptyState": {
+    "planNotReady": "Your counsellor will release your plan when it's ready. Review your programme choices in the meantime."
   },
   "planEditor": {
     "editing": "Editing: {section}",
