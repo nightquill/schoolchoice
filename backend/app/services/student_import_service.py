@@ -61,7 +61,7 @@ VALID_SITTINGS: set[str] = {"MOCK", "TRIAL", "OFFICIAL"}
 
 # Profile fields that can be extracted from CSV columns
 PROFILE_FIELDS: set[str] = {
-    "class_name", "year_of_study", "gender",
+    "name_zh", "class_name", "year_of_study", "gender",
     "date_of_birth", "target_region", "preferred_language",
 }
 
@@ -71,6 +71,7 @@ PROFILE_FIELDS: set[str] = {
 
 _ZH_PROFILE_MAP: dict[str, str] = {
     "姓名": "name", "名稱": "name", "學生姓名": "name",
+    "中文姓名": "name_zh", "Chinese Name": "name_zh", "中文名": "name_zh",
     "學號": "candidate_number", "考生編號": "candidate_number", "准考證號": "candidate_number",
     "班別": "class_name", "班級": "class_name",
     "年級": "year_of_study",
@@ -752,6 +753,7 @@ def commit_import(
                     user_id=user_id,
                     organisation_id=org_id,
                     name=row["name"],
+                    name_zh=profile.get("name_zh"),
                     candidate_number=row["candidate_number"],
                     target_region=profile.get("target_region", "local"),
                     class_name=profile.get("class_name"),
@@ -778,6 +780,9 @@ def commit_import(
                 for field, val in profile.items():
                     if val and hasattr(student, field):
                         setattr(student, field, val)
+
+                if "name_zh" in profile:
+                    student.name_zh = profile["name_zh"]
 
                 updated += 1
             else:
