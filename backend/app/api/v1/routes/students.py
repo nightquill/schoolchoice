@@ -41,12 +41,39 @@ def _org_id(user: User) -> UUID | None:
     return getattr(user, "active_organisation_id", None)
 
 
+def _compute_best5_from_v2(student: Student) -> int | None:
+    """Compute best5 from v2 grade records (subject_grades relationship)."""
+    grade_records = getattr(student, "subject_grades", None) or []
+    if not grade_records:
+        # Fallback to legacy grades dict
+        from app.services.student_service import compute_best5
+        return compute_best5(student.grades)
+    from app.modules.school_choice.services.hkdse_service import (
+        compute_best5_aggregate,
+        grade_to_int,
+    )
+    grade_dicts = []
+    for g in grade_records:
+        subj = g.subject if hasattr(g, "subject") and g.subject else None
+        raw = g.raw_grade or g.predicted_grade or "U"
+        numeric = grade_to_int(raw)
+        grade_dicts.append({
+            "subject_code": getattr(subj, "code", "") if subj else "",
+            "numeric_value": numeric,
+            "is_compulsory": getattr(subj, "is_compulsory", False) if subj else False,
+            "category": getattr(subj, "category", "") if subj else "",
+        })
+    result = compute_best5_aggregate(grade_dicts)
+    return result if result > 0 else None
+
+
 def _build_full_response(student: Student) -> dict:
     """Build a StudentFullResponse-compatible dict from a Student ORM object."""
     ielts = student.ielts_score or {}
     if not isinstance(ielts, dict):
         ielts = {}
     return {
+        "best5": _compute_best5_from_v2(student),
         "id": student.id,
         "user_id": student.user_id,
         "name": student.name,
@@ -406,6 +433,40 @@ def graduate_student(
     db.commit()
     db.refresh(student)
     return _build_full_response(student)
+
+
+@router.get("/{student_id}/delete-preview", status_code=status.HTTP_200_OK)
+def delete_preview(
+    student_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return counts of data that would be deleted with this student."""
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=_org_id(current_user),
+    )
+    from app.modules.school_choice.models.models import StudentSubjectGrade
+
+    grades = db.query(StudentSubjectGrade).filter(StudentSubjectGrade.student_id == student_id).count()
+    targets = db.query(StudentSchoolTarget).filter(StudentSchoolTarget.student_id == student_id).count()
+    plans = db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).count()
+
+    # StudentChoiceSubmission may or may not exist
+    submissions = 0
+    try:
+        from app.modules.school_choice.models.submissions import StudentChoiceSubmission
+        submissions = db.query(StudentChoiceSubmission).filter(StudentChoiceSubmission.student_id == student_id).count()
+    except Exception:
+        pass
+
+    return {
+        "grades": grades,
+        "targets": targets,
+        "plans": plans,
+        "submissions": submissions,
+        "has_account": student.user_id is not None,
+    }
 
 
 # REQ-025, REQ-028

@@ -236,21 +236,33 @@ def delete_student(
     db: Session, student_id: UUID, user_id: UUID, *, organisation_id: UUID | None = None
 ) -> None:
     """
-    Soft-delete a student profile. Sets deleted_at timestamp.
-    Deactivates linked student account if one exists.
-    REQ-025, REQ-028
+    Delete a student record.
+    - Data-only (no account): hard delete with cascade.
+    - Has account: reject — must archive/delete the account first.
     """
-    from datetime import datetime, timezone as _tz
     student = get_student(db, student_id, user_id, organisation_id=organisation_id)
-    student.deleted_at = datetime.now(_tz.utc)
 
-    # Deactivate linked student account
-    linked_user = db.query(User).filter(
-        User.student_id == student.id,
-        User.is_active == True  # noqa: E712
-    ).first()
-    if linked_user:
-        linked_user.is_active = False
-        linked_user.deleted_at = datetime.now(_tz.utc)
+    if student.user_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Student has a login account. Archive or delete the account first.",
+        )
 
+    # Hard delete — cascade removes grades, plans, targets, submissions
+    from app.modules.school_choice.models.models import StudentSubjectGrade, Recommendation
+    from app.db.models_v2 import StudentSchoolTarget, AcademicPlan
+
+    db.query(StudentSubjectGrade).filter(StudentSubjectGrade.student_id == student_id).delete()
+    db.query(StudentSchoolTarget).filter(StudentSchoolTarget.student_id == student_id).delete()
+    db.query(AcademicPlan).filter(AcademicPlan.student_id == student_id).delete()
+    db.query(Recommendation).filter(Recommendation.student_id == student_id).delete()
+
+    # StudentChoiceSubmission may or may not exist
+    try:
+        from app.modules.school_choice.models.submissions import StudentChoiceSubmission
+        db.query(StudentChoiceSubmission).filter(StudentChoiceSubmission.student_id == student_id).delete()
+    except Exception:
+        pass
+
+    db.delete(student)
     db.commit()
