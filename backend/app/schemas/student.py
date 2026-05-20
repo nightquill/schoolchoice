@@ -61,6 +61,7 @@ class StudentListItem(BaseModel):
 
     id: UUID
     name: str
+    name_zh: str | None = None
     full_name: str | None = None
     target_region: str
     created_at: datetime
@@ -69,6 +70,7 @@ class StudentListItem(BaseModel):
     plan_generated_at: datetime | None = None
     year_of_study: int | None = None
     class_name: str | None = None
+    candidate_number: str | None = None
     has_at_risk_targets: bool = False
 
     model_config = {"from_attributes": True}
@@ -86,6 +88,7 @@ class StudentFullResponse(BaseModel):
     user_id: UUID
     # v1
     name: str
+    name_zh: Optional[str] = None
     grades: Optional[dict] = {}
     interests: Optional[list] = []
     strengths_weaknesses: Optional[str] = ""
@@ -94,6 +97,7 @@ class StudentFullResponse(BaseModel):
     updated_at: datetime
     # v2 identity fields
     full_name: Optional[str] = None
+    name_zh: Optional[str] = None
     preferred_name: Optional[str] = None
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None
@@ -103,6 +107,7 @@ class StudentFullResponse(BaseModel):
     class_name: Optional[str] = None
     year_of_study: Optional[int] = None
     candidate_number: Optional[str] = None
+    best5: Optional[int] = None
     financial_aid_flag: Optional[bool] = False
     preferred_language: Optional[str] = "en"
     notes: Optional[str] = None
@@ -131,6 +136,7 @@ class StudentProfileUpdate(BaseModel):
     """Request body for PUT /students/{id}/profile — all v2 profile fields."""
 
     full_name: Optional[str] = None
+    name_zh: Optional[str] = None
     preferred_name: Optional[str] = None
     date_of_birth: Optional[date] = None
     gender: Optional[str] = None
