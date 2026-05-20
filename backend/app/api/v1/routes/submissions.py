@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
-from app.db.models import User
+from app.db.models import OrganisationMembership, User
 from app.db.session import get_db
 from app.modules.school_choice.models.models import (
     JupasProgramme,
@@ -71,12 +71,30 @@ def _rank_to_band(rank: int) -> str:
     return "E"
 
 
-def _get_submission_or_404(db: Session, submission_id: UUID) -> StudentChoiceSubmission:
+def _resolve_org_id(db: Session, user: User):
+    """Resolve the user's active organisation ID."""
+    org_id = getattr(user, "active_organisation_id", None)
+    if not org_id:
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == user.id).first()
+        org_id = mem.organisation_id if mem else None
+    return org_id
+
+
+def _get_submission_or_404(db: Session, submission_id: UUID, user: User | None = None) -> StudentChoiceSubmission:
     sub = db.query(StudentChoiceSubmission).filter(
         StudentChoiceSubmission.id == submission_id
     ).first()
     if not sub:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
+    # Org isolation: verify the submission's student belongs to user's org
+    if user:
+        org_id = _resolve_org_id(db, user)
+        if org_id:
+            student = db.query(Student).filter(
+                Student.id == sub.student_id, Student.organisation_id == org_id
+            ).first()
+            if not student:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found")
     return sub
 
 
@@ -135,6 +153,16 @@ def list_student_submissions(
     db: Session = Depends(get_db),
 ):
     """All submissions for a specific student (teacher view). Newest first."""
+    # --- Org isolation: verify student belongs to user's org ---
+    org_id = getattr(user, "active_organisation_id", None)
+    if not org_id:
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == user.id).first()
+        org_id = mem.organisation_id if mem else None
+    if org_id:
+        student = db.query(Student).filter(Student.id == student_id, Student.organisation_id == org_id).first()
+        if not student:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
     subs = (
         db.query(StudentChoiceSubmission)
         .filter(StudentChoiceSubmission.student_id == student_id)
@@ -168,7 +196,7 @@ def get_submission_detail(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    sub = _get_submission_or_404(db, submission_id)
+    sub = _get_submission_or_404(db, submission_id, user)
     student = db.query(Student).filter(Student.id == sub.student_id).first()
     if not student:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
@@ -242,7 +270,7 @@ def approve_submission(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    sub = _get_submission_or_404(db, submission_id)
+    sub = _get_submission_or_404(db, submission_id, user)
 
     if sub.status != "pending":
         raise HTTPException(
@@ -355,7 +383,7 @@ def revise_submission(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    sub = _get_submission_or_404(db, submission_id)
+    sub = _get_submission_or_404(db, submission_id, user)
 
     if sub.status != "pending":
         raise HTTPException(
@@ -385,7 +413,7 @@ def reject_submission(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    sub = _get_submission_or_404(db, submission_id)
+    sub = _get_submission_or_404(db, submission_id, user)
 
     if sub.status != "pending":
         raise HTTPException(

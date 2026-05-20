@@ -55,7 +55,23 @@ def get_hkdse_trends(
     Returns per-subject mean, variance, grade distribution, and per-grade rates.
     Also returns subject combination frequency.
     """
-    query = db.query(StudentSubjectGrade)
+    # --- Org isolation ---
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        from app.db.models import OrganisationMembership
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+
+    # Get student IDs in this org
+    org_student_ids = [
+        s.id for s in db.query(Student.id).filter(Student.organisation_id == org_id).all()
+    ] if org_id else []
+    if not org_student_ids:
+        return {"trends": [], "total_subjects": 0, "subject_combinations": []}
+
+    query = db.query(StudentSubjectGrade).filter(
+        StudentSubjectGrade.student_id.in_(org_student_ids)
+    )
     if sitting:
         query = query.filter(StudentSubjectGrade.sitting == sitting.upper())
 
@@ -211,10 +227,25 @@ def get_popular_majors(
     Return the most commonly intended majors across all target school entries
     and graduated students' final majors.
     """
+    # --- Org isolation ---
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        from app.db.models import OrganisationMembership
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+
+    org_student_ids = [
+        s.id for s in db.query(Student.id).filter(Student.organisation_id == org_id).all()
+    ] if org_id else []
+    if not org_student_ids:
+        return {"majors": [], "total_distinct": 0}
+
     major_counts: dict[str, int] = defaultdict(int)
 
-    # From target school intended_majors
-    targets = db.query(StudentSchoolTarget).all()
+    # From target school intended_majors — filtered to org students
+    targets = db.query(StudentSchoolTarget).filter(
+        StudentSchoolTarget.student_id.in_(org_student_ids)
+    ).all()
     for t in targets:
         majors = t.intended_majors
         if majors and isinstance(majors, list):
@@ -222,8 +253,11 @@ def get_popular_majors(
                 if m:
                     major_counts[str(m)] += 1
 
-    # From graduated students' final_major
-    graduated = db.query(Student).filter(Student.is_graduated == True).all()  # noqa: E712
+    # From graduated students' final_major — filtered to org
+    graduated = db.query(Student).filter(
+        Student.organisation_id == org_id,
+        Student.is_graduated == True,  # noqa: E712
+    ).all()
     for s in graduated:
         if s.final_major:
             major_counts[str(s.final_major)] += 1
@@ -331,7 +365,22 @@ def get_subject_combinations(
     current_user: User = Depends(get_current_user),
 ):
     """Frequency of elective subject combinations across students."""
-    query = db.query(StudentSubjectGrade)
+    # --- Org isolation ---
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        from app.db.models import OrganisationMembership
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+
+    org_student_ids = [
+        s.id for s in db.query(Student.id).filter(Student.organisation_id == org_id).all()
+    ] if org_id else []
+    if not org_student_ids:
+        return {"combinations": []}
+
+    query = db.query(StudentSubjectGrade).filter(
+        StudentSubjectGrade.student_id.in_(org_student_ids)
+    )
     if sitting:
         query = query.filter(StudentSubjectGrade.sitting == sitting.upper())
     if cohort_id:
@@ -409,15 +458,20 @@ def get_plan_generation_history(
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        from app.db.models import OrganisationMembership
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+
+    if not org_id:
+        return {"data": [], "granularity": granularity, "total": 0}
 
     query = db.query(AcademicPlan).filter(
         AcademicPlan.generated_at.isnot(None),
         AcademicPlan.generated_at >= cutoff,
+    ).join(Student, AcademicPlan.student_id == Student.id).filter(
+        Student.organisation_id == org_id
     )
-    if org_id:
-        query = query.join(Student, AcademicPlan.student_id == Student.id).filter(
-            Student.organisation_id == org_id
-        )
 
     plans = query.all()
 
@@ -442,14 +496,22 @@ def get_submission_history(
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
     org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        from app.db.models import OrganisationMembership
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+
+    if not org_id:
+        return {
+            "data": [], "granularity": granularity,
+            "total_submissions": 0, "total_approved": 0,
+        }
 
     query = db.query(StudentChoiceSubmission).filter(
         StudentChoiceSubmission.created_at >= cutoff,
+    ).join(Student, StudentChoiceSubmission.student_id == Student.id).filter(
+        Student.organisation_id == org_id
     )
-    if org_id:
-        query = query.join(Student, StudentChoiceSubmission.student_id == Student.id).filter(
-            Student.organisation_id == org_id
-        )
 
     submissions = query.all()
 
