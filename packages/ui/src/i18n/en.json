@@ -14,7 +14,9 @@
     "manage": "User Management",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "myPlan": "My Plan"
+    "myPlan": "My Plan",
+    "teacherGroups": "Teacher Groups",
+    "students": "Students"
   },
   "auth": {
     "login": "Login",
@@ -295,7 +297,21 @@
     "subjectsGrades": "Subjects (grades)",
     "schoolOutcomes": "School Outcomes",
     "graduated": "Grad",
-    "active": "Active"
+    "active": "Active",
+    "graduationOutcomes": "Graduation Outcomes",
+    "graduationOutcomesDesc": "Actual admission results for graduated students",
+    "noGraduatedStudents": "No graduated students yet. Mark students as graduated to see outcomes here.",
+    "graduatedCount": "Graduated",
+    "withRecordedOutcome": "With Recorded Outcome",
+    "distinctUniversities": "Distinct Universities",
+    "distinctProgrammes": "Distinct Programmes",
+    "universityDestinations": "University Destinations",
+    "programmeDistribution": "Programme Distribution",
+    "individualOutcomes": "Individual Outcomes",
+    "graduationYear": "Graduation Year",
+    "finalUniversity": "Final University",
+    "finalProgramme": "Final Programme",
+    "best5": "Best 5"
   },
   "plan": {
     "backToProfile": "Back to Profile",
@@ -514,7 +530,18 @@
     "numeric": "Numeric",
     "commaSeparated": "Comma-separated",
     "optionalDescription": "Optional description",
-    "loadFailed": "Failed to load schools."
+    "loadFailed": "Failed to load schools.",
+    "minScore": "Min. score: {score}",
+    "programs": "Programs",
+    "majors": "Majors",
+    "scholarshipAvailable": "Scholarship available",
+    "morePrograms": "+{count} more",
+    "moreMajors": "+{count} more",
+    "sfTitle": "Sub-degree & Self-financing",
+    "sfBadge": "副學士 · 高級文憑",
+    "sfDesc": "Associate Degree, Higher Diploma, and self-financing programmes — separate from JUPAS.",
+    "tier": "Tier {tier}",
+    "articulation": "{pct}% articulation"
   },
   "schoolProfile": {
     "backToDirectory": "Back to Directory",
@@ -739,7 +766,8 @@
     "searchStudentByName": "Search student by name",
     "missingPlan": "missing plan",
     "awaitingReview": "awaiting review",
-    "studentDataImport": "Student Data Import"
+    "studentDataImport": "Student Data Import",
+    "default": "Default"
   },
   "targets": {
     "backToProfile": "Back to Profile",
@@ -871,10 +899,21 @@
     "planDetailDesc": "How many of the student's programme choices to include in generated plans.",
     "bandAOnly": "Band A only (top 3 choices)",
     "bandAB": "Band A+B (top 6 choices)",
-    "bandABC": "Band A+B+C (top 10 choices)"
+    "bandABC": "Band A+B+C (top 10 choices)",
+    "teachersNote": "Manage teacher roles here. Use Teacher Groups tab to set cohort access and permissions."
   },
   "methodology": {
-    "title": "Methodology"
+    "title": "Methodology",
+    "backToDashboard": "\u2190 Back to Dashboard",
+    "loading": "Loading methodology report...",
+    "dataCoverage": "Data Coverage",
+    "jupasCount": "JUPAS Programmes",
+    "institutionCount": "Institutions",
+    "howItWorks": "How It Works",
+    "dataSources": "Data Sources",
+    "confidenceLevels": "Data Confidence Levels",
+    "limitations": "Limitations",
+    "loadFailed": "Failed to load methodology report."
   },
   "analytics": {
     "planHistory": "Plan Generation History",
@@ -951,6 +990,65 @@
     "code": "Code",
     "name": "Programme",
     "score": "Score"
+  },
+  "programmeDetail": {
+    "loading": "Loading programme…",
+    "loadFailed": "Failed to load programme data",
+    "notFound": "Programme not found",
+    "backToSchool": "← Back to school",
+    "programmes": "Programmes",
+    "veryCompetitive": "Very Competitive",
+    "competitive": "Competitive",
+    "moderate": "Moderate",
+    "accessible": "Accessible",
+    "eligible": "Eligible",
+    "ineligible": "Ineligible",
+    "atRisk": "AT RISK",
+    "medianScore": "Median Score",
+    "upperQuartile": "Upper Quartile",
+    "lowerQuartile": "Lower Quartile",
+    "minRequirement": "Min Requirement",
+    "highest": "Highest",
+    "meanScore": "Mean Score",
+    "entryRequirements": "Entry Requirements",
+    "general": "General:",
+    "required": "Required:",
+    "preferred": "Preferred:",
+    "yourStudents": "Your Students — Scored against this programme",
+    "strongCandidates": "Strong Candidates",
+    "possible": "Possible",
+    "stretch": "Stretch",
+    "students": "students",
+    "hide": "hide",
+    "show": "show",
+    "noGradeData": "No Grade Data",
+    "noStudentsScored": "No students have been scored against this programme yet.",
+    "studentsNoGrades": "student(s) with no grade data",
+    "name": "Name",
+    "class": "Class",
+    "match": "Match",
+    "weightedScore": "Weighted Score",
+    "best5": "Best 5",
+    "eligibility": "Eligibility",
+    "scoresNote": "Scores are best-5 HKDSE subjects",
+    "source": "Source:",
+    "associateDegree": "Associate Degree",
+    "higherDiploma": "Higher Diploma",
+    "diploma": "Diploma",
+    "selfFinancingDegree": "Self-financing Degree",
+    "pctMatch": "% match",
+    "band": "Band",
+    "addFilter": "+ Add filter",
+    "jupasToggle": "JUPAS",
+    "sfToggle": "Self-Financing",
+    "jupasLink": "↗ JUPAS"
+  },
+  "bands": {
+    "A": "Top picks — very confident",
+    "B": "Strong interest, good chance",
+    "C": "Interested, reasonable chance",
+    "D": "Backup choices",
+    "E": "Safety net"
   },
   "sfInstitution": {
     "loadFailed": "Failed to load institution",
@@ -1047,7 +1145,17 @@
     "exportFailed": "Export failed. Please try again.",
     "account": "Account",
     "showingUnaccounted": "Showing Unaccounted",
-    "unaccounted": "Unaccounted"
+    "unaccounted": "Unaccounted",
+    "deleteConfirm": "Delete student {name}? This cannot be undone.",
+    "deleteSuccess": "Student deleted.",
+    "deleteFailed": "Failed to delete student.",
+    "active": "Active",
+    "invited": "Invited",
+    "noAccount": "No Account",
+    "invite": "Invite",
+    "local": "Local",
+    "international": "International",
+    "inviteFailed": "Failed to invite"
   },
   "teacherGroups": {
     "title": "Teacher Groups",
@@ -1079,7 +1187,10 @@
     "failedRemoveMember": "Failed to remove member",
     "teacherNotFound": "Teacher not found. Enter an exact email of an existing teacher.",
     "alreadyMember": "Already a member of this group",
-    "selectGroup": "Select a group to manage members and permissions."
+    "selectGroup": "Select a group to manage members and permissions.",
+    "searchTeacherPlaceholder": "Search by name or email...",
+    "noTeachersMatch": "No matching teachers found.",
+    "addTeacher": "Add Teacher"
   },
   "groupPermissions": {
     "title": "Cohort Permissions",
@@ -1101,7 +1212,8 @@
     "accountAssign": "Account Assign",
     "none": "None",
     "view": "View",
-    "edit": "Edit"
+    "edit": "Edit",
+    "studentDelete": "Delete Student"
   },
   "importWizard": {
     "uploadFile": "Upload File",
@@ -1221,5 +1333,137 @@
     "passwordTooShort": "Password must be at least 8 characters.",
     "invalidExpired": "Invalid or expired invite link.",
     "failedCreate": "Failed to create account."
+  },
+  "subjectDetail": {
+    "backToAnalysis": "\u2190 Back to Data Analysis",
+    "cohortFilter": "Cohort:",
+    "allStudents": "All Students",
+    "sittingFilter": "Sitting:",
+    "all": "All",
+    "sittingCount": "{count} sitting(s)",
+    "noData": "No data available for this subject with the selected filters.",
+    "sittingLabel": "{sitting} Sitting",
+    "studentCount": "{count} student(s)",
+    "mean": "Mean",
+    "variance": "Variance",
+    "gradeDistribution": "Grade Distribution",
+    "gradeDistributionPct": "Grade Distribution (%)",
+    "gradeRates": "Grade Rates (% achieving grade or above)",
+    "populationData": "HK Population Data (HKDSE)",
+    "candidates": "{count} candidates",
+    "gradeFivePlus": "Grade 5+",
+    "categoryCore": "Core",
+    "categoryElective": "Elective",
+    "categoryOtherLanguage": "Other Language",
+    "categoryAppliedLearning": "Applied Learning",
+    "meanModeN": "Mean: {mean} ({meanNum}) | Mode: {mode} | n={totalN}"
+  },
+  "studentDetail": {
+    "loading": "Loading\u2026",
+    "notFound": "Student not found.",
+    "noAccess": "You do not have access to this student record.",
+    "loadFailed": "Could not load student data. Please try again.",
+    "changesSaved": "Changes saved.",
+    "profileIncompleteRecs": "The student profile is incomplete. Please ensure all required fields are filled in before generating recommendations.",
+    "recsNotFound": "Student not found.",
+    "recsFailed": "Could not generate recommendations. Please try again.",
+    "actionPlanGenerated": "Action plan generated.",
+    "profileIncompleteAction": "The student profile is incomplete. Please ensure all fields are filled in before generating an action plan.",
+    "actionFailed": "Could not generate action plan. Please try again.",
+    "backToStudents": "Back to Students",
+    "name": "Name",
+    "targetRegion": "Target Region",
+    "local": "Local",
+    "international": "International",
+    "grades": "Grades",
+    "noGrades": "No grades recorded",
+    "interests": "Interests",
+    "noInterests": "No interests recorded",
+    "strengthsWeaknesses": "Strengths and Weaknesses",
+    "notRecorded": "Not recorded",
+    "editStudent": "Edit Student",
+    "generating": "Generating...",
+    "generateRecommendations": "Generate Recommendations",
+    "generateActionPlan": "Generate Action Plan",
+    "actionPlanTitle": "Action Plan",
+    "saveChanges": "Save Changes"
+  },
+  "submissionHistory": {
+    "title": "Submission History",
+    "loading": "Loading history\u2026",
+    "noSubmissions": "No submissions yet.",
+    "submitted": "Submitted",
+    "status": "Status",
+    "choices": "Choices",
+    "reviewed": "Reviewed",
+    "notes": "Notes",
+    "programmeCount": "{count} programme(s)",
+    "choiceRank": "Choice {rank}",
+    "andMore": "\u2026and {count} more",
+    "choicesFlagged": "{count} choice(s) flagged",
+    "draft": "Draft",
+    "pendingReview": "Pending Review",
+    "approved": "Approved",
+    "revisionRequested": "Revision Requested",
+    "rejected": "Rejected"
+  },
+  "validation": {
+    "validCount": "{count} valid",
+    "errorCount": "{count} error(s)",
+    "warningCount": "{count} warning(s)",
+    "rowsWithErrors": "Rows with errors",
+    "rowNumber": "Row #",
+    "field": "Field",
+    "value": "Value",
+    "reason": "Reason",
+    "downloadErrors": "Download error rows as CSV",
+    "downloading": "Downloading\u2026",
+    "duplicateRows": "Duplicate rows ({count})",
+    "applyToAll": "Apply this choice to all duplicates:",
+    "skip": "Skip",
+    "overwrite": "Overwrite existing",
+    "importAsNew": "Import as new",
+    "back": "Back",
+    "importValid": "Import {count} Valid Row(s)",
+    "importing": "Importing\u2026"
+  },
+  "actionPlan": {
+    "title": "Action Plan",
+    "academicTargets": "Academic Targets",
+    "extracurricularDirection": "Extracurricular Direction",
+    "preparationSteps": "Preparation Steps"
+  },
+  "recommendation": {
+    "score": "Score: {score}",
+    "whyMatches": "Why it matches",
+    "gaps": "Gaps"
+  },
+  "entityForm": {
+    "fieldRequired": "{field} is required.",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "selectPlaceholder": "\u2014 Select \u2014"
+  },
+  "shap": {
+    "admissionProbability": "Admission probability: {pct}",
+    "pts": "pts",
+    "meanModeN": "Mean: {mean}{meanNum} | Mode: {mode} | n={totalN}"
+  },
+  "fileUpload": {
+    "uploading": "Uploading\u2026",
+    "dragHere": "Drag file here or",
+    "browse": "Browse"
+  },
+  "planEditor": {
+    "editing": "Editing: {section}",
+    "bold": "Bold",
+    "italic": "Italic",
+    "bulletList": "Bullet List",
+    "list": "List",
+    "cancel": "Cancel",
+    "resetToDefault": "Reset to Default",
+    "saving": "Saving\u2026",
+    "save": "Save"
   }
 }
