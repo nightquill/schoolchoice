@@ -152,10 +152,15 @@ class User(Base):
         server_default="'en'",
         comment="'en' or 'zh-HK'; default 'en'",
     )
+    account_status = Column(
+        String(20), nullable=False, default="active",
+        server_default="'active'",
+        comment="Lifecycle: active | suspended | archived | deleted",
+    )
     is_active = Column(
         Boolean, nullable=False, default=True,
         server_default="true",
-        comment="true until soft-deleted; row is retained for audit",
+        comment="Derived from account_status; true when status='active'",
     )
     deleted_at = Column(
         TIMESTAMP(timezone=True), nullable=True, default=None,
