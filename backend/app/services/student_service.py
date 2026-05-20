@@ -62,6 +62,7 @@ def get_students(
         pattern = f"%{q}%"
         query = query.filter(or_(
             Student.name.ilike(pattern),
+            Student.name_zh.ilike(pattern),
             Student.email.ilike(pattern),
             Student.candidate_number.ilike(pattern),
         ))
