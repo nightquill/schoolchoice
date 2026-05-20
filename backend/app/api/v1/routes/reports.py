@@ -88,10 +88,12 @@ def target_distribution(
     for school_id, targets in school_groups.items():
         school = db.query(School).filter(School.id == school_id).first()
         school_name = school.name if school else "Unknown"
+        school_name_zh = getattr(school, 'name_zh', None) if school else None
         scores = [float(t.match_score) for t in targets if t.match_score is not None]
         avg_score = round(sum(scores) / len(scores), 4) if scores else None
         distribution.append({
             "school": school_name,
+            "school_zh": school_name_zh,
             "count": len(targets),
             "avg_score": avg_score,
         })
