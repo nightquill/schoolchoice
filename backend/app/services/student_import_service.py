@@ -133,22 +133,85 @@ def _is_chinese(text: str) -> bool:
     return any("\u4e00" <= ch <= "\u9fff" for ch in text)
 
 
+def _jyutping_to_hk(jyutping: str) -> str:
+    """Convert a single Jyutping syllable to common HK romanization.
+
+    Strips tones, then applies initial/final substitutions so the output
+    matches names Hong Kong residents typically use on ID cards.
+    """
+    # Strip tone digit
+    bare = re.sub(r"[0-9]+$", "", jyutping)
+    if not bare:
+        return jyutping
+
+    # --- Initial substitutions ---
+    # Order matters: longer prefixes first
+    _INITIAL_MAP = [
+        ("gw", "kw"), ("kw", "kw"),
+        ("ng", "ng"),
+        ("c", "ch"), ("z", "ch"),
+        ("j", "y"),
+        ("g", "k"),
+        ("b", "p"),
+        ("d", "t"),
+    ]
+    result = bare
+    for old, new in _INITIAL_MAP:
+        if result.startswith(old):
+            result = new + result[len(old):]
+            break
+
+    # --- Final / vowel substitutions ---
+    _FINAL_MAP = [
+        ("eoi", "ui"), ("eot", "ut"), ("eon", "un"),
+        ("oeng", "eung"), ("oek", "euk"),
+        ("aai", "ai"), ("aau", "au"), ("aat", "at"),
+        ("aan", "an"), ("aang", "ang"), ("aak", "ak"),
+        ("aap", "ap"), ("aam", "am"),
+        ("aa", "a"),
+        ("oe", "eu"), ("eo", "eu"),
+        ("ou", "o"),
+        ("ei", "ei"),
+        ("yu", "yu"),
+    ]
+    for old, new in _FINAL_MAP:
+        if old in result:
+            result = result.replace(old, new, 1)
+            break
+
+    return result
+
+
 def _romanize_chinese_name(chinese: str) -> str:
     """
-    Convert a Chinese name to romanized form using pypinyin.
-    Produces title-cased pinyin without tones, surname first.
-    E.g. "陳美玲" → "Chen Meiling"  (first char = surname, rest = given name)
+    Convert a Chinese name to Cantonese romanization using ToJyutping.
+    Produces title-cased HK-style romanization, surname first.
+    E.g. "陳美玲" → "Chan Mei Ling"
+         "黃家豪" → "Wong Ka Ho"
+    Falls back to Mandarin pypinyin if ToJyutping unavailable.
     """
+    try:
+        import ToJyutping
+        pairs = ToJyutping.get_jyutping_list(chinese)
+        if not pairs:
+            return chinese
+        syllables = [_jyutping_to_hk(jp) for _char, jp in pairs if jp]
+        if not syllables:
+            return chinese
+        # HK convention: each syllable capitalised and space-separated
+        # First char = surname
+        return " ".join(s.capitalize() for s in syllables)
+    except ImportError:
+        pass
+
+    # Fallback: Mandarin pinyin
     try:
         from pypinyin import pinyin, Style
         parts = pinyin(chinese, style=Style.NORMAL, heteronym=False)
         syllables = [p[0] for p in parts if p and p[0]]
         if not syllables:
             return chinese
-        # HK convention: surname (first char) separate, given name joined
-        surname = syllables[0].capitalize()
-        given = "".join(syllables[1:]).capitalize() if len(syllables) > 1 else ""
-        return f"{surname} {given}".strip()
+        return " ".join(s.capitalize() for s in syllables)
     except ImportError:
         return chinese
 

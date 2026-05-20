@@ -26,4 +26,5 @@ jsonschema>=4.23.0
 slowapi>=0.1.9
 chardet>=5.0
 pypinyin>=0.55
+ToJyutping>=3.2
 resend>=2.0
