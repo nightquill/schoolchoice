@@ -300,10 +300,10 @@ function CohortDetail() {
                     }}
                     title={cohort.is_default ? '' : t('common.edit')}
                   >
-                    {cohort.name}
+                    {cohort.is_default ? t('dashboard.allStudentsCohort') : cohort.name}
                     {!cohort.is_default && <span style={{ marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>✎</span>}
                   </h1>
-                  {cohort.description && (
+                  {cohort.description && !cohort.is_default && (
                     <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 'var(--space-1) 0 0' }}>
                       {cohort.description}
                     </p>

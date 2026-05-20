@@ -148,9 +148,9 @@ function CohortList() {
                 >
                   <div>
                     <div style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                      {cohort.name}
+                      {cohort.is_default ? t('dashboard.allStudentsCohort') : cohort.name}
                     </div>
-                    {cohort.description && (
+                    {cohort.description && !cohort.is_default && (
                       <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-1)' }}>
                         {cohort.description}
                       </div>
@@ -159,23 +159,25 @@ function CohortList() {
                       {t('cohorts.studentCount', { count: cohort.member_count })}
                     </div>
                   </div>
-                  <button
-                    style={{
-                      background: 'none',
-                      border: 'var(--border-width) solid var(--color-error)',
-                      borderRadius: 'var(--border-radius-sm)',
-                      color: 'var(--color-error)',
-                      fontSize: 'var(--font-size-sm)',
-                      padding: 'var(--space-1) var(--space-3)',
-                      cursor: 'pointer',
-                      fontFamily: 'var(--font-family-base)',
-                      flexShrink: 0,
-                    }}
-                    onClick={(e) => { e.stopPropagation(); setDeleteTarget(cohort); }}
-                    aria-label={`Delete cohort ${cohort.name}`}
-                  >
-                    {t('cohorts.delete')}
-                  </button>
+                  {!cohort.is_default && (
+                    <button
+                      style={{
+                        background: 'none',
+                        border: 'var(--border-width) solid var(--color-error)',
+                        borderRadius: 'var(--border-radius-sm)',
+                        color: 'var(--color-error)',
+                        fontSize: 'var(--font-size-sm)',
+                        padding: 'var(--space-1) var(--space-3)',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-family-base)',
+                        flexShrink: 0,
+                      }}
+                      onClick={(e) => { e.stopPropagation(); setDeleteTarget(cohort); }}
+                      aria-label={`Delete cohort ${cohort.name}`}
+                    >
+                      {t('cohorts.delete')}
+                    </button>
+                  )}
                 </div>
               ))
             )}

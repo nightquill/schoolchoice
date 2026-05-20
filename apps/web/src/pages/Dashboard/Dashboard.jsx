@@ -398,7 +398,7 @@ function Dashboard() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
                         <Users size={18} style={{ color: 'var(--color-primary)', flexShrink: 0 }} aria-hidden="true" />
                         <CardTitle style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)' }}>
-                          {cohort.name}
+                          {cohort.is_default ? t('dashboard.allStudentsCohort') : cohort.name}
                         </CardTitle>
                         {cohort.is_default && (
                           <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-info-bg)', color: 'var(--color-primary)', padding: '1px 8px', borderRadius: '10px', fontWeight: 600, flexShrink: 0 }}>

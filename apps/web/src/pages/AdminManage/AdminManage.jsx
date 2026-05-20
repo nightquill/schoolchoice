@@ -12,14 +12,15 @@ import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { listUsers, updateUser, getSubmissionRateLimit, setSubmissionRateLimit, getPlanDetailLevel, setPlanDetailLevel } from '../../api/admin';
 import { getCohorts, createCohort, deleteCohort, getCohort, addCohortMembers, removeCohortMember, searchStudents } from '../../api/cohorts';
-import { getCohortPermissions, setCohortPermission, removeCohortPermission } from '../../api/admin';
+// Individual cohort permissions removed — use Teacher Groups for permission management
 import { useTranslation } from '@schoolchoice/ui/i18n';
-import { Users, BookOpen, Settings } from 'lucide-react';
+import { Users, BookOpen, Settings, Shield } from 'lucide-react';
+import AdminTeacherGroups from '../AdminTeacherGroups/AdminTeacherGroups';
 
 function AdminManage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [activeSection, setActiveSection] = useState('teachers');
+  const [activeSection, setActiveSection] = useState('groups');
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount, staleTime: 5 * 60 * 1000 });
   const usersQuery = useQuery({ queryKey: ['admin-users'], queryFn: listUsers });
@@ -51,21 +52,27 @@ function AdminManage() {
         </h1>
 
         <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
-          <button onClick={() => setActiveSection('teachers')} style={sectionToggle('teachers')}>
-            <Users size={16} /> {t('adminManage.teachers')}
+          <button onClick={() => setActiveSection('groups')} style={sectionToggle('groups')}>
+            <Shield size={16} /> {t('teacherGroups.title')}
           </button>
           <button onClick={() => setActiveSection('cohorts')} style={sectionToggle('cohorts')}>
             <BookOpen size={16} /> {t('adminManage.cohortMgmt')}
+          </button>
+          <button onClick={() => setActiveSection('teachers')} style={sectionToggle('teachers')}>
+            <Users size={16} /> {t('adminManage.teachers')}
           </button>
           <button onClick={() => setActiveSection('settings')} style={sectionToggle('settings')}>
             <Settings size={16} /> {t('adminManage.settings')}
           </button>
         </div>
 
+        {activeSection === 'groups' && (
+          <AdminTeacherGroups embedded />
+        )}
+
         {activeSection === 'teachers' && (
           <TeachersSection
             teachers={teachers}
-            cohorts={cohorts}
             account={account}
             usersLoading={usersQuery.isLoading}
             queryClient={queryClient}
@@ -91,278 +98,73 @@ function AdminManage() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// TEACHERS SECTION
+// TEACHERS SECTION — simple user list with role management
 // ═══════════════════════════════════════════════════════════════
 
-function TeachersSection({ teachers, cohorts, account, usersLoading, queryClient, t }) {
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [grantCohortId, setGrantCohortId] = useState('');
-  const [grantPermission, setGrantPermission] = useState('read_write');
-
-  useEffect(() => {
-    if (!selectedUser && teachers.length > 0) setSelectedUser(teachers[0]);
-  }, [teachers.length]); // eslint-disable-line react-hooks/exhaustive-deps
-
+function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
   const updateUserMutation = useMutation({
     mutationFn: ({ userId, ...data }) => updateUser(userId, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); toast.success(t('adminManage.saved')); },
     onError: () => toast.error(t('adminManage.saveFailed')),
   });
 
-  const grantMutation = useMutation({
-    mutationFn: ({ cohortId, user_id, permission }) => setCohortPermission(cohortId, { user_id, permission }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['teacher-cohort-perms'] }); setGrantCohortId(''); toast.success(t('adminManage.grantSuccess')); },
-    onError: () => toast.error(t('adminManage.grantFailed')),
-  });
-
-  const revokeMutation = useMutation({
-    mutationFn: ({ cohortId, userId }) => removeCohortPermission(cohortId, userId),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['teacher-cohort-perms'] }); toast.success(t('adminManage.revokeSuccess')); },
-    onError: () => toast.error(t('adminManage.revokeFailed')),
-  });
-
   const cardStyle = { background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', overflow: 'hidden' };
   const thStyle = { padding: 'var(--space-2) var(--space-3)', textAlign: 'left', fontSize: 'var(--font-size-xs)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-secondary)', borderBottom: 'var(--border-width) solid var(--color-border)' };
   const tdStyle = { padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)', borderBottom: 'var(--border-width) solid var(--color-border)' };
 
+  if (usersLoading) return <LoadingSpinner label={t('adminManage.loading')} />;
+
   return (
-    <div style={{ display: 'flex', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
-      {/* Left: Teacher list */}
-      <div style={{ flex: '1 1 280px', minWidth: '260px' }}>
-        {usersLoading ? <LoadingSpinner label={t('adminManage.loading')} /> : (
-          <div style={{ ...cardStyle, maxHeight: '70vh', overflowY: 'auto' }}>
+    <div style={cardStyle}>
+      <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+        {t('adminManage.teachersNote')}
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={thStyle}>{t('adminManage.name')}</th>
+              <th style={thStyle}>{t('adminManage.email')}</th>
+              <th style={thStyle}>{t('adminManage.role')}</th>
+              <th style={thStyle}>{t('adminManage.actions')}</th>
+            </tr>
+          </thead>
+          <tbody>
             {teachers.map((user) => {
-              const isSelected = selectedUser?.id === user.id;
+              const isSelf = account?.email === user.email;
               return (
-                <div key={user.id} onClick={() => setSelectedUser(user)} style={{
-                  padding: 'var(--space-3) var(--space-4)', cursor: 'pointer',
-                  background: isSelected ? 'rgba(37,99,235,0.06)' : 'var(--color-surface)',
-                  borderBottom: 'var(--border-width) solid var(--color-border)',
-                  borderLeft: isSelected ? '3px solid var(--color-primary)' : '3px solid transparent',
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                }} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setSelectedUser(user)}>
-                  <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                      {user.display_name || user.email.split('@')[0]}
-                    </div>
-                    <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{user.email}</div>
-                  </div>
-                  <span style={{
-                    fontSize: 'var(--font-size-xs)', padding: '2px 8px', borderRadius: '8px', fontWeight: 500,
-                    background: user.role === 'admin' ? '#dbeafe' : '#f3f4f6',
-                    color: user.role === 'admin' ? '#1d4ed8' : '#6b7280',
-                  }}>
-                    {user.role === 'admin' ? t('adminManage.admin') : t('adminManage.counsellor')}
-                  </span>
-                </div>
+                <tr key={user.id}>
+                  <td style={{ ...tdStyle, fontWeight: 'var(--font-weight-medium)' }}>
+                    {user.display_name || user.email.split('@')[0]}
+                  </td>
+                  <td style={tdStyle}>{user.email}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      fontSize: 'var(--font-size-xs)', padding: '2px 8px', borderRadius: '8px', fontWeight: 500,
+                      background: user.role === 'admin' ? '#dbeafe' : '#f3f4f6',
+                      color: user.role === 'admin' ? '#1d4ed8' : '#6b7280',
+                    }}>
+                      {user.role === 'admin' ? t('adminManage.admin') : t('adminManage.counsellor')}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>
+                    {!isSelf && (
+                      <select
+                        value={user.role}
+                        onChange={(e) => updateUserMutation.mutate({ userId: user.id, role: e.target.value })}
+                        disabled={updateUserMutation.isPending}
+                        style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-xs)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)' }}
+                      >
+                        <option value="counsellor">{t('adminManage.counsellor')}</option>
+                        <option value="admin">{t('adminManage.admin')}</option>
+                      </select>
+                    )}
+                  </td>
+                </tr>
               );
             })}
-          </div>
-        )}
-      </div>
-
-      {/* Right: Teacher detail */}
-      <div style={{ flex: '2 1 400px', minWidth: '340px' }}>
-        {!selectedUser ? (
-          <div style={{ ...cardStyle, padding: 'var(--space-8)', textAlign: 'center' }}>
-            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('adminManage.selectTeacher')}</p>
-          </div>
-        ) : (
-          <TeacherDetail
-            user={selectedUser} cohorts={cohorts} account={account}
-            onRoleChange={(role) => updateUserMutation.mutate({ userId: selectedUser.id, role })}
-            roleUpdating={updateUserMutation.isPending}
-            onUpdateName={(name) => updateUserMutation.mutate({ userId: selectedUser.id, display_name: name })}
-            onToggleCohortMgmt={(val) => updateUserMutation.mutate({ userId: selectedUser.id, can_manage_cohorts: val })}
-            grantCohortId={grantCohortId} setGrantCohortId={setGrantCohortId}
-            grantPermission={grantPermission} setGrantPermission={setGrantPermission}
-            onGrant={() => grantMutation.mutate({ cohortId: grantCohortId, user_id: selectedUser.id, permission: grantPermission })}
-            grantPending={grantMutation.isPending}
-            onRevoke={(cohortId) => revokeMutation.mutate({ cohortId, userId: selectedUser.id })}
-            revokePending={revokeMutation.isPending}
-            t={t} thStyle={thStyle} tdStyle={tdStyle} cardStyle={cardStyle}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-function TeacherDetail({ user, cohorts, account, onRoleChange, roleUpdating, onToggleCohortMgmt, onUpdateName, grantCohortId, setGrantCohortId, grantPermission, setGrantPermission, onGrant, grantPending, onRevoke, revokePending, t, thStyle, tdStyle, cardStyle }) {
-  const [editingName, setEditingName] = useState(false);
-  const [nameValue, setNameValue] = useState(user.display_name || '');
-  const permsQuery = useQuery({
-    queryKey: ['teacher-cohort-perms', user.id],
-    queryFn: async () => {
-      const results = [];
-      for (const cohort of cohorts) {
-        try {
-          const data = await getCohortPermissions(cohort.id);
-          const perms = data.permissions ?? [];
-          const userPerm = perms.find(p => p.user_id === user.id);
-          if (userPerm) results.push({ cohort_id: cohort.id, cohort_name: cohort.name, permission: userPerm.permission });
-        } catch { /* skip */ }
-      }
-      return results;
-    },
-    enabled: cohorts.length > 0,
-  });
-
-  const cohortPerms = permsQuery.data ?? [];
-  const assignedCohortIds = new Set(cohortPerms.map(p => p.cohort_id));
-  const availableCohorts = cohorts.filter(c => !assignedCohortIds.has(c.id));
-  const isSelf = account?.email === user.email;
-
-  return (
-    <div>
-      {/* Header */}
-      <div style={{ ...cardStyle, padding: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
-          <div>
-            {editingName ? (
-              <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-                <input
-                  autoFocus
-                  value={nameValue}
-                  onChange={(e) => setNameValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && nameValue.trim()) { onUpdateName(nameValue.trim()); setEditingName(false); }
-                    if (e.key === 'Escape') { setNameValue(user.display_name || ''); setEditingName(false); }
-                  }}
-                  style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', padding: 'var(--space-1) var(--space-2)', border: 'var(--border-width) solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', width: '220px' }}
-                />
-                <Button variant="secondary" onClick={() => { if (nameValue.trim()) { onUpdateName(nameValue.trim()); setEditingName(false); } }}>
-                  {t('common.save')}
-                </Button>
-                <button onClick={() => { setNameValue(user.display_name || ''); setEditingName(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', fontFamily: 'var(--font-family-base)' }}>
-                  {t('common.cancel')}
-                </button>
-              </div>
-            ) : (
-              <h2
-                style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0, cursor: 'pointer' }}
-                onClick={() => setEditingName(true)}
-                title={t('adminManage.clickToEditName')}
-              >
-                {user.display_name || user.email.split('@')[0]}
-                <span style={{ marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>✎</span>
-              </h2>
-            )}
-            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 'var(--space-1) 0 0' }}>{user.email}</p>
-          </div>
-          {!isSelf && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <label style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('adminManage.role')}:</label>
-              <select value={user.role} onChange={(e) => onRoleChange(e.target.value)} disabled={roleUpdating} style={{
-                padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)',
-                border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)',
-              }}>
-                <option value="counsellor">{t('adminManage.counsellor')}</option>
-                <option value="admin">{t('adminManage.admin')}</option>
-              </select>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Cohort Management toggle */}
-      <div style={{ ...cardStyle, padding: 'var(--space-3) var(--space-4)', marginBottom: 'var(--space-4)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-            {t('adminManage.cohortMgmtPermission')}
-          </div>
-          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-            {t('adminManage.cohortMgmtDesc')}
-          </div>
-        </div>
-        <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', flexShrink: 0 }}>
-          <input
-            type="checkbox"
-            checked={user.can_manage_cohorts || user.role === 'admin'}
-            disabled={user.role === 'admin'}
-            onChange={(e) => onToggleCohortMgmt(e.target.checked)}
-            style={{ opacity: 0, width: 0, height: 0 }}
-            aria-label="Toggle cohort management"
-          />
-          <span style={{
-            position: 'absolute', cursor: user.role === 'admin' ? 'default' : 'pointer',
-            top: 0, left: 0, right: 0, bottom: 0,
-            background: (user.can_manage_cohorts || user.role === 'admin') ? 'var(--color-primary)' : '#cbd5e1',
-            borderRadius: '12px', transition: 'background 0.2s',
-          }}>
-            <span style={{
-              position: 'absolute', height: '18px', width: '18px',
-              left: (user.can_manage_cohorts || user.role === 'admin') ? '23px' : '3px',
-              bottom: '3px', background: '#fff', borderRadius: '50%', transition: 'left 0.2s',
-            }} />
-          </span>
-        </label>
-      </div>
-
-      {/* Cohort Scope */}
-      <div style={cardStyle}>
-        <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-          {t('adminManage.cohortScope')}
-        </div>
-        <p style={{ padding: 'var(--space-2) var(--space-4) 0', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: 0 }}>
-          {t('adminManage.cohortScopeDesc')}
-        </p>
-
-        {permsQuery.isLoading ? (
-          <div style={{ padding: 'var(--space-4)' }}><LoadingSpinner label={t('adminManage.loading')} /></div>
-        ) : cohortPerms.length === 0 ? (
-          <p style={{ padding: 'var(--space-3) var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-            {t('adminManage.noPermissions')}
-          </p>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead><tr>
-                <th style={thStyle}>{t('adminManage.cohortName')}</th>
-                <th style={thStyle}>{t('adminManage.permission')}</th>
-                <th style={thStyle}>{t('adminManage.actions')}</th>
-              </tr></thead>
-              <tbody>
-                {cohortPerms.map((p) => (
-                  <tr key={p.cohort_id}>
-                    <td style={tdStyle}>{p.cohort_name}</td>
-                    <td style={tdStyle}>
-                      <span style={{
-                        fontSize: 'var(--font-size-xs)', padding: '2px 8px', borderRadius: '8px', fontWeight: 500,
-                        background: p.permission === 'read_write' ? '#dcfce7' : '#fef3c7',
-                        color: p.permission === 'read_write' ? '#166534' : '#92400e',
-                      }}>
-                        {p.permission === 'read_write' ? t('adminManage.readWrite') : t('adminManage.readOnly')}
-                      </span>
-                    </td>
-                    <td style={tdStyle}>
-                      <button onClick={() => onRevoke(p.cohort_id)} disabled={revokePending} style={{
-                        background: 'none', border: 'var(--border-width) solid var(--color-error)',
-                        borderRadius: 'var(--border-radius-sm)', color: 'var(--color-error)',
-                        fontSize: 'var(--font-size-xs)', padding: 'var(--space-1) var(--space-2)', cursor: 'pointer', fontFamily: 'var(--font-family-base)',
-                      }}>{t('adminManage.removeAccess')}</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Grant access form */}
-        <div style={{ padding: 'var(--space-3) var(--space-4)', borderTop: 'var(--border-width) solid var(--color-border)', display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', alignItems: 'center' }}>
-          <select value={grantCohortId} onChange={(e) => setGrantCohortId(e.target.value)} style={{ padding: 'var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', flex: '2 1 200px' }}>
-            <option value="">{t('adminManage.selectCohort')}</option>
-            {availableCohorts.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-          <select value={grantPermission} onChange={(e) => setGrantPermission(e.target.value)} style={{ padding: 'var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', flex: '1 1 120px' }}>
-            <option value="read_write">{t('adminManage.readWrite')}</option>
-            <option value="read_only">{t('adminManage.readOnly')}</option>
-          </select>
-          <Button onClick={onGrant} disabled={!grantCohortId || grantPending}>
-            {grantPending ? t('adminManage.saving') : t('adminManage.addAccess')}
-          </Button>
-        </div>
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -600,7 +402,7 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
         <DialogContent>
           <DialogHeader><DialogTitle>{t('cohorts.deleteCohort')}</DialogTitle></DialogHeader>
           <p style={{ fontSize: 'var(--font-size-md)', color: 'var(--color-text-primary)' }}>
-            Delete cohort <strong>{deleteTarget?.name}</strong>? Students are not affected.
+            {t('cohorts.deleteConfirm', { name: deleteTarget?.name })}
           </p>
           <DialogFooter>
             <Button variant="secondary" onClick={() => setDeleteTarget(null)}>{t('dashboard.cancel')}</Button>

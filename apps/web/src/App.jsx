@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
 import LoginPage from './pages/LoginPage/LoginPage';
-import RegisterPage from './pages/RegisterPage/RegisterPage';
+// RegisterPage removed — teachers are created by admin only
 import StudentListPage from './pages/StudentListPage/StudentListPage';
 import RecommendationPage from './pages/RecommendationPage/RecommendationPage';
 // v2 pages
@@ -80,7 +80,7 @@ export default function App() {
 
         {/* v1 public routes (unchanged) */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<Navigate to="/login" replace />} />
         <Route path="/invite/:token" element={<InviteAccept />} />
 
         {/* v1 protected routes (unchanged) */}

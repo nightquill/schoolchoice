@@ -148,9 +148,9 @@ def list_users(
 def create_user(
     payload: UserCreateAdmin,
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("admin")),
+    current_user: User = Depends(require_role("admin")),
 ):
-    """Create a new user account. Admin only."""
+    """Create a new user account. Admin only. Auto-joins the admin's org."""
     user = User(
         email=payload.email,
         hashed_password=get_password_hash(payload.password),
@@ -168,13 +168,23 @@ def create_user(
             detail="A user with this email already exists",
         )
 
-    if payload.organisation_id:
-        from app.db.models import OrganisationMembership, Organisation
+    # Auto-join the admin's organisation (or explicit org_id if provided)
+    from app.db.models import OrganisationMembership, Organisation
+    target_org_id = payload.organisation_id
+    if not target_org_id:
+        admin_membership = (
+            db.query(OrganisationMembership)
+            .filter(OrganisationMembership.user_id == current_user.id)
+            .first()
+        )
+        if admin_membership:
+            target_org_id = admin_membership.organisation_id
 
-        org = db.query(Organisation).filter(Organisation.id == payload.organisation_id).first()
+    if target_org_id:
+        org = db.query(Organisation).filter(Organisation.id == target_org_id).first()
         if org:
             membership = OrganisationMembership(
-                organisation_id=payload.organisation_id,
+                organisation_id=target_org_id,
                 user_id=user.id,
                 role="member",
             )

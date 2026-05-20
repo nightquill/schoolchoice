@@ -172,12 +172,7 @@ function LoginPage() {
               {loading ? t('auth.loggingIn') : t('auth.logIn')}
             </Button>
           </div>
-          {mode === 'teacher' && (
-            <p style={{ marginTop: 'var(--space-3)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
-              {t('auth.noAccount')}{' '}
-              <a href="/register" style={{ color: 'var(--color-primary)' }}>{t('auth.register')}</a>
-            </p>
-          )}
+          {/* Self-registration removed — teachers are created by admin */}
         </form>
       </FormCard>
     </div>

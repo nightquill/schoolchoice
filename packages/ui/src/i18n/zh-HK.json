@@ -111,7 +111,9 @@
     "awaitingReview": "待審核",
     "studentDataImport": "學生資料匯入",
     "default": "預設",
-    "exportFailed": "匯出失敗，請重試。"
+    "exportFailed": "匯出失敗，請重試。",
+    "allStudentsCohort": "所有學生",
+    "allStudentsDesc": "自動包含本校所有學生。"
   },
   "alerts": {
     "title": "提醒",

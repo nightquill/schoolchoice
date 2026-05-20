@@ -768,7 +768,9 @@
     "awaitingReview": "awaiting review",
     "studentDataImport": "Student Data Import",
     "default": "Default",
-    "exportFailed": "Export failed. Please try again."
+    "exportFailed": "Export failed. Please try again.",
+    "allStudentsCohort": "All Students",
+    "allStudentsDesc": "Automatically includes every student in this school."
   },
   "targets": {
     "backToProfile": "Back to Profile",
