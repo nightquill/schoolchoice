@@ -16,7 +16,9 @@ import { getAllProgrammes } from '../../api/jupas';
 import { getSfProgrammes } from '../../api/selfFinancing';
 import { getAutoRecommendations } from '../../api/match';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 import { getRequirementBadges } from '../../utils/requirementBadges';
+import { useLocalizedName } from '../../utils/localizedName';
 // SubmissionHistory moved to separate /submissions page
 
 /* ── Admission band helpers ── */
@@ -40,6 +42,8 @@ const BAND_COLORS = {
 
 export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
   const { t } = useTranslation();
+  const { canEdit: canEditChoices } = useFeatureAccess('programme_choices');
+  const ln = useLocalizedName();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -315,11 +319,11 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
       {/* JUPAS 選科表 — 25 choices grouped into bands A-E */}
       {(() => {
         const BANDS = [
-          { id: 'A', slots: [1, 2, 3], bg: '#fff1f2', border: '#fecdd3', fg: '#be123c', tip: 'Top picks — very confident' },
-          { id: 'B', slots: [4, 5, 6], bg: '#fef9c3', border: '#fde68a', fg: '#a16207', tip: 'Strong interest, good chance' },
-          { id: 'C', slots: [7, 8, 9, 10], bg: '#d1fae5', border: '#a7f3d0', fg: '#047857', tip: 'Interested, reasonable chance' },
-          { id: 'D', slots: [11, 12, 13, 14], bg: '#dbeafe', border: '#bfdbfe', fg: '#1d4ed8', tip: 'Backup choices' },
-          { id: 'E', slots: [15, 16, 17, 18, 19, 20], bg: '#f1f5f9', border: '#e2e8f0', fg: '#475569', tip: 'Safety net' },
+          { id: 'A', slots: [1, 2, 3], bg: '#fff1f2', border: '#fecdd3', fg: '#be123c', tip: t('bands.A') },
+          { id: 'B', slots: [4, 5, 6], bg: '#fef9c3', border: '#fde68a', fg: '#a16207', tip: t('bands.B') },
+          { id: 'C', slots: [7, 8, 9, 10], bg: '#d1fae5', border: '#a7f3d0', fg: '#047857', tip: t('bands.C') },
+          { id: 'D', slots: [11, 12, 13, 14], bg: '#dbeafe', border: '#bfdbfe', fg: '#1d4ed8', tip: t('bands.D') },
+          { id: 'E', slots: [15, 16, 17, 18, 19, 20], bg: '#f1f5f9', border: '#e2e8f0', fg: '#475569', tip: t('bands.E') },
         ];
         // Map targets to slots by rank (1-indexed)
         const slotMap = {};
@@ -342,7 +346,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
               <thead>
                 <tr>
                   <th style={{ ...thStyle, width: '50px' }}>{t('programmes.rank')}</th>
-                  <th style={{ ...thStyle, width: '40px' }}>Band</th>
+                  <th style={{ ...thStyle, width: '40px' }}>{t('programmeDetail.band')}</th>
                   <th style={{ ...thStyle, width: '80px' }}>{t('programmes.code')}</th>
                   <th style={thStyle}>{t('programmes.name')}</th>
                   <th style={{ ...thStyle, width: '80px' }}>{t('programmes.score')}</th>
@@ -379,11 +383,11 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                           {tgt ? (
                             <div>
                               <div style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                                {tgt.school_name ? `${tgt.school_name} — ` : ''}{tgt.programme_name || '—'}
+                                {tgt.school_name ? `${ln(tgt, 'school_name')} — ` : ''}{ln(tgt, 'programme_name')}
                               </div>
-                              {tgt.at_risk && <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', background: '#dc2626', padding: '1px 5px', borderRadius: '6px', marginTop: '2px', display: 'inline-block' }}>AT RISK</span>}
+                              {tgt.at_risk && <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', background: '#dc2626', padding: '1px 5px', borderRadius: '6px', marginTop: '2px', display: 'inline-block' }}>{t('programmeDetail.atRisk')}</span>}
                               {!tgt.eligibility_pass && tgt.eligibility_pass !== null && (
-                                <span style={{ fontSize: '10px', fontWeight: 600, color: '#991b1b', marginLeft: '4px' }}>INELIGIBLE</span>
+                                <span style={{ fontSize: '10px', fontWeight: 600, color: '#991b1b', marginLeft: '4px' }}>{t('programmeDetail.ineligible').toUpperCase()}</span>
                               )}
                               {tgt.jupas_code && getRequirementBadges(progReqsMap[tgt.jupas_code], true).map((badge) => (
                                 <span key={badge.label} style={{ fontSize: '10px', fontWeight: 600, color: badge.color, background: badge.bg, padding: '1px 5px', borderRadius: '6px', marginLeft: '4px', display: 'inline-block' }}>{badge.label}</span>
@@ -391,8 +395,9 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                             </div>
                           ) : (
                             <span
-                              onClick={() => { setAddingToSlot(slot); setAddModalOpen(true); }}
-                              style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-xs)', cursor: 'pointer', textDecoration: 'underline', fontStyle: 'italic' }}
+                              onClick={() => { if (canEditChoices) { setAddingToSlot(slot); setAddModalOpen(true); } }}
+                              title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : undefined}
+                              style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-xs)', cursor: !canEditChoices ? 'not-allowed' : 'pointer', textDecoration: 'underline', fontStyle: 'italic', opacity: !canEditChoices ? 0.5 : undefined }}
                             >{t('programmes.addSlot')}</span>
                           )}
                         </td>
@@ -412,8 +417,8 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                         <td style={tdBase}>
                           {tgt && (
                             <div style={{ display: 'flex', gap: '2px' }}>
-                              <button style={iconBtnStyle} onClick={() => handleOpenEdit(tgt)} aria-label="Edit" title="Edit">✎</button>
-                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)' }} onClick={() => handleRemove(tgt)} aria-label="Remove" title="Remove">×</button>
+                              <button style={{ ...iconBtnStyle, opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && handleOpenEdit(tgt)} disabled={!canEditChoices} aria-label="Edit" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Edit'}>✎</button>
+                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)', opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && handleRemove(tgt)} disabled={!canEditChoices} aria-label="Remove" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Remove'}>×</button>
                             </div>
                           )}
                         </td>
@@ -466,7 +471,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                           border: isSelected ? 'var(--border-width) solid var(--color-primary)' : 'var(--border-width) solid transparent',
                           marginBottom: 'var(--space-1)',
                         }}>
-                          <div style={{ fontWeight: 'var(--font-weight-medium)' }}>{rec.school_name ?? rec.name}</div>
+                          <div style={{ fontWeight: 'var(--font-weight-medium)' }}>{ln(rec, 'school_name') !== '—' ? ln(rec, 'school_name') : ln(rec, 'name')}</div>
                           {rec.major_name && (
                             <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', marginTop: '2px' }}>
                               {rec.major_name}{rec.major_jupas_code ? ` (${rec.major_jupas_code})` : ''}
@@ -474,7 +479,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                           )}
                           {rec.final_score != null && (
                             <div style={{ fontSize: 'var(--font-size-xs)', color: rec.final_score >= 0.7 ? 'var(--color-success)' : rec.final_score >= 0.4 ? 'var(--color-warning)' : 'var(--color-error)', fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>
-                              {Math.round(rec.final_score * 100)}% match
+                              {Math.round(rec.final_score * 100)}{t('programmeDetail.pctMatch')}
                             </div>
                           )}
                         </li>
@@ -500,7 +505,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                     }}
                     aria-pressed={programmeMode === 'jupas'}
                   >
-                    JUPAS ({allJupasProgs.length})
+                    {t('programmeDetail.jupasToggle')} ({allJupasProgs.length})
                   </button>
                   <button
                     onClick={() => { setProgrammeMode('sf'); setFilters([]); setSearchInput(''); }}
@@ -514,7 +519,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                     }}
                     aria-pressed={programmeMode === 'sf'}
                   >
-                    Self-Financing ({allSfProgs.length})
+                    {t('programmeDetail.sfToggle')} ({allSfProgs.length})
                   </button>
                 </div>
 
@@ -548,7 +553,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                       border: '1px dashed var(--color-primary)', cursor: 'pointer',
                       fontFamily: 'var(--font-family-base)', fontWeight: 500,
                     }}>
-                      + Add filter
+                      {t('programmeDetail.addFilter')}
                     </button>
 
                     {/* Category picker */}
@@ -686,15 +691,15 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                               {prog.level.replace(/_/g, ' ')}
                             </span>
                           )}
-                          <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>{prog.school_name}</span>
+                          <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>{ln(prog, 'school_name')}</span>
                         </div>
-                        <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{prog.name}</div>
+                        <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{ln(prog, 'name')}</div>
                         {prog.faculty && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{prog.faculty}</div>}
                         {prog.website_url && (
                           <a href={prog.website_url} target="_blank" rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                             style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-primary)', textDecoration: 'none', marginTop: '2px', display: 'inline-block' }}>
-                            ↗ JUPAS
+                            {t('programmeDetail.jupasLink')}
                           </a>
                         )}
                       </li>

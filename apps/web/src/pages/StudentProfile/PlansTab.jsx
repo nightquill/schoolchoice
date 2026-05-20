@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 import { usePlansTab } from '../../hooks/usePlansTab';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
@@ -19,6 +20,7 @@ export default function PlansTab({ studentId }) {
     handleDelete,
   } = usePlansTab(studentId);
   const { t } = useTranslation();
+  const { canEdit: canGenerate } = useFeatureAccess('plan_generation');
   const [downloadingPdf, setDownloadingPdf] = useState(null);
   const handleDownloadPdf = useCallback(async (e, planId) => {
     e.stopPropagation();
@@ -58,7 +60,12 @@ export default function PlansTab({ studentId }) {
         <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>
           {t('plans.savedPlans')} ({plans.length})
         </h2>
-        <Button onClick={() => navigate(`/students/${studentId}/consultant?generate=true`)}>{t('plans.generateNew')}</Button>
+        <Button
+          onClick={() => navigate(`/students/${studentId}/consultant?generate=true`)}
+          disabled={!canGenerate}
+          title={!canGenerate ? t('permission.requiresPermission', { permission: t('permission.planGeneration') }) : undefined}
+          style={{ opacity: !canGenerate ? 0.5 : undefined, cursor: !canGenerate ? 'not-allowed' : undefined }}
+        >{t('plans.generateNew')}</Button>
       </div>
 
       {plans.length === 0 && (

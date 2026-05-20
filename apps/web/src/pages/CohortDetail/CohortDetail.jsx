@@ -14,9 +14,12 @@ import {
   addCohortMembers,
   removeCohortMember,
   searchStudents,
+  updateCohort,
 } from '../../api/cohorts';
+import { Input } from '@schoolchoice/ui/primitives/input';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 
 // ---- Grade-numeric display helpers ----
 const GRADE_LABELS = { 7: '5**', 6: '5*', 5: '5', 4: '4', 3: '3', 2: '2', 1: '1', 0: 'U' };
@@ -73,7 +76,9 @@ const tdStyle = {
 
 // ---- Main ----
 function CohortDetail() {
-  const { t } = useTranslation();  const { id } = useParams();
+  const { t } = useTranslation();
+  const { canEdit: canEditCohort } = useFeatureAccess('cohort_management');
+  const { id } = useParams();
   const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [cohort, setCohort] = useState(null);
@@ -96,6 +101,12 @@ function CohortDetail() {
   // Remove confirmation
   const [removeTarget, setRemoveTarget] = useState(null);
   const [removing, setRemoving] = useState(false);
+
+  // Edit cohort name/description
+  const [editingName, setEditingName] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     Promise.all([getCohort(id), getAccount()])
@@ -262,19 +273,53 @@ function CohortDetail() {
         <div>
           <div style={headerStyle}>
             <div>
-              <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                {cohort.name}
-              </h1>
-              {cohort.description && (
-                <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 'var(--space-1) 0 0' }}>
-                  {cohort.description}
-                </p>
+              {editingName ? (
+                <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', width: '280px' }} />
+                  <Input value={editDesc} onChange={(e) => setEditDesc(e.target.value)} placeholder={t('cohorts.descriptionPlaceholder')} style={{ width: '280px' }} />
+                  <Button disabled={savingEdit || !editName.trim()} onClick={async () => {
+                    setSavingEdit(true);
+                    try {
+                      const updated = await updateCohort(id, { name: editName.trim(), description: editDesc.trim() || null });
+                      setCohort(prev => ({ ...prev, name: updated.name, description: updated.description }));
+                      setEditingName(false);
+                      toast.success(t('adminManage.saved'));
+                    } catch { toast.error(t('adminManage.saveFailed')); }
+                    finally { setSavingEdit(false); }
+                  }}>{t('common.save')}</Button>
+                  <Button variant="secondary" onClick={() => setEditingName(false)}>{t('common.cancel')}</Button>
+                </div>
+              ) : (
+                <>
+                  <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0, cursor: cohort.is_default ? 'default' : 'pointer' }}
+                    onClick={() => {
+                      if (cohort.is_default) return;
+                      setEditName(cohort.name);
+                      setEditDesc(cohort.description || '');
+                      setEditingName(true);
+                    }}
+                    title={cohort.is_default ? '' : t('common.edit')}
+                  >
+                    {cohort.name}
+                    {!cohort.is_default && <span style={{ marginLeft: 'var(--space-2)', fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', fontWeight: 'var(--font-weight-normal)' }}>✎</span>}
+                  </h1>
+                  {cohort.description && (
+                    <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', margin: 'var(--space-1) 0 0' }}>
+                      {cohort.description}
+                    </p>
+                  )}
+                </>
               )}
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <Button onClick={() => navigate(`/cohorts/${id}/report`)}>{t('cohortDetail.viewReport')}</Button>
               <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>{t('cohortDetail.bulkEditGrades')}</Button>
-              <Button onClick={() => setAddModalOpen(true)}>{t('cohortDetail.addStudents')}</Button>
+              <Button
+                onClick={() => setAddModalOpen(true)}
+                disabled={!canEditCohort}
+                title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
+                style={{ opacity: !canEditCohort ? 0.5 : undefined, cursor: !canEditCohort ? 'not-allowed' : undefined }}
+              >{t('cohortDetail.addStudents')}</Button>
             </div>
           </div>
 
@@ -321,10 +366,13 @@ function CohortDetail() {
                                 color: 'var(--color-error)',
                                 fontSize: 'var(--font-size-xs)',
                                 padding: 'var(--space-1) var(--space-2)',
-                                cursor: 'pointer',
+                                cursor: !canEditCohort ? 'not-allowed' : 'pointer',
                                 fontFamily: 'var(--font-family-base)',
+                                opacity: !canEditCohort ? 0.5 : undefined,
                               }}
-                              onClick={() => setRemoveTarget(member)}
+                              onClick={() => canEditCohort && setRemoveTarget(member)}
+                              disabled={!canEditCohort}
+                              title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
                               aria-label={`Remove ${member.full_name} from cohort`}
                             >
                               {t('cohortDetail.remove')}

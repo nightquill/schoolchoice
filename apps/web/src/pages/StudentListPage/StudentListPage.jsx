@@ -1,28 +1,35 @@
 // REQ-032: Student Profile Management - Student list with search, import/export
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { NavBar, ActionBar, EmptyState, LoadingSpinner, ErrorMessage } from '@schoolchoice/ui';
+import { EmptyState, LoadingSpinner, ErrorMessage } from '@schoolchoice/ui';
 import { Input } from '@schoolchoice/ui/primitives/input';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 import StudentRow from '../../components/StudentRow/StudentRow';
 import StudentForm from '../../components/StudentForm/StudentForm';
-import { getStudents, createStudent } from '../../api/students';
-import { exportEntityCSV } from '../../api/entities';
+import { getStudents, createStudent, deleteStudent } from '../../api/students';
 import { inviteStudent } from '../../api/invite';
+import { getAccount } from '@schoolchoice/ui/api/account';
+import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 
 function StudentListPage() {
   const { t } = useTranslation();
+  const { canEdit: canDelete } = useFeatureAccess('student_delete');
+  const { canEdit: canInvite } = useFeatureAccess('account_assignment');
+  const { canEdit: canImport } = useFeatureAccess('data_import');
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [searchText, setSearchText] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [isExporting, setIsExporting] = useState(false);
   const [showUnaccounted, setShowUnaccounted] = useState(false);
+  const [account, setAccount] = useState(null);
+
+  useEffect(() => { getAccount().then(setAccount).catch(() => {}); }, []);
 
   useEffect(() => {
     const handle = setTimeout(() => setDebouncedSearch(searchText), 300);
@@ -57,32 +64,6 @@ function StudentListPage() {
       setFormLoading(false);
     }
   };
-
-  const handleExportFiltered = useCallback(async () => {
-    setIsExporting(true);
-    try {
-      const params = {};
-      if (debouncedSearch) params.q = debouncedSearch;
-      await exportEntityCSV('student', params);
-      toast.success(t('studentList.exportSuccess'));
-    } catch {
-      toast.error(t('studentList.exportFailed'));
-    } finally {
-      setIsExporting(false);
-    }
-  }, [debouncedSearch]);
-
-  const handleExportAll = useCallback(async () => {
-    setIsExporting(true);
-    try {
-      await exportEntityCSV('student', {});
-      toast.success(t('studentList.exportSuccess'));
-    } catch {
-      toast.error(t('studentList.exportFailed'));
-    } finally {
-      setIsExporting(false);
-    }
-  }, []);
 
   const pageStyle = {
     minHeight: '100vh',
@@ -141,7 +122,7 @@ function StudentListPage() {
 
   return (
     <div style={pageStyle}>
-      <NavBar />
+      <NavBarV2 account={account} />
       <div className="px-4 md:px-8" style={{ maxWidth: '100%', margin: '0 auto', paddingTop: 'var(--space-8)', paddingBottom: 'var(--space-8)' }}>
         <div style={headerRowStyle}>
           <h1 style={headingStyle}>{t('studentList.title')}</h1>
@@ -149,13 +130,6 @@ function StudentListPage() {
             <Button onClick={() => setShowForm(true)}>{t('studentList.addStudent')}</Button>
           )}
         </div>
-
-        <ActionBar
-          entityName="student"
-          onExportFiltered={handleExportFiltered}
-          onExportAll={handleExportAll}
-          isExporting={isExporting}
-        />
 
         <div style={searchBarStyle}>
           <div style={searchWrapStyle}>
@@ -257,7 +231,22 @@ function StudentListPage() {
                 </tr>
               ) : (
                 students.map((student) => (
-                  <StudentRow key={student.id} student={student} onInvite={inviteStudent} queryClient={queryClient} />
+                  <StudentRow
+                    key={student.id}
+                    student={student}
+                    onInvite={canInvite ? inviteStudent : undefined}
+                    onDelete={async (sid) => {
+                      try {
+                        await deleteStudent(sid);
+                        queryClient.invalidateQueries({ queryKey: ['students'] });
+                        toast.success(t('studentList.deleteSuccess'));
+                      } catch {
+                        toast.error(t('studentList.deleteFailed'));
+                      }
+                    }}
+                    canDelete={canDelete && account?.role === 'admin'}
+                    queryClient={queryClient}
+                  />
                 ))
               )}
             </tbody>

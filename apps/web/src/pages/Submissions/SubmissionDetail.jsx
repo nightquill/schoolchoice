@@ -10,6 +10,7 @@ import { Modal } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 import { getSubmission, approveSubmission, reviseSubmission, rejectSubmission } from '../../api/submissions';
 
 function useBands() {
@@ -25,6 +26,7 @@ function useBands() {
 
 function SubmissionDetail() {
   const { t } = useTranslation();
+  const { canEdit: canEditSubmissions } = useFeatureAccess('submissions');
   const BANDS = useBands();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -346,15 +348,18 @@ function SubmissionDetail() {
               <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'center' }}>
                 <Button
                   onClick={handleApprove}
-                  disabled={actionLoading || flaggedCount > 0}
-                  style={{ background: flaggedCount > 0 ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none' }}
+                  disabled={actionLoading || flaggedCount > 0 || !canEditSubmissions}
+                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
+                  style={{ background: (flaggedCount > 0 || !canEditSubmissions) ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none', opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
                 >
                   {actionLoading ? t('submissions.processing') : t('submissions.approve')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setReviseOpen(true)}
-                  disabled={actionLoading}
+                  disabled={actionLoading || !canEditSubmissions}
+                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
+                  style={{ opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
                 >
                   {flaggedCount > 0
                     ? t('submissions.sendBackFlagged', { count: flaggedCount })
@@ -363,8 +368,9 @@ function SubmissionDetail() {
                 <Button
                   variant="outline"
                   onClick={() => setRejectOpen(true)}
-                  disabled={actionLoading}
-                  style={{ color: '#dc2626', borderColor: '#dc2626' }}
+                  disabled={actionLoading || !canEditSubmissions}
+                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
+                  style={{ color: '#dc2626', borderColor: '#dc2626', opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
                 >
                   {t('submissions.reject')}
                 </Button>

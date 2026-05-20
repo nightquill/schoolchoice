@@ -12,6 +12,7 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess } from '../../hooks/usePermission';
 import { getSubjects } from '../../api/grades';
 import ProgrammeChoicesTab from './ProgrammeChoicesTab';
 import GradesTab from './GradesTab';
@@ -22,6 +23,7 @@ import OtherTab from './OtherTab';
 
 function StudentProfile() {
   const { t } = useTranslation();
+  const { canEdit: canEditProfile } = useFeatureAccess('student_profile');
 
   const TABS = [
     { id: 'programmes', label: t('profile.tabs.programmes') },
@@ -153,9 +155,20 @@ function StudentProfile() {
                   </span>
                 )}
                 {!student.is_graduated && (
-                  <Button variant="secondary" onClick={handleOpenGraduate}>{t('profile.markGraduated')}</Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleOpenGraduate}
+                    disabled={!canEditProfile}
+                    title={!canEditProfile ? t('permission.requiresPermission', { permission: t('permission.studentProfile') }) : undefined}
+                    style={{ opacity: !canEditProfile ? 0.5 : undefined, cursor: !canEditProfile ? 'not-allowed' : undefined }}
+                  >{t('profile.markGraduated')}</Button>
                 )}
-                <Button onClick={handleGeneratePlan}>{t('profile.generatePlan')}</Button>
+                <Button
+                  onClick={handleGeneratePlan}
+                  disabled={!canEditProfile}
+                  title={!canEditProfile ? t('permission.requiresPermission', { permission: t('permission.studentProfile') }) : undefined}
+                  style={{ opacity: !canEditProfile ? 0.5 : undefined, cursor: !canEditProfile ? 'not-allowed' : undefined }}
+                >{t('profile.generatePlan')}</Button>
               </div>
             </div>
 

@@ -17,10 +17,13 @@ import { getEntities, getEntityList } from '../../api/entities';
 import { getCohorts, createCohort } from '../../api/cohorts';
 import AlertsPanel from '../../components/AlertsPanel/AlertsPanel';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useFeatureAccess, useHasAnyAccess } from '../../hooks/usePermission';
 import { Users } from 'lucide-react';
 
 function Dashboard() {
   const { t } = useTranslation();
+  const { canEdit: canImport } = useFeatureAccess('data_import');
+  const { hasAccess, isLoading: accessLoading } = useHasAnyAccess();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showAddForm, setShowAddForm] = useState(false);
@@ -160,6 +163,10 @@ function Dashboard() {
     <div style={pageStyle}>
       <NavBarV2 account={account} />
 
+      {!accessLoading && !hasAccess && account?.role === 'counsellor' ? (
+        <div style={{ textAlign: 'center', padding: '64px 24px', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-md)' }}>{t('permission.noGroupAccess')}</div>
+      ) : (
+      <>
       {/* Config-driven metrics: domain-specific + auto_crud entity counts */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 md:px-8" style={{ paddingTop: 'var(--space-4)', paddingBottom: 'var(--space-4)', background: 'var(--color-surface)', borderBottom: 'var(--border-width) solid var(--color-border)' }} role="region" aria-label="Summary statistics">
         {metrics.map((m) => {
@@ -197,30 +204,77 @@ function Dashboard() {
 
       <main id="main-content" className="px-4 md:px-8" style={{ paddingTop: 'var(--space-6)', paddingBottom: 'var(--space-6)' }}>
         {/* Student data import section */}
-        <h2 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-2) 0' }}>
-          {t('dashboard.studentDataImport')}
-        </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', padding: 'var(--space-3)', background: 'var(--color-surface)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 'var(--space-3)',
+          marginBottom: 'var(--space-6)',
+          padding: 'var(--space-4)',
+          background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, rgba(37,99,235,0.01) 100%)',
+          border: 'var(--border-width) solid var(--color-border)',
+          borderRadius: 'var(--border-radius-md)',
+        }}>
           {!showAddForm && (
-            <Button variant="secondary" onClick={() => setShowAddForm(true)}>{t('dashboard.addStudent')}</Button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
+                padding: 'var(--space-4)', background: 'var(--color-surface)',
+                border: 'var(--border-width) solid var(--color-border)',
+                borderRadius: 'var(--border-radius-md)', cursor: 'pointer',
+                fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              <span style={{ fontSize: '24px' }}>+</span>
+              <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('dashboard.addStudent')}</span>
+            </button>
           )}
-          <Button variant="outline" onClick={() => navigate('/import/students')}>
-            {t('import.importCsvExcel')}
-          </Button>
-          <Button variant="outline" onClick={async () => {
-            try {
-              const { default: client } = await import('@schoolchoice/ui/api/client');
-              const resp = await client.get('/api/v1/entities/student/export', { responseType: 'blob' });
-              const url = URL.createObjectURL(resp.data);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
-              a.click();
-              URL.revokeObjectURL(url);
-            } catch { /* ignore */ }
-          }}>
-            {t('dashboard.exportStudents')}
-          </Button>
+          <button
+            onClick={() => canImport && navigate('/import/students')}
+            disabled={!canImport}
+            title={!canImport ? t('permission.requiresPermission', { permission: t('permission.dataImport') }) : undefined}
+            style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
+              padding: 'var(--space-4)', background: 'var(--color-surface)',
+              border: 'var(--border-width) solid var(--color-border)',
+              borderRadius: 'var(--border-radius-md)', cursor: !canImport ? 'not-allowed' : 'pointer',
+              fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+              opacity: !canImport ? 0.5 : undefined,
+            }}
+            onMouseEnter={(e) => { if (canImport) { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
+          >
+            <span style={{ fontSize: '24px' }}>&#8593;</span>
+            <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('import.importCsvExcel')}</span>
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                const { default: client } = await import('@schoolchoice/ui/api/client');
+                const resp = await client.get('/api/v1/entities/student/export', { responseType: 'blob' });
+                const url = URL.createObjectURL(resp.data);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              } catch { /* ignore */ }
+            }}
+            style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
+              padding: 'var(--space-4)', background: 'var(--color-surface)',
+              border: 'var(--border-width) solid var(--color-border)',
+              borderRadius: 'var(--border-radius-md)', cursor: 'pointer',
+              fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
+          >
+            <span style={{ fontSize: '24px' }}>&#8595;</span>
+            <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('dashboard.exportStudents')}</span>
+          </button>
         </div>
 
         {showAddForm && (
@@ -324,11 +378,14 @@ function Dashboard() {
 
             {!cohortsQuery.isLoading && cohorts.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Cohort list">
-                {cohorts.map((cohort) => (
+                {[...cohorts].sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0)).map((cohort) => (
                   <Card
                     key={cohort.id}
                     role="listitem"
-                    style={{ cursor: 'pointer', transition: 'box-shadow 0.15s' }}
+                    style={{
+                      cursor: 'pointer', transition: 'box-shadow 0.15s',
+                      ...(cohort.is_default ? { borderColor: 'var(--color-primary)', borderWidth: '2px' } : {}),
+                    }}
                     onClick={() => navigate(`/cohorts/${cohort.id}`)}
                     onKeyDown={(e) => e.key === 'Enter' && navigate(`/cohorts/${cohort.id}`)}
                     tabIndex={0}
@@ -339,10 +396,15 @@ function Dashboard() {
                         <CardTitle style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)' }}>
                           {cohort.name}
                         </CardTitle>
+                        {cohort.is_default && (
+                          <span style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-info-bg)', color: 'var(--color-primary)', padding: '1px 8px', borderRadius: '10px', fontWeight: 600, flexShrink: 0 }}>
+                            {t('dashboard.default')}
+                          </span>
+                        )}
                       </div>
                     </CardHeader>
                     <CardContent>
-                      {cohort.description && (
+                      {cohort.description && !cohort.is_default && (
                         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-2) 0' }}>
                           {cohort.description}
                         </p>
@@ -358,6 +420,8 @@ function Dashboard() {
           </div>
         )}
       </main>
+      </>
+      )}
 
       {/* Create cohort dialog */}
       <Dialog open={showCreateCohort} onOpenChange={setShowCreateCohort}>
