@@ -66,7 +66,8 @@ function Dashboard() {
   useEffect(() => {
     if (account?.preferred_language) {
       const loc = account.preferred_language === 'zh-HK' ? 'zh-HK' : 'en';
-      if (localStorage.getItem('locale') !== loc) {
+      if (sessionStorage.getItem('locale') !== loc) {
+        sessionStorage.setItem('locale', loc);
         localStorage.setItem('locale', loc);
         setLocale(loc);
       }

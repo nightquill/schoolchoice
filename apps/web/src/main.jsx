@@ -10,7 +10,7 @@ import App from './App.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
-      <I18nProvider initialLocale={localStorage.getItem('locale') || 'en'}>
+      <I18nProvider initialLocale={sessionStorage.getItem('locale') || localStorage.getItem('locale') || 'en'}>
         <App />
         <Toaster position="bottom-right" richColors />
       </I18nProvider>

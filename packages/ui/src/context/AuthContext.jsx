@@ -5,24 +5,26 @@ import { getAccount } from '../api/account';
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [token, setToken] = useState(() => sessionStorage.getItem('token') || localStorage.getItem('token'));
   const [user, setUser] = useState(null);
   const isAuthenticated = !!token;
 
   const logout = useCallback(() => {
+    sessionStorage.removeItem('token');
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
   }, []);
 
   const login = useCallback(async (t) => {
+    sessionStorage.setItem('token', t);
     localStorage.setItem('token', t);
     setToken(t);
     try {
       const data = await getAccount();
       setUser(data);
     } catch {
-      // If account fetch fails after login, clear state
+      sessionStorage.removeItem('token');
       localStorage.removeItem('token');
       setToken(null);
       setUser(null);

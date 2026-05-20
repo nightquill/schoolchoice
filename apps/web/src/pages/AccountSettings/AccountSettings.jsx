@@ -48,6 +48,7 @@ function AccountSettings() {
         setPreferredLanguage(data.preferred_language || 'en');
         const loc = data.preferred_language === 'zh-HK' ? 'zh-HK' : 'en';
         setLocale(loc);
+        sessionStorage.setItem('locale', loc);
         localStorage.setItem('locale', loc);
       })
       .catch(() => setError(t('account.loading')))
@@ -104,6 +105,7 @@ function AccountSettings() {
       const updated = await updateAccount({ preferred_language: preferredLanguage });
       setAccount(updated);
       const newLocale = preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en';
+      sessionStorage.setItem('locale', newLocale);
       localStorage.setItem('locale', newLocale);
       setLocale(newLocale);
       // Reload page so all components pick up the new locale cleanly
