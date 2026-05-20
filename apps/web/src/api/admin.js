@@ -35,3 +35,6 @@ export const getPlanDetailLevel = () =>
 
 export const setPlanDetailLevel = (level) =>
   put('/api/v1/admin/settings/plan-detail-level', { level });
+
+export const updateUserStatus = (userId, status) =>
+  put(`/api/v1/admin/users/${userId}/status`, { status });

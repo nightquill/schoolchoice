@@ -17,3 +17,6 @@ export const deleteStudent = (id) =>
 
 export const graduateStudent = (id, data) =>
   post(`/api/v1/students/${id}/graduate`, data);
+
+export const getDeletePreview = (id) =>
+  get(`/api/v1/students/${id}/delete-preview`);
