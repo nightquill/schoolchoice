@@ -77,6 +77,7 @@ def _build_full_response(student: Student) -> dict:
         "id": student.id,
         "user_id": student.user_id,
         "name": student.name,
+        "name_zh": student.name_zh,
         "grades": student.grades or {},
         "interests": student.interests or [],
         "strengths_weaknesses": student.strengths_weaknesses or "",
@@ -186,7 +187,7 @@ def export_students(
             grade_map[sid][subj.code] = raw
 
     # CSV columns: Name, Candidate Number, then one column per subject
-    field_names = ["Name", "Candidate Number"] + subject_codes
+    field_names = ["Name", "Name (Chinese)", "Candidate Number"] + subject_codes
 
     def generate():
         output = io.StringIO()
@@ -197,6 +198,7 @@ def export_students(
             output = io.StringIO()
             row = {
                 "Name": s.name,
+                "Name (Chinese)": getattr(s, "name_zh", None) or "",
                 "Candidate Number": s.candidate_number or "",
             }
             sg = grade_map.get(str(s.id), {})
@@ -286,6 +288,7 @@ def list_students(
         item.full_name = s.name
         item.has_at_risk_targets = s.id in at_risk_set
         item_dict = item.model_dump()
+        item_dict["name_zh"] = getattr(s, "name_zh", None)
         item_dict["has_account"] = s.id in account_sids
         item_dict["invite_status"] = (
             "accepted" if getattr(s, "invite_accepted_at", None)
@@ -376,6 +379,8 @@ def update_student_profile(
     # `full_name` in request → `name` in model
     if "full_name" in update_fields:
         student.name = update_fields.pop("full_name")
+    if "name_zh" in update_fields:
+        student.name_zh = update_fields.pop("name_zh")
 
     for field, value in update_fields.items():
         if hasattr(student, field):
