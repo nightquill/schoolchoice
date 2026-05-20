@@ -5,7 +5,8 @@ export function usePermissions() {
   const { data, isLoading } = useQuery({
     queryKey: ['my-permissions'],
     queryFn: getMyPermissions,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
   return { permissions: data?.cohorts ?? [], isLoading };
 }

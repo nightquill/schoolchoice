@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { LoadingSpinner } from '@schoolchoice/ui';
@@ -8,6 +8,7 @@ import { getGroupPermissions, setGroupPermissions } from '../../api/teacherGroup
 
 export default function GroupPermissions({ groupId }) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const TOOLS = [
     { key: 'programme_choices', label: t('groupPermissions.programmes') },
@@ -58,6 +59,7 @@ export default function GroupPermissions({ groupId }) {
       await setGroupPermissions(groupId, localPerms);
       toast.success(t('groupPermissions.saved'));
       setDirty(false);
+      queryClient.invalidateQueries({ queryKey: ['my-permissions'] });
     } catch {
       toast.error(t('groupPermissions.failedSave'));
     } finally {
