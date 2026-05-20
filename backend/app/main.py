@@ -214,6 +214,91 @@ def _seed_database():
 
 _seed_database()
 
+
+def _ensure_all_cohorts():
+    """Ensure every organisation has an immutable 'All' default cohort.
+
+    Runs once at startup. If the cohort already exists, no-op.
+    Also back-fills any students not yet in the All cohort.
+    """
+    from sqlalchemy import text as _t
+    from sqlalchemy.orm import Session as _Sess
+    from app.db.models import Organisation, CohortPermission, TeacherGroup
+    from app.db.models_v2 import StudentCohort, CohortMembership
+
+    with _Sess(engine) as db:
+        orgs = db.query(Organisation).all()
+        for org in orgs:
+            existing = (
+                db.query(StudentCohort)
+                .filter(StudentCohort.organisation_id == org.id, StudentCohort.is_default.is_(True))
+                .first()
+            )
+            if existing:
+                # Back-fill: add any students not yet in the All cohort
+                from app.db.models import Student
+                all_students = db.query(Student.id).filter(Student.organisation_id == org.id).all()
+                existing_members = set(
+                    r[0] for r in db.query(CohortMembership.student_id)
+                    .filter(CohortMembership.cohort_id == existing.id).all()
+                )
+                for (sid,) in all_students:
+                    if sid not in existing_members:
+                        db.add(CohortMembership(cohort_id=existing.id, student_id=sid))
+                db.commit()
+                continue
+
+            # Find any admin user in this org to own the cohort
+            from app.db.models import OrganisationMembership
+            owner_row = (
+                db.query(OrganisationMembership)
+                .filter(OrganisationMembership.organisation_id == org.id)
+                .first()
+            )
+            if not owner_row:
+                continue
+
+            from app.services.default_cohort import ALL_STUDENTS_NAME_EN
+            cohort = StudentCohort(
+                user_id=owner_row.user_id,
+                organisation_id=org.id,
+                name=ALL_STUDENTS_NAME_EN,
+                description="All students in this organisation",
+                is_default=True,
+            )
+            db.add(cohort)
+            db.flush()
+
+            # Create permissions for all teacher groups
+            groups = db.query(TeacherGroup).filter(TeacherGroup.organisation_id == org.id).all()
+            for grp in groups:
+                db.add(CohortPermission(
+                    group_id=grp.id, cohort_id=cohort.id,
+                    visible=True,
+                    programme_choices="read_write",
+                    grades="read_write",
+                    plan_generation="read_write",
+                    submissions="read_write",
+                    reports="read_only",
+                    cohort_management="none",
+                    data_import="none",
+                    account_assignment="none",
+                    student_delete="none",
+                    student_profile="read_write",
+                ))
+
+            # Add all existing students
+            from app.db.models import Student
+            students = db.query(Student).filter(Student.organisation_id == org.id).all()
+            for s in students:
+                db.add(CohortMembership(cohort_id=cohort.id, student_id=s.id))
+
+            db.commit()
+            _startup_logger.info(f"Created default 'All' cohort for org {org.name}")
+
+
+_ensure_all_cohorts()
+
 # ---------------------------------------------------------------------------
 # Runtime column migrations (PostgreSQL only — SQLite does not support
 # IF NOT EXISTS in ALTER TABLE; guard prevents test suite collection errors)

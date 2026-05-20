@@ -349,6 +349,8 @@ def update_cohort(
     """Update cohort name or description."""
     _require_cohort_management(current_user, db)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    if getattr(cohort, "is_default", False):
+        raise HTTPException(status_code=400, detail="Cannot edit the default 'All' cohort.")
     if payload.name is not None:
         cohort.name = payload.name
     if payload.description is not None:
@@ -374,7 +376,7 @@ def delete_cohort(
     _require_cohort_management(current_user, db)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     if getattr(cohort, "is_default", False):
-        raise HTTPException(status_code=400, detail="Cannot delete the default 'All Students' cohort.")
+        raise HTTPException(status_code=400, detail="Cannot delete the default 'All' cohort.")
     db.delete(cohort)
     db.commit()
 
@@ -447,7 +449,9 @@ def remove_member(
     current_user: User = Depends(get_current_user),
 ):
     """Remove a student from a cohort."""
-    _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    if getattr(cohort, "is_default", False):
+        raise HTTPException(status_code=400, detail="Cannot remove students from the default 'All' cohort.")
     membership = (
         db.query(CohortMembership)
         .filter(

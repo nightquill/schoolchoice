@@ -12,8 +12,8 @@ from sqlalchemy.orm import Session
 
 from app.db.models_v2 import CohortMembership, StudentCohort
 
-ALL_STUDENTS_NAME_EN = "All Students"
-ALL_STUDENTS_NAME_ZH = "所有學生"
+ALL_STUDENTS_NAME_EN = "All"
+ALL_STUDENTS_NAME_ZH = "全部"
 
 
 def get_or_create_default_cohort(

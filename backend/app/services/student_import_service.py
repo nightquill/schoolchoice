@@ -833,43 +833,8 @@ def commit_import(
     subjects = db.query(Subject).all()
     code_to_subject: dict[str, Subject] = {s.code.upper(): s for s in subjects}
 
-    # Auto-create import cohort if no cohort column in CSV
+    # Check if CSV has an explicit cohort column
     has_cohort_column = any(r.get("profile", {}).get("cohort") for r in rows if r["status"] != "error")
-    auto_cohort = None
-    if not has_cohort_column:
-        from datetime import timezone as _tz
-        from app.db.models_v2 import StudentCohort
-        from app.db.models import User as UserModel
-        user_obj = db.query(UserModel).filter(UserModel.id == user_id).first()
-        auto_name = f"Import {datetime.now(_tz.utc).strftime('%Y-%m-%d')} by {user_obj.display_name or user_obj.email if user_obj else user_id}"
-        auto_cohort = StudentCohort(
-            user_id=user_id,
-            organisation_id=org_id,
-            name=auto_name,
-            description="Auto-created from CSV import",
-        )
-        db.add(auto_cohort)
-        db.flush()
-
-        # Auto-create CohortPermission rows for ALL existing teacher groups
-        from app.db.models import CohortPermission, TeacherGroup as _TG2
-        org_groups = db.query(_TG2).filter(_TG2.organisation_id == org_id).all()
-        for grp in org_groups:
-            db.add(CohortPermission(
-                group_id=grp.id, cohort_id=auto_cohort.id,
-                visible=True,
-                programme_choices="read_write",
-                grades="read_write",
-                plan_generation="read_write",
-                submissions="read_write",
-                reports="read_only",
-                cohort_management="none",
-                data_import="none",
-                account_assignment="none",
-                student_delete="none",
-                student_profile="read_write",
-            ))
-        db.flush()
 
     created = 0
     updated = 0
@@ -1029,15 +994,11 @@ def commit_import(
                     cm = CohortMembership(cohort_id=cohort.id, student_id=student.id)
                     db.add(cm)
 
-            # --- Auto-cohort assignment (when no cohort column in CSV) ---
-            if auto_cohort and not row.get("profile", {}).get("cohort"):
-                from app.db.models_v2 import CohortMembership as CM
-                existing_cm = db.query(CM).filter(
-                    CM.cohort_id == auto_cohort.id,
-                    CM.student_id == student.id,
-                ).first()
-                if not existing_cm:
-                    db.add(CM(cohort_id=auto_cohort.id, student_id=student.id))
+            # --- Always add student to the "All" default cohort ---
+            from app.services.default_cohort import ensure_student_in_default_cohort
+            ensure_student_in_default_cohort(
+                db, student_id=student.id, organisation_id=org_id, user_id=user_id,
+            )
 
             # Collect per-row warnings
             all_warnings.extend(
