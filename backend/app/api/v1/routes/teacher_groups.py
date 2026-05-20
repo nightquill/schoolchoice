@@ -142,6 +142,30 @@ def create_group(
         description=payload.description,
     )
     db.add(group)
+    db.flush()
+
+    # Auto-create CohortPermission rows for all org cohorts with read_write defaults
+    org_cohorts = db.query(StudentCohort).filter(
+        StudentCohort.organisation_id == org_membership.organisation_id
+    ).all()
+    for cohort in org_cohorts:
+        perm = CohortPermission(
+            group_id=group.id,
+            cohort_id=cohort.id,
+            visible=True,
+            programme_choices="read_write",
+            grades="read_write",
+            plan_generation="read_write",
+            submissions="read_write",
+            reports="read_only",
+            cohort_management="none",
+            data_import="none",
+            account_assignment="none",
+            student_delete="none",
+            student_profile="read_write",
+        )
+        db.add(perm)
+
     db.commit()
     db.refresh(group)
     return {
