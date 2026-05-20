@@ -25,6 +25,7 @@ from app.db.models_v2 import (
 from app.db.session import get_db
 from app.modules.school_choice.models.models import School, Student
 from app.modules.school_choice.services.hkdse_service import grade_to_int
+from app.services.permission_service import check_feature_permission
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
@@ -56,6 +57,21 @@ def _member_student_ids(cohort: StudentCohort) -> list[UUID]:
     return [m.student_id for m in cohort.memberships]
 
 
+def _check_cohort_feature(db, user, cohort, feature):
+    """Check permission on a cohort by testing against its first member."""
+    if user.role == "admin":
+        return
+    member_ids = _member_student_ids(cohort)
+    if not member_ids:
+        return
+    perm = check_feature_permission(user, db, student_id=member_ids[0], feature=feature)
+    if perm == "none":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"No {feature} access for this cohort.",
+        )
+
+
 # ---------------------------------------------------------------------------
 # GET /reports/cohort/{cohort_id}/target-distribution
 # ---------------------------------------------------------------------------
@@ -68,6 +84,7 @@ def target_distribution(
 ):
     """School target distribution across cohort members."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    _check_cohort_feature(db, current_user, cohort, "reports")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:
@@ -115,6 +132,7 @@ def risk_breakdown(
 ):
     """Risk breakdown by class — how many students have at-risk targets."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    _check_cohort_feature(db, current_user, cohort, "reports")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:
@@ -169,6 +187,7 @@ def subject_performance(
 ):
     """Per-subject performance stats for cohort members."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    _check_cohort_feature(db, current_user, cohort, "reports")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:
