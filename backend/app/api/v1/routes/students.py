@@ -117,6 +117,103 @@ def _build_full_response(student: Student) -> dict:
     }
 
 
+# Student data export — name, candidate_number, grades only
+@router.get("/export", status_code=status.HTTP_200_OK)
+def export_students(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Export student data as CSV: name, candidate_number, and subject grades.
+
+    Only exports students visible to the current user's organisation.
+    Robust to scope changes — columns are derived from actual grade data.
+    """
+    import csv
+    import io
+    from datetime import date
+    from fastapi.responses import StreamingResponse
+    from app.modules.school_choice.models.models import StudentSubjectGrade
+    from app.db.models_v2 import Subject
+
+    students = student_service.get_students(
+        db, user_id=current_user.id, organisation_id=_org_id(current_user),
+    )
+    from app.services.permission_service import get_visible_student_ids
+    visible_ids = get_visible_student_ids(current_user, db)
+    if visible_ids is not None:
+        students = [s for s in students if s.id in visible_ids]
+
+    if current_user.role != "admin":
+        from app.services.permission_service import resolve_user_permissions
+        user = db.merge(current_user)
+        perms = resolve_user_permissions(user, db)
+        has_export = any(p.get("data_export") in ("read_only", "read_write") for p in perms)
+        if not has_export:
+            from fastapi import HTTPException as _HTTPExcExport
+            raise _HTTPExcExport(status_code=status.HTTP_403_FORBIDDEN, detail="Data export permission required.")
+
+    # Collect all subject codes used across all students
+    all_student_ids = [s.id for s in students]
+    all_grades = []
+    if all_student_ids:
+        all_grades = (
+            db.query(StudentSubjectGrade)
+            .filter(StudentSubjectGrade.student_id.in_(all_student_ids))
+            .all()
+        )
+
+    # Build subject code → name lookup
+    subjects = {s.id: s for s in db.query(Subject).all()}
+    subject_codes = sorted({
+        subjects[g.subject_id].code
+        for g in all_grades
+        if g.subject_id in subjects
+    })
+
+    # Build grade lookup: student_id → {subject_code: best_grade}
+    from app.modules.school_choice.services.hkdse_service import grade_to_int
+    grade_map: dict[str, dict[str, str]] = {}
+    for g in all_grades:
+        subj = subjects.get(g.subject_id)
+        if not subj:
+            continue
+        sid = str(g.student_id)
+        raw = g.raw_grade or g.predicted_grade or ""
+        if sid not in grade_map:
+            grade_map[sid] = {}
+        existing = grade_map[sid].get(subj.code)
+        if existing is None or grade_to_int(raw) > grade_to_int(existing):
+            grade_map[sid][subj.code] = raw
+
+    # CSV columns: Name, Candidate Number, then one column per subject
+    field_names = ["Name", "Candidate Number"] + subject_codes
+
+    def generate():
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=field_names)
+        writer.writeheader()
+        yield output.getvalue()
+        for s in students:
+            output = io.StringIO()
+            row = {
+                "Name": s.name,
+                "Candidate Number": s.candidate_number or "",
+            }
+            sg = grade_map.get(str(s.id), {})
+            for code in subject_codes:
+                row[code] = sg.get(code, "")
+            writer = csv.DictWriter(output, fieldnames=field_names)
+            writer.writerow(row)
+            yield output.getvalue()
+
+    filename = f"students-export-{date.today().isoformat()}.csv"
+    return StreamingResponse(
+        generate(),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 # REQ-015, REQ-032
 @router.get("", status_code=status.HTTP_200_OK)
 def list_students(
@@ -135,7 +232,6 @@ def list_students(
     """List student profiles owned by the authenticated counselor (paginated). REQ-015, REQ-032"""
     from sqlalchemy import select
     from app.db.models import User as UserModel
-    from app.services.student_service import compute_best5
 
     all_students = student_service.get_students(
         db, user_id=current_user.id, organisation_id=_org_id(current_user),
@@ -197,7 +293,8 @@ def list_students(
             else "none"
         )
         item_dict["email"] = getattr(s, "email", None)
-        item_dict["best5"] = compute_best5(s.grades)
+        item_dict["best5"] = _compute_best5_from_v2(s)
+        item_dict["user_id"] = str(s.user_id) if s.user_id else None
         result.append(item_dict)
     return {"items": result, "total": total}
 
@@ -299,6 +396,10 @@ def update_language_scores(
 ):
     """Save IELTS and other language scores for a student."""
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
 
     # Pack flat IELTS fields into the JSONB structure
     existing_ielts = student.ielts_score or {}
@@ -356,6 +457,10 @@ def update_teacher_evaluations(
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid teacher evaluation data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        from fastapi import HTTPException as _HTTPExc
+        raise _HTTPExc(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     student.teacher_evaluation = validated
     db.commit()
     db.refresh(student)
@@ -378,6 +483,10 @@ def update_extracurricular(
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid extracurricular data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        from fastapi import HTTPException as _HTTPExc2
+        raise _HTTPExc2(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     student.extra_curricular = validated
     db.commit()
     db.refresh(student)
@@ -400,6 +509,10 @@ def update_awards(
         from fastapi import HTTPException
         raise HTTPException(status_code=422, detail=f"Invalid award data: {exc}")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        from fastapi import HTTPException as _HTTPExc3
+        raise _HTTPExc3(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     student.awards = validated
     db.commit()
     db.refresh(student)
@@ -417,6 +530,10 @@ def graduate_student(
     """Mark a student as graduated with their final school and major. Feeds the analytics data store."""
     from datetime import date as _date
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        from fastapi import HTTPException as _HTTPExc4
+        raise _HTTPExc4(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     student.is_graduated = True
     if payload.final_school_id is not None:
         student.final_school_id = payload.final_school_id
