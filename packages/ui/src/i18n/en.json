@@ -138,6 +138,7 @@
   "personal": {
     "fullName": "Full Name",
     "preferredName": "Preferred Name",
+    "chineseName": "Chinese Name",
     "dateOfBirth": "Date of Birth",
     "age": "Age: {age}",
     "gender": "Gender",
@@ -1282,8 +1283,7 @@
     "programmes": "Programmes",
     "grades": "Grades",
     "plans": "Plans",
-    "submissions": "Submissions",
-    "reports": "Reports",
+    "dataAnalysis": "Data Analysis",
     "cohortMgmt": "Cohort Mgmt",
     "dataImport": "Data Import",
     "accountAssign": "Account Assign",
@@ -1537,6 +1537,7 @@
   "permission": {
     "requiresPermission": "Requires {permission} permission — contact your admin",
     "noGroupAccess": "Your administrator hasn’t assigned you to any groups yet. Contact them to get started.",
+    "noAccess": "You do not have permission to access this page. Contact your administrator.",
     "programmeChoices": "programme choices",
     "grades": "grades",
     "planGeneration": "plan generation",
