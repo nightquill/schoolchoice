@@ -712,13 +712,23 @@ def commit_import(
         db.add(auto_cohort)
         db.flush()
 
-        # Auto-grant visibility to importer's groups
-        from app.db.models import CohortPermission, TeacherGroupMember
-        user_group_ids = [m.group_id for m in db.query(TeacherGroupMember).filter(TeacherGroupMember.user_id == user_id).all()]
-        for gid in user_group_ids:
+        # Auto-create CohortPermission rows for ALL existing teacher groups
+        from app.db.models import CohortPermission, TeacherGroup as _TG2
+        org_groups = db.query(_TG2).filter(_TG2.organisation_id == org_id).all()
+        for grp in org_groups:
             db.add(CohortPermission(
-                group_id=gid, cohort_id=auto_cohort.id,
-                visible=True, data_import="read_write", account_assignment="read_write",
+                group_id=grp.id, cohort_id=auto_cohort.id,
+                visible=True,
+                programme_choices="read_write",
+                grades="read_write",
+                plan_generation="read_write",
+                submissions="read_write",
+                reports="read_only",
+                cohort_management="none",
+                data_import="none",
+                account_assignment="none",
+                student_delete="none",
+                student_profile="read_write",
             ))
         db.flush()
 
@@ -841,6 +851,30 @@ def commit_import(
                         description=f"Auto-created from CSV import",
                     )
                     db.add(cohort)
+                    db.flush()
+
+                    # Auto-create CohortPermission rows for ALL existing teacher groups
+                    from app.db.models import CohortPermission as _CP, TeacherGroup as _TG
+                    org_groups = db.query(_TG).filter(_TG.organisation_id == org_id).all()
+                    for grp in org_groups:
+                        existing_perm = db.query(_CP).filter(
+                            _CP.group_id == grp.id, _CP.cohort_id == cohort.id
+                        ).first()
+                        if not existing_perm:
+                            db.add(_CP(
+                                group_id=grp.id, cohort_id=cohort.id,
+                                visible=True,
+                                programme_choices="read_write",
+                                grades="read_write",
+                                plan_generation="read_write",
+                                submissions="read_write",
+                                reports="read_only",
+                                cohort_management="none",
+                                data_import="none",
+                                account_assignment="none",
+                                student_delete="none",
+                                student_profile="read_write",
+                            ))
                     db.flush()
 
                 # Check if membership exists

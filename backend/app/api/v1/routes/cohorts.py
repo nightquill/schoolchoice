@@ -139,14 +139,40 @@ def create_cohort(
 ):
     """Create a new student cohort."""
     _require_cohort_management(current_user, db)
+    org_id = _org_id(current_user)
     cohort = StudentCohort(
         user_id=current_user.id,
-        organisation_id=_org_id(current_user),
+        organisation_id=org_id,
         name=payload.name,
         description=payload.description,
         academic_year=payload.academic_year,
     )
     db.add(cohort)
+    db.flush()
+
+    # Auto-create CohortPermission rows for all existing teacher groups
+    if org_id:
+        from app.db.models import CohortPermission, TeacherGroup
+        org_groups = db.query(TeacherGroup).filter(
+            TeacherGroup.organisation_id == org_id
+        ).all()
+        for grp in org_groups:
+            db.add(CohortPermission(
+                group_id=grp.id,
+                cohort_id=cohort.id,
+                visible=True,
+                programme_choices="read_write",
+                grades="read_write",
+                plan_generation="read_write",
+                submissions="read_write",
+                reports="read_only",
+                cohort_management="none",
+                data_import="none",
+                account_assignment="none",
+                student_delete="none",
+                student_profile="read_write",
+            ))
+
     db.commit()
     db.refresh(cohort)
     return _cohort_to_response(cohort)

@@ -123,9 +123,13 @@ async def preview_import(
 
     summary = {
         "total": len(validated),
+        "new": create_count,
         "create": create_count,
+        "updated": update_count,
         "update": update_count,
+        "errors": error_count,
         "error": error_count,
+        "grades": grade_count,
         "grade_count": grade_count,
     }
 

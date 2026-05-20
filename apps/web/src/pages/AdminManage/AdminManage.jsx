@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { listUsers, createUser, updateUser, getSubmissionRateLimit, setSubmissionRateLimit, getPlanDetailLevel, setPlanDetailLevel } from '../../api/admin';
-import { getCohorts, createCohort, deleteCohort, getCohort, addCohortMembers, removeCohortMember, searchStudents } from '../../api/cohorts';
+import { getCohorts, createCohort, deleteCohort, getCohort, updateCohort, addCohortMembers, removeCohortMember, searchStudents } from '../../api/cohorts';
 // Individual cohort permissions removed — use Teacher Groups for permission management
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { Users, BookOpen, Settings, Shield } from 'lucide-react';
@@ -243,6 +243,8 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
   const [searchLoading, setSearchLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [renameTarget, setRenameTarget] = useState(null);
+  const [renameName, setRenameName] = useState('');
 
   // Auto-select first cohort
   useEffect(() => {
@@ -276,6 +278,22 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
       toast.success(t('adminManage.cohortDeleted'));
     },
     onError: () => toast.error(t('adminManage.cohortDeleteFailed')),
+  });
+
+  const renameMutation = useMutation({
+    mutationFn: ({ id, name }) => updateCohort(id, { name }),
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ['cohorts'] });
+      queryClient.invalidateQueries({ queryKey: ['cohort-detail', renameTarget?.id] });
+      // Update selectedCohort in-place
+      if (selectedCohort?.id === renameTarget?.id) {
+        setSelectedCohort({ ...selectedCohort, name: renameName.trim() });
+      }
+      setRenameTarget(null);
+      setRenameName('');
+      toast.success(t('adminManage.cohortRenamed'));
+    },
+    onError: () => toast.error(t('adminManage.cohortRenameFailed')),
   });
 
   const addMembersMutation = useMutation({
@@ -344,7 +362,14 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setSelectedCohort(c)}>
                   <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{c.name}</div>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                      {c.name}
+                      <span style={{
+                        fontSize: '10px', padding: '1px 6px', borderRadius: '6px',
+                        background: '#dbeafe', color: '#1d4ed8', fontWeight: 500,
+                        whiteSpace: 'nowrap',
+                      }}>{t('adminManage.studentCohort')}</span>
+                    </div>
                     {c.description && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{c.description}</div>}
                   </div>
                   <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
@@ -376,6 +401,9 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
                 <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                   <Button variant="secondary" onClick={() => setAddModalOpen(true)}>{t('cohortDetail.addStudents')}</Button>
                   <Button variant="outline" onClick={() => navigate(`/cohorts/${selectedCohort.id}`)}>{t('adminManage.viewFull')}</Button>
+                  {!selectedCohort.is_default && (
+                    <Button variant="outline" onClick={() => { setRenameTarget(selectedCohort); setRenameName(selectedCohort.name); }}>{t('common.edit')}</Button>
+                  )}
                   {!selectedCohort.is_default && (
                     <button onClick={() => setDeleteTarget(selectedCohort)} style={{
                       background: 'none', border: 'var(--border-width) solid var(--color-error)',
@@ -467,6 +495,23 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
             <Button variant="secondary" onClick={() => setDeleteTarget(null)}>{t('dashboard.cancel')}</Button>
             <Button variant="destructive" onClick={() => deleteMutation.mutate(deleteTarget.id)} disabled={deleteMutation.isPending}>
               {deleteMutation.isPending ? t('cohorts.deleting') : t('common.delete')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename cohort dialog */}
+      <Dialog open={!!renameTarget} onOpenChange={() => setRenameTarget(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t('adminManage.renameCohort')}</DialogTitle></DialogHeader>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.newCohortName')}</label>
+            <Input value={renameName} onChange={(e) => setRenameName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && renameName.trim() && renameMutation.mutate({ id: renameTarget.id, name: renameName.trim() })} />
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setRenameTarget(null)}>{t('dashboard.cancel')}</Button>
+            <Button onClick={() => renameMutation.mutate({ id: renameTarget.id, name: renameName.trim() })} disabled={!renameName.trim() || renameMutation.isPending}>
+              {renameMutation.isPending ? t('profile.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
