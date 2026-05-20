@@ -13,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
-from app.db.models import Student, User
+from app.db.models import CohortPermission, Student, User
 from app.services.permission_service import resolve_user_permissions
 from app.db.models_v2 import (
     CohortMembership,
@@ -102,6 +102,23 @@ def list_cohorts(
     else:
         q = q.filter(StudentCohort.user_id == current_user.id)
     cohorts = q.order_by(StudentCohort.created_at.desc()).all()
+
+    # Non-admin: filter to cohorts where user's groups have visible=True
+    if current_user.role != "admin":
+        from app.services.permission_service import _get_user_group_ids
+        group_ids = _get_user_group_ids(current_user.id, db)
+        if group_ids:
+            visible_cohort_ids = {
+                r[0]
+                for r in db.query(CohortPermission.cohort_id)
+                .filter(
+                    CohortPermission.group_id.in_(group_ids),
+                    CohortPermission.visible == True,  # noqa: E712
+                )
+                .all()
+            }
+            cohorts = [c for c in cohorts if c.id in visible_cohort_ids]
+
     return CohortListResponse(
         cohorts=[_cohort_to_response(c) for c in cohorts],
         total=len(cohorts),
@@ -286,6 +303,20 @@ def get_cohort(
 ):
     """Get a cohort with its full member list."""
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+
+    # Non-admin: check visibility permission
+    if current_user.role != "admin":
+        from app.services.permission_service import _get_user_group_ids
+        group_ids = _get_user_group_ids(current_user.id, db)
+        if group_ids:
+            visible = db.query(CohortPermission).filter(
+                CohortPermission.group_id.in_(group_ids),
+                CohortPermission.cohort_id == cohort.id,
+                CohortPermission.visible == True,  # noqa: E712
+            ).first()
+            if not visible:
+                raise HTTPException(status_code=403, detail="You do not have access to this cohort")
+
     members = [_member_to_response(m.student) for m in cohort.memberships if m.student]
     return CohortDetailResponse(
         id=cohort.id,
