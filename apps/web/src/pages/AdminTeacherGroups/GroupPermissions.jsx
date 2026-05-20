@@ -123,7 +123,7 @@ export default function GroupPermissions({ groupId }) {
               return (
                 <tr key={p.cohort_id} style={{ background: isHidden ? 'var(--color-background)' : 'transparent' }}>
                   <td style={{ ...tdStyle, fontWeight: 'var(--font-weight-medium)' }}>
-                    {p.cohort_name || p.cohort_id}
+                    {p.is_default || p.cohort_name === 'All Students' ? t('dashboard.allStudentsCohort') : (p.cohort_name || p.cohort_id)}
                   </td>
                   <td style={{ ...tdStyle, textAlign: 'center' }}>
                     <input
