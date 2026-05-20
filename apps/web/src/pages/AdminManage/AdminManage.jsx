@@ -114,12 +114,24 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
     onError: () => toast.error(t('adminManage.saveFailed')),
   });
 
+  const handleTeacherStatus = async (userId, newStatus) => {
+    try {
+      const { updateUserStatus } = await import('../../api/admin');
+      await updateUserStatus(userId, newStatus);
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      toast.success(t(`account.${newStatus}`));
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || t('adminManage.saveFailed'));
+    }
+  };
+
+  const [createdCredentials, setCreatedCredentials] = useState(null);
+
   const createUserMutation = useMutation({
     mutationFn: (data) => createUser(data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setShowCreateTeacher(false);
-      setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('counsellor');
+      setCreatedCredentials({ email: variables.email, password: variables.password });
       toast.success(t('settings.userCreated'));
     },
     onError: (err) => {
@@ -149,6 +161,7 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
               <th style={thStyle}>{t('adminManage.name')}</th>
               <th style={thStyle}>{t('adminManage.email')}</th>
               <th style={thStyle}>{t('adminManage.role')}</th>
+              <th style={thStyle}>{t('studentList.account')}</th>
               <th style={thStyle}>{t('adminManage.actions')}</th>
             </tr>
           </thead>
@@ -171,17 +184,53 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
                     </span>
                   </td>
                   <td style={tdStyle}>
-                    {!isSelf && (
-                      <select
-                        value={user.role}
-                        onChange={(e) => updateUserMutation.mutate({ userId: user.id, role: e.target.value })}
-                        disabled={updateUserMutation.isPending}
-                        style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-xs)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)' }}
-                      >
-                        <option value="counsellor">{t('adminManage.counsellor')}</option>
-                        <option value="admin">{t('adminManage.admin')}</option>
-                      </select>
-                    )}
+                    <span style={{
+                      fontSize: 'var(--font-size-xs)', padding: '2px 8px', borderRadius: '8px', fontWeight: 500,
+                      background: (user.account_status || 'active') === 'active' ? '#dcfce7' :
+                                  (user.account_status || 'active') === 'suspended' ? '#fef3c7' : '#f3f4f6',
+                      color: (user.account_status || 'active') === 'active' ? '#166534' :
+                             (user.account_status || 'active') === 'suspended' ? '#92400e' : '#6b7280',
+                    }}>
+                      {t(`account.${user.account_status || 'active'}`)}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>
+                    {!isSelf && (() => {
+                      const userStatus = user.account_status || 'active';
+                      return (
+                        <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {userStatus === 'active' && (
+                            <select
+                              value={user.role}
+                              onChange={(e) => updateUserMutation.mutate({ userId: user.id, role: e.target.value })}
+                              disabled={updateUserMutation.isPending}
+                              style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-xs)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)' }}
+                            >
+                              <option value="counsellor">{t('adminManage.counsellor')}</option>
+                              <option value="admin">{t('adminManage.admin')}</option>
+                            </select>
+                          )}
+                          {userStatus === 'active' && (
+                            <>
+                              <button onClick={() => handleTeacherStatus(user.id, 'suspended')}
+                                style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
+                                {t('account.suspend')}
+                              </button>
+                              <button onClick={() => handleTeacherStatus(user.id, 'archived')}
+                                style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
+                                {t('account.archive')}
+                              </button>
+                            </>
+                          )}
+                          {(userStatus === 'suspended' || userStatus === 'archived') && (
+                            <button onClick={() => handleTeacherStatus(user.id, 'active')}
+                              style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-base)' }}>
+                              {t('account.reactivate')}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </td>
                 </tr>
               );
@@ -191,36 +240,75 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
       </div>
     </div>
 
-    <Dialog open={showCreateTeacher} onOpenChange={setShowCreateTeacher}>
+    <Dialog open={showCreateTeacher} onOpenChange={(open) => { if (!open) { setShowCreateTeacher(false); setCreatedCredentials(null); setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('counsellor'); } else { setShowCreateTeacher(true); } }}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{t('settings.createUser')}</DialogTitle></DialogHeader>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.email')} *</label>
-            <Input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="teacher@school.hk" type="email" />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.password')} *</label>
-            <Input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type="password" />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.fullName')}</label>
-            <Input value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.role')}</label>
-            <select value={newRole} onChange={(e) => setNewRole(e.target.value)} style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
-              <option value="counsellor">{t('adminManage.counsellor')}</option>
-              <option value="admin">{t('adminManage.admin')}</option>
-            </select>
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="secondary" onClick={() => setShowCreateTeacher(false)}>{t('dashboard.cancel')}</Button>
-          <Button onClick={() => createUserMutation.mutate({ email: newEmail.trim(), password: newPassword, display_name: newDisplayName.trim() || null, role: newRole })} disabled={!newEmail.trim() || !newPassword || createUserMutation.isPending}>
-            {createUserMutation.isPending ? t('settings.saving') : t('settings.createUser')}
-          </Button>
-        </DialogFooter>
+        <DialogHeader><DialogTitle>{createdCredentials ? t('settings.userCreated') : t('settings.createUser')}</DialogTitle></DialogHeader>
+        {!createdCredentials ? (
+          <>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.email')} *</label>
+                <Input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="teacher@school.hk" type="email" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.password')} *</label>
+                <Input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type="password" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.fullName')}</label>
+                <Input value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.role')}</label>
+                <select value={newRole} onChange={(e) => setNewRole(e.target.value)} style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
+                  <option value="counsellor">{t('adminManage.counsellor')}</option>
+                  <option value="admin">{t('adminManage.admin')}</option>
+                </select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => setShowCreateTeacher(false)}>{t('dashboard.cancel')}</Button>
+              <Button onClick={() => createUserMutation.mutate({ email: newEmail.trim(), password: newPassword, display_name: newDisplayName.trim() || null, role: newRole })} disabled={!newEmail.trim() || !newPassword || createUserMutation.isPending}>
+                {createUserMutation.isPending ? t('settings.saving') : t('settings.createUser')}
+              </Button>
+            </DialogFooter>
+          </>
+        ) : (
+          <>
+            <div style={{ background: 'var(--color-background)', padding: 'var(--space-4)', borderRadius: 'var(--border-radius-md)', marginBottom: 'var(--space-4)' }}>
+              <div style={{ marginBottom: 'var(--space-2)' }}>
+                <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('adminManage.email')}: </span>
+                <strong style={{ color: 'var(--color-text-primary)' }}>{createdCredentials.email}</strong>
+              </div>
+              <div>
+                <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('settings.password')}: </span>
+                <strong style={{ color: 'var(--color-text-primary)', fontFamily: 'monospace' }}>{createdCredentials.password}</strong>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const { sendCredentialsEmail } = await import('../../api/invite');
+                    await sendCredentialsEmail(
+                      createdCredentials.email,
+                      createdCredentials.email,
+                      createdCredentials.password,
+                      newDisplayName || createdCredentials.email.split('@')[0],
+                    );
+                    toast.success(t('studentList.emailSent'));
+                  } catch {
+                    toast.error(t('studentList.emailFailed'));
+                  }
+                }}
+              >
+                {t('studentList.sendViaEmail')}
+              </Button>
+              <Button onClick={() => { setShowCreateTeacher(false); setCreatedCredentials(null); setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('counsellor'); }}>{t('common.close')}</Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
     </>
@@ -344,7 +432,7 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
       <div style={{ flex: '1 1 280px', minWidth: '260px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
           <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-secondary)' }}>
-            {cohorts.length} {cohorts.length === 1 ? 'cohort' : 'cohorts'}
+            {t('adminManage.cohortCount', { count: cohorts.length })}
           </span>
           <Button variant="secondary" onClick={() => setShowCreate(true)}>{t('adminManage.createCohort')}</Button>
         </div>
@@ -373,7 +461,7 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
                     {c.description && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{c.description}</div>}
                   </div>
                   <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                    {c.member_count} students
+                    {t('cohorts.studentCount', { count: c.member_count })}
                   </span>
                 </div>
               );
