@@ -49,6 +49,20 @@ def _resolve_user_from_token(token_str: str, db: Session) -> User:
     if user is None:
         raise _unauthorized
 
+    # Account lifecycle guard
+    acct_status = getattr(user, "account_status", "active")
+    if acct_status == "suspended":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account suspended",
+        )
+    if acct_status in ("archived", "deleted"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Account disabled",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # Attach org context from JWT claim
     org_id_str = payload.get("org_id")
     if org_id_str:
