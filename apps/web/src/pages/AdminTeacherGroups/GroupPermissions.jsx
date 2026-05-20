@@ -18,6 +18,8 @@ export default function GroupPermissions({ groupId }) {
     { key: 'cohort_management', label: t('groupPermissions.cohortMgmt') },
     { key: 'data_import', label: t('groupPermissions.dataImport') },
     { key: 'account_assignment', label: t('groupPermissions.accountAssign') },
+    { key: 'student_delete', label: t('groupPermissions.studentDelete') },
+    { key: 'student_profile', label: t('groupPermissions.studentProfile') },
   ];
 
   const ACCESS_OPTIONS = [
