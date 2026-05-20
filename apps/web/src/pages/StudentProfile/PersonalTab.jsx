@@ -51,17 +51,6 @@ export default function PersonalTab({ studentId, student, onSaved }) {
           )}
         </div>
         <div style={{ marginBottom: 'var(--space-4)' }}>
-          <label htmlFor="input-preferred_name" style={labelStyle}>
-            {t('personal.preferredName')}
-          </label>
-          <Input
-            id="input-preferred_name"
-            name="preferred_name"
-            value={form.preferred_name}
-            onChange={handleChange}
-          />
-        </div>
-        <div style={{ marginBottom: 'var(--space-4)' }}>
           <label htmlFor="input-name_zh" style={labelStyle}>
             {t('personal.chineseName')}
           </label>

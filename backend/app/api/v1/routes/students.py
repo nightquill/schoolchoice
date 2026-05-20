@@ -86,7 +86,6 @@ def _build_full_response(student: Student) -> dict:
         "updated_at": student.updated_at,
         # v2 identity
         "full_name": student.name,  # name is the canonical full name
-        "preferred_name": student.preferred_name,
         "date_of_birth": student.date_of_birth,
         "gender": student.gender,
         "address": student.address,

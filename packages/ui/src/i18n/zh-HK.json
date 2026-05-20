@@ -199,7 +199,6 @@
   },
   "personal": {
     "fullName": "全名",
-    "preferredName": "慣用名稱",
     "chineseName": "中文姓名",
     "dateOfBirth": "出生日期",
     "age": "年齡：{age}",

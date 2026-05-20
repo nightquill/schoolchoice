@@ -137,7 +137,6 @@
   },
   "personal": {
     "fullName": "Full Name",
-    "preferredName": "Preferred Name",
     "chineseName": "Chinese Name",
     "dateOfBirth": "Date of Birth",
     "age": "Age: {age}",

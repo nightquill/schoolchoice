@@ -9,7 +9,6 @@ export function usePersonalTab(student, studentId, onSaved) {
 
   const [form, setForm] = useState({
     full_name: student?.full_name || '',
-    preferred_name: student?.preferred_name || '',
     name_zh: student?.name_zh || '',
     date_of_birth: student?.date_of_birth || '',
     gender: student?.gender || '',

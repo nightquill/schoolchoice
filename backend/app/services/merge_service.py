@@ -18,7 +18,7 @@ class MergeError(Exception):
 
 # Profile fields to copy from source to target when target field is blank
 _PROFILE_FIELDS = [
-    "preferred_name", "date_of_birth", "gender", "address", "phone",
+    "name_zh", "date_of_birth", "gender", "address", "phone",
     "email", "class_name", "year_of_study", "candidate_number",
 ]
 
