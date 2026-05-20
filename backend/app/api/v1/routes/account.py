@@ -248,10 +248,15 @@ def setup_organisation(
     if existing:
         org = db.query(Organisation).filter(Organisation.id == existing.organisation_id).first()
         if org:
-            # Update email_domain if provided on subsequent calls
-            if payload.email_domain and not org.email_domain:
+            import re as _re
+            # Update org name from placeholder if set during onboarding
+            if payload.school_name and (org.name.startswith("pending-") or not org.name):
+                org.name = payload.school_name
+                org.slug = _re.sub(r"[^a-z0-9]+", "-", payload.school_name.lower()).strip("-") or "school"
+            if payload.email_domain:
                 org.email_domain = payload.email_domain
-                db.commit()
+            db.commit()
+            db.refresh(org)
             return {"id": str(org.id), "name": org.name, "already_existed": True}
         # Orphaned membership — clean it up
         db.delete(existing)
