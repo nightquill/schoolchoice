@@ -1473,6 +1473,16 @@
     "studentDelete": "student delete",
     "studentProfile": "student profile"
   },
+  "studentDashboard": {
+    "addProgrammeFirst": "Add at least one programme before submitting.",
+    "submitSuccess": "Programme choices submitted for review.",
+    "rateLimited": "Submission rate limit reached. Try again later.",
+    "submitFailed": "Failed to submit. Please try again.",
+    "noProfile": "No student profile linked to this account.",
+    "submitting": "Submitting\u2026",
+    "awaitingReview": "Awaiting Review",
+    "submitToTeacher": "Submit to Teacher"
+  },
   "confirmation": {
     "deletePlan": "Delete this plan? This cannot be undone.",
     "removeFromGroup": "Remove {name} from this group?",

@@ -1473,6 +1473,16 @@
     "studentDelete": "刪除學生",
     "studentProfile": "學生檔案"
   },
+  "studentDashboard": {
+    "addProgrammeFirst": "提交前請至少新增一個課程。",
+    "submitSuccess": "選科志願已提交審核。",
+    "rateLimited": "提交頻率已達上限，請稍後再試。",
+    "submitFailed": "提交失敗，請重試。",
+    "noProfile": "此帳戶未連結學生檔案。",
+    "submitting": "提交中\u2026",
+    "awaitingReview": "待審核",
+    "submitToTeacher": "提交給老師"
+  },
   "confirmation": {
     "deletePlan": "刪除此計劃？此操作無法復原。",
     "removeFromGroup": "從此群組移除 {name}？",

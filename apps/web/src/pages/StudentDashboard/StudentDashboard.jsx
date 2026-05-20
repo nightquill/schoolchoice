@@ -1,4 +1,4 @@
-// Student Dashboard — programme choices + submit to teacher
+// Student Dashboard — programme choices + grade sandbox + submit to teacher
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { toast } from 'sonner';
 import ProgrammeChoicesTab from '../StudentProfile/ProgrammeChoicesTab';
+import GradesTab from '../StudentProfile/GradesTab';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function StudentDashboard() {
@@ -56,7 +57,7 @@ function StudentDashboard() {
         }));
 
       if (choices.length === 0) {
-        toast.error('Add at least one programme before submitting.');
+        toast.error(t('studentDashboard.addProgrammeFirst'));
         return;
       }
 
@@ -66,13 +67,13 @@ function StudentDashboard() {
       // Submit
       await client.post('/api/v1/student/choices/submit');
       setSubmissionStatus('pending');
-      toast.success('Programme choices submitted for review.');
+      toast.success(t('studentDashboard.submitSuccess'));
     } catch (err) {
       const detail = err?.response?.data?.detail;
       if (err?.response?.status === 429) {
-        toast.error(typeof detail === 'string' ? detail : 'Submission rate limit reached. Try again later.');
+        toast.error(typeof detail === 'string' ? detail : t('studentDashboard.rateLimited'));
       } else {
-        toast.error(typeof detail === 'string' ? detail : 'Failed to submit. Please try again.');
+        toast.error(typeof detail === 'string' ? detail : t('studentDashboard.submitFailed'));
       }
     } finally {
       setSubmitting(false);
@@ -93,18 +94,18 @@ function StudentDashboard() {
       <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
         <NavBarV2 account={account} />
         <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-          No student profile linked to this account.
+          {t('studentDashboard.noProfile')}
         </div>
       </div>
     );
   }
 
   const statusLabels = {
-    pending: { text: 'Pending Review', bg: '#fef3c7', color: '#92400e' },
-    approved: { text: 'Approved', bg: '#dcfce7', color: '#166534' },
-    revision_requested: { text: 'Revision Requested', bg: '#fee2e2', color: '#991b1b' },
-    rejected: { text: 'Rejected', bg: '#fee2e2', color: '#991b1b' },
-    draft: { text: 'Draft', bg: '#f1f5f9', color: '#475569' },
+    pending: { text: t('submissionHistory.pendingReview'), bg: '#fef3c7', color: '#92400e' },
+    approved: { text: t('submissionHistory.approved'), bg: '#dcfce7', color: '#166534' },
+    revision_requested: { text: t('submissionHistory.revisionRequested'), bg: '#fee2e2', color: '#991b1b' },
+    rejected: { text: t('submissionHistory.rejected'), bg: '#fee2e2', color: '#991b1b' },
+    draft: { text: t('submissionHistory.draft'), bg: '#f1f5f9', color: '#475569' },
   };
   const statusInfo = submissionStatus ? statusLabels[submissionStatus] : null;
 
@@ -131,11 +132,16 @@ function StudentDashboard() {
               onClick={handleSubmit}
               disabled={submitting || submissionStatus === 'pending'}
             >
-              {submitting ? 'Submitting…' : submissionStatus === 'pending' ? 'Awaiting Review' : 'Submit to Teacher'}
+              {submitting ? t('studentDashboard.submitting') : submissionStatus === 'pending' ? t('studentDashboard.awaitingReview') : t('studentDashboard.submitToTeacher')}
             </Button>
           </div>
         </div>
         <ProgrammeChoicesTab studentId={studentId} />
+
+        {/* Grade sandbox — students can create "what-if" grade builds and see how scores change */}
+        <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
+          <GradesTab studentId={studentId} />
+        </div>
       </div>
     </div>
   );
