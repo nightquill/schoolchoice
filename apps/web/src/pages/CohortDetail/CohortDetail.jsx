@@ -314,12 +314,14 @@ function CohortDetail() {
             <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
               <Button onClick={() => navigate(`/cohorts/${id}/report`)}>{t('cohortDetail.viewReport')}</Button>
               <Button onClick={() => navigate(`/cohorts/${id}/bulk-edit`)}>{t('cohortDetail.bulkEditGrades')}</Button>
-              <Button
-                onClick={() => setAddModalOpen(true)}
-                disabled={!canEditCohort}
-                title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
-                style={{ opacity: !canEditCohort ? 0.5 : undefined, cursor: !canEditCohort ? 'not-allowed' : undefined }}
-              >{t('cohortDetail.addStudents')}</Button>
+              {!cohort.is_default && (
+                <Button
+                  onClick={() => setAddModalOpen(true)}
+                  disabled={!canEditCohort}
+                  title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
+                  style={{ opacity: !canEditCohort ? 0.5 : undefined, cursor: !canEditCohort ? 'not-allowed' : undefined }}
+                >{t('cohortDetail.addStudents')}</Button>
+              )}
             </div>
           </div>
 
@@ -358,25 +360,27 @@ function CohortDetail() {
                           <td style={tdStyle}>{member.class_name || '—'}</td>
                           <td style={tdStyle}>{member.year_of_study ?? '—'}</td>
                           <td style={tdStyle}>
-                            <button
-                              style={{
-                                background: 'none',
-                                border: 'var(--border-width) solid var(--color-error)',
-                                borderRadius: 'var(--border-radius-sm)',
-                                color: 'var(--color-error)',
-                                fontSize: 'var(--font-size-xs)',
-                                padding: 'var(--space-1) var(--space-2)',
-                                cursor: !canEditCohort ? 'not-allowed' : 'pointer',
-                                fontFamily: 'var(--font-family-base)',
-                                opacity: !canEditCohort ? 0.5 : undefined,
-                              }}
-                              onClick={() => canEditCohort && setRemoveTarget(member)}
-                              disabled={!canEditCohort}
-                              title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
-                              aria-label={`Remove ${member.full_name} from cohort`}
-                            >
-                              {t('cohortDetail.remove')}
-                            </button>
+                            {!cohort.is_default && (
+                              <button
+                                style={{
+                                  background: 'none',
+                                  border: 'var(--border-width) solid var(--color-error)',
+                                  borderRadius: 'var(--border-radius-sm)',
+                                  color: 'var(--color-error)',
+                                  fontSize: 'var(--font-size-xs)',
+                                  padding: 'var(--space-1) var(--space-2)',
+                                  cursor: !canEditCohort ? 'not-allowed' : 'pointer',
+                                  fontFamily: 'var(--font-family-base)',
+                                  opacity: !canEditCohort ? 0.5 : undefined,
+                                }}
+                                onClick={() => canEditCohort && setRemoveTarget(member)}
+                                disabled={!canEditCohort}
+                                title={!canEditCohort ? t('permission.requiresPermission', { permission: t('permission.cohortManagement') }) : undefined}
+                                aria-label={`Remove ${member.full_name} from cohort`}
+                              >
+                                {t('cohortDetail.remove')}
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}

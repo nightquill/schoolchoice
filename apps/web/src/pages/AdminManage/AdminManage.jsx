@@ -319,11 +319,13 @@ function CohortsSection({ cohorts, cohortsLoading, queryClient, t }) {
                 <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
                   <Button variant="secondary" onClick={() => setAddModalOpen(true)}>{t('cohortDetail.addStudents')}</Button>
                   <Button variant="outline" onClick={() => navigate(`/cohorts/${selectedCohort.id}`)}>{t('adminManage.viewFull')}</Button>
-                  <button onClick={() => setDeleteTarget(selectedCohort)} style={{
-                    background: 'none', border: 'var(--border-width) solid var(--color-error)',
-                    borderRadius: 'var(--border-radius-sm)', color: 'var(--color-error)',
-                    fontSize: 'var(--font-size-sm)', padding: 'var(--space-1) var(--space-3)', cursor: 'pointer', fontFamily: 'var(--font-family-base)',
-                  }}>{t('common.delete')}</button>
+                  {!selectedCohort.is_default && (
+                    <button onClick={() => setDeleteTarget(selectedCohort)} style={{
+                      background: 'none', border: 'var(--border-width) solid var(--color-error)',
+                      borderRadius: 'var(--border-radius-sm)', color: 'var(--color-error)',
+                      fontSize: 'var(--font-size-sm)', padding: 'var(--space-1) var(--space-3)', cursor: 'pointer', fontFamily: 'var(--font-family-base)',
+                    }}>{t('common.delete')}</button>
+                  )}
                 </div>
               </div>
             </div>
