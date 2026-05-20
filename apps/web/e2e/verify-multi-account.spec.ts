@@ -83,7 +83,10 @@ test.describe('Multi-account E2E verification', () => {
     await page.fill('input[type="email"]', 'demo@school.hk');
     await page.fill('input[type="password"]', 'demo12345');
     await page.click('button[type="submit"]');
-    await page.waitForURL('**/dashboard');
+    await page.waitForTimeout(3000);
+    if (!page.url().includes('/dashboard')) {
+      await page.waitForURL('**/dashboard', { timeout: 10000 });
+    }
 
     await page.goto(`${BASE}/students`);
     await page.waitForLoadState('networkidle');
