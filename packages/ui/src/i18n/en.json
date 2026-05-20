@@ -1213,7 +1213,8 @@
     "none": "None",
     "view": "View",
     "edit": "Edit",
-    "studentDelete": "Delete Student"
+    "studentDelete": "Delete Student",
+    "studentProfile": "Student Profile"
   },
   "importWizard": {
     "uploadFile": "Upload File",
@@ -1454,6 +1455,20 @@
     "uploading": "Uploading\u2026",
     "dragHere": "Drag file here or",
     "browse": "Browse"
+  },
+  "permission": {
+    "requiresPermission": "Requires {permission} permission \u2014 contact your admin",
+    "noGroupAccess": "Your administrator hasn\u2019t assigned you to any groups yet. Contact them to get started.",
+    "programmeChoices": "programme choices",
+    "grades": "grades",
+    "planGeneration": "plan generation",
+    "submissions": "submissions",
+    "reports": "reports",
+    "cohortManagement": "cohort management",
+    "dataImport": "data import",
+    "accountAssignment": "account assignment",
+    "studentDelete": "student delete",
+    "studentProfile": "student profile"
   },
   "planEditor": {
     "editing": "Editing: {section}",

@@ -1213,7 +1213,8 @@
     "none": "無",
     "view": "檢視",
     "edit": "編輯",
-    "studentDelete": "刪除學生"
+    "studentDelete": "刪除學生",
+    "studentProfile": "學生檔案"
   },
   "importWizard": {
     "uploadFile": "上載檔案",
@@ -1454,6 +1455,20 @@
     "uploading": "上載中\u2026",
     "dragHere": "拖曳檔案至此或",
     "browse": "瀏覽"
+  },
+  "permission": {
+    "requiresPermission": "需要{permission}權限 — 請聯絡管理員",
+    "noGroupAccess": "您的管理員尚未將您分配到任何群組。請聯絡他們以開始使用。",
+    "programmeChoices": "課程選擇",
+    "grades": "成績",
+    "planGeneration": "計劃生成",
+    "submissions": "提交",
+    "reports": "報告",
+    "cohortManagement": "群組管理",
+    "dataImport": "數據匯入",
+    "accountAssignment": "帳戶指派",
+    "studentDelete": "刪除學生",
+    "studentProfile": "學生檔案"
   },
   "planEditor": {
     "editing": "編輯：{section}",
