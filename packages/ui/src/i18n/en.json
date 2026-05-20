@@ -50,7 +50,10 @@
     "tokenRequired": "Registration token is required.",
     "passwordMismatch": "Passwords do not match.",
     "registerHere": "Have a registration token? Register here",
-    "loginHere": "Already have an account? Log in here"
+    "loginHere": "Already have an account? Log in here",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "passwordNeedsUpper": "Password must contain at least one uppercase letter.",
+    "passwordNeedsDigit": "Password must contain at least one number."
   },
   "onboarding": {
     "welcome": "Welcome",
@@ -735,7 +738,7 @@
     "flagPlaceholder": "Why is this questionable?",
     "removeFlag": "Remove flag",
     "flagAsQuestionable": "Flag as questionable",
-    "topPicks": "Top picks \u2014 very confident",
+    "topPicks": "Top picks — very confident",
     "strongInterest": "Strong interest, good chance",
     "interestedReasonable": "Interested, reasonable chance",
     "backupChoices": "Backup choices",
@@ -926,7 +929,7 @@
   },
   "methodology": {
     "title": "Methodology",
-    "backToDashboard": "\u2190 Back to Dashboard",
+    "backToDashboard": "← Back to Dashboard",
     "loading": "Loading methodology report...",
     "dataCoverage": "Data Coverage",
     "jupasCount": "JUPAS Programmes",
@@ -1252,13 +1255,13 @@
     "reviewAndImport": "Review and Import",
     "wizardSteps": "Import wizard steps",
     "uploadDesc": "Upload a CSV or Excel file to import data into {entityName}.",
-    "parsing": "Parsing\u2026",
+    "parsing": "Parsing…",
     "multipleSheets": "This Excel file contains multiple sheets. Select the sheet to import.",
     "sheet": "Sheet",
     "selectASheet": "Select a sheet",
-    "loading": "Loading\u2026",
+    "loading": "Loading…",
     "mapDesc": "Map the columns from your file to {entityName} fields. Auto-mapped columns are pre-filled.",
-    "validating": "Validating\u2026",
+    "validating": "Validating…",
     "importComplete": "Import complete",
     "importedDesc": "Your data has been imported into {entityName}.",
     "goToList": "Go to list",
@@ -1305,7 +1308,7 @@
     "refreshLog": "Refresh log messages",
     "noMessages": "No refresh messages yet.",
     "confirmTitle": "Confirm Data Refresh",
-    "triggering": "Triggering\u2026",
+    "triggering": "Triggering…",
     "confirmButton": "Yes, Trigger Refresh",
     "confirmDesc": "This will queue a full data re-import. Continue?",
     "noPermission": "You do not have permission to access that page.",
@@ -1365,7 +1368,7 @@
     "failedCreate": "Failed to create account."
   },
   "subjectDetail": {
-    "backToAnalysis": "\u2190 Back to Data Analysis",
+    "backToAnalysis": "← Back to Data Analysis",
     "cohortFilter": "Cohort:",
     "allStudents": "All Students",
     "sittingFilter": "Sitting:",
@@ -1389,7 +1392,7 @@
     "meanModeN": "Mean: {mean} ({meanNum}) | Mode: {mode} | n={totalN}"
   },
   "studentDetail": {
-    "loading": "Loading\u2026",
+    "loading": "Loading…",
     "notFound": "Student not found.",
     "noAccess": "You do not have access to this student record.",
     "loadFailed": "Could not load student data. Please try again.",
@@ -1420,7 +1423,7 @@
   },
   "submissionHistory": {
     "title": "Submission History",
-    "loading": "Loading history\u2026",
+    "loading": "Loading history…",
     "noSubmissions": "No submissions yet.",
     "submitted": "Submitted",
     "status": "Status",
@@ -1429,7 +1432,7 @@
     "notes": "Notes",
     "programmeCount": "{count} programme(s)",
     "choiceRank": "Choice {rank}",
-    "andMore": "\u2026and {count} more",
+    "andMore": "…and {count} more",
     "choicesFlagged": "{count} choice(s) flagged",
     "draft": "Draft",
     "pendingReview": "Pending Review",
@@ -1447,7 +1450,7 @@
     "value": "Value",
     "reason": "Reason",
     "downloadErrors": "Download error rows as CSV",
-    "downloading": "Downloading\u2026",
+    "downloading": "Downloading…",
     "duplicateRows": "Duplicate rows ({count})",
     "applyToAll": "Apply this choice to all duplicates:",
     "skip": "Skip",
@@ -1455,7 +1458,7 @@
     "importAsNew": "Import as new",
     "back": "Back",
     "importValid": "Import {count} Valid Row(s)",
-    "importing": "Importing\u2026"
+    "importing": "Importing…"
   },
   "actionPlan": {
     "title": "Action Plan",
@@ -1473,7 +1476,7 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
-    "selectPlaceholder": "\u2014 Select \u2014"
+    "selectPlaceholder": "— Select —"
   },
   "shap": {
     "admissionProbability": "Admission probability: {pct}",
@@ -1481,13 +1484,13 @@
     "meanModeN": "Mean: {mean}{meanNum} | Mode: {mode} | n={totalN}"
   },
   "fileUpload": {
-    "uploading": "Uploading\u2026",
+    "uploading": "Uploading…",
     "dragHere": "Drag file here or",
     "browse": "Browse"
   },
   "permission": {
-    "requiresPermission": "Requires {permission} permission \u2014 contact your admin",
-    "noGroupAccess": "Your administrator hasn\u2019t assigned you to any groups yet. Contact them to get started.",
+    "requiresPermission": "Requires {permission} permission — contact your admin",
+    "noGroupAccess": "Your administrator hasn’t assigned you to any groups yet. Contact them to get started.",
     "programmeChoices": "programme choices",
     "grades": "grades",
     "planGeneration": "plan generation",
@@ -1505,7 +1508,7 @@
     "rateLimited": "Submission rate limit reached. Try again later.",
     "submitFailed": "Failed to submit. Please try again.",
     "noProfile": "No student profile linked to this account.",
-    "submitting": "Submitting\u2026",
+    "submitting": "Submitting…",
     "awaitingReview": "Awaiting Review",
     "submitToTeacher": "Submit to Teacher"
   },
@@ -1545,7 +1548,7 @@
     "list": "List",
     "cancel": "Cancel",
     "resetToDefault": "Reset to Default",
-    "saving": "Saving\u2026",
+    "saving": "Saving…",
     "save": "Save"
   }
 }

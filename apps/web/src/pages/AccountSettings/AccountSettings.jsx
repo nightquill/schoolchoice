@@ -103,9 +103,11 @@ function AccountSettings() {
     try {
       const updated = await updateAccount({ preferred_language: preferredLanguage });
       setAccount(updated);
-      setLocale(preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en');
-      localStorage.setItem('locale', preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en');
-      toast.success(t('account.prefsSaved'));
+      const newLocale = preferredLanguage === 'zh-HK' ? 'zh-HK' : 'en';
+      localStorage.setItem('locale', newLocale);
+      setLocale(newLocale);
+      // Reload page so all components pick up the new locale cleanly
+      window.location.reload();
     } catch {
       toast.error(t('account.prefsFailed'));
     } finally {

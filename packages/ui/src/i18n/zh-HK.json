@@ -50,7 +50,10 @@
     "tokenRequired": "請輸入註冊令牌。",
     "passwordMismatch": "密碼不一致。",
     "registerHere": "持有註冊令牌？在此註冊",
-    "loginHere": "已有帳戶？在此登入"
+    "loginHere": "已有帳戶？在此登入",
+    "passwordTooShort": "密碼須至少8個字元。",
+    "passwordNeedsUpper": "密碼須包含至少一個大寫字母。",
+    "passwordNeedsDigit": "密碼須包含至少一個數字。"
   },
   "onboarding": {
     "welcome": "歡迎",
@@ -926,7 +929,7 @@
   },
   "methodology": {
     "title": "方法",
-    "backToDashboard": "\u2190 返回主頁",
+    "backToDashboard": "← 返回主頁",
     "loading": "載入方法報告中...",
     "dataCoverage": "數據覆蓋範圍",
     "jupasCount": "JUPAS 課程",
@@ -1252,13 +1255,13 @@
     "reviewAndImport": "預覽及匯入",
     "wizardSteps": "匯入精靈步驟",
     "uploadDesc": "上載 CSV 或 Excel 檔案以匯入資料至 {entityName}。",
-    "parsing": "解析中\u2026",
+    "parsing": "解析中…",
     "multipleSheets": "此 Excel 檔案包含多個工作表。請選擇要匯入的工作表。",
     "sheet": "工作表",
     "selectASheet": "選擇工作表",
-    "loading": "載入中\u2026",
+    "loading": "載入中…",
     "mapDesc": "將檔案欄位對應至 {entityName} 欄位。已自動對應的欄位已預先填入。",
-    "validating": "驗證中\u2026",
+    "validating": "驗證中…",
     "importComplete": "匯入完成",
     "importedDesc": "資料已匯入 {entityName}。",
     "goToList": "前往列表",
@@ -1305,7 +1308,7 @@
     "refreshLog": "更新日誌訊息",
     "noMessages": "尚無更新訊息。",
     "confirmTitle": "確認數據更新",
-    "triggering": "觸發中\u2026",
+    "triggering": "觸發中…",
     "confirmButton": "是，觸發更新",
     "confirmDesc": "將排程完整的數據重新匯入。是否繼續？",
     "noPermission": "您沒有權限存取此頁面。",
@@ -1365,7 +1368,7 @@
     "failedCreate": "建立帳戶失敗。"
   },
   "subjectDetail": {
-    "backToAnalysis": "\u2190 返回數據分析",
+    "backToAnalysis": "← 返回數據分析",
     "cohortFilter": "群組：",
     "allStudents": "所有學生",
     "sittingFilter": "考試類別：",
@@ -1389,7 +1392,7 @@
     "meanModeN": "平均：{mean}（{meanNum}）| 眾數：{mode} | n={totalN}"
   },
   "studentDetail": {
-    "loading": "載入中\u2026",
+    "loading": "載入中…",
     "notFound": "找不到學生。",
     "noAccess": "您沒有權限查看此學生記錄。",
     "loadFailed": "無法載入學生資料，請重試。",
@@ -1420,7 +1423,7 @@
   },
   "submissionHistory": {
     "title": "提交歷史",
-    "loading": "載入歷史中\u2026",
+    "loading": "載入歷史中…",
     "noSubmissions": "尚無提交記錄。",
     "submitted": "提交時間",
     "status": "狀態",
@@ -1429,7 +1432,7 @@
     "notes": "備註",
     "programmeCount": "{count} 個課程",
     "choiceRank": "志願 {rank}",
-    "andMore": "\u2026及 {count} 個更多",
+    "andMore": "…及 {count} 個更多",
     "choicesFlagged": "{count} 個志願已標記",
     "draft": "草稿",
     "pendingReview": "待審核",
@@ -1447,7 +1450,7 @@
     "value": "值",
     "reason": "原因",
     "downloadErrors": "下載錯誤列 CSV",
-    "downloading": "下載中\u2026",
+    "downloading": "下載中…",
     "duplicateRows": "重複列（{count}）",
     "applyToAll": "將此選擇套用至所有重複項：",
     "skip": "略過",
@@ -1455,7 +1458,7 @@
     "importAsNew": "作為新項匯入",
     "back": "返回",
     "importValid": "匯入 {count} 個有效列",
-    "importing": "匯入中\u2026"
+    "importing": "匯入中…"
   },
   "actionPlan": {
     "title": "行動計劃",
@@ -1473,7 +1476,7 @@
     "save": "儲存",
     "saving": "儲存中...",
     "cancel": "取消",
-    "selectPlaceholder": "\u2014 請選擇 \u2014"
+    "selectPlaceholder": "— 請選擇 —"
   },
   "shap": {
     "admissionProbability": "取錄機率：{pct}",
@@ -1481,7 +1484,7 @@
     "meanModeN": "平均：{mean}{meanNum} | 眾數：{mode} | n={totalN}"
   },
   "fileUpload": {
-    "uploading": "上載中\u2026",
+    "uploading": "上載中…",
     "dragHere": "拖曳檔案至此或",
     "browse": "瀏覽"
   },
@@ -1505,7 +1508,7 @@
     "rateLimited": "提交頻率已達上限，請稍後再試。",
     "submitFailed": "提交失敗，請重試。",
     "noProfile": "此帳戶未連結學生檔案。",
-    "submitting": "提交中\u2026",
+    "submitting": "提交中…",
     "awaitingReview": "待審核",
     "submitToTeacher": "提交給老師"
   },
@@ -1545,7 +1548,7 @@
     "list": "列表",
     "cancel": "取消",
     "resetToDefault": "重設為預設",
-    "saving": "儲存中\u2026",
+    "saving": "儲存中…",
     "save": "儲存"
   }
 }

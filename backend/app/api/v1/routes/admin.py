@@ -131,10 +131,19 @@ def list_users(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("admin")),
+    current_user: User = Depends(require_role("admin")),
 ):
-    """List all active users (paginated). Admin only."""
-    query = db.query(User).filter(User.is_active == True)  # noqa: E712
+    """List active users in the admin's organisation. Admin only."""
+    # Scope to current user's organisation
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+    org_user_ids = set()
+    if org_id:
+        rows = db.query(OrganisationMembership.user_id).filter(OrganisationMembership.organisation_id == org_id).all()
+        org_user_ids = {r[0] for r in rows}
+    query = db.query(User).filter(User.is_active == True, User.id.in_(org_user_ids))  # noqa: E712
     total = query.count()
     users = query.offset(skip).limit(limit).all()
     return {"items": [UserAdminResponse.model_validate(u).model_dump() for u in users], "total": total}
@@ -500,15 +509,22 @@ def remove_cohort_permission(
 @router.get("/users-with-permissions")
 def list_users_with_permissions(
     db: Session = Depends(get_db),
-    _: User = Depends(require_role("admin")),
+    current_user: User = Depends(require_role("admin")),
 ):
-    """List all counsellor/admin users with org-level permission and group memberships. Admin only.
-    (Migrated from user-based to group-based permissions.)
-    """
+    """List counsellor/admin users in the admin's org with permissions. Admin only."""
     from app.db.models import TeacherGroup, TeacherGroupMember
+    # Scope to current user's organisation
+    org_id = getattr(current_user, "active_organisation_id", None)
+    if not org_id:
+        mem = db.query(OrganisationMembership).filter(OrganisationMembership.user_id == current_user.id).first()
+        org_id = mem.organisation_id if mem else None
+    org_user_ids = set()
+    if org_id:
+        rows = db.query(OrganisationMembership.user_id).filter(OrganisationMembership.organisation_id == org_id).all()
+        org_user_ids = {r[0] for r in rows}
     users = (
         db.query(User)
-        .filter(User.is_active == True, User.role.in_(["admin", "counsellor"]))  # noqa: E712
+        .filter(User.is_active == True, User.role.in_(["admin", "counsellor"]), User.id.in_(org_user_ids))  # noqa: E712
         .all()
     )
 

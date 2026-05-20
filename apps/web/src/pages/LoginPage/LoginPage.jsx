@@ -109,8 +109,14 @@ function LoginPage() {
     }
     if (!password) {
       newFieldErrors.password = t('auth.passwordRequired');
+    } else if (password.length < 8) {
+      newFieldErrors.password = t('auth.passwordTooShort');
+    } else if (!/[A-Z]/.test(password)) {
+      newFieldErrors.password = t('auth.passwordNeedsUpper');
+    } else if (!/[0-9]/.test(password)) {
+      newFieldErrors.password = t('auth.passwordNeedsDigit');
     }
-    if (password !== confirmPassword) {
+    if (password && password !== confirmPassword) {
       newFieldErrors.confirmPassword = t('auth.passwordMismatch');
     }
     if (Object.keys(newFieldErrors).length > 0) {
