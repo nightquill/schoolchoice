@@ -401,6 +401,7 @@ class CohortPermission(Base):
     account_assignment = Column(String(10), nullable=False, default="none", server_default="'none'")
     student_delete = Column(String(10), nullable=False, default="none", server_default="'none'")
     student_profile = Column(String(10), nullable=False, default="none", server_default="'none'")
+    data_export = Column(String(10), nullable=False, default="none", server_default="'none'")
     group = relationship("TeacherGroup", back_populates="permissions")
 
 

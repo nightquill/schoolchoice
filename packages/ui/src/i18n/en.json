@@ -180,8 +180,10 @@
     "cancel": "Cancel",
     "gradeAdded": "Grade added.",
     "gradeDeleted": "Grade deleted.",
+    "gradeUpdated": "Grade updated.",
     "addFailed": "Failed to add grade.",
-    "deleteFailed": "Failed to delete grade."
+    "deleteFailed": "Failed to delete grade.",
+    "updateFailed": "Failed to update grade."
   },
   "language": {
     "ielts": "IELTS",
@@ -287,7 +289,7 @@
     "title": "Data Analysis",
     "hkdseTrends": "HKDSE Grade Trends",
     "subjectCombinations": "Subject Combinations",
-    "popularMajors": "Popular Majors",
+    "popularMajors": "Popular Programmes",
     "studentDirectory": "Student Directory",
     "loading": "Loading analytics…",
     "gradeDistribution": "HKDSE Grade Distribution by Subject",
@@ -304,9 +306,9 @@
     "electiveCombinations": "Elective Subject Combinations by Frequency",
     "topPairs": "Top pairs and triples of elective subjects taken together",
     "noCombinationData": "No combination data yet. Add elective grades to see patterns.",
-    "popularIntendedMajors": "Popular Intended Majors",
-    "distinctMajors": "distinct majors across all targets and graduates",
-    "noMajorData": "No major data yet. Add intended majors to target schools to see trends.",
+    "popularIntendedMajors": "Popular Intended Programmes",
+    "distinctMajors": "distinct programmes across all targets and graduates",
+    "noMajorData": "No programme data yet. Add intended programmes to target schools to see trends.",
     "anonymizedDirectory": "Anonymized Student Directory",
     "graduatedOnly": "Graduated only",
     "namesRemoved": "Names/contacts removed",
@@ -1289,7 +1291,8 @@
     "view": "View",
     "edit": "Edit",
     "studentDelete": "Delete Student",
-    "studentProfile": "Student Profile"
+    "studentProfile": "Student Profile",
+    "dataExport": "Data Export"
   },
   "importWizard": {
     "uploadFile": "Upload File",
@@ -1662,7 +1665,7 @@
     "saving": "Saving…",
     "save": "Save"
   },
-  "account": {
+  "accountStatus": {
     "active": "Active",
     "suspended": "Suspended",
     "archived": "Archived",

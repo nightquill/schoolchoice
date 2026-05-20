@@ -21,6 +21,7 @@ export default function GroupPermissions({ groupId }) {
     { key: 'account_assignment', label: t('groupPermissions.accountAssign') },
     { key: 'student_delete', label: t('groupPermissions.studentDelete') },
     { key: 'student_profile', label: t('groupPermissions.studentProfile') },
+    { key: 'data_export', label: t('groupPermissions.dataExport') },
   ];
 
   const ACCESS_OPTIONS = [

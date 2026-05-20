@@ -242,8 +242,10 @@
     "cancel": "取消",
     "gradeAdded": "成績已新增。",
     "gradeDeleted": "成績已刪除。",
+    "gradeUpdated": "成績已更新。",
     "addFailed": "新增成績失敗。",
-    "deleteFailed": "刪除成績失敗。"
+    "deleteFailed": "刪除成績失敗。",
+    "updateFailed": "更新成績失敗。"
   },
   "language": {
     "ielts": "IELTS",
@@ -560,7 +562,7 @@
     "title": "數據分析",
     "hkdseTrends": "DSE 成績趨勢",
     "subjectCombinations": "科目組合",
-    "popularMajors": "熱門主修",
+    "popularMajors": "熱門課程",
     "studentDirectory": "學生名錄",
     "loading": "載入分析數據中…",
     "gradeDistribution": "DSE 各科成績分佈",
@@ -577,9 +579,9 @@
     "electiveCombinations": "選修科目組合頻率",
     "topPairs": "最常見的選修科目配對及三科組合",
     "noCombinationData": "暫無組合數據。新增選修科成績以查看模式。",
-    "popularIntendedMajors": "熱門預計主修",
-    "distinctMajors": "個不同主修（跨所有目標及畢業生）",
-    "noMajorData": "暫無主修數據。為目標院校設定預計主修以查看趨勢。",
+    "popularIntendedMajors": "熱門預計課程",
+    "distinctMajors": "個不同課程（跨所有目標及畢業生）",
+    "noMajorData": "暫無課程數據。為目標院校設定預計課程以查看趨勢。",
     "anonymizedDirectory": "匿名化學生名錄",
     "graduatedOnly": "僅限已畢業",
     "namesRemoved": "已移除姓名/聯絡資料",
@@ -1289,7 +1291,8 @@
     "view": "檢視",
     "edit": "編輯",
     "studentDelete": "刪除學生",
-    "studentProfile": "學生檔案"
+    "studentProfile": "學生檔案",
+    "dataExport": "資料匯出"
   },
   "importWizard": {
     "uploadFile": "上載檔案",
@@ -1662,7 +1665,7 @@
     "saving": "儲存中…",
     "save": "儲存"
   },
-  "account": {
+  "accountStatus": {
     "active": "啟用",
     "suspended": "已停用",
     "archived": "已封存",

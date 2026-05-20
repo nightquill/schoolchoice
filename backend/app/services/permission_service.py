@@ -32,6 +32,7 @@ TOOL_FIELDS = (
     "account_assignment",
     "student_delete",
     "student_profile",
+    "data_export",
 )
 
 _ACCESS_RANK = {"none": 0, "read_only": 1, "read_write": 2}
@@ -43,7 +44,7 @@ ROLE_DEFAULTS: dict[str, dict] = {
         **{f: "none" for f in (
             "programme_choices", "grades", "plan_generation", "submissions",
             "reports", "cohort_management", "data_import", "account_assignment",
-            "student_delete", "student_profile",
+            "student_delete", "student_profile", "data_export",
         )},
     },
     "student": {
@@ -58,6 +59,7 @@ ROLE_DEFAULTS: dict[str, dict] = {
         "account_assignment": "none",
         "student_delete": "none",
         "student_profile": "read_only",
+        "data_export": "none",
     },
 }
 
