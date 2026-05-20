@@ -1,7 +1,10 @@
 import { useRef, useState } from 'react';
 
 // FileUpload — drag-and-drop file upload with browse button and progress
-function FileUpload({ onFile, accept = '*', loading = false, progress = null }) {
+function FileUpload({ onFile, accept = '*', loading = false, progress = null, labels = {} }) {
+  const uploadingText = labels.uploading || 'Uploading\u2026';
+  const dragText = labels.dragHere || 'Drag file here or';
+  const browseText = labels.browse || 'Browse';
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -87,10 +90,10 @@ function FileUpload({ onFile, accept = '*', loading = false, progress = null }) 
       >
         <span style={labelStyle}>
           {loading
-            ? 'Uploading…'
+            ? uploadingText
             : selectedFile
             ? selectedFile.name
-            : 'Drag file here or'}
+            : dragText}
         </span>
         {!loading && (
           <button
@@ -110,7 +113,7 @@ function FileUpload({ onFile, accept = '*', loading = false, progress = null }) 
               inputRef.current?.click();
             }}
           >
-            Browse
+            {browseText}
           </button>
         )}
         <input

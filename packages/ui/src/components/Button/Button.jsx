@@ -1,4 +1,4 @@
-function Button({ label, onClick, variant = 'primary', disabled = false, loading = false, type = 'button' }) {
+function Button({ label, onClick, variant = 'primary', disabled = false, loading = false, type = 'button', loadingLabel = 'Loading\u2026' }) {
   const isDisabled = disabled || loading;
 
   const baseStyle = {
@@ -43,7 +43,7 @@ function Button({ label, onClick, variant = 'primary', disabled = false, loading
       aria-busy={loading}
       aria-label={loading ? `${label}, loading` : label}
     >
-      {loading ? 'Loading…' : label}
+      {loading ? loadingLabel : label}
     </button>
   );
 }

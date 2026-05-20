@@ -2,12 +2,14 @@
 // Props: sectionKey, initialHtml, onSave, onReset, onCancel, saving
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel, saving }) {
   const editor = useEditor({
     extensions: [StarterKit],
     content: initialHtml || '',
   });
+  const { t } = useTranslation();
 
   const handleSave = () => {
     if (!editor) return;
@@ -56,7 +58,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
         color: 'var(--color-text-secondary)',
         fontFamily: 'var(--font-family-base)',
       }}>
-        Editing: <strong>{sectionKey}</strong>
+        {t('planEditor.editing', { section: sectionKey })}
       </p>
 
       {/* Mini toolbar */}
@@ -65,7 +67,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
           type="button"
           onClick={() => editor && editor.chain().focus().toggleBold().run()}
           style={editor && editor.isActive('bold') ? toolbarBtnActive : toolbarBtnBase}
-          title="Bold"
+          title={t('planEditor.bold')}
         >
           <strong>B</strong>
         </button>
@@ -73,7 +75,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
           type="button"
           onClick={() => editor && editor.chain().focus().toggleItalic().run()}
           style={editor && editor.isActive('italic') ? toolbarBtnActive : toolbarBtnBase}
-          title="Italic"
+          title={t('planEditor.italic')}
         >
           <em>I</em>
         </button>
@@ -81,9 +83,9 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
           type="button"
           onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
           style={editor && editor.isActive('bulletList') ? toolbarBtnActive : toolbarBtnBase}
-          title="Bullet List"
+          title={t('planEditor.bulletList')}
         >
-          &#8226; List
+          &#8226; {t('planEditor.list')}
         </button>
       </div>
 
@@ -109,7 +111,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
             color: 'var(--color-text-secondary)',
           }}
         >
-          Cancel
+          {t('planEditor.cancel')}
         </button>
         <button
           type="button"
@@ -126,7 +128,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
             color: 'var(--color-text-secondary)',
           }}
         >
-          Reset to Default
+          {t('planEditor.resetToDefault')}
         </button>
         <button
           type="button"
@@ -144,7 +146,7 @@ function PlanSectionEditor({ sectionKey, initialHtml, onSave, onReset, onCancel,
             fontWeight: 'var(--font-weight-medium)',
           }}
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? t('planEditor.saving') : t('planEditor.save')}
         </button>
       </div>
     </div>

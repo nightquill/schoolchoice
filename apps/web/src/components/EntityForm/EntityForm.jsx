@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FIELD_COMPONENT_MAP } from './fieldComponents.jsx';
 import { Button } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const inputStyle = {
   width: '100%',
@@ -16,12 +17,13 @@ const inputStyle = {
 export default function EntityForm({ schema, initialValues = {}, onSubmit, onCancel, saving }) {
   const [form, setForm] = useState(initialValues);
   const [errors, setErrors] = useState({});
+  const { t } = useTranslation();
 
   const validate = () => {
     const newErrors = {};
     for (const field of schema?.fields ?? []) {
       if (field.required && (form[field.name] === undefined || form[field.name] === null || form[field.name] === '')) {
-        newErrors[field.name] = `${field.name} is required.`;
+        newErrors[field.name] = t('entityForm.fieldRequired', { field: field.name });
       }
     }
     setErrors(newErrors);
@@ -68,8 +70,8 @@ export default function EntityForm({ schema, initialValues = {}, onSubmit, onCan
         );
       })}
       <div style={{ display: 'flex', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
-        <Button label={saving ? 'Saving...' : 'Save'} variant="primary" type="submit" disabled={saving} />
-        {onCancel && <Button label="Cancel" variant="secondary" onClick={onCancel} disabled={saving} />}
+        <Button label={saving ? t('entityForm.saving') : t('entityForm.save')} variant="primary" type="submit" disabled={saving} />
+        {onCancel && <Button label={t('entityForm.cancel')} variant="secondary" onClick={onCancel} disabled={saving} />}
       </div>
     </form>
   );

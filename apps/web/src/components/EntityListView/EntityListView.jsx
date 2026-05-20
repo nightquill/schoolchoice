@@ -1,4 +1,5 @@
 import { EmptyState } from '@schoolchoice/ui';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const tableStyle = {
   width: '100%',
@@ -32,9 +33,10 @@ const rowHoverStyle = {
 
 export default function EntityListView({ schema, rows, onRowClick }) {
   const displayFields = schema?.fields?.slice(0, 5) ?? [];
+  const { t } = useTranslation();
 
   if (!rows || rows.length === 0) {
-    return <EmptyState message={`No ${schema?.name || 'records'} yet. Add the first one to get started.`} />;
+    return <EmptyState message={t('entityList.noResults')} />;
   }
 
   return (

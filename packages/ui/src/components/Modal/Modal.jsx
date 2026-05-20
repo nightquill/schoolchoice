@@ -10,6 +10,7 @@ function Modal({
   onConfirm,
   confirmLabel = 'Confirm',
   confirmVariant = 'primary',
+  cancelLabel = 'Cancel',
 }) {
   const dialogRef = useRef(null);
   const triggerRef = useRef(null);
@@ -150,7 +151,7 @@ function Modal({
         <h2 id={titleId} style={titleStyle}>{title}</h2>
         <div style={bodyStyle}>{children}</div>
         <div style={footerStyle}>
-          <Button label="Cancel" onClick={onClose} variant="secondary" />
+          <Button label={cancelLabel} onClick={onClose} variant="secondary" />
           {onConfirm && (
             <Button
               label={confirmLabel}

@@ -1,3 +1,5 @@
+import { useTranslation } from '@schoolchoice/ui/i18n';
+
 export const FIELD_COMPONENT_MAP = {
   string: ({ field, value, onChange, inputStyle }) => (
     <input
@@ -62,19 +64,22 @@ export const FIELD_COMPONENT_MAP = {
       onChange={(e) => onChange(e.target.checked)}
     />
   ),
-  enum: ({ field, value, onChange, inputStyle }) => (
-    <select
-      id={field.name}
-      value={value ?? ''}
-      onChange={(e) => onChange(e.target.value)}
-      style={inputStyle}
-    >
-      <option value="">— Select —</option>
-      {field.choices?.map((c) => (
-        <option key={c} value={c}>{c}</option>
-      ))}
-    </select>
-  ),
+  enum: function EnumField({ field, value, onChange, inputStyle }) {
+    const { t } = useTranslation();
+    return (
+      <select
+        id={field.name}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        style={inputStyle}
+      >
+        <option value="">{t('entityForm.selectPlaceholder')}</option>
+        {field.choices?.map((c) => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+    );
+  },
   jsonb: ({ field, value, onChange, inputStyle }) => (
     <textarea
       id={field.name}
