@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useGradesTab } from '../../hooks/useGradesTab';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { LoadingSpinner } from '@schoolchoice/ui';
@@ -8,7 +8,20 @@ import { Button } from '@schoolchoice/ui/primitives/button';
 import { PredictedGradeBadge } from '@schoolchoice/ui';
 import { FileUpload } from '@schoolchoice/ui';
 import { getGradeBuilds, createGradeBuild, updateGradeBuild, deleteGradeBuild, scoreBuild } from '../../api/gradeBuilds';
+import { updateGrade as apiUpdateGrade } from '../../api/grades';
+import { get, post, put, del } from '../../api/helpers';
 import { toast } from 'sonner';
+import { Pencil } from 'lucide-react';
+import { useFeatureAccess } from '../../hooks/usePermission';
+
+// Student-portal grade build API (uses /student/ prefix, no studentId)
+const studentBuildApi = {
+  getBuilds: () => get('/api/v1/student/grade-builds'),
+  create: (name) => post('/api/v1/student/grade-builds', { name, grades: {} }),
+  update: (buildId, data) => put(`/api/v1/student/grade-builds/${buildId}`, data),
+  delete: (buildId) => del(`/api/v1/student/grade-builds/${buildId}`),
+  score: (buildId) => post(`/api/v1/student/grade-builds/${buildId}/scores`),
+};
 
 const HKDSE_SUBJECT_CODES = [
   'CHLA', 'ENGL', 'MATH', 'CSD', 'CHIH', 'CHIL', 'HIST', 'GEOG', 'TOUR',
@@ -19,8 +32,9 @@ const HKDSE_SUBJECT_CODES = [
 
 const HKDSE_GRADES = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
 
-export default function GradesTab({ studentId, subjects }) {
+export default function GradesTab({ studentId, subjects, isStudentView = false }) {
   const { t } = useTranslation();
+  const { canEdit: canEditGrades } = useFeatureAccess('grades');
   const {
     grades,
     loading,
@@ -37,6 +51,29 @@ export default function GradesTab({ studentId, subjects }) {
     dismissParsedGrade,
   } = useGradesTab(studentId);
 
+  // Inline edit state
+  const [editingGradeId, setEditingGradeId] = useState(null);
+  const [editGradeValue, setEditGradeValue] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+
+  const gradeQueryClient = useQueryClient();
+
+  const handleEditGrade = async (gradeId) => {
+    if (!editGradeValue) return;
+    setEditSaving(true);
+    try {
+      await apiUpdateGrade(studentId, gradeId, { raw_grade: editGradeValue });
+      gradeQueryClient.invalidateQueries({ queryKey: ['grades', studentId] });
+      setEditingGradeId(null);
+      setEditGradeValue('');
+      toast.success(t('grades.gradeUpdated'));
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || t('grades.updateFailed'));
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   // Grade builds state
   const [activeBuildId, setActiveBuildId] = useState(null); // null = actual grades
   const [buildGrades, setBuildGrades] = useState({});
@@ -46,7 +83,7 @@ export default function GradesTab({ studentId, subjects }) {
 
   const buildsQuery = useQuery({
     queryKey: ['grade-builds', studentId],
-    queryFn: () => getGradeBuilds(studentId),
+    queryFn: () => isStudentView ? studentBuildApi.getBuilds() : getGradeBuilds(studentId),
   });
   const builds = buildsQuery.data?.builds ?? [];
   const activeBuild = builds.find(b => b.id === activeBuildId);
@@ -56,16 +93,20 @@ export default function GradesTab({ studentId, subjects }) {
     if (scoreTimeoutRef.current) clearTimeout(scoreTimeoutRef.current);
     scoreTimeoutRef.current = setTimeout(async () => {
       try {
-        const result = await scoreBuild(studentId, buildId);
+        const result = isStudentView
+          ? await studentBuildApi.score(buildId)
+          : await scoreBuild(studentId, buildId);
         setLiveScores(result.scores || []);
       } catch { /* ignore */ }
     }, 300);
-  }, [studentId]);
+  }, [studentId, isStudentView]);
 
   const handleCreateBuild = async () => {
     if (!newBuildName.trim()) return;
     try {
-      const result = await createGradeBuild(studentId, newBuildName.trim());
+      const result = isStudentView
+        ? await studentBuildApi.create(newBuildName.trim())
+        : await createGradeBuild(studentId, newBuildName.trim());
       buildsQuery.refetch();
       setActiveBuildId(result.id);
       setBuildGrades(result.grades || {});
@@ -81,7 +122,11 @@ export default function GradesTab({ studentId, subjects }) {
     setBuildGrades(newGrades);
     if (activeBuildId) {
       try {
-        await updateGradeBuild(studentId, activeBuildId, { grades: newGrades });
+        if (isStudentView) {
+          await studentBuildApi.update(activeBuildId, { grades: newGrades });
+        } else {
+          await updateGradeBuild(studentId, activeBuildId, { grades: newGrades });
+        }
         fetchLiveScores(activeBuildId);
       } catch { /* ignore */ }
     }
@@ -90,7 +135,11 @@ export default function GradesTab({ studentId, subjects }) {
   const handleDeleteBuild = async () => {
     if (!activeBuildId) return;
     try {
-      await deleteGradeBuild(studentId, activeBuildId);
+      if (isStudentView) {
+        await studentBuildApi.delete(activeBuildId);
+      } else {
+        await deleteGradeBuild(studentId, activeBuildId);
+      }
       setActiveBuildId(null);
       setBuildGrades({});
       setLiveScores([]);
@@ -132,8 +181,7 @@ export default function GradesTab({ studentId, subjects }) {
     background: 'var(--color-surface)',
     border: 'var(--border-width) solid var(--color-border)',
     borderRadius: 'var(--border-radius-md)',
-    overflow: 'auto',
-    display: 'block',
+    overflow: 'hidden',
   };
 
   const thStyle = {
@@ -190,7 +238,7 @@ export default function GradesTab({ studentId, subjects }) {
 
       {/* Editable build grades */}
       {activeBuildId && (
-        <div style={{ marginBottom: 'var(--space-4)' }}>
+        <div style={{ marginBottom: 'var(--space-4)', overflowX: 'auto' }}>
           <table style={tableStyle}>
             <thead>
               <tr>
@@ -234,8 +282,9 @@ export default function GradesTab({ studentId, subjects }) {
         </div>
       )}
 
-      {/* Actual grades view */}
-      {!activeBuildId && (<>
+      {/* Actual grades view — hidden for student role (students only see grade builds) */}
+      {!activeBuildId && !isStudentView && (<>
+      {canEditGrades && (
       <div>
         <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
           {t('grades.uploadTranscript')}
@@ -252,8 +301,9 @@ export default function GradesTab({ studentId, subjects }) {
           </p>
         )}
       </div>
+      )}
 
-      {parsedGrades.length > 0 && (
+      {canEditGrades && parsedGrades.length > 0 && (
         <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)' }}>
           <p style={{ fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-3)' }}>{t('grades.parsedReview')}</p>
           {parsedGrades.map((g, i) => (
@@ -309,7 +359,32 @@ export default function GradesTab({ studentId, subjects }) {
               <tr key={g.id}>
                 <td style={{ ...tdStyle, position: 'sticky', left: 0, background: 'var(--color-surface)' }}>{(() => { const k = `subjects.${g.subject_code}`; const tr = t(k); return tr !== k ? tr : (g.subject_name || g.subject_code); })()}</td>
                 <td style={tdStyle}>{g.year_of_exam || '\u2014'}</td>
-                <td style={tdStyle}>{g.raw_grade}</td>
+                <td style={tdStyle}>
+                  {editingGradeId === g.id ? (
+                    <div style={{ display: 'flex', gap: 'var(--space-1)', alignItems: 'center' }}>
+                      <select
+                        value={editGradeValue}
+                        onChange={(e) => setEditGradeValue(e.target.value)}
+                        style={{ padding: '2px 4px', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)' }}
+                        autoFocus
+                      >
+                        {HKDSE_GRADES.map((gr) => (
+                          <option key={gr} value={gr}>{gr}</option>
+                        ))}
+                      </select>
+                      <button onClick={() => handleEditGrade(g.id)} disabled={editSaving}
+                        style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 6px', border: '1px solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-primary)', color: '#fff', fontFamily: 'var(--font-family-base)' }}>
+                        {editSaving ? '…' : '✓'}
+                      </button>
+                      <button onClick={() => { setEditingGradeId(null); setEditGradeValue(''); }}
+                        style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 6px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <span>{g.raw_grade}</span>
+                  )}
+                </td>
                 <td style={tdStyle}>
                   {g.predicted_grade && g.sitting !== 'OFFICIAL' ? (
                     <PredictedGradeBadge grade={g.predicted_grade} isOfficial={false} />
@@ -320,20 +395,34 @@ export default function GradesTab({ studentId, subjects }) {
                 <td style={tdStyle}>{g.transcript_uploaded ? '\u2713' : ''}</td>
                 <td style={tdStyle}>{g.notes}</td>
                 <td style={tdStyle}>
-                  <button
-                    onClick={() => handleDeleteGrade(g.id)}
-                    style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                    aria-label={`Delete grade for ${g.subject_name}`}
-                  >
-                    {t('grades.delete')}
-                  </button>
+                  <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+                    {!isStudentView && canEditGrades && editingGradeId !== g.id && (
+                      <button
+                        onClick={() => { setEditingGradeId(g.id); setEditGradeValue(g.raw_grade); }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', color: 'var(--color-primary)' }}
+                        aria-label={`Edit grade for ${g.subject_name}`}
+                        title={t('common.edit')}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                    )}
+                    {canEditGrades && (
+                    <button
+                      onClick={() => handleDeleteGrade(g.id)}
+                      style={{ color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
+                      aria-label={`Delete grade for ${g.subject_name}`}
+                    >
+                      {t('grades.delete')}
+                    </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {!newRow ? (
+      {canEditGrades && !newRow ? (
         <div>
           <Button variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })}>{t('grades.addGrade')}</Button>
         </div>
