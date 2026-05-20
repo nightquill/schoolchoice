@@ -12,6 +12,7 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { getStudent, graduateStudent } from '../../api/students';
 import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
+import { useLocalizedName } from '../../utils/localizedName';
 import { useFeatureAccess } from '../../hooks/usePermission';
 import { getSubjects } from '../../api/grades';
 import ProgrammeChoicesTab from './ProgrammeChoicesTab';
@@ -21,17 +22,31 @@ import PlansTab from './PlansTab';
 import PersonalTab from './PersonalTab';
 import OtherTab from './OtherTab';
 
-function StudentProfile() {
-  const { t } = useTranslation();
-  const { canEdit: canEditProfile } = useFeatureAccess('student_profile');
+function NoPermission({ message }) {
+  return (
+    <div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>
+      {message}
+    </div>
+  );
+}
 
-  const TABS = [
-    { id: 'programmes', label: t('profile.tabs.programmes') },
-    { id: 'grades', label: t('profile.tabs.grades') },
-    { id: 'plans', label: t('profile.tabs.plans') },
-    { id: 'personal', label: t('profile.tabs.personal') },
-    { id: 'other', label: t('profile.tabs.other') },
+function StudentProfile() {
+  const { t, locale } = useTranslation();
+  const ln = useLocalizedName();
+  const { canEdit: canEditProfile, canView: canViewProfile } = useFeatureAccess('student_profile');
+  const { canView: canViewProgrammes, canEdit: canEditProgrammes } = useFeatureAccess('programme_choices');
+  const { canView: canViewGrades, canEdit: canEditGrades } = useFeatureAccess('grades');
+  const { canView: canViewPlans, canEdit: canEditPlans } = useFeatureAccess('plan_generation');
+
+  // Only show tabs the user has at least read access to
+  const ALL_TABS = [
+    { id: 'programmes', label: t('profile.tabs.programmes'), visible: canViewProgrammes },
+    { id: 'grades', label: t('profile.tabs.grades'), visible: canViewGrades },
+    { id: 'plans', label: t('profile.tabs.plans'), visible: canViewPlans },
+    { id: 'personal', label: t('profile.tabs.personal'), visible: canViewProfile },
+    { id: 'other', label: t('profile.tabs.other'), visible: canViewProfile },
   ];
+  const TABS = ALL_TABS.filter((tab) => tab.visible);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -41,7 +56,9 @@ function StudentProfile() {
   const [graduateForm, setGraduateForm] = useState({ final_school_id: '', final_major: '', graduation_year: new Date().getFullYear() });
   const [schoolOptions, setSchoolOptions] = useState([]);
 
-  const activeTab = searchParams.get('tab') || 'programmes';
+  const defaultTab = TABS.length > 0 ? TABS[0].id : 'programmes';
+  const requestedTab = searchParams.get('tab');
+  const activeTab = requestedTab && TABS.some(t => t.id === requestedTab) ? requestedTab : defaultTab;
 
   // Student data via useQuery (D-01: parent-fetches-all pattern)
   const studentQuery = useQuery({
@@ -129,7 +146,12 @@ function StudentProfile() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
                   <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
-                    {student.full_name || 'Student Profile'}
+                    {ln(student, 'name') || student.full_name || 'Student Profile'}
+                    {student.name_zh && student.full_name && (
+                      <span style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-normal)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                        {locale === 'zh-HK' ? student.full_name : student.name_zh}
+                      </span>
+                    )}
                   </h1>
                   {student.candidate_number && (
                     <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-secondary)', background: 'var(--color-background)', padding: '2px 8px', borderRadius: 'var(--border-radius-sm)', border: 'var(--border-width) solid var(--color-border)' }}>
@@ -154,21 +176,16 @@ function StudentProfile() {
                     {t('profile.graduated')} {student.graduation_year || ''}
                   </span>
                 )}
-                {!student.is_graduated && (
-                  <Button
-                    variant="secondary"
-                    onClick={handleOpenGraduate}
-                    disabled={!canEditProfile}
-                    title={!canEditProfile ? t('permission.requiresPermission', { permission: t('permission.studentProfile') }) : undefined}
-                    style={{ opacity: !canEditProfile ? 0.5 : undefined, cursor: !canEditProfile ? 'not-allowed' : undefined }}
-                  >{t('profile.markGraduated')}</Button>
+                {!student.is_graduated && canEditProfile && (
+                  <Button variant="secondary" onClick={handleOpenGraduate}>
+                    {t('profile.markGraduated')}
+                  </Button>
                 )}
-                <Button
-                  onClick={handleGeneratePlan}
-                  disabled={!canEditProfile}
-                  title={!canEditProfile ? t('permission.requiresPermission', { permission: t('permission.studentProfile') }) : undefined}
-                  style={{ opacity: !canEditProfile ? 0.5 : undefined, cursor: !canEditProfile ? 'not-allowed' : undefined }}
-                >{t('profile.generatePlan')}</Button>
+                {canEditPlans && (
+                  <Button onClick={handleGeneratePlan}>
+                    {t('profile.generatePlan')}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -181,25 +198,35 @@ function StudentProfile() {
                 </TabsList>
               </div>
 
-              <div className="px-4 md:px-8" style={{ maxWidth: '100%', margin: '0 auto', paddingTop: 'var(--space-4)' }}>
-                <TabsContent value="programmes">
-                  <ProgrammeChoicesTab studentId={id} />
-                </TabsContent>
-                <TabsContent value="grades">
-                  <GradesTab studentId={id} subjects={subjects} />
-                  <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-4)' }}>
-                    <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} />
-                  </div>
-                </TabsContent>
-                <TabsContent value="plans">
-                  <PlansTab studentId={id} />
-                </TabsContent>
-                <TabsContent value="personal">
-                  <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} />
-                </TabsContent>
-                <TabsContent value="other">
-                  <OtherTab studentId={id} student={student} onSaved={handleStudentSaved} />
-                </TabsContent>
+              <div className="px-4 md:px-8" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', paddingTop: 'var(--space-4)' }}>
+                {canViewProgrammes && (
+                  <TabsContent value="programmes">
+                    <ProgrammeChoicesTab studentId={id} />
+                  </TabsContent>
+                )}
+                {canViewGrades && (
+                  <TabsContent value="grades">
+                    <GradesTab studentId={id} subjects={subjects} />
+                    <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-4)' }}>
+                      <LanguageTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                    </div>
+                  </TabsContent>
+                )}
+                {canViewPlans && (
+                  <TabsContent value="plans">
+                    <PlansTab studentId={id} />
+                  </TabsContent>
+                )}
+                {canViewProfile && (
+                  <TabsContent value="personal">
+                    <PersonalTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                  </TabsContent>
+                )}
+                {canViewProfile && (
+                  <TabsContent value="other">
+                    <OtherTab studentId={id} student={student} onSaved={handleStudentSaved} />
+                  </TabsContent>
+                )}
               </div>
             </Tabs>
           </>
