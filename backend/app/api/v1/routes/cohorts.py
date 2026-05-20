@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import Student, User
+from app.services.permission_service import resolve_user_permissions
 from app.db.models_v2 import (
     CohortMembership,
     StudentCohort,
@@ -68,6 +69,7 @@ def _cohort_to_response(cohort: StudentCohort) -> CohortResponse:
         name=cohort.name,
         description=cohort.description,
         academic_year=cohort.academic_year,
+        is_default=getattr(cohort, "is_default", False),
         member_count=len(cohort.memberships),
         created_at=cohort.created_at,
         updated_at=cohort.updated_at,
@@ -106,15 +108,23 @@ def list_cohorts(
     )
 
 
-def _require_cohort_management(user: User) -> None:
-    """Raise 403 if user is not admin and doesn't have can_manage_cohorts."""
+def _require_cohort_management(user: User, db: Session = None) -> None:
+    """Raise 403 if user is not admin and doesn't have cohort management permission."""
     if getattr(user, "role", "") == "admin":
         return
-    if not getattr(user, "can_manage_cohorts", False):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to manage cohorts. Ask an admin to grant cohort management access.",
-        )
+    # Check group-based cohort_management permission
+    if db:
+        perms = resolve_user_permissions(user, db)
+        has_mgmt = any(p.get("cohort_management") == "read_write" for p in perms)
+        if has_mgmt:
+            return
+    # Legacy fallback
+    if getattr(user, "can_manage_cohorts", False):
+        return
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You do not have permission to manage cohorts. Ask an admin to grant cohort management access.",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +138,7 @@ def create_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new student cohort."""
-    _require_cohort_management(current_user)
+    _require_cohort_management(current_user, db)
     cohort = StudentCohort(
         user_id=current_user.id,
         organisation_id=_org_id(current_user),
@@ -214,6 +224,7 @@ def get_cohort(
         id=cohort.id,
         name=cohort.name,
         description=cohort.description,
+        is_default=getattr(cohort, "is_default", False),
         members=members,
         created_at=cohort.created_at,
         updated_at=cohort.updated_at,
@@ -236,7 +247,7 @@ def update_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Update cohort name or description."""
-    _require_cohort_management(current_user)
+    _require_cohort_management(current_user, db)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
     if payload.name is not None:
         cohort.name = payload.name
@@ -260,8 +271,10 @@ def delete_cohort(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a cohort (members are unlinked, not deleted)."""
-    _require_cohort_management(current_user)
+    _require_cohort_management(current_user, db)
     cohort = _get_cohort_or_404(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
+    if getattr(cohort, "is_default", False):
+        raise HTTPException(status_code=400, detail="Cannot delete the default 'All Students' cohort.")
     db.delete(cohort)
     db.commit()
 
@@ -315,6 +328,7 @@ def add_members(
         id=cohort.id,
         name=cohort.name,
         description=cohort.description,
+        is_default=getattr(cohort, "is_default", False),
         members=members,
         created_at=cohort.created_at,
         updated_at=cohort.updated_at,

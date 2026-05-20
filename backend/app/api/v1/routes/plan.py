@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import School, Student, User
+from app.services.permission_service import check_feature_permission
 from app.db.models_v2 import AcademicPlan, PlanGenerationJob, PlanHistory, StudentSchoolTarget, Subject
 from app.db.session import SessionLocal, get_db
 from app.schemas.v2.plan import PlanGenerateRequest, PlanHistoryItem, PlanHistoryResponse, PlanJobResponse, PlanResponse, PlanStatusResponse
@@ -303,6 +304,9 @@ def create_plan(
     Accepts optional JSON body with plan_type: "UNIVERSITY" (default) or "HIGH_SCHOOL".
     Returns {job_id, status: 'PENDING'}. REQ-078
     """
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="plan_generation")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Plan generation permission required.")
     student_service.get_student(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),

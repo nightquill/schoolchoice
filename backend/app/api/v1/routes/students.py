@@ -211,6 +211,10 @@ def update_student(
     current_user: User = Depends(get_current_user),
 ):
     """Full update of a student profile (v1 fields). REQ-013, REQ-033"""
+    from fastapi import HTTPException
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     return student_service.update_student(
         db, student_id=student_id, user_id=current_user.id, data=payload,
         organisation_id=_org_id(current_user),
@@ -226,6 +230,10 @@ def update_student_profile(
     current_user: User = Depends(get_current_user),
 ):
     """Update all v2 student profile fields. REQ-057"""
+    from fastapi import HTTPException as _HTTPException
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_profile")
+    if perm != "read_write":
+        raise _HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student profile write permission required.")
     student = student_service.get_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))
 
     update_fields: dict[str, Any] = {

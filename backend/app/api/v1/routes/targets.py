@@ -15,6 +15,7 @@ from pydantic import BaseModel
 
 from app.core.dependencies import get_current_user
 from app.db.models import School, Student, User
+from app.services.permission_service import check_feature_permission
 from app.db.models_v2 import StudentSchoolTarget
 from app.db.session import get_db
 from app.schemas.v2.targets import (
@@ -95,8 +96,15 @@ def list_targets(
 
         if school is not None:
             resp.school_name = school.name
+            resp.school_name_zh = getattr(school, 'name_zh', None)
             resp.jupas_code = t.jupas_code
             resp.programme_name = t.programme_name
+            # Look up programme_name_zh from JUPAS data
+            if t.jupas_code:
+                from app.modules.school_choice.models.models import JupasProgramme
+                jp = db.query(JupasProgramme).filter(JupasProgramme.jupas_code == t.jupas_code).first()
+                if jp:
+                    resp.programme_name_zh = getattr(jp, 'name_zh', None)
             school_dict = school_dict_map.get(str(t.school_id), build_school_dict(school))
 
             # If target has a JUPAS programme, use programme-level scoring
@@ -171,6 +179,9 @@ def add_target(
     current_user: User = Depends(get_current_user),
 ):
     """Add a school to the student's target list. REQ-069"""
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="programme_choices")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Programme choices write permission required.")
     student = student_service.get_student(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
@@ -253,8 +264,14 @@ def add_target(
 
     resp = TargetResponse.model_validate(target)
     resp.school_name = school.name
+    resp.school_name_zh = getattr(school, 'name_zh', None)
     resp.jupas_code = payload.jupas_code
     resp.programme_name = payload.programme_name
+    if payload.jupas_code:
+        from app.modules.school_choice.models.models import JupasProgramme
+        jp = db.query(JupasProgramme).filter(JupasProgramme.jupas_code == payload.jupas_code).first()
+        if jp:
+            resp.programme_name_zh = getattr(jp, 'name_zh', None)
     resp.eligibility_pass = passes
     resp.match_score = match_score
     resp.failing_criteria = failing
@@ -278,6 +295,9 @@ def update_target(
     current_user: User = Depends(get_current_user),
 ):
     """Update student_rank or status on a target. REQ-069"""
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="programme_choices")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Programme choices write permission required.")
     student_service.get_student(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
@@ -315,6 +335,9 @@ def delete_target(
     current_user: User = Depends(get_current_user),
 ):
     """Remove a school from the student's target list. REQ-069"""
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="programme_choices")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Programme choices write permission required.")
     student_service.get_student(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
