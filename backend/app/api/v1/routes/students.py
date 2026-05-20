@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
 from app.db.models import Student, User
+from app.services.permission_service import check_feature_permission
 from app.db.models_v2 import AcademicPlan, StudentSchoolTarget
 from app.db.session import get_db
 from app.schemas.student import (
@@ -378,6 +379,13 @@ def graduate_student(
     if payload.final_major is not None:
         student.final_major = payload.final_major
     student.graduation_year = payload.graduation_year or _date.today().year
+
+    # Auto-unbind the student's user account on graduation
+    linked_user = db.query(User).filter(User.student_id == student.id, User.is_active == True).first()  # noqa: E712
+    if linked_user:
+        linked_user.student_id = None
+        linked_user.is_active = False
+
     db.commit()
     db.refresh(student)
     return _build_full_response(student)
@@ -390,5 +398,9 @@ def delete_student(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Permanently delete a student profile and all associated data. REQ-025, REQ-028"""
+    """Soft-delete a student profile. Requires student_delete permission. REQ-025, REQ-028"""
+    from fastapi import HTTPException
+    perm = check_feature_permission(current_user, db, student_id=student_id, feature="student_delete")
+    if perm != "read_write":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Student delete permission required.")
     student_service.delete_student(db, student_id=student_id, user_id=current_user.id, organisation_id=_org_id(current_user))

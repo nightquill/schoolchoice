@@ -227,7 +227,9 @@ def delete_user(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+    from datetime import datetime, timezone
     user.is_active = False
+    user.deleted_at = datetime.now(timezone.utc)
     db.commit()
 
 

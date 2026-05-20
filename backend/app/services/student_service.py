@@ -28,9 +28,9 @@ def get_students(
     REQ-015, REQ-032
     """
     if organisation_id is not None:
-        query = db.query(Student).filter(Student.organisation_id == organisation_id)
+        query = db.query(Student).filter(Student.organisation_id == organisation_id, Student.deleted_at.is_(None))
     else:
-        query = db.query(Student).filter(Student.user_id == user_id)
+        query = db.query(Student).filter(Student.user_id == user_id, Student.deleted_at.is_(None))
     if q:
         from sqlalchemy import or_
         pattern = f"%{q}%"
@@ -117,6 +117,15 @@ def create_student(
         target_region=data.target_region,
     )
     db.add(student)
+    db.flush()
+
+    # Auto-add to "All Students" default cohort
+    if organisation_id:
+        from app.services.default_cohort import ensure_student_in_default_cohort
+        ensure_student_in_default_cohort(
+            db, student_id=student.id, organisation_id=organisation_id, user_id=user_id,
+        )
+
     db.commit()
     db.refresh(student)
     return student
@@ -170,10 +179,21 @@ def delete_student(
     db: Session, student_id: UUID, user_id: UUID, *, organisation_id: UUID | None = None
 ) -> None:
     """
-    Permanently delete a student profile and all associated data.
-    Raises HTTP 404 or HTTP 403 as appropriate.
+    Soft-delete a student profile. Sets deleted_at timestamp.
+    Deactivates linked student account if one exists.
     REQ-025, REQ-028
     """
+    from datetime import datetime, timezone as _tz
     student = get_student(db, student_id, user_id, organisation_id=organisation_id)
-    db.delete(student)
+    student.deleted_at = datetime.now(_tz.utc)
+
+    # Deactivate linked student account
+    linked_user = db.query(User).filter(
+        User.student_id == student.id,
+        User.is_active == True  # noqa: E712
+    ).first()
+    if linked_user:
+        linked_user.is_active = False
+        linked_user.deleted_at = datetime.now(_tz.utc)
+
     db.commit()

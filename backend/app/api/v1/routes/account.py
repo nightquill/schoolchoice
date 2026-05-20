@@ -211,9 +211,12 @@ def delete_account(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Soft-delete account by setting is_active=False. REQ-079"""
+    """Soft-delete account by setting is_active=False + deleted_at. Unlink student_id. REQ-079"""
+    from datetime import datetime, timezone
     user = db.merge(current_user)
     user.is_active = False
+    user.deleted_at = datetime.now(timezone.utc)
+    user.student_id = None
     db.commit()
     return {"message": "Account deactivated successfully"}
 
@@ -271,6 +274,12 @@ def setup_organisation(
         permission="read_write",
     )
     db.add(membership)
+    db.flush()
+
+    # Auto-create the "All Students" default cohort for this org
+    from app.services.default_cohort import get_or_create_default_cohort
+    get_or_create_default_cohort(db, organisation_id=org.id, user_id=user.id)
+
     db.commit()
     db.refresh(org)
     return {"id": str(org.id), "name": org.name, "already_existed": False}
