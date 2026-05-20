@@ -50,6 +50,8 @@ class CohortPermissionSet(BaseModel):
     cohort_management: str = "none"
     data_import: str = "none"
     account_assignment: str = "none"
+    student_delete: str = "none"
+    student_profile: str = "none"
 
 
 class PermissionsUpdate(BaseModel):

@@ -157,6 +157,10 @@ class User(Base):
         server_default="true",
         comment="true until soft-deleted; row is retained for audit",
     )
+    deleted_at = Column(
+        TIMESTAMP(timezone=True), nullable=True, default=None,
+        comment="Soft delete timestamp — NULL means active",
+    )
     student_id = Column(
         UUID(as_uuid=True),
         ForeignKey("students.id", ondelete="SET NULL", name="fk_user_student_id"),
@@ -368,6 +372,8 @@ class CohortPermission(Base):
     cohort_management = Column(String(10), nullable=False, default="none", server_default="'none'")
     data_import = Column(String(10), nullable=False, default="none", server_default="'none'")
     account_assignment = Column(String(10), nullable=False, default="none", server_default="'none'")
+    student_delete = Column(String(10), nullable=False, default="none", server_default="'none'")
+    student_profile = Column(String(10), nullable=False, default="none", server_default="'none'")
     group = relationship("TeacherGroup", back_populates="permissions")
 
 

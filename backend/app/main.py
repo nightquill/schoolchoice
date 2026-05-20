@@ -71,6 +71,40 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # ---------------------------------------------------------------------------
 Base.metadata.create_all(bind=engine)
 
+# Patch missing columns — create_all only adds missing tables, not columns
+from sqlalchemy import inspect as _sa_inspect, text
+with engine.connect() as _conn:
+    _inspector = _sa_inspect(engine)
+    _existing_tables = _inspector.get_table_names()
+    for _table_obj in Base.metadata.sorted_tables:
+        _tname = _table_obj.name
+        if _tname not in _existing_tables:
+            continue
+        _existing_cols = {c["name"] for c in _inspector.get_columns(_tname)}
+        for _col_obj in _table_obj.columns:
+            if _col_obj.name not in _existing_cols:
+                _ctype = _col_obj.type.compile(engine.dialect)
+                _default = ""
+                if _col_obj.server_default is not None:
+                    _default = f" DEFAULT {_col_obj.server_default.arg}"
+                try:
+                    _conn.execute(text(f"ALTER TABLE {_tname} ADD COLUMN {_col_obj.name} {_ctype}{_default}"))
+                    _conn.commit()
+                except Exception:
+                    pass
+
+# Also fix Student.user_id FK cascade if it's still CASCADE
+try:
+    with engine.connect() as _conn:
+        _conn.execute(text("""
+            ALTER TABLE students DROP CONSTRAINT IF EXISTS fk_students_user_id;
+            ALTER TABLE students ADD CONSTRAINT fk_students_user_id
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
+        """))
+        _conn.commit()
+except Exception:
+    pass
+
 # ---------------------------------------------------------------------------
 # Auto-seed subjects and schools on startup if tables are empty
 # ---------------------------------------------------------------------------

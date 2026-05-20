@@ -62,10 +62,10 @@ class Student(Base):
     )
     user_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE", name="fk_students_user_id"),
-        nullable=False,
+        ForeignKey("users.id", ondelete="SET NULL", name="fk_students_user_id"),
+        nullable=True,
         index=True,
-        comment="Owning counselor — FK to users.id, cascade delete",
+        comment="Owning counselor — FK to users.id, SET NULL on delete",
     )
     organisation_id = Column(
         UUID(as_uuid=True),
@@ -213,6 +213,7 @@ class Student(Base):
     graduation_year = Column(Integer, nullable=True)
     final_school_id = Column(UUID(as_uuid=True), ForeignKey("schools.id", ondelete="SET NULL", name="fk_students_final_school_id"), nullable=True, index=True)
     final_major = Column(String(255), nullable=True)
+    deleted_at = Column(TIMESTAMP(timezone=True), nullable=True, default=None, comment="Soft delete timestamp — NULL means active")
 
     # Relationships
     user = relationship("User", back_populates="students", foreign_keys=[user_id])
@@ -1462,6 +1463,13 @@ class StudentCohort(Base):
         String(20),
         nullable=True,
         comment="Academic year e.g. '2025-26'; used for grade snapshot context",
+    )
+    is_default = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+        comment="True for the auto-created 'All Students' cohort — cannot be deleted",
     )
     created_at = Column(
         TIMESTAMP(timezone=True),
