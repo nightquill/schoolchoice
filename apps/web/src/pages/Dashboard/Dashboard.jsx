@@ -24,6 +24,7 @@ import { Users } from 'lucide-react';
 function Dashboard() {
   const { t, setLocale } = useTranslation();
   const { canEdit: canImport } = useFeatureAccess('data_import');
+  const { canEdit: canExport } = useFeatureAccess('data_export');
   const { hasAccess, isLoading: accessLoading } = useHasAnyAccess();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -134,13 +135,13 @@ function Dashboard() {
     },
   });
 
-  // Search students by name for quick-find
-  const filteredStudents = searchQuery.trim()
-    ? students.filter((s) => {
-        const name = (s.full_name || s.name || '').toLowerCase();
+  // Search cohorts by name for quick-find
+  const filteredCohorts = searchQuery.trim()
+    ? cohorts.filter((c) => {
+        const name = (c.name || '').toLowerCase();
         return name.includes(searchQuery.toLowerCase());
       })
-    : [];
+    : cohorts;
 
   const handleCreateStudent = async (e) => {
     e.preventDefault();
@@ -265,9 +266,10 @@ function Dashboard() {
           </button>
           <button
             onClick={async () => {
+              if (!canExport) return;
               try {
                 const { default: client } = await import('@schoolchoice/ui/api/client');
-                const resp = await client.get('/api/v1/entities/student/export', { responseType: 'blob' });
+                const resp = await client.get('/api/v1/students/export', { responseType: 'blob' });
                 const url = URL.createObjectURL(resp.data);
                 const a = document.createElement('a');
                 a.href = url;
@@ -276,14 +278,17 @@ function Dashboard() {
                 URL.revokeObjectURL(url);
               } catch { toast.error(t('dashboard.exportFailed')); }
             }}
+            disabled={!canExport}
+            title={!canExport ? t('permission.requiresPermission', { permission: t('permission.dataExport') }) : undefined}
             style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
               padding: 'var(--space-4)', background: 'var(--color-surface)',
               border: 'var(--border-width) solid var(--color-border)',
-              borderRadius: 'var(--border-radius-md)', cursor: 'pointer',
+              borderRadius: 'var(--border-radius-md)', cursor: !canExport ? 'not-allowed' : 'pointer',
               fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+              opacity: !canExport ? 0.5 : undefined,
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+            onMouseEnter={(e) => { if (canExport) { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; } }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
           >
             <span style={{ fontSize: '24px' }}>&#8595;</span>
@@ -336,66 +341,28 @@ function Dashboard() {
               )}
             </div>
 
-            {/* Search bar — finds students across all cohorts */}
+            {/* Search bar — filters cohorts by name */}
             <div style={{ marginBottom: 'var(--space-4)' }}>
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('dashboard.searchStudentByName')}
-                name="student-search"
+                placeholder={t('dashboard.searchCohortByName')}
+                name="cohort-search"
                 autoComplete="off"
                 style={{ width: '100%', maxWidth: '400px', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-                aria-label={t('dashboard.searchStudentByName')}
+                aria-label={t('dashboard.searchCohortByName')}
               />
-              {searchQuery.trim() && (
-                <div style={{ marginTop: 'var(--space-3)' }}>
-                  {filteredStudents.length === 0 ? (
-                    <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('dashboard.noMatch')}</p>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {filteredStudents.slice(0, 12).map((student) => (
-                        <div
-                          key={student.id}
-                          onClick={() => navigate(`/students/${student.id}/profile`)}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/students/${student.id}/profile`); } }}
-                          style={{
-                            background: 'var(--color-surface)',
-                            border: 'var(--border-width) solid var(--color-border)',
-                            borderRadius: 'var(--border-radius-md)',
-                            padding: 'var(--space-3)',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 'var(--space-1)',
-                          }}
-                        >
-                          <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
-                            {student.full_name || student.name || t('dashboard.unnamedStudent')}
-                          </span>
-                          <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                            {student.class_name && `${t('dashboard.class')} ${student.class_name}`}
-                            {student.class_name && student.year_of_study && ' · '}
-                            {student.year_of_study && `${t('dashboard.year')} ${student.year_of_study}`}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
 
             {cohortsQuery.isLoading && <LoadingSpinner label={t('cohorts.loading')} />}
 
-            {!cohortsQuery.isLoading && cohorts.length === 0 && (
-              <EmptyState message={t('dashboard.noCohorts')} />
+            {!cohortsQuery.isLoading && filteredCohorts.length === 0 && (
+              <EmptyState message={searchQuery.trim() ? t('dashboard.noMatch') : t('dashboard.noCohorts')} />
             )}
 
-            {!cohortsQuery.isLoading && cohorts.length > 0 && (
+            {!cohortsQuery.isLoading && filteredCohorts.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label="Cohort list">
-                {[...cohorts].sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0)).map((cohort) => (
+                {[...filteredCohorts].sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0)).map((cohort) => (
                   <Card
                     key={cohort.id}
                     role="listitem"

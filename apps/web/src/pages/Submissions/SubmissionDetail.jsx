@@ -255,7 +255,7 @@ function SubmissionDetail() {
                                 </div>
                                 {isAtRisk && (
                                   <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', background: '#dc2626', padding: '1px 5px', borderRadius: '6px', marginTop: '2px', display: 'inline-block' }}>
-                                    AT RISK
+                                    {t('submissions.atRisk')}
                                   </span>
                                 )}
                                 {choice.notes && (
@@ -344,22 +344,19 @@ function SubmissionDetail() {
             </div>
 
             {/* Action buttons */}
-            {isPending && (
+            {isPending && canEditSubmissions && (
               <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', alignItems: 'center' }}>
                 <Button
                   onClick={handleApprove}
-                  disabled={actionLoading || flaggedCount > 0 || !canEditSubmissions}
-                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
-                  style={{ background: (flaggedCount > 0 || !canEditSubmissions) ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none', opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
+                  disabled={actionLoading || flaggedCount > 0}
+                  style={{ background: flaggedCount > 0 ? '#9ca3af' : '#16a34a', color: '#fff', border: 'none' }}
                 >
                   {actionLoading ? t('submissions.processing') : t('submissions.approve')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setReviseOpen(true)}
-                  disabled={actionLoading || !canEditSubmissions}
-                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
-                  style={{ opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
+                  disabled={actionLoading}
                 >
                   {flaggedCount > 0
                     ? t('submissions.sendBackFlagged', { count: flaggedCount })
@@ -368,9 +365,8 @@ function SubmissionDetail() {
                 <Button
                   variant="outline"
                   onClick={() => setRejectOpen(true)}
-                  disabled={actionLoading || !canEditSubmissions}
-                  title={!canEditSubmissions ? t('permission.requiresPermission', { permission: t('permission.submissions') }) : undefined}
-                  style={{ color: '#dc2626', borderColor: '#dc2626', opacity: !canEditSubmissions ? 0.5 : undefined, cursor: !canEditSubmissions ? 'not-allowed' : undefined }}
+                  disabled={actionLoading}
+                  style={{ color: '#dc2626', borderColor: '#dc2626' }}
                 >
                   {t('submissions.reject')}
                 </Button>
@@ -404,7 +400,7 @@ function SubmissionDetail() {
                   const choice = slotMap[parseInt(rank, 10)];
                   return (
                     <li key={rank}>
-                      {t('submissions.rank')} {rank}: {choice?.programme_name || choice?.jupas_code || 'Unknown'}
+                      {t('submissions.rank')} {rank}: {choice?.programme_name || choice?.jupas_code || t('submissions.unknownStudent')}
                       {note && ` — ${note}`}
                     </li>
                   );
