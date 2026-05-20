@@ -10,7 +10,7 @@ import { Input } from '@schoolchoice/ui/primitives/input';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
-import { listUsers, updateUser, getSubmissionRateLimit, setSubmissionRateLimit, getPlanDetailLevel, setPlanDetailLevel } from '../../api/admin';
+import { listUsers, createUser, updateUser, getSubmissionRateLimit, setSubmissionRateLimit, getPlanDetailLevel, setPlanDetailLevel } from '../../api/admin';
 import { getCohorts, createCohort, deleteCohort, getCohort, addCohortMembers, removeCohortMember, searchStudents } from '../../api/cohorts';
 // Individual cohort permissions removed — use Teacher Groups for permission management
 import { useTranslation } from '@schoolchoice/ui/i18n';
@@ -102,10 +102,31 @@ function AdminManage() {
 // ═══════════════════════════════════════════════════════════════
 
 function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
+  const [showCreateTeacher, setShowCreateTeacher] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [newDisplayName, setNewDisplayName] = useState('');
+  const [newRole, setNewRole] = useState('counsellor');
+
   const updateUserMutation = useMutation({
     mutationFn: ({ userId, ...data }) => updateUser(userId, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); toast.success(t('adminManage.saved')); },
     onError: () => toast.error(t('adminManage.saveFailed')),
+  });
+
+  const createUserMutation = useMutation({
+    mutationFn: (data) => createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setShowCreateTeacher(false);
+      setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('counsellor');
+      toast.success(t('settings.userCreated'));
+    },
+    onError: (err) => {
+      const detail = err?.response?.data?.detail;
+      if (detail && detail.includes('exists')) toast.error(t('settings.emailExists'));
+      else toast.error(t('settings.createFailed'));
+    },
   });
 
   const cardStyle = { background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', overflow: 'hidden' };
@@ -115,9 +136,11 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
   if (usersLoading) return <LoadingSpinner label={t('adminManage.loading')} />;
 
   return (
+    <>
     <div style={cardStyle}>
-      <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-        {t('adminManage.teachersNote')}
+      <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: 'var(--border-width) solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('adminManage.teachersNote')}</span>
+        <Button onClick={() => setShowCreateTeacher(true)}>{t('settings.createUser')}</Button>
       </div>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -167,6 +190,40 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
         </table>
       </div>
     </div>
+
+    <Dialog open={showCreateTeacher} onOpenChange={setShowCreateTeacher}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>{t('settings.createUser')}</DialogTitle></DialogHeader>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.email')} *</label>
+            <Input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="teacher@school.hk" type="email" />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.password')} *</label>
+            <Input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type="password" />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('settings.fullName')}</label>
+            <Input value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', marginBottom: 'var(--space-1)' }}>{t('adminManage.role')}</label>
+            <select value={newRole} onChange={(e) => setNewRole(e.target.value)} style={{ width: '100%', padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}>
+              <option value="counsellor">{t('adminManage.counsellor')}</option>
+              <option value="admin">{t('adminManage.admin')}</option>
+            </select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setShowCreateTeacher(false)}>{t('dashboard.cancel')}</Button>
+          <Button onClick={() => createUserMutation.mutate({ email: newEmail.trim(), password: newPassword, display_name: newDisplayName.trim() || null, role: newRole })} disabled={!newEmail.trim() || !newPassword || createUserMutation.isPending}>
+            {createUserMutation.isPending ? t('settings.saving') : t('settings.createUser')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
 
