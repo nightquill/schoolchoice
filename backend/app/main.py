@@ -192,7 +192,7 @@ def _seed_database():
     """Auto-seed subjects and schools on startup if tables are empty."""
     from sqlalchemy import text as _t
 
-    seed_dir = Path(__file__).parent.parent / "data" / "seed"
+    seed_dir = Path(os.environ.get("SEED_DIR", Path(__file__).parent.parent / "data" / "seed"))
 
     with engine.connect() as conn:
         # Seed subjects if empty

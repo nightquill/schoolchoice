@@ -27,7 +27,7 @@ from typing import Any
 # Constants
 # ---------------------------------------------------------------------------
 
-_DATA_DIR = Path(__file__).resolve().parents[5] / "data" / "jupas"
+_DATA_DIR = Path(os.environ.get("JUPAS_DATA_DIR", Path(__file__).resolve().parents[5] / "data" / "jupas"))
 _GRADE_SCALES_PATH = _DATA_DIR / "grade_scales.json"
 
 # CSD subject code — uses pass/fail grading, not the standard numeric scale
