@@ -1,5 +1,5 @@
 // Student Dashboard — grade sandbox on top, then programme choices, then submit
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
@@ -14,6 +14,7 @@ import { useTranslation } from '@schoolchoice/ui/i18n';
 function StudentDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('choices');
   const [submitting, setSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
 
@@ -138,16 +139,34 @@ function StudentDashboard() {
           </div>
         </div>
 
-        {/* Grades — tabbed: Actual Grades + grade sets */}
-        <div style={{ marginBottom: 'var(--space-6)' }}>
-          <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-3) 0' }}>
-            {t('studentPortal.myGrades')}
-          </h2>
-          <GradesTab studentId={studentId} isStudentView={true} />
+        {/* Dashboard tabs */}
+        <div style={{ display: 'flex', borderBottom: 'var(--border-width) solid var(--color-border)', marginBottom: 'var(--space-4)', gap: 0 }}>
+          {[
+            { key: 'choices', label: t('studentPortal.myChoices') },
+            { key: 'grades', label: t('studentPortal.myGrades') },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              style={{
+                padding: 'var(--space-3) var(--space-5)',
+                fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)',
+                fontWeight: activeTab === key ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                borderBottom: activeTab === key ? '2px solid var(--color-primary)' : '2px solid transparent',
+                color: activeTab === key ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              }}
+            >{label}</button>
+          ))}
         </div>
 
-        {/* Programme Choices */}
-        <ProgrammeChoicesTab studentId={studentId} isStudent={true} />
+        {activeTab === 'choices' && (
+          <ProgrammeChoicesTab studentId={studentId} isStudent={true} />
+        )}
+
+        {activeTab === 'grades' && (
+          <GradesTab studentId={studentId} isStudentView={true} />
+        )}
       </div>
     </div>
   );
