@@ -215,6 +215,62 @@ def _seed_database():
 _seed_database()
 
 
+def _seed_jupas_programmes():
+    """Auto-seed JUPAS programmes from JSON files if table is empty."""
+    from sqlalchemy import text as _t
+    from sqlalchemy.orm import Session as _Sess
+
+    jupas_dir = Path(os.environ.get("JUPAS_DATA_DIR", Path(__file__).parent.parent / "data" / "jupas"))
+    progs_dir = jupas_dir / "programmes"
+    if not progs_dir.exists():
+        return
+
+    with engine.connect() as conn:
+        count = conn.execute(_t("SELECT COUNT(*) FROM jupas_programmes")).scalar()
+        if count > 0:
+            return
+
+    _startup_logger.info("Seeding JUPAS programmes from JSON files...")
+    import json as _json
+    from app.modules.school_choice.models.models import JupasProgramme
+
+    with _Sess(engine) as db:
+        for json_file in sorted(progs_dir.glob("*.json")):
+            try:
+                with open(json_file) as f:
+                    data = _json.load(f)
+                programmes = data if isinstance(data, list) else data.get("programmes", [])
+                for p in programmes:
+                    existing = db.query(JupasProgramme).filter(
+                        JupasProgramme.jupas_code == p.get("jupas_code")
+                    ).first()
+                    if existing:
+                        continue
+                    db.add(JupasProgramme(
+                        jupas_code=p.get("jupas_code"),
+                        name=p.get("name"),
+                        name_zh=p.get("name_zh"),
+                        institution_code=p.get("institution_code"),
+                        faculty=p.get("faculty"),
+                        scoring_formula=p.get("scoring_formula"),
+                        minimum_requirements=p.get("minimum_requirements"),
+                        admission_stats=p.get("admission_stats"),
+                        non_grade_requirements=p.get("non_grade_requirements"),
+                    ))
+                db.flush()
+            except Exception as exc:
+                _startup_logger.warning(f"Failed to seed {json_file.name}: {exc}")
+        db.commit()
+        final = db.query(JupasProgramme).count()
+        _startup_logger.info(f"Seeded {final} JUPAS programmes")
+
+
+try:
+    _seed_jupas_programmes()
+except Exception as _exc:
+    _startup_logger.warning(f"JUPAS seed skipped: {_exc}")
+
+
 def _ensure_all_cohorts():
     """Ensure every organisation has an immutable 'All' default cohort.
 
