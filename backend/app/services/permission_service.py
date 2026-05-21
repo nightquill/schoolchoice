@@ -151,6 +151,10 @@ def check_feature_permission(
     if user.role == "admin":
         return "read_write"
 
+    # Students always have full access to their own data
+    if user.role == "student" and getattr(user, "student_id", None) and str(user.student_id) == str(student_id):
+        return "read_write"
+
     # Find which cohorts the student belongs to
     cohort_ids = [
         r[0]
