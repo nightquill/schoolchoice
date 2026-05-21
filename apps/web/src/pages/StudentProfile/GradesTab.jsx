@@ -205,36 +205,83 @@ export default function GradesTab({ studentId, subjects, isStudentView = false }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-      {/* Build selector */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
-        <select
-          value={activeBuildId || ''}
-          onChange={(e) => setActiveBuildId(e.target.value || null)}
-          style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
-        >
-          <option value="">{t('gradeBuilds.actualGrades')}</option>
-          {builds.map(b => (
-            <option key={b.id} value={b.id}>{b.name}</option>
-          ))}
-        </select>
-        {!showNewBuild && builds.length < 5 && (
-          <button onClick={() => setShowNewBuild(true)} style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
-            {t('gradeBuilds.newBuild')}
-          </button>
-        )}
-        {showNewBuild && (
-          <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-            <input value={newBuildName} onChange={(e) => setNewBuildName(e.target.value)} placeholder={t('gradeBuilds.buildName')} style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', width: '150px' }} onKeyDown={(e) => e.key === 'Enter' && handleCreateBuild()} />
-            <Button onClick={handleCreateBuild}>{t('dashboard.create')}</Button>
-            <button onClick={() => { setShowNewBuild(false); setNewBuildName(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>&#x2715;</button>
+      {/* Grade set selector — tabs for student view, dropdown for teacher view */}
+      {isStudentView ? (
+        <div style={{ marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', borderBottom: 'var(--border-width) solid var(--color-border)', gap: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+            <button
+              onClick={() => setActiveBuildId(null)}
+              style={{
+                padding: 'var(--space-2) var(--space-4)',
+                fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', fontWeight: !activeBuildId ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                borderBottom: !activeBuildId ? '2px solid var(--color-primary)' : '2px solid transparent',
+                color: !activeBuildId ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+              }}
+            >{t('gradeBuilds.actualGrades')}</button>
+            {builds.map(b => (
+              <button
+                key={b.id}
+                onClick={() => setActiveBuildId(b.id)}
+                style={{
+                  padding: 'var(--space-2) var(--space-4)',
+                  fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', fontWeight: activeBuildId === b.id ? 'var(--font-weight-bold)' : 'var(--font-weight-normal)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  borderBottom: activeBuildId === b.id ? '2px solid var(--color-primary)' : '2px solid transparent',
+                  color: activeBuildId === b.id ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                }}
+              >{b.name}</button>
+            ))}
+            {!showNewBuild && builds.length < 5 && (
+              <button onClick={() => setShowNewBuild(true)} style={{ padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)', borderBottom: '2px solid transparent' }}>
+                + {t('gradeBuilds.newBuild')}
+              </button>
+            )}
+            {activeBuildId && (
+              <button onClick={handleDeleteBuild} style={{ padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)', marginLeft: 'auto', borderBottom: '2px solid transparent' }}>
+                {t('gradeBuilds.deleteBuild')}
+              </button>
+            )}
           </div>
-        )}
-        {activeBuildId && (
-          <button onClick={handleDeleteBuild} style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
-            {t('gradeBuilds.deleteBuild')}
-          </button>
-        )}
-      </div>
+          {showNewBuild && (
+            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', marginTop: 'var(--space-3)' }}>
+              <input value={newBuildName} onChange={(e) => setNewBuildName(e.target.value)} placeholder={t('gradeBuilds.buildName')} style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', width: '150px' }} onKeyDown={(e) => e.key === 'Enter' && handleCreateBuild()} autoFocus />
+              <Button onClick={handleCreateBuild}>{t('dashboard.create')}</Button>
+              <button onClick={() => { setShowNewBuild(false); setNewBuildName(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>&#x2715;</button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
+          <select
+            value={activeBuildId || ''}
+            onChange={(e) => setActiveBuildId(e.target.value || null)}
+            style={{ padding: 'var(--space-2)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
+          >
+            <option value="">{t('gradeBuilds.actualGrades')}</option>
+            {builds.map(b => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          {!showNewBuild && builds.length < 5 && (
+            <button onClick={() => setShowNewBuild(true)} style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
+              {t('gradeBuilds.newBuild')}
+            </button>
+          )}
+          {showNewBuild && (
+            <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+              <input value={newBuildName} onChange={(e) => setNewBuildName(e.target.value)} placeholder={t('gradeBuilds.buildName')} style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontFamily: 'var(--font-family-base)', width: '150px' }} onKeyDown={(e) => e.key === 'Enter' && handleCreateBuild()} />
+              <Button onClick={handleCreateBuild}>{t('dashboard.create')}</Button>
+              <button onClick={() => { setShowNewBuild(false); setNewBuildName(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-sm)' }}>&#x2715;</button>
+            </div>
+          )}
+          {activeBuildId && (
+            <button onClick={handleDeleteBuild} style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-family-base)' }}>
+              {t('gradeBuilds.deleteBuild')}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Editable build grades */}
       {activeBuildId && (
@@ -282,8 +329,8 @@ export default function GradesTab({ studentId, subjects, isStudentView = false }
         </div>
       )}
 
-      {/* Actual grades view — hidden for student role (students only see grade builds) */}
-      {!activeBuildId && !isStudentView && (<>
+      {/* Actual grades view */}
+      {!activeBuildId && (<>
       {canEditGrades && (
       <div>
         <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-2)' }}>
@@ -422,11 +469,12 @@ export default function GradesTab({ studentId, subjects, isStudentView = false }
           </tbody>
         </table>
       </div>
-      {canEditGrades && !newRow ? (
+      {canEditGrades && !newRow && (
         <div>
           <Button variant="secondary" onClick={() => setNewRow({ subject_name: '', sitting: 'MOCK', raw_grade: '', notes: '' })}>{t('grades.addGrade')}</Button>
         </div>
-      ) : (
+      )}
+      {canEditGrades && newRow && (
         <div style={{ background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-primary)', borderRadius: 'var(--border-radius-md)', padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <p style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', margin: 0 }}>{t('grades.newGradeEntry')}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-3)', alignItems: 'flex-end' }}>

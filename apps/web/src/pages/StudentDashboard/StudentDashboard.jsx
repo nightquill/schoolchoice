@@ -138,8 +138,11 @@ function StudentDashboard() {
           </div>
         </div>
 
-        {/* Grade Sandbox — ABOVE programme choices */}
+        {/* Grades — tabbed: Actual Grades + grade sets */}
         <div style={{ marginBottom: 'var(--space-6)' }}>
+          <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-3) 0' }}>
+            {t('studentPortal.myGrades')}
+          </h2>
           <GradesTab studentId={studentId} isStudentView={true} />
         </div>
 
