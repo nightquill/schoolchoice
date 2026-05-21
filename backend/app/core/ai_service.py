@@ -17,7 +17,10 @@ import re
 from collections.abc import AsyncGenerator
 from typing import Any
 
-import litellm
+try:
+    import litellm
+except ImportError:
+    litellm = None  # Not available on Vercel — AI features disabled
 from fastapi import HTTPException
 
 from app.core.config import settings
