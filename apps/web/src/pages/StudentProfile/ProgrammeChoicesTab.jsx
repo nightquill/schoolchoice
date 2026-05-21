@@ -102,7 +102,7 @@ const BAND_COLORS = {
   E: { bg: '#fee2e2', fg: '#991b1b' },
 };
 
-export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
+export default function ProgrammeChoicesTab({ studentId, isStudent = false, overrideGrades = null }) {
   const { t } = useTranslation();
   const { canEdit: canEditTeacher } = useFeatureAccess('programme_choices');
   // Students always have edit access to their own choices
@@ -140,7 +140,14 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-  const studentBest5 = computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
+  // Use override grades (from a grade build) if provided, otherwise actual grades
+  const studentBest5 = overrideGrades
+    ? computeBest5FromV2Grades(
+        Object.entries(overrideGrades)
+          .filter(([, v]) => v)
+          .map(([code, grade]) => ({ subject_code: code, sitting: 'MOCK', raw_grade: grade }))
+      )
+    : computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
 
   const targetsQuery = useQuery({
     queryKey: ['targets', studentId],

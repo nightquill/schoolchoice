@@ -175,6 +175,7 @@ function StudentDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('choices');
+  const [scoringGradeSet, setScoringGradeSet] = useState(''); // '' = actual grades, buildId = use that build
   const [submitting, setSubmitting] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState(null);
   const [creatingBuild, setCreatingBuild] = useState(false);
@@ -315,7 +316,29 @@ function StudentDashboard() {
         </div>
 
         {/* Tab content */}
-        {activeTab === 'choices' && <ProgrammeChoicesTab studentId={studentId} isStudent={true} />}
+        {activeTab === 'choices' && (
+          <div>
+            {/* Grade set selector for scoring */}
+            {builds.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>{t('studentPortal.gradeSetLabel')}:</span>
+                <select
+                  value={scoringGradeSet}
+                  onChange={e => setScoringGradeSet(e.target.value)}
+                  style={{ padding: 'var(--space-1) var(--space-2)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)' }}
+                >
+                  <option value="">{t('gradeBuilds.actualGrades')}</option>
+                  {builds.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+            )}
+            <ProgrammeChoicesTab
+              studentId={studentId}
+              isStudent={true}
+              overrideGrades={scoringGradeSet ? builds.find(b => b.id === scoringGradeSet)?.grades : null}
+            />
+          </div>
+        )}
         {activeTab === 'grades' && <ActualGradesView studentId={studentId} t={t} />}
         {activeBuild && <GradeSetEditor key={activeBuild.id} build={activeBuild} t={t} onRefresh={() => buildsQuery.refetch()} onDelete={() => handleDeleteBuild(activeBuild.id)} />}
       </div>
