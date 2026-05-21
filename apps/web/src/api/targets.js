@@ -14,3 +14,6 @@ export const deleteTarget = (studentId, targetId) =>
 
 export const reorderTargets = (studentId, orderedIds) =>
   post(`/api/v1/students/${studentId}/targets/reorder`, { ordered_ids: orderedIds });
+
+export const getProgrammeScores = (studentId, gradeBuildId = null) =>
+  get(`/api/v1/students/${studentId}/programme-scores${gradeBuildId ? `?grade_build_id=${gradeBuildId}` : ''}`);

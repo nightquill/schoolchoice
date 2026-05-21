@@ -11,7 +11,7 @@ import { LoadingSpinner } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { toast } from 'sonner';
-import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets } from '../../api/targets';
+import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets, getProgrammeScores } from '../../api/targets';
 import { getAllProgrammes } from '../../api/jupas';
 import { getSfProgrammes } from '../../api/selfFinancing';
 import { getAutoRecommendations } from '../../api/match';
@@ -72,6 +72,14 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, grad
   const [editConfidence, setEditConfidence] = useState(3);
   const [editSaving, setEditSaving] = useState(false);
   const prevTargetsRef = useRef([]);
+
+  // Real scores for all programmes — computed server-side, used in add modal
+  const progScoresQuery = useQuery({
+    queryKey: ['programme-scores', studentId, gradeBuildId || 'actual'],
+    queryFn: () => getProgrammeScores(studentId, gradeBuildId),
+    staleTime: 60_000,
+  });
+  const progScores = progScoresQuery.data?.scores ?? {};
 
   // When gradeBuildId is set, pass it to the targets API so backend re-scores with build grades
   const targetsQuery = useQuery({
@@ -700,6 +708,14 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, grad
                             </span>
                           )}
                           <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', flex: 1 }}>{ln(prog, 'school_name')}</span>
+                          {(() => {
+                            const score = progScores[prog.jupas_code];
+                            if (score == null) return null;
+                            const pct = Math.round(score * 100);
+                            const color = pct >= 70 ? '#166534' : pct >= 40 ? '#92400e' : '#991b1b';
+                            const bg = pct >= 70 ? '#dcfce7' : pct >= 40 ? '#fef3c7' : '#fee2e2';
+                            return <span style={{ fontSize: '10px', fontWeight: 600, background: bg, color, padding: '1px 5px', borderRadius: '4px', flexShrink: 0 }}>{pct}%</span>;
+                          })()}
                         </div>
                         <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{ln(prog, 'name')}</div>
                         {prog.faculty && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{prog.faculty}</div>}

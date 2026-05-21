@@ -475,3 +475,62 @@ def update_target_counselor(
     db.refresh(target)
 
     return TargetResponse.model_validate(target)
+
+
+# ---------------------------------------------------------------------------
+# GET /students/{student_id}/programme-scores — score all JUPAS programmes
+# ---------------------------------------------------------------------------
+
+@router.get("/{student_id}/programme-scores", status_code=status.HTTP_200_OK)
+def score_all_programmes(
+    student_id: UUID,
+    grade_build_id: str | None = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Score a student against every JUPAS programme using the real weighted scorer.
+
+    Returns {jupas_code: admission_probability} for all programmes.
+    Optional grade_build_id uses that build's grades instead of actual.
+    """
+    from app.modules.school_choice.models.models import JupasProgramme
+    from app.modules.school_choice.services.jupas_scorer import score_student_for_programme
+
+    student = student_service.get_student(
+        db, student_id=student_id, user_id=current_user.id,
+        organisation_id=getattr(current_user, "active_organisation_id", None),
+    )
+    student_data = build_student_data(student, db)
+
+    # Override grades with build if requested
+    if grade_build_id:
+        from app.modules.school_choice.models.grade_builds import GradeBuild
+        normalized_id = grade_build_id.replace("-", "")
+        build = db.query(GradeBuild).filter(
+            GradeBuild.id == normalized_id,
+            GradeBuild.student_id == student_id,
+        ).first()
+        if build and build.grades:
+            student_data["grades_by_code"] = dict(build.grades)
+
+    student_grades = student_data.get("grades_by_code", {})
+    if not student_grades:
+        return {"scores": {}}
+
+    programmes = db.query(JupasProgramme).all()
+    scores = {}
+    for prog in programmes:
+        prog_dict = {
+            "jupas_code": prog.jupas_code,
+            "name": prog.name,
+            "scoring_formula": prog.scoring_formula or {},
+            "minimum_requirements": prog.minimum_requirements or {},
+            "admission_stats": prog.admission_stats or {},
+        }
+        try:
+            result = score_student_for_programme(student_grades, prog_dict)
+            scores[prog.jupas_code] = result.get("admission_probability", 0.0)
+        except Exception:
+            pass
+
+    return {"scores": scores}
