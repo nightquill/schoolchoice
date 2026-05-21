@@ -15,74 +15,14 @@ import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets } fro
 import { getAllProgrammes } from '../../api/jupas';
 import { getSfProgrammes } from '../../api/selfFinancing';
 import { getAutoRecommendations } from '../../api/match';
-import { getGrades } from '../../api/grades';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { useFeatureAccess } from '../../hooks/usePermission';
 import { getRequirementBadges } from '../../utils/requirementBadges';
 import { useLocalizedName } from '../../utils/localizedName';
 // SubmissionHistory moved to separate /submissions page
 
-/* ── Client-side best-5 + admission probability (preview only — used in add modal) ── */
-// Real scoring is done server-side via jupas_scorer; this is for quick previews
-// JUPAS 2025 enhanced scale — same as backend grade_scales.json
-const ENHANCED_SCALE = { '5**': 8.5, '5*': 7, '5': 5.5, '4': 4, '3': 3, '2': 2, '1': 1, 'U': 0 };
-const CSD_SCALE = { 'AD': 2, 'A': 1, 'U': 0 };
-
-function computeBest5FromV2Grades(grades) {
-  // grades: array from /api/v1/students/:id/grades — [{subject_code, sitting, raw_grade}]
-  if (!Array.isArray(grades) || grades.length === 0) return null;
-  // Use MOCK sitting grades only
-  const mockGrades = grades.filter(g => g.sitting === 'MOCK' && g.raw_grade);
-  if (mockGrades.length < 5) return null;
-  // Convert to enhanced scale points
-  const scored = mockGrades.map(g => {
-    const code = g.subject_code;
-    const grade = String(g.raw_grade).trim();
-    if (code === 'CSD') return { code, pts: CSD_SCALE[grade] ?? 0 };
-    return { code, pts: ENHANCED_SCALE[grade] ?? 0 };
-  });
-  // Best 5: sort by points descending, take top 5
-  scored.sort((a, b) => b.pts - a.pts);
-  return scored.slice(0, 5).reduce((s, v) => s + v.pts, 0);
-}
-
-function estimateAdmissionProb(best5, admissionStats) {
-  if (best5 == null || !admissionStats) return null;
-  // Get most recent year's stats
-  const years = Object.keys(admissionStats).filter(k => admissionStats[k]?.median != null);
-  if (years.length === 0) return null;
-  const latest = years.sort().pop();
-  const stats = admissionStats[latest];
-  const median = Number(stats.median);
-  const lq = stats.lower_quartile != null ? Number(stats.lower_quartile) : null;
-  const uq = stats.upper_quartile != null ? Number(stats.upper_quartile) : median + (median - (lq ?? median));
-  if (lq == null) return null;
-  // Piecewise linear interpolation (matches backend jupas_scorer logic)
-  if (uq <= lq) return best5 >= median ? 0.75 : 0.25;
-  if (best5 >= lq && best5 <= median) {
-    return median === lq ? 0.375 : 0.25 + ((best5 - lq) / (median - lq)) * 0.25;
-  } else if (best5 > median && best5 <= uq) {
-    return uq === median ? 0.625 : 0.50 + ((best5 - median) / (uq - median)) * 0.25;
-  } else if (best5 > uq) {
-    const half = uq - median;
-    if (half <= 0) return 0.85;
-    const excess = (best5 - uq) / half;
-    return 0.75 + 0.24 * (1 - Math.exp(-excess));
-  } else {
-    // below LQ
-    const half = median - lq;
-    if (half <= 0) return 0.15;
-    const deficit = (lq - best5) / half;
-    return 0.25 * Math.exp(-deficit);
-  }
-}
-
-function probColor(prob) {
-  if (prob == null) return { bg: '#f1f5f9', fg: '#64748b' }; // gray
-  if (prob >= 0.70) return { bg: '#dcfce7', fg: '#166534' }; // green
-  if (prob >= 0.40) return { bg: '#fef3c7', fg: '#92400e' }; // amber
-  return { bg: '#fee2e2', fg: '#991b1b' }; // red
-}
+// All admission scoring is done server-side via jupas_scorer.
+// No client-side heuristics — scores appear after programme is added to targets.
 
 /* ── Admission band helpers ── */
 function getBand(score) {
@@ -132,16 +72,6 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, grad
   const [editConfidence, setEditConfidence] = useState(3);
   const [editSaving, setEditSaving] = useState(false);
   const prevTargetsRef = useRef([]);
-
-  // Fetch student grades for admission probability (reuses react-query cache from GradesTab)
-  const gradesQuery = useQuery({
-    queryKey: ['grades', studentId],
-    queryFn: () => getGrades(studentId),
-    enabled: !!studentId,
-    staleTime: 5 * 60 * 1000,
-    retry: false,
-  });
-  const studentBest5 = computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
 
   // When gradeBuildId is set, pass it to the targets API so backend re-scores with build grades
   const targetsQuery = useQuery({
@@ -742,8 +672,6 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, grad
                   {filteredProgs.map((prog) => {
                     const progKey = prog.jupas_code || prog.id;
                     const isSelected = selectedProgramme?.jupas_code === progKey;
-                    const admProb = estimateAdmissionProb(studentBest5, prog.admission_stats);
-                    const admCol = probColor(admProb);
                     return (
                       <li key={progKey} onClick={() => {
                         setSelectedProgramme({
@@ -772,11 +700,6 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, grad
                             </span>
                           )}
                           <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', flex: 1 }}>{ln(prog, 'school_name')}</span>
-                          {admProb != null && (
-                            <span style={{ fontSize: '10px', fontWeight: 600, background: admCol.bg, color: admCol.fg, padding: '1px 5px', borderRadius: '4px', flexShrink: 0, lineHeight: '16px' }}>
-                              {Math.round(admProb * 100)}%
-                            </span>
-                          )}
                         </div>
                         <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{ln(prog, 'name')}</div>
                         {prog.faculty && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{prog.faculty}</div>}
