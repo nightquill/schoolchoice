@@ -1,16 +1,42 @@
 """Vercel serverless shim — re-exports FastAPI app."""
 import os
+import sys
+import traceback
 from pathlib import Path
 
-# Set env defaults before importing app
+from fastapi import FastAPI
+
+# Default app — will be replaced by the real one if import succeeds
+app = FastAPI()
+_import_error = None
+
+# Set env defaults
 os.environ.setdefault("DATABASE_URL", "sqlite:////tmp/app.db")
 os.environ.setdefault("SECRET_KEY", os.environ.get("SECRET_KEY", "vercel-deploy-key-change-in-prod"))
 os.environ.setdefault("CORS_ORIGINS", "*")
 
-# Fix data paths: on Vercel, data/ is at repo root (one level up from backend/)
-_data_dir = Path(__file__).resolve().parent.parent.parent / "data"
-if _data_dir.exists():
-    os.environ.setdefault("SEED_DIR", str(_data_dir / "seed"))
-    os.environ.setdefault("JUPAS_DATA_DIR", str(_data_dir / "jupas"))
+# Find data directory
+for _candidate in [
+    Path("/var/task/data"),
+    Path(os.getcwd()) / "data",
+    Path(__file__).resolve().parent.parent / "data",
+]:
+    if (_candidate / "seed").exists() or (_candidate / "jupas").exists():
+        os.environ.setdefault("SEED_DIR", str(_candidate / "seed"))
+        os.environ.setdefault("JUPAS_DATA_DIR", str(_candidate / "jupas"))
+        break
 
-from app.main import app  # noqa: E402, F401
+# Try importing the real app
+try:
+    from app.main import app  # noqa: F811
+except Exception:
+    _import_error = traceback.format_exc()
+
+    @app.get("/{path:path}")
+    def _error(path: str):
+        return {
+            "error": "App failed to start",
+            "traceback": _import_error,
+            "cwd": os.getcwd(),
+            "python": sys.version,
+        }
