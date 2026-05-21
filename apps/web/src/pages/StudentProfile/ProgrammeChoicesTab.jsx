@@ -441,7 +441,12 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, over
                   band.slots.map((slot, si) => {
                     const tgt = slotMap[slot];
                     const isFirst = si === 0;
-                    const matchScore = tgt?.match_score != null ? Math.round(tgt.match_score * 100) : null;
+                    // Compute admission probability client-side so it reacts to grade set changes
+                    const tgtProg = tgt?.jupas_code ? allJupasProgs.find(p => p.jupas_code === tgt.jupas_code) : null;
+                    const clientProb = tgtProg ? estimateAdmissionProb(studentBest5, tgtProg.admission_stats) : null;
+                    const matchScore = clientProb != null ? Math.round(clientProb * 100)
+                      : tgt?.match_score != null ? Math.round(tgt.match_score * 100)
+                      : null;
                     return (
                       <tr key={slot} style={{ background: tgt ? 'var(--color-surface)' : band.bg + '40' }}>
                         {/* 志願 number */}
