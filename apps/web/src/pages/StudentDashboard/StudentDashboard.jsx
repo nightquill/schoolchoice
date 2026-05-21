@@ -1,4 +1,4 @@
-// Student Dashboard — programme choices + grade sandbox + submit to teacher
+// Student Dashboard — grade sandbox on top, then programme choices, then submit
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +15,7 @@ function StudentDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-  const [submissionStatus, setSubmissionStatus] = useState(null); // null | 'draft' | 'pending' | 'approved' | 'revision_requested' | 'rejected'
+  const [submissionStatus, setSubmissionStatus] = useState(null);
 
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const account = accountQuery.data;
@@ -113,6 +113,7 @@ function StudentDashboard() {
     <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}>
       <NavBarV2 account={account} />
       <div style={{ maxWidth: '100%', margin: '0 auto', padding: 'var(--space-6) var(--space-8)' }}>
+        {/* Header with name + submit */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-3)' }}>
           <div>
             <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
@@ -136,12 +137,14 @@ function StudentDashboard() {
             </Button>
           </div>
         </div>
-        <ProgrammeChoicesTab studentId={studentId} />
 
-        {/* Grade sandbox — students can create "what-if" grade builds and see how scores change */}
-        <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
+        {/* Grade Sandbox — ABOVE programme choices */}
+        <div style={{ marginBottom: 'var(--space-6)' }}>
           <GradesTab studentId={studentId} isStudentView={true} />
         </div>
+
+        {/* Programme Choices */}
+        <ProgrammeChoicesTab studentId={studentId} isStudent={true} />
       </div>
     </div>
   );

@@ -104,7 +104,9 @@ const BAND_COLORS = {
 
 export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
   const { t } = useTranslation();
-  const { canEdit: canEditChoices } = useFeatureAccess('programme_choices');
+  const { canEdit: canEditTeacher } = useFeatureAccess('programme_choices');
+  // Students always have edit access to their own choices
+  const canEditChoices = isStudent || canEditTeacher;
   const ln = useLocalizedName();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
