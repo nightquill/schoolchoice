@@ -1,14 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm install -g pnpm && pnpm install && pip install -r api/requirements.txt",
-  "buildCommand": "python api/build_db.py && pnpm --filter @schoolchoice/web build",
-  "outputDirectory": "apps/web/dist",
-  "functions": {
-    "api/index.py": {
-      "runtime": "@vercel/python",
-      "maxDuration": 60
-    }
-  },
   "rewrites": [
     { "source": "/api/v1/(.*)", "destination": "/api/index.py" },
     { "source": "/(.*)", "destination": "/index.html" }
