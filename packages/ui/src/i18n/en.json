@@ -1652,7 +1652,10 @@
     "deleteBuildConfirm": "Delete this build?",
     "buildDeleted": "Build deleted.",
     "buildCreated": "Build created.",
-    "maxBuildsReached": "Maximum 5 builds. Delete one to create another."
+    "maxBuildsReached": "Maximum 5 builds. Delete one to create another.",
+    "gradeSetLabel": "Grade Set",
+    "saveGradeSet": "Save Grade Set",
+    "gradesSaved": "Grades saved."
   },
   "planEditor": {
     "editing": "Editing: {section}",

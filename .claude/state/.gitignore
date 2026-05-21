@@ -1,0 +1,10 @@
+# Per-session bug-fix state. Not committed.
+# bugfix-tier and test-command are intentionally committable so that CI
+# can see them on PRs; the rest is transient.
+last-test-run.log
+last-test-exit-code
+last-test-timestamp
+loop-attempts
+error-fingerprints
+user-aborted
+aborted/

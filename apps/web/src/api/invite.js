@@ -23,3 +23,11 @@ export const resetPassword = (token, password) =>
 
 export const mergeStudent = (sourceId, targetId) =>
   post(`/api/v1/admin/students/${sourceId}/merge/${targetId}`);
+
+export const sendCredentialsEmail = (email, loginId, password, studentName) =>
+  post('/api/v1/admin/send-credentials', {
+    email,
+    login_id: loginId,
+    password,
+    student_name: studentName,
+  });

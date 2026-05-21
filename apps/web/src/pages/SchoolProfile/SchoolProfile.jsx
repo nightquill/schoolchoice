@@ -11,9 +11,11 @@ import { getAccount } from '@schoolchoice/ui/api/account';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { getCompetitivenessTier } from '../../utils/competitiveness';
 import { getRequirementBadges } from '../../utils/requirementBadges';
+import { useLocalizedName } from '../../utils/localizedName';
 
 function SchoolProfile() {
   const { t } = useTranslation();
+  const ln = useLocalizedName();
   const { id } = useParams();
   const [search, setSearch] = useState('');
   const [faculty, setFaculty] = useState('');
@@ -52,6 +54,7 @@ function SchoolProfile() {
       const matchesSearch =
         !q ||
         (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.name_zh && p.name_zh.toLowerCase().includes(q)) ||
         (p.jupas_code && p.jupas_code.toLowerCase().includes(q));
       const matchesFaculty = !faculty || p.faculty === faculty;
       return matchesSearch && matchesFaculty;
@@ -389,7 +392,7 @@ function SchoolProfile() {
                       <span style={jupasCodeStyle}>{prog.jupas_code}</span>
 
                       <div style={progNameColStyle}>
-                        <span style={progNameStyle}>{prog.name}</span>
+                        <span style={progNameStyle}>{ln(prog, 'name')}</span>
                         {prog.faculty && <span style={facultyStyle}>{prog.faculty}</span>}
                       </div>
 
@@ -406,7 +409,7 @@ function SchoolProfile() {
                             color: tier.color,
                           }}
                         >
-                          {tier.label}
+                          {t(`programmeDetail.${tier.id === 'very_competitive' ? 'veryCompetitive' : tier.id}`)}
                         </span>
                         {getRequirementBadges(prog.non_grade_requirements, true).map((badge) => (
                           <span key={badge.label} style={{ ...tierBadgeBase, background: badge.bg, color: badge.color, fontSize: '10px' }}>

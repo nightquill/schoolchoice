@@ -283,6 +283,42 @@ def bulk_assign_accounts(
     return {"results": results, "errors": errors}
 
 
+class SendCredentialsRequest(BaseModel):
+    email: str
+    login_id: str
+    password: str
+    student_name: str | None = None
+
+
+@router.post("/admin/send-credentials")
+def send_credentials_email_endpoint(
+    payload: SendCredentialsRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Send account credentials to a student or teacher via email (Resend)."""
+    # Get org name for email context
+    org_name = None
+    org_id = _get_org_id(current_user, db)
+    if org_id:
+        from app.db.models import Organisation
+        org = db.query(Organisation).filter(Organisation.id == org_id).first()
+        if org:
+            org_name = org.name
+
+    from app.services.email_service import send_credentials_email
+    result = send_credentials_email(
+        to_email=payload.email,
+        student_name=payload.student_name or payload.email.split("@")[0],
+        login_id=payload.login_id,
+        password=payload.password,
+        org_name=org_name,
+    )
+    if not result.get("sent"):
+        raise HTTPException(status_code=422, detail=result.get("error", "Failed to send email"))
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Public endpoints (no auth)
 # ---------------------------------------------------------------------------

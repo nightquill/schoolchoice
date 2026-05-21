@@ -388,6 +388,20 @@ def export_entity_csv(
     from sqlalchemy import or_
     query = db.query(model_cls)
 
+    # Organisation scoping: if model has organisation_id, filter to user's org
+    # Prevents data leak — users must only export their own org's data
+    if hasattr(model_cls, "organisation_id"):
+        from app.db.models import OrganisationMembership
+        org_id = getattr(current_user, "active_organisation_id", None)
+        if not org_id:
+            membership = db.query(OrganisationMembership).filter(
+                OrganisationMembership.user_id == current_user.id
+            ).first()
+            if membership:
+                org_id = membership.organisation_id
+        if org_id:
+            query = query.filter(model_cls.organisation_id == org_id)
+
     # Apply text search (same logic as crud_generator, T-04-05 mitigation)
     if q:
         ilike_clauses = []

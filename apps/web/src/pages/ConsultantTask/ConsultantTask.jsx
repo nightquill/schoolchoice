@@ -43,22 +43,24 @@ import {
 } from '../../components/PlanWorkspace/planStyles';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
-const JUPAS_MILESTONES = [
-  { label: 'JUPAS application opens', date: '2025-09-01' },
-  { label: 'Reference letters deadline', date: '2025-10-31' },
-  { label: 'Personal statement draft', date: '2025-11-15' },
-  { label: 'Band A submission deadline', date: '2025-12-08' },
-  { label: 'HKDSE exam period', date: '2026-03-28' },
-  { label: 'HKDSE exam ends', date: '2026-05-10' },
-  { label: 'Band A/B/C revision', date: '2026-05-20' },
-  { label: 'Revision period ends', date: '2026-06-05' },
-  { label: 'HKDSE results release', date: '2026-07-15' },
-  { label: 'Main round offers', date: '2026-08-10' },
+const JUPAS_MILESTONES_DATA = [
+  { key: 'jupasOpens', date: '2025-09-01' },
+  { key: 'refLetters', date: '2025-10-31' },
+  { key: 'personalStatement', date: '2025-11-15' },
+  { key: 'bandADeadline', date: '2025-12-08' },
+  { key: 'hkdseExamStart', date: '2026-03-28' },
+  { key: 'hkdseExamEnd', date: '2026-05-10' },
+  { key: 'bandRevision', date: '2026-05-20' },
+  { key: 'revisionEnd', date: '2026-06-05' },
+  { key: 'hkdseResults', date: '2026-07-15' },
+  { key: 'mainOffers', date: '2026-08-10' },
 ];
 
-function getNextMilestone() {
+function getNextMilestone(t) {
   const today = new Date().toISOString().slice(0, 10);
-  return JUPAS_MILESTONES.find(m => m.date >= today) || null;
+  const found = JUPAS_MILESTONES_DATA.find(m => m.date >= today);
+  if (!found) return null;
+  return { label: t(`consultant.milestone_${found.key}`), date: found.date };
 }
 
 function daysUntil(dateStr) {
@@ -379,7 +381,7 @@ function ConsultantTask() {
               borderRadius: 'var(--border-radius-sm)', cursor: 'pointer',
               background: 'var(--color-surface)', color: 'var(--color-text-primary)',
             }}
-            title={planLanguage === '繁體中文' ? 'Switch to English' : '切換至繁體中文'}
+            title={planLanguage === '繁體中文' ? t('consultant.switchToEnglish') : t('consultant.switchToChinese')}
           >
             {planLanguage === '繁體中文' ? '中 → EN' : 'EN → 中'}
           </button>
@@ -387,7 +389,7 @@ function ConsultantTask() {
 
         <div style={toolbarRightStyle}>
           {(() => {
-            const milestone = getNextMilestone();
+            const milestone = getNextMilestone(t);
             if (!milestone) return null;
             const days = daysUntil(milestone.date);
             return (
@@ -398,7 +400,7 @@ function ConsultantTask() {
                 padding: '2px 10px', borderRadius: 'var(--border-radius-sm)',
                 border: `1px solid ${days <= 30 ? 'var(--color-error-border)' : 'var(--color-warning-border)'}`,
               }}>
-                {milestone.label}: {new Date(milestone.date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })} — {days} days
+                {milestone.label}: {new Date(milestone.date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })} — {t('consultant.daysRemaining', { days })}
               </span>
             );
           })()}

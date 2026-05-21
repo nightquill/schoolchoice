@@ -60,3 +60,16 @@ export function useHasAnyAccess() {
   const hasVisibleCohort = permissions.some(p => p.visible);
   return { hasAccess: hasVisibleCohort, isLoading: false };
 }
+
+/**
+ * Page-level permission gate hook. Returns { allowed, isLoading }.
+ * Use in components to conditionally render content.
+ */
+export function usePermissionGate(feature, requiredLevel = 'read_only') {
+  const { level, isLoading } = useFeatureAccess(feature);
+  const rank = { none: 0, read_only: 1, read_write: 2 };
+  return {
+    allowed: (rank[level] || 0) >= (rank[requiredLevel] || 0),
+    isLoading,
+  };
+}

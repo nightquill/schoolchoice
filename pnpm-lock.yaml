@@ -12,55 +12,6 @@ importers:
         specifier: ^1.59.1
         version: 1.59.1
 
-  apps/student:
-    dependencies:
-      '@schoolchoice/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
-      axios:
-        specifier: ^1.13.6
-        version: 1.16.0
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      lucide-react:
-        specifier: ^1.11.0
-        version: 1.14.0(react@19.2.6)
-      react:
-        specifier: ^19.2.4
-        version: 19.2.6
-      react-dom:
-        specifier: ^19.2.4
-        version: 19.2.6(react@19.2.6)
-      react-router-dom:
-        specifier: ^7.13.2
-        version: 7.15.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      sonner:
-        specifier: ^2.0.7
-        version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      tailwind-merge:
-        specifier: ^3.5.0
-        version: 3.5.0
-    devDependencies:
-      '@vitejs/plugin-react':
-        specifier: ^6.0.1
-        version: 6.0.1(vite@8.0.11(jiti@1.21.7))
-      autoprefixer:
-        specifier: ^10.5.0
-        version: 10.5.0(postcss@8.5.14)
-      postcss:
-        specifier: ^8.5.10
-        version: 8.5.14
-      tailwindcss:
-        specifier: ^3.4.19
-        version: 3.4.19
-      vite:
-        specifier: ^8.0.1
-        version: 8.0.11(jiti@1.21.7)
-
   apps/web:
     dependencies:
       '@schoolchoice/ui':

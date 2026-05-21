@@ -84,7 +84,7 @@ def target_distribution(
 ):
     """School target distribution across cohort members."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
-    _check_cohort_feature(db, current_user, cohort, "reports")
+    _check_cohort_feature(db, current_user, cohort, "data_analysis")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:
@@ -132,7 +132,7 @@ def risk_breakdown(
 ):
     """Risk breakdown by class — how many students have at-risk targets."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
-    _check_cohort_feature(db, current_user, cohort, "reports")
+    _check_cohort_feature(db, current_user, cohort, "data_analysis")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:
@@ -187,7 +187,7 @@ def subject_performance(
 ):
     """Per-subject performance stats for cohort members."""
     cohort = _get_cohort_or_403(db, cohort_id, current_user.id, organisation_id=_org_id(current_user))
-    _check_cohort_feature(db, current_user, cohort, "reports")
+    _check_cohort_feature(db, current_user, cohort, "data_analysis")
     member_ids = _member_student_ids(cohort)
 
     if not member_ids:

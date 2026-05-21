@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import PermissionGate from '../../components/PermissionGate/PermissionGate';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { ErrorMessage } from '@schoolchoice/ui';
 import { EmptyState } from '@schoolchoice/ui';
@@ -11,7 +12,7 @@ import { getCohorts } from '../../api/cohorts';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
 const GRADE_ORDER = ['5**', '5*', '5', '4', '3', '2', '1', 'U'];
-const CATEGORY_LABELS = { CORE: 'Core', ELECTIVE: 'Elective', OTHER_LANGUAGE: 'Other Language', APPLIED_LEARNING: 'Applied Learning' };
+// CATEGORY_LABELS moved inside component to access t()
 
 // ---- Grade distribution bar ----
 function GradeBar({ dist }) {
@@ -62,6 +63,7 @@ function deriveChartStats(distribution) {
 }
 
 function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
+  const { t } = useTranslation();
   const [hoveredGrade, setHoveredGrade] = useState(null);
   if (!distribution) return null;
 
@@ -152,7 +154,7 @@ function VerticalBarChart({ distribution, title, mean, mode, totalN }) {
       {/* Summary line */}
       {stats.totalN > 0 && (
         <div style={{ marginTop: '12px', fontSize: '12px', color: '#9ca3af' }}>
-          Mean: {stats.mean}{stats.meanNum ? ` (${stats.meanNum})` : ''} | Mode: {stats.mode} | n={stats.totalN}
+          {t('shap.meanModeN', { mean: stats.mean, meanNum: stats.meanNum ? ` (${stats.meanNum})` : '', mode: stats.mode, totalN: stats.totalN })}
         </div>
       )}
     </div>
@@ -203,7 +205,9 @@ const tdStyle = {
 };
 
 function DataAnalysis() {
-  const { t } = useTranslation();  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const CATEGORY_LABELS = { CORE: t('dataAnalysis.categoryCore'), ELECTIVE: t('dataAnalysis.categoryElective'), OTHER_LANGUAGE: t('dataAnalysis.categoryOtherLanguage'), APPLIED_LEARNING: t('dataAnalysis.categoryAppliedLearning') };
+  const navigate = useNavigate();
   const [account, setAccount] = useState(null);
   const [trends, setTrends] = useState(null);
   const [majors, setMajors] = useState(null);
@@ -334,6 +338,7 @@ function DataAnalysis() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
+      <PermissionGate feature="data_analysis">
 
       <div style={headerStyle}>
         <h1 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: '0 0 var(--space-3) 0' }}>
@@ -343,7 +348,7 @@ function DataAnalysis() {
           <button style={tabBtnStyle('trends')} onClick={() => setActiveSection('trends')}>{t('dataAnalysis.hkdseTrends')}</button>
           <button style={tabBtnStyle('combinations')} onClick={() => setActiveSection('combinations')}>{t('dataAnalysis.subjectCombinations')}</button>
           <button style={tabBtnStyle('majors')} onClick={() => setActiveSection('majors')}>{t('dataAnalysis.popularMajors')}</button>
-          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>Graduation Outcomes</button>
+          <button style={tabBtnStyle('directory')} onClick={() => setActiveSection('directory')}>{t('dataAnalysis.graduationOutcomes')}</button>
         </div>
       </div>
 
@@ -423,8 +428,8 @@ function DataAnalysis() {
                         {chartStats && chartStats.totalN > 0 && (
                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
                             {[
-                              { label: 'Mean', value: chartStats.mean },
-                              { label: 'Variance', value: bestSitting?.variance != null ? bestSitting.variance.toFixed(2) : '—' },
+                              { label: t('cohortDetail.meanGrade'), value: chartStats.mean },
+                              { label: t('cohortDetail.variance'), value: bestSitting?.variance != null ? bestSitting.variance.toFixed(2) : '—' },
                               { label: 'n=', value: String(totalStudents) },
                             ].map(({ label, value }) => (
                               <div key={label} style={{ background: '#f3f4f6', borderRadius: '20px', padding: '3px 10px', fontSize: '11px', color: '#6b7280', display: 'flex', gap: '3px', alignItems: 'center' }}>
@@ -553,14 +558,14 @@ function DataAnalysis() {
           {activeSection === 'directory' && (
             <div style={cardStyle}>
               <div style={sectionTitleStyle}>
-                <span>Graduation Outcomes</span>
+                <span>{t('dataAnalysis.graduationOutcomes')}</span>
                 <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                  Actual admission results for graduated students
+                  {t('dataAnalysis.graduationOutcomesDesc')}
                 </span>
               </div>
               {!directory?.students?.length ? (
                 <div style={{ padding: 'var(--space-5)' }}>
-                  <EmptyState message="No graduated students yet. Mark students as graduated to see outcomes here." />
+                  <EmptyState message={t('dataAnalysis.noGraduatedStudents')} />
                 </div>
               ) : (() => {
                 const grads = (directory.students || []).filter(s => s.is_graduated);
@@ -584,19 +589,19 @@ function DataAnalysis() {
                     <div style={{ display: 'flex', gap: 'var(--space-4)', flexWrap: 'wrap', marginBottom: 'var(--space-6)' }}>
                       <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>{grads.length}</div>
-                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Graduated</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.graduatedCount')}</div>
                       </div>
                       <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-success)' }}>{withOutcome.length}</div>
-                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>With Recorded Outcome</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.withRecordedOutcome')}</div>
                       </div>
                       <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>{sortedSchools.length}</div>
-                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Distinct Universities</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.distinctUniversities')}</div>
                       </div>
                       <div style={{ flex: '1 1 120px', padding: 'var(--space-4)', background: 'var(--color-background)', borderRadius: 'var(--border-radius-md)', textAlign: 'center' }}>
                         <div style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-primary)' }}>{sortedMajors.length}</div>
-                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>Distinct Programmes</div>
+                        <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>{t('dataAnalysis.distinctProgrammes')}</div>
                       </div>
                     </div>
 
@@ -604,7 +609,7 @@ function DataAnalysis() {
                     {sortedSchools.length > 0 && (
                       <div style={{ marginBottom: 'var(--space-6)' }}>
                         <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-                          University Destinations
+                          {t('dataAnalysis.universityDestinations')}
                         </h3>
                         {sortedSchools.map(([school, count]) => (
                           <div key={school} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
@@ -624,7 +629,7 @@ function DataAnalysis() {
                     {sortedMajors.length > 0 && (
                       <div style={{ marginBottom: 'var(--space-6)' }}>
                         <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-                          Programme Distribution
+                          {t('dataAnalysis.programmeDistribution')}
                         </h3>
                         {sortedMajors.slice(0, 15).map(([major, count]) => (
                           <div key={major} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
@@ -639,7 +644,7 @@ function DataAnalysis() {
                     {grads.length > 0 && (
                       <div>
                         <h3 style={{ fontSize: 'var(--font-size-md)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-                          Individual Outcomes
+                          {t('dataAnalysis.individualOutcomes')}
                         </h3>
                         <div style={{ overflowX: 'auto' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -647,10 +652,10 @@ function DataAnalysis() {
                               <tr>
                                 <th style={thStyle}>{t('dataAnalysis.class')}</th>
                                 <th style={thStyle}>{t('dataAnalysis.year')}</th>
-                                <th style={thStyle}>Graduation Year</th>
-                                <th style={thStyle}>Final University</th>
-                                <th style={thStyle}>Final Programme</th>
-                                <th style={thStyle}>Best 5</th>
+                                <th style={thStyle}>{t('dataAnalysis.graduationYear')}</th>
+                                <th style={thStyle}>{t('dataAnalysis.finalUniversity')}</th>
+                                <th style={thStyle}>{t('dataAnalysis.finalProgramme')}</th>
+                                <th style={thStyle}>{t('dataAnalysis.best5')}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -680,6 +685,7 @@ function DataAnalysis() {
         </div>
       )}
 
+    </PermissionGate>
     </div>
   );
 }

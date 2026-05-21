@@ -9,18 +9,26 @@ import { getAccount } from '@schoolchoice/ui/api/account';
 import { getSfInstitution } from '../../api/selfFinancing';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 
-const LEVEL_LABELS = {
-  associate_degree: { label: 'Associate Degree', short: 'AD', bg: '#dbeafe', color: '#1e40af' },
-  higher_diploma: { label: 'Higher Diploma', short: 'HD', bg: '#fef3c7', color: '#92400e' },
-  diploma: { label: 'Diploma', short: 'Dip', bg: '#f1f5f9', color: '#475569' },
-  self_financing_degree: { label: 'Degree', short: 'Deg', bg: '#d1fae5', color: '#065f46' },
+// Level labels use short codes that don't need translation; full labels are resolved via t() inside the component
+const LEVEL_STYLE = {
+  associate_degree: { short: 'AD', bg: '#dbeafe', color: '#1e40af' },
+  higher_diploma: { short: 'HD', bg: '#fef3c7', color: '#92400e' },
+  diploma: { short: 'Dip', bg: '#f1f5f9', color: '#475569' },
+  self_financing_degree: { short: 'Deg', bg: '#d1fae5', color: '#065f46' },
 };
 
-function getTierStyle(mean) {
+const LEVEL_LABEL_KEYS = {
+  associate_degree: 'programmeDetail.associateDegree',
+  higher_diploma: 'programmeDetail.higherDiploma',
+  diploma: 'programmeDetail.diploma',
+  self_financing_degree: 'programmeDetail.selfFinancingDegree',
+};
+
+function getTierLabel(mean, t) {
   if (mean == null) return { label: '—', bg: '#f1f5f9', color: '#64748b' };
-  if (mean >= 16) return { label: 'Competitive', bg: '#fef3c7', color: '#92400e' };
-  if (mean >= 14) return { label: 'Moderate', bg: '#d1fae5', color: '#065f46' };
-  return { label: 'Accessible', bg: '#eff6ff', color: '#1e40af' };
+  if (mean >= 16) return { label: t('programmeDetail.competitive'), bg: '#fef3c7', color: '#92400e' };
+  if (mean >= 14) return { label: t('programmeDetail.moderate'), bg: '#d1fae5', color: '#065f46' };
+  return { label: t('programmeDetail.accessible'), bg: '#eff6ff', color: '#1e40af' };
 }
 
 export default function SfInstitution() {
@@ -74,7 +82,7 @@ export default function SfInstitution() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-1)' }}>
                     <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>{t('sfInstitution.subDegree')}</span>
-                    <span style={{ background: '#f0fdf4', color: '#059669', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>Tier {inst.tier}</span>
+                    <span style={{ background: '#f0fdf4', color: '#059669', padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-size-xs)', fontWeight: 600 }}>{t('schools.tier', { tier: inst.tier })}</span>
                   </div>
                   <h1 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 'var(--space-2) 0 0' }}>
                     {inst.name}
@@ -121,11 +129,11 @@ export default function SfInstitution() {
                   style={{ padding: 'var(--space-2) var(--space-3)', border: 'var(--border-width) solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', fontSize: 'var(--font-size-sm)', fontFamily: 'var(--font-family-base)' }}
                 >
                   <option value="">{t('sfInstitution.allLevels')}</option>
-                  {levels.map(l => <option key={l} value={l}>{LEVEL_LABELS[l]?.label ?? l}</option>)}
+                  {levels.map(l => <option key={l} value={l}>{LEVEL_LABEL_KEYS[l] ? t(LEVEL_LABEL_KEYS[l]) : l}</option>)}
                 </select>
               )}
               <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)' }}>
-                {filteredProgs.length} of {allProgs.length}
+                {t('schools.showing', { count: filteredProgs.length, total: allProgs.length })}
               </span>
             </div>
 
@@ -145,8 +153,8 @@ export default function SfInstitution() {
                 </thead>
                 <tbody>
                   {filteredProgs.map((p) => {
-                    const lvl = LEVEL_LABELS[p.level] ?? { short: '?', bg: '#f1f5f9', color: '#475569' };
-                    const tier = getTierStyle(p.admission_score_mean);
+                    const lvl = LEVEL_STYLE[p.level] ?? { short: '?', bg: '#f1f5f9', color: '#475569' };
+                    const tier = getTierLabel(p.admission_score_mean, t);
                     return (
                       <tr key={p.id} style={{ borderBottom: 'var(--border-width) solid var(--color-border)' }}>
                         <td style={{ padding: 'var(--space-2) var(--space-3)', verticalAlign: 'middle' }}>

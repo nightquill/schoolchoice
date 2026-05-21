@@ -15,11 +15,73 @@ import { getTargets, addTarget, updateTarget, deleteTarget, reorderTargets } fro
 import { getAllProgrammes } from '../../api/jupas';
 import { getSfProgrammes } from '../../api/selfFinancing';
 import { getAutoRecommendations } from '../../api/match';
+import { getGrades } from '../../api/grades';
 import { useTranslation } from '@schoolchoice/ui/i18n';
 import { useFeatureAccess } from '../../hooks/usePermission';
 import { getRequirementBadges } from '../../utils/requirementBadges';
 import { useLocalizedName } from '../../utils/localizedName';
 // SubmissionHistory moved to separate /submissions page
+
+/* ── Client-side best-5 + admission probability ── */
+// JUPAS 2025 enhanced scale — same as backend grade_scales.json
+const ENHANCED_SCALE = { '5**': 8.5, '5*': 7, '5': 5.5, '4': 4, '3': 3, '2': 2, '1': 1, 'U': 0 };
+const CSD_SCALE = { 'AD': 2, 'A': 1, 'U': 0 };
+
+function computeBest5FromV2Grades(grades) {
+  // grades: array from /api/v1/students/:id/grades — [{subject_code, sitting, raw_grade}]
+  if (!Array.isArray(grades) || grades.length === 0) return null;
+  // Use MOCK sitting grades only
+  const mockGrades = grades.filter(g => g.sitting === 'MOCK' && g.raw_grade);
+  if (mockGrades.length < 5) return null;
+  // Convert to enhanced scale points
+  const scored = mockGrades.map(g => {
+    const code = g.subject_code;
+    const grade = String(g.raw_grade).trim();
+    if (code === 'CSD') return { code, pts: CSD_SCALE[grade] ?? 0 };
+    return { code, pts: ENHANCED_SCALE[grade] ?? 0 };
+  });
+  // Best 5: sort by points descending, take top 5
+  scored.sort((a, b) => b.pts - a.pts);
+  return scored.slice(0, 5).reduce((s, v) => s + v.pts, 0);
+}
+
+function estimateAdmissionProb(best5, admissionStats) {
+  if (best5 == null || !admissionStats) return null;
+  // Get most recent year's stats
+  const years = Object.keys(admissionStats).filter(k => admissionStats[k]?.median != null);
+  if (years.length === 0) return null;
+  const latest = years.sort().pop();
+  const stats = admissionStats[latest];
+  const median = Number(stats.median);
+  const lq = stats.lower_quartile != null ? Number(stats.lower_quartile) : null;
+  const uq = stats.upper_quartile != null ? Number(stats.upper_quartile) : median + (median - (lq ?? median));
+  if (lq == null) return null;
+  // Piecewise linear interpolation (matches backend jupas_scorer logic)
+  if (uq <= lq) return best5 >= median ? 0.75 : 0.25;
+  if (best5 >= lq && best5 <= median) {
+    return median === lq ? 0.375 : 0.25 + ((best5 - lq) / (median - lq)) * 0.25;
+  } else if (best5 > median && best5 <= uq) {
+    return uq === median ? 0.625 : 0.50 + ((best5 - median) / (uq - median)) * 0.25;
+  } else if (best5 > uq) {
+    const half = uq - median;
+    if (half <= 0) return 0.85;
+    const excess = (best5 - uq) / half;
+    return 0.75 + 0.24 * (1 - Math.exp(-excess));
+  } else {
+    // below LQ
+    const half = median - lq;
+    if (half <= 0) return 0.15;
+    const deficit = (lq - best5) / half;
+    return 0.25 * Math.exp(-deficit);
+  }
+}
+
+function probColor(prob) {
+  if (prob == null) return { bg: '#f1f5f9', fg: '#64748b' }; // gray
+  if (prob >= 0.70) return { bg: '#dcfce7', fg: '#166534' }; // green
+  if (prob >= 0.40) return { bg: '#fef3c7', fg: '#92400e' }; // amber
+  return { bg: '#fee2e2', fg: '#991b1b' }; // red
+}
 
 /* ── Admission band helpers ── */
 function getBand(score) {
@@ -67,6 +129,16 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
   const [editConfidence, setEditConfidence] = useState(3);
   const [editSaving, setEditSaving] = useState(false);
   const prevTargetsRef = useRef([]);
+
+  // Fetch student grades for admission probability (reuses react-query cache from GradesTab)
+  const gradesQuery = useQuery({
+    queryKey: ['grades', studentId],
+    queryFn: () => getGrades(studentId),
+    enabled: !!studentId,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const studentBest5 = computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
 
   const targetsQuery = useQuery({
     queryKey: ['targets', studentId],
@@ -342,17 +414,17 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
         const tdBase = { padding: 'var(--space-2) var(--space-3)', fontSize: 'var(--font-size-sm)', borderBottom: 'var(--border-width) solid var(--color-border)', verticalAlign: 'middle' };
 
         return (
-          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-md)', border: 'var(--border-width) solid var(--color-border)', overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
               <thead>
                 <tr>
-                  <th style={{ ...thStyle, width: '50px' }}>{t('programmes.rank')}</th>
-                  <th style={{ ...thStyle, width: '40px' }}>{t('programmeDetail.band')}</th>
-                  <th style={{ ...thStyle, width: '80px' }}>{t('programmes.code')}</th>
-                  <th style={thStyle}>{t('programmes.name')}</th>
-                  <th style={{ ...thStyle, width: '80px' }}>{t('programmes.score')}</th>
-                  <th style={{ ...thStyle, width: '90px' }}>{t('targets.applicationStatus')}</th>
-                  <th style={{ ...thStyle, width: '60px' }}></th>
+                  <th style={{ ...thStyle, width: '44px', minWidth: '44px' }}>{t('programmes.rank')}</th>
+                  <th style={{ ...thStyle, width: '36px', minWidth: '36px' }}>{t('programmeDetail.band')}</th>
+                  <th style={{ ...thStyle, width: '80px', minWidth: '80px' }}>{t('programmes.code')}</th>
+                  <th style={{ ...thStyle, minWidth: '280px' }}>{t('programmes.name')}</th>
+                  <th style={{ ...thStyle, width: '70px', minWidth: '70px' }}>{t('programmes.score')}</th>
+                  <th style={{ ...thStyle, width: '90px', minWidth: '90px' }}>{t('targets.applicationStatus')}</th>
+                  <th style={{ ...thStyle, width: '56px', minWidth: '56px' }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -380,10 +452,10 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                           )}
                         </td>
                         {/* Programme name + school */}
-                        <td style={tdBase}>
+                        <td style={{ ...tdBase, wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                           {tgt ? (
                             <div>
-                              <div style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>
+                              <div style={{ fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)', lineHeight: 1.4 }}>
                                 {tgt.school_name ? `${ln(tgt, 'school_name')} — ` : ''}{ln(tgt, 'programme_name')}
                               </div>
                               {tgt.at_risk && <span style={{ fontSize: '10px', fontWeight: 700, color: '#fff', background: '#dc2626', padding: '1px 5px', borderRadius: '6px', marginTop: '2px', display: 'inline-block' }}>{t('programmeDetail.atRisk')}</span>}
@@ -394,13 +466,12 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                                 <span key={badge.label} style={{ fontSize: '10px', fontWeight: 600, color: badge.color, background: badge.bg, padding: '1px 5px', borderRadius: '6px', marginLeft: '4px', display: 'inline-block' }}>{badge.label}</span>
                               ))}
                             </div>
-                          ) : (
-                            <span
-                              onClick={() => { if (canEditChoices) { setAddingToSlot(slot); setAddModalOpen(true); } }}
-                              title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : undefined}
-                              style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-xs)', cursor: !canEditChoices ? 'not-allowed' : 'pointer', textDecoration: 'underline', fontStyle: 'italic', opacity: !canEditChoices ? 0.5 : undefined }}
-                            >{t('programmes.addSlot')}</span>
-                          )}
+                          ) : canEditChoices ? (
+                              <span
+                                onClick={() => { setAddingToSlot(slot); setAddModalOpen(true); }}
+                                style={{ color: 'var(--color-primary)', fontSize: 'var(--font-size-xs)', cursor: 'pointer', textDecoration: 'underline', fontStyle: 'italic' }}
+                              >{t('programmes.addSlot')}</span>
+                          ) : null}
                         </td>
                         {/* Admission score / probability */}
                         <td style={{ ...tdBase, textAlign: 'center' }}>
@@ -416,10 +487,10 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                         </td>
                         {/* Actions */}
                         <td style={tdBase}>
-                          {tgt && (
+                          {tgt && canEditChoices && (
                             <div style={{ display: 'flex', gap: '2px' }}>
-                              <button style={{ ...iconBtnStyle, opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && handleOpenEdit(tgt)} disabled={!canEditChoices} aria-label="Edit" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Edit'}>✎</button>
-                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)', opacity: !canEditChoices ? 0.5 : undefined, cursor: !canEditChoices ? 'not-allowed' : undefined }} onClick={() => canEditChoices && setConfirmRemoveTarget(tgt)} disabled={!canEditChoices} aria-label="Remove" title={!canEditChoices ? t('permission.requiresPermission', { permission: t('permission.programmeChoices') }) : 'Remove'}>×</button>
+                              <button style={iconBtnStyle} onClick={() => handleOpenEdit(tgt)} aria-label="Edit" title="Edit">✎</button>
+                              <button style={{ ...iconBtnStyle, color: 'var(--color-error)' }} onClick={() => setConfirmRemoveTarget(tgt)} aria-label="Remove" title="Remove">×</button>
                             </div>
                           )}
                         </td>
@@ -657,7 +728,7 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                 <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>
                   {(programmeMode === 'jupas' ? allProgsQuery.isLoading : sfProgsQuery.isLoading) ? t('programmes.loadingProgrammes') :
                     filteredProgs.length === 0 ? t('profile.programmesTab.noResults') :
-                    `${filteredProgs.length} of ${allProgs.length} programmes`}
+                    t('schools.showing', { count: filteredProgs.length, total: allProgs.length })}
                 </div>
 
                 {/* Results list */}
@@ -665,6 +736,8 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                   {filteredProgs.map((prog) => {
                     const progKey = prog.jupas_code || prog.id;
                     const isSelected = selectedProgramme?.jupas_code === progKey;
+                    const admProb = estimateAdmissionProb(studentBest5, prog.admission_stats);
+                    const admCol = probColor(admProb);
                     return (
                       <li key={progKey} onClick={() => {
                         setSelectedProgramme({
@@ -692,7 +765,12 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false }) {
                               {prog.level.replace(/_/g, ' ')}
                             </span>
                           )}
-                          <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)' }}>{ln(prog, 'school_name')}</span>
+                          <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-xs)', flex: 1 }}>{ln(prog, 'school_name')}</span>
+                          {admProb != null && (
+                            <span style={{ fontSize: '10px', fontWeight: 600, background: admCol.bg, color: admCol.fg, padding: '1px 5px', borderRadius: '4px', flexShrink: 0, lineHeight: '16px' }}>
+                              {Math.round(admProb * 100)}%
+                            </span>
+                          )}
                         </div>
                         <div style={{ fontWeight: 'var(--font-weight-medium)', marginTop: '2px' }}>{ln(prog, 'name')}</div>
                         {prog.faculty && <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '1px' }}>{prog.faculty}</div>}

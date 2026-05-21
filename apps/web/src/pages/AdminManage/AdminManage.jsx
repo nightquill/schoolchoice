@@ -119,7 +119,7 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
       const { updateUserStatus } = await import('../../api/admin');
       await updateUserStatus(userId, newStatus);
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      toast.success(t(`account.${newStatus}`));
+      toast.success(t(`accountStatus.${newStatus}`));
     } catch (err) {
       toast.error(err?.response?.data?.detail || t('adminManage.saveFailed'));
     }
@@ -191,7 +191,7 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
                       color: (user.account_status || 'active') === 'active' ? '#166534' :
                              (user.account_status || 'active') === 'suspended' ? '#92400e' : '#6b7280',
                     }}>
-                      {t(`account.${user.account_status || 'active'}`)}
+                      {t(`accountStatus.${user.account_status || 'active'}`)}
                     </span>
                   </td>
                   <td style={tdStyle}>
@@ -214,18 +214,18 @@ function TeachersSection({ teachers, account, usersLoading, queryClient, t }) {
                             <>
                               <button onClick={() => handleTeacherStatus(user.id, 'suspended')}
                                 style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
-                                {t('account.suspend')}
+                                {t('accountStatus.suspend')}
                               </button>
                               <button onClick={() => handleTeacherStatus(user.id, 'archived')}
                                 style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', fontFamily: 'var(--font-family-base)' }}>
-                                {t('account.archive')}
+                                {t('accountStatus.archive')}
                               </button>
                             </>
                           )}
                           {(userStatus === 'suspended' || userStatus === 'archived') && (
                             <button onClick={() => handleTeacherStatus(user.id, 'active')}
                               style={{ fontSize: 'var(--font-size-xs)', cursor: 'pointer', padding: '2px 8px', border: '1px solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', background: 'var(--color-surface)', color: 'var(--color-primary)', fontFamily: 'var(--font-family-base)' }}>
-                              {t('account.reactivate')}
+                              {t('accountStatus.reactivate')}
                             </button>
                           )}
                         </div>

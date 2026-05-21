@@ -60,7 +60,7 @@ export default function SubmissionsAnalytics() {
 
         {data && (
           <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', fontVariantNumeric: 'tabular-nums' }}>
-            {t('analytics.total')}: {data.total_submissions} submitted, {data.total_approved} approved
+            {t('analytics.total')}: {data.total_submissions} {t('submissions.submitted')}, {data.total_approved} {t('submissions.approved')}
           </p>
         )}
 

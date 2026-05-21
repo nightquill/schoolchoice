@@ -25,6 +25,7 @@ function Dashboard() {
   const { t, setLocale } = useTranslation();
   const { canEdit: canImport } = useFeatureAccess('data_import');
   const { canEdit: canExport } = useFeatureAccess('data_export');
+  const { canEdit: canManageCohorts } = useFeatureAccess('cohort_management');
   const { hasAccess, isLoading: accessLoading } = useHasAnyAccess();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -246,54 +247,51 @@ function Dashboard() {
               <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('dashboard.addStudent')}</span>
             </button>
           )}
-          <button
-            onClick={() => canImport && navigate('/import/students')}
-            disabled={!canImport}
-            title={!canImport ? t('permission.requiresPermission', { permission: t('permission.dataImport') }) : undefined}
-            style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
-              padding: 'var(--space-4)', background: 'var(--color-surface)',
-              border: 'var(--border-width) solid var(--color-border)',
-              borderRadius: 'var(--border-radius-md)', cursor: !canImport ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
-              opacity: !canImport ? 0.5 : undefined,
-            }}
-            onMouseEnter={(e) => { if (canImport) { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; } }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
-          >
-            <span style={{ fontSize: '24px' }}>&#8593;</span>
-            <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('import.importCsvExcel')}</span>
-          </button>
-          <button
-            onClick={async () => {
-              if (!canExport) return;
-              try {
-                const { default: client } = await import('@schoolchoice/ui/api/client');
-                const resp = await client.get('/api/v1/students/export', { responseType: 'blob' });
-                const url = URL.createObjectURL(resp.data);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
-                a.click();
-                URL.revokeObjectURL(url);
-              } catch { toast.error(t('dashboard.exportFailed')); }
-            }}
-            disabled={!canExport}
-            title={!canExport ? t('permission.requiresPermission', { permission: t('permission.dataExport') }) : undefined}
-            style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
-              padding: 'var(--space-4)', background: 'var(--color-surface)',
-              border: 'var(--border-width) solid var(--color-border)',
-              borderRadius: 'var(--border-radius-md)', cursor: !canExport ? 'not-allowed' : 'pointer',
-              fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
-              opacity: !canExport ? 0.5 : undefined,
-            }}
-            onMouseEnter={(e) => { if (canExport) { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; } }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
-          >
-            <span style={{ fontSize: '24px' }}>&#8595;</span>
-            <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('dashboard.exportStudents')}</span>
-          </button>
+          {canImport && (
+            <button
+              onClick={() => navigate('/import/students')}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
+                padding: 'var(--space-4)', background: 'var(--color-surface)',
+                border: 'var(--border-width) solid var(--color-border)',
+                borderRadius: 'var(--border-radius-md)', cursor: 'pointer',
+                fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              <span style={{ fontSize: '24px' }}>&#8593;</span>
+              <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('import.importCsvExcel')}</span>
+            </button>
+          )}
+          {canExport && (
+            <button
+              onClick={async () => {
+                try {
+                  const { default: client } = await import('@schoolchoice/ui/api/client');
+                  const resp = await client.get('/api/v1/students/export', { responseType: 'blob' });
+                  const url = URL.createObjectURL(resp.data);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `students-export-${new Date().toISOString().slice(0,10)}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch { toast.error(t('dashboard.exportFailed')); }
+              }}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)',
+                padding: 'var(--space-4)', background: 'var(--color-surface)',
+                border: 'var(--border-width) solid var(--color-border)',
+                borderRadius: 'var(--border-radius-md)', cursor: 'pointer',
+                fontFamily: 'var(--font-family-base)', transition: 'box-shadow 0.15s, border-color 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              <span style={{ fontSize: '24px' }}>&#8595;</span>
+              <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)', color: 'var(--color-text-primary)' }}>{t('dashboard.exportStudents')}</span>
+            </button>
+          )}
         </div>
 
         {showAddForm && (
@@ -334,7 +332,7 @@ function Dashboard() {
               <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)', margin: 0, textWrap: 'balance' }}>
                 {t('dashboard.yourCohorts')}
               </h2>
-              {(account?.can_manage_cohorts || account?.role === 'admin') && (
+              {canManageCohorts && (
                 <Button variant="secondary" onClick={() => setShowCreateCohort(true)}>
                   {t('dashboard.newCohort')}
                 </Button>

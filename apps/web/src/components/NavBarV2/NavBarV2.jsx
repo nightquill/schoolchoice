@@ -159,6 +159,9 @@ function NavBarV2({ account }) {
           )}
           {!isStudent && (
             <>
+              <Link to="/students" style={getLinkStyle('/students')}>
+                {t('nav.students')}
+              </Link>
               <Link to="/schools" style={getLinkStyle('/schools')}>
                 {t('nav.schoolDirectory')}
               </Link>
@@ -244,6 +247,7 @@ function NavBarV2({ account }) {
           )}
           {!isStudent && (
             <>
+              <Link to="/students" style={getMobileLinkStyle('/students')} onClick={() => setMobileMenuOpen(false)}>{t('nav.students')}</Link>
               <Link to="/schools" style={getMobileLinkStyle('/schools')} onClick={() => setMobileMenuOpen(false)}>{t('nav.schoolDirectory')}</Link>
               <Link to="/data-analysis" style={getMobileLinkStyle('/data-analysis')} onClick={() => setMobileMenuOpen(false)}>{t('nav.dataAnalysis')}</Link>
               <Link to="/submissions" style={getMobileLinkStyle('/submissions')} onClick={() => setMobileMenuOpen(false)}>{t('nav.submissions')}</Link>

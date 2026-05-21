@@ -130,7 +130,7 @@ function StudentFilterBar({ filters, onFiltersChange, classOptions = [], yearOpt
       >
         <option value="">{t('filters.all')} {t('filters.subject')}</option>
         {HKDSE_ELECTIVES.map((s) => (
-          <option key={s} value={s}>{s}</option>
+          <option key={s} value={s}>{t(`subjects.${s}`)}</option>
         ))}
       </select>
 

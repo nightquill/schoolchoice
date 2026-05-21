@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 
 // SchoolCard — card displayed in school directory grid
 function SchoolCard({ school }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const cardStyle = {
     background: 'var(--color-surface)',
@@ -78,11 +80,11 @@ function SchoolCard({ school }) {
         <p style={metaStyle}>{'\u{1F4CD}'} {school.location}</p>
       )}
       {school.minimum_entry_score != null && (
-        <p style={metaStyle}>Min. score: {school.minimum_entry_score}</p>
+        <p style={metaStyle}>{t('schools.minScore', { score: school.minimum_entry_score })}</p>
       )}
       {school.notable_programs?.length > 0 && (
         <div style={{ marginTop: 'var(--space-1)' }}>
-          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>Programs</div>
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>{t('schools.programs')}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {school.notable_programs.slice(0, 4).map((p, i) => (
               <span key={i} style={{ fontSize: '10px', background: 'var(--color-background)', border: 'var(--border-width) solid var(--color-border)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-text-secondary)' }}>
@@ -91,7 +93,7 @@ function SchoolCard({ school }) {
             ))}
             {school.notable_programs.length > 4 && (
               <span style={{ fontSize: '10px', color: 'var(--color-text-secondary)', padding: '1px 6px' }}>
-                +{school.notable_programs.length - 4} more
+                {t('schools.morePrograms', { count: school.notable_programs.length - 4 })}
               </span>
             )}
           </div>
@@ -99,7 +101,7 @@ function SchoolCard({ school }) {
       )}
       {Array.isArray(school.major_requirements) && school.major_requirements.length > 0 && (
         <div style={{ marginTop: 'var(--space-1)' }}>
-          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>Majors</div>
+          <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '2px' }}>{t('schools.majors')}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
             {school.major_requirements.slice(0, 3).map((req) => (
               <span key={req.major} style={{ fontSize: '10px', background: 'rgba(37,99,235,0.08)', border: 'var(--border-width) solid rgba(37,99,235,0.2)', borderRadius: '4px', padding: '1px 6px', color: 'var(--color-primary)' }}>
@@ -108,14 +110,14 @@ function SchoolCard({ school }) {
             ))}
             {school.major_requirements.length > 3 && (
               <span style={{ fontSize: '10px', color: 'var(--color-text-secondary)', padding: '1px 6px' }}>
-                +{school.major_requirements.length - 3} more
+                {t('schools.moreMajors', { count: school.major_requirements.length - 3 })}
               </span>
             )}
           </div>
         </div>
       )}
       {school.scholarship_available && (
-        <span style={scholarshipStyle}>Scholarship available</span>
+        <span style={scholarshipStyle}>{t('schools.scholarshipAvailable')}</span>
       )}
     </div>
   );

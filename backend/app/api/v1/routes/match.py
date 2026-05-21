@@ -16,6 +16,7 @@ from app.core.dependencies import get_current_user
 from app.db.models import School, User
 from app.db.models_v2 import StudentSchoolTarget
 from app.db.session import get_db
+from app.modules.school_choice.models.models import JupasProgramme
 from app.schemas.v2.targets import TargetListResponse
 from app.services import student_service
 from app.services.matching_service import attach_jupas_programmes
@@ -23,6 +24,28 @@ from app.services.student_data_builder import build_school_dict, build_student_d
 from app.modules.school_choice.services.matchmaker_v2 import run_matching
 
 router = APIRouter(prefix="/students", tags=["match-v2"])
+
+
+def _build_zh_lookups(db: Session, results):
+    """Build school_id->name_zh and jupas_code->name_zh lookup dicts from results."""
+    school_ids = {r.school_id for r in results if r.school_id}
+    jupas_codes = {r.major_jupas_code for r in results if r.major_jupas_code}
+
+    school_zh = {}
+    if school_ids:
+        rows = db.query(School.id, School.name_zh).filter(School.id.in_(school_ids)).all()
+        school_zh = {str(row.id): row.name_zh for row in rows}
+
+    programme_zh = {}
+    if jupas_codes:
+        rows = (
+            db.query(JupasProgramme.jupas_code, JupasProgramme.name_zh)
+            .filter(JupasProgramme.jupas_code.in_(jupas_codes))
+            .all()
+        )
+        programme_zh = {row.jupas_code: row.name_zh for row in rows}
+
+    return school_zh, programme_zh
 
 
 # ---------------------------------------------------------------------------
@@ -104,12 +127,17 @@ def run_match(
 
     db.commit()
 
+    # Build Chinese name lookups
+    school_zh, programme_zh = _build_zh_lookups(db, results)
+
     # Return serialisable list
     return [
         {
             "school_id": r.school_id,
             "school_name": r.school_name,
+            "school_name_zh": school_zh.get(r.school_id),
             "major_name": r.major_name,
+            "name_zh": programme_zh.get(r.major_jupas_code),
             "major_jupas_code": r.major_jupas_code,
             "eligibility_pass": r.eligibility_pass,
             "failing_criteria": r.failing_criteria,
@@ -188,17 +216,55 @@ def get_auto_recommendations(
     # No existing target preference context
     results = run_matching(student_data, school_dicts, [])
 
-    # Sort by final_score descending, eligibility first
-    eligible = [r for r in results if r.eligibility_pass]
-    eligible.sort(key=lambda r: r.final_score, reverse=True)
+    # Only use results that have admission_probability from the JUPAS scorer.
+    # Results from the old heuristic path (no scorer) use stale major_requirements
+    # data and don't have real probability estimates.
+    scored = [
+        r for r in results
+        if r.eligibility_pass
+        and r.component_scores.get("admission_probability") is not None
+    ]
 
-    top = eligible[:limit]
+    # Strategy: "ambitious but achievable" — prefer 70-90% admission probability
+    # This targets programmes where the student has a strong but not guaranteed chance.
+    def get_prob(r):
+        return r.component_scores.get("admission_probability", 0)
+
+    # Tier 1: Sweet spot (70-90% probability) — ambitious but achievable
+    sweet_spot = [r for r in scored if 0.30 <= get_prob(r) <= 0.90]
+    sweet_spot.sort(key=lambda r: get_prob(r), reverse=True)
+
+    # Tier 2: Achievable (50-70%) — moderate reach
+    moderate = [r for r in scored if 0.50 <= get_prob(r) < 0.70 and r not in sweet_spot]
+    moderate.sort(key=lambda r: get_prob(r), reverse=True)
+
+    # Tier 3: Safe (>90%) — backup options
+    safe = [r for r in scored if get_prob(r) > 0.90]
+    safe.sort(key=lambda r: get_prob(r))
+
+    # Build recommendation list: prioritise sweet spot, fill from moderate, then safe
+    candidates = sweet_spot + moderate + safe
+    top = candidates[:limit]
+
+    # Fallback: if no scorer results, use heuristic results (better than nothing)
+    if not top:
+        fallback = [r for r in results if r.eligibility_pass]
+        fallback.sort(key=lambda r: r.final_score, reverse=True)
+        top = fallback[:limit]
+
+    # Build Chinese name lookups
+    school_zh, programme_zh = _build_zh_lookups(db, top)
+
     return [
         {
             "school_id": r.school_id,
             "school_name": r.school_name,
+            "school_name_zh": school_zh.get(r.school_id),
             "major_name": r.major_name,
+            "name_zh": programme_zh.get(r.major_jupas_code),
             "major_jupas_code": r.major_jupas_code,
+            "admission_probability": r.component_scores.get("admission_probability"),
+            "risk_level": r.component_scores.get("risk_level"),
             "fit_score": round(r.fit_score, 3),
             "final_score": round(r.final_score, 3),
             "rationale": r.rationale,

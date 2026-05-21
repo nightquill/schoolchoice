@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@schoolchoice/ui/hooks/useAuth';
-import { login as apiLogin, studentLogin as apiStudentLogin, register as apiRegister } from '@schoolchoice/ui/api/auth';
+import { login as apiLogin, register as apiRegister } from '@schoolchoice/ui/api/auth';
 import { FormCard } from '@schoolchoice/ui';
 import { TextInput } from '@schoolchoice/ui';
 import { Button } from '@schoolchoice/ui/primitives/button';
@@ -47,16 +47,10 @@ function LoginPage() {
 
     const newFieldErrors = {};
 
-    if (mode === 'teacher') {
-      if (!email.trim()) {
-        newFieldErrors.email = t('auth.emailRequired');
-      } else if (!/\S+@\S+\.\S+/.test(email)) {
-        newFieldErrors.email = t('auth.invalidEmail');
-      }
-    } else {
-      if (!candidateNumber.trim()) {
-        newFieldErrors.candidateNumber = t('auth.candidateRequired');
-      }
+    if (!email.trim()) {
+      newFieldErrors.email = t('auth.emailRequired');
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newFieldErrors.email = t('auth.invalidEmail');
     }
     if (!password) {
       newFieldErrors.password = t('auth.passwordRequired');
@@ -69,11 +63,8 @@ function LoginPage() {
     setLoading(true);
     try {
       let data;
-      if (mode === 'teacher') {
-        data = await apiLogin(email, password);
-      } else {
-        data = await apiStudentLogin(candidateNumber, password);
-      }
+      // Both teacher and student login with email
+      data = await apiLogin(email, password);
       queryClient.clear();
       await login(data.access_token);
       navigate('/dashboard', { replace: true });
@@ -81,7 +72,7 @@ function LoginPage() {
       const status = err.response?.status;
       const detail = err.response?.data?.detail;
       if (status === 404) {
-        setError(mode === 'teacher' ? t('auth.noAccountFound') : t('auth.noStudentFound'));
+        setError(t('auth.noAccountFound'));
       } else if (status === 401) {
         setError(typeof detail === 'string' ? detail : t('auth.incorrectPassword'));
       } else if (status === 422) {
@@ -214,28 +205,16 @@ function LoginPage() {
             </div>
 
             <form onSubmit={handleLoginSubmit} noValidate>
-              {mode === 'teacher' ? (
-                <TextInput
-                  label={t('auth.email')}
-                  name="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); clearErrors(); }}
-                  required
-                  error={fieldErrors.email}
-                />
-              ) : (
-                <TextInput
-                  label={t('auth.candidateNumber')}
-                  name="candidateNumber"
-                  type="text"
-                  value={candidateNumber}
-                  onChange={(e) => { setCandidateNumber(e.target.value); clearErrors(); }}
-                  required
-                  placeholder="e.g. HKDSE-2026-A001"
-                  error={fieldErrors.candidateNumber}
-                />
-              )}
+              <TextInput
+                label={t('auth.email')}
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); clearErrors(); }}
+                required
+                placeholder={mode === 'student' ? 'e.g. smchan@school.hk' : ''}
+                error={fieldErrors.email}
+              />
               <TextInput
                 label={t('auth.password')}
                 name="password"

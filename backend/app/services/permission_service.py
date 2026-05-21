@@ -25,8 +25,7 @@ TOOL_FIELDS = (
     "programme_choices",
     "grades",
     "plan_generation",
-    "submissions",
-    "reports",
+    "data_analysis",
     "cohort_management",
     "data_import",
     "account_assignment",
@@ -42,8 +41,8 @@ ROLE_DEFAULTS: dict[str, dict] = {
     "counsellor": {
         "visible": False,
         **{f: "none" for f in (
-            "programme_choices", "grades", "plan_generation", "submissions",
-            "reports", "cohort_management", "data_import", "account_assignment",
+            "programme_choices", "grades", "plan_generation",
+            "data_analysis", "cohort_management", "data_import", "account_assignment",
             "student_delete", "student_profile", "data_export",
         )},
     },
@@ -52,8 +51,7 @@ ROLE_DEFAULTS: dict[str, dict] = {
         "programme_choices": "read_only",
         "grades": "read_only",
         "plan_generation": "none",
-        "submissions": "read_write",
-        "reports": "none",
+        "data_analysis": "none",
         "cohort_management": "none",
         "data_import": "none",
         "account_assignment": "none",
@@ -124,7 +122,7 @@ def _get_cohort_permissions_for_groups(
     for row in rows:
         d = {"visible": row.visible}
         for f in TOOL_FIELDS:
-            d[f] = getattr(row, f)
+            d[f] = getattr(row, f, "none")
         result.append(d)
     return result
 
@@ -133,7 +131,7 @@ def _perm_row_to_dict(row: CohortPermission) -> dict:
     """Convert a CohortPermission ORM row to a plain dict."""
     d = {"visible": row.visible}
     for f in TOOL_FIELDS:
-        d[f] = getattr(row, f)
+        d[f] = getattr(row, f, "none")
     return d
 
 

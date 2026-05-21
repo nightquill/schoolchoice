@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
+import PermissionGate from '../../components/PermissionGate/PermissionGate';
 import { Button } from '@schoolchoice/ui/primitives/button';
 import { LoadingSpinner } from '@schoolchoice/ui';
 import { toast } from 'sonner';
@@ -120,6 +121,7 @@ export default function StudentImport() {
   return (
     <div style={pageStyle}>
       <NavBarV2 account={account} />
+      <PermissionGate feature="data_import" requiredLevel="read_write">
       <main id="main-content" className="px-4 md:px-8" style={contentStyle}>
         <h1 style={headingStyle}>{t('onboarding.importStudents')}</h1>
 
@@ -289,6 +291,7 @@ export default function StudentImport() {
           </div>
         )}
       </main>
+      </PermissionGate>
     </div>
   );
 }

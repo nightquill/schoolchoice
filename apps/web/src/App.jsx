@@ -102,6 +102,7 @@ export default function App() {
         {/* Self-financing / Sub-degree — completely separate from JUPAS */}
         <Route path="/sf/:code" element={<ProtectedRoute><SfInstitution /></ProtectedRoute>} />
         <Route path="/sf/:code/programmes/:progId" element={<ProtectedRoute><SfProgrammeDetail /></ProtectedRoute>} />
+        <Route path="/account" element={<Navigate to="/account/settings" replace />} />
         <Route path="/account/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
         <Route path="/admin/data-refresh" element={<ProtectedRoute><AdminDataRefresh /></ProtectedRoute>} />
         {/* Cohort list now on dashboard — redirect old URL */}

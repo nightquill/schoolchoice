@@ -45,13 +45,15 @@ class CohortPermissionSet(BaseModel):
     programme_choices: str = "read_write"
     grades: str = "read_write"
     plan_generation: str = "read_write"
-    submissions: str = "read_write"
-    reports: str = "read_only"
+    submissions: str = "read_write"  # legacy — kept for backward compat
+    reports: str = "read_only"  # legacy — kept for backward compat
+    data_analysis: str = "read_only"
     cohort_management: str = "none"
     data_import: str = "none"
     account_assignment: str = "none"
     student_delete: str = "none"
     student_profile: str = "none"
+    data_export: str = "none"
 
 
 class PermissionsUpdate(BaseModel):
@@ -364,7 +366,7 @@ def get_group_permissions(
             "visible": perm.visible if perm else True,
         }
         for f in TOOL_FIELDS:
-            entry[f] = getattr(perm, f) if perm else "read_write"
+            entry[f] = getattr(perm, f, "none") if perm else "read_write"
         result.append(entry)
     return {"permissions": result}
 
@@ -393,7 +395,9 @@ def update_group_permissions(
         if existing:
             existing.visible = perm_data.visible
             for f in TOOL_FIELDS:
-                setattr(existing, f, getattr(perm_data, f))
+                val = getattr(perm_data, f, "none")
+                if hasattr(existing, f):
+                    setattr(existing, f, val)
         else:
             new_perm = CohortPermission(
                 group_id=group.id,
@@ -401,7 +405,9 @@ def update_group_permissions(
                 visible=perm_data.visible,
             )
             for f in TOOL_FIELDS:
-                setattr(new_perm, f, getattr(perm_data, f))
+                val = getattr(perm_data, f, "none")
+                if hasattr(new_perm, f):
+                    setattr(new_perm, f, val)
             db.add(new_perm)
 
     db.commit()

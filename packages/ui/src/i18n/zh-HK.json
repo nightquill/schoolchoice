@@ -1652,7 +1652,10 @@
     "deleteBuildConfirm": "刪除此組合？",
     "buildDeleted": "組合已刪除。",
     "buildCreated": "組合已建立。",
-    "maxBuildsReached": "最多5個組合。請刪除一個以建立新的。"
+    "maxBuildsReached": "最多5個組合。請刪除一個以建立新的。",
+    "gradeSetLabel": "成績組合",
+    "saveGradeSet": "儲存成績組合",
+    "gradesSaved": "成績已儲存。"
   },
   "planEditor": {
     "editing": "編輯：{section}",

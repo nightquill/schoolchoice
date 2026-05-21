@@ -26,7 +26,7 @@ function useBands() {
 
 function SubmissionDetail() {
   const { t } = useTranslation();
-  const { canEdit: canEditSubmissions } = useFeatureAccess('submissions');
+  const { canEdit: canEditSubmissions } = useFeatureAccess('programme_choices');
   const BANDS = useBands();
   const { id } = useParams();
   const navigate = useNavigate();

@@ -1,0 +1,111 @@
+name: claude-verify
+
+# Third wall: CI. If a PR is opened or pushed and a bug-fix session is
+# still active in the repo (.claude/state/bugfix-tier exists), the CI
+# check fails until the reproduction test passes.
+#
+# This catches the case where:
+#   - The agent talked past Claude Code hooks (Wall 1)
+#   - The agent or user used --no-verify to bypass git hooks (Wall 2)
+#   - Unverified bug-fix code is now attempting to merge to main
+#
+# Branch protection on main + "Require status checks to pass" + this job
+# = no unverified bug-fix code reaches main, ever.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Detect repo language/tooling. Add language-specific setup as needed.
+      - name: Set up Node (if needed)
+        if: hashFiles('package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python (if needed)
+        if: hashFiles('requirements.txt', 'pyproject.toml') != ''
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies (Node)
+        if: hashFiles('package.json') != ''
+        run: |
+          if [ -f package-lock.json ]; then npm ci; \
+          elif [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+          elif [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm install --frozen-lockfile; \
+          else npm install; fi
+
+      - name: Install dependencies (Python)
+        if: hashFiles('requirements.txt') != ''
+        run: pip install -r requirements.txt
+
+      - name: Check for active bug-fix session
+        id: check
+        run: |
+          if [ -f .claude/state/bugfix-tier ]; then
+            echo "active=true" >> $GITHUB_OUTPUT
+            echo "Active bug-fix session detected."
+            echo "Tier: $(cat .claude/state/bugfix-tier)"
+          else
+            echo "active=false" >> $GITHUB_OUTPUT
+            echo "No active bug-fix session. Nothing to verify; passing."
+          fi
+
+      - name: Refuse if test-command missing
+        if: steps.check.outputs.active == 'true'
+        run: |
+          if [ ! -s .claude/state/test-command ]; then
+            echo "::error::Bug-fix session active but .claude/state/test-command is missing or empty."
+            echo "::error::A reproduction test is required to merge bug-fix work."
+            exit 1
+          fi
+
+      - name: Run reproduction test
+        if: steps.check.outputs.active == 'true'
+        run: |
+          cmd=$(cat .claude/state/test-command)
+          echo "Reproduction test command: $cmd"
+          echo ""
+          set +e
+          timeout 600 bash -c "$cmd"
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::Reproduction test failed with exit code $rc."
+            echo "::error::The bug-fix is not verified. Refusing to merge."
+            exit 1
+          fi
+          echo "Reproduction test passes."
+
+      - name: Run full test suite (if registered)
+        if: steps.check.outputs.active == 'true'
+        run: |
+          if [ -s .claude/state/full-test-command ]; then
+            cmd=$(cat .claude/state/full-test-command)
+            echo "Full test suite: $cmd"
+            echo ""
+            bash -c "$cmd"
+          else
+            echo "No full-test-command registered. Skipping (warning, not error)."
+          fi
+
+      - name: Verify fix-summary present (for merged PRs)
+        if: steps.check.outputs.active == 'true' && github.event_name == 'pull_request'
+        run: |
+          if [ ! -s .claude/state/fix-summary.md ]; then
+            echo "::warning::No .claude/state/fix-summary.md present. Recommended for merged bug-fixes."
+          else
+            if ! grep -qiE 'root cause' .claude/state/fix-summary.md; then
+              echo "::warning::fix-summary.md exists but doesn't document root cause."
+            fi
+          fi

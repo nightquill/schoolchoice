@@ -246,7 +246,7 @@ function StudentListPage() {
     try {
       await updateUserStatus(student.user_id, newStatus);
       queryClient.invalidateQueries({ queryKey: ['students'] });
-      toast.success(t(`account.${newStatus}`));
+      toast.success(t(`accountStatus.${newStatus}`));
     } catch (err) {
       toast.error(err?.response?.data?.detail || t('adminManage.saveFailed'));
     }
@@ -369,7 +369,7 @@ function StudentListPage() {
                     <Button
                       variant="destructive"
                       onClick={async () => {
-                        if (window.confirm(t('account.batchDeleteConfirm', { count: selectedIds.size }))) {
+                        if (window.confirm(t('accountStatus.batchDeleteConfirm', { count: selectedIds.size }))) {
                           for (const sid of selectedIds) {
                             try { await deleteStudent(sid); } catch {}
                           }
@@ -380,7 +380,7 @@ function StudentListPage() {
                       }}
                       style={{ fontSize: 'var(--font-size-sm)', padding: '4px 12px' }}
                     >
-                      {t('account.deleteSelected')}
+                      {t('accountStatus.deleteSelected')}
                     </Button>
                   ) : null;
                 })()}
@@ -626,25 +626,25 @@ function StudentListPage() {
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { setDeleteTarget(null); setDeletePreview(null); }}>
           <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--border-radius-lg)', padding: 'var(--space-6)', minWidth: 360, maxWidth: 480, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ margin: '0 0 var(--space-4)', fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
-              {t('account.deleteConfirmTitle', { name: deleteTarget.name || deleteTarget.full_name })}
+              {t('accountStatus.deleteConfirmTitle', { name: deleteTarget.name || deleteTarget.full_name })}
             </h2>
             {(deletePreview.grades > 0 || deletePreview.targets > 0 || deletePreview.plans > 0 || deletePreview.submissions > 0) && (
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <p style={{ margin: '0 0 var(--space-2)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                  {t('account.cascadeWarning')}
+                  {t('accountStatus.cascadeWarning')}
                 </p>
                 <ul style={{ margin: 0, padding: '0 0 0 var(--space-4)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-primary)' }}>
-                  {deletePreview.grades > 0 && <li>{t('account.gradeRecords', { count: deletePreview.grades })}</li>}
-                  {deletePreview.targets > 0 && <li>{t('account.targets', { count: deletePreview.targets })}</li>}
-                  {deletePreview.plans > 0 && <li>{t('account.academicPlans', { count: deletePreview.plans })}</li>}
-                  {deletePreview.submissions > 0 && <li>{t('account.submissions', { count: deletePreview.submissions })}</li>}
+                  {deletePreview.grades > 0 && <li>{t('accountStatus.gradeRecords', { count: deletePreview.grades })}</li>}
+                  {deletePreview.targets > 0 && <li>{t('accountStatus.targets', { count: deletePreview.targets })}</li>}
+                  {deletePreview.plans > 0 && <li>{t('accountStatus.academicPlans', { count: deletePreview.plans })}</li>}
+                  {deletePreview.submissions > 0 && <li>{t('accountStatus.submissions', { count: deletePreview.submissions })}</li>}
                 </ul>
               </div>
             )}
             <div style={{ display: 'flex', gap: 'var(--space-3)', justifyContent: 'flex-end' }}>
               <Button variant="outline" onClick={() => { setDeleteTarget(null); setDeletePreview(null); }}>{t('common.cancel')}</Button>
               <Button variant="destructive" onClick={confirmDelete} disabled={deleteLoading}>
-                {deleteLoading ? '...' : t('account.delete')}
+                {deleteLoading ? '...' : t('accountStatus.delete')}
               </Button>
             </div>
           </div>

@@ -140,7 +140,7 @@ function StudentDashboard() {
 
         {/* Grade sandbox — students can create "what-if" grade builds and see how scores change */}
         <div style={{ marginTop: 'var(--space-6)', borderTop: 'var(--border-width) solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
-          <GradesTab studentId={studentId} />
+          <GradesTab studentId={studentId} isStudentView={true} />
         </div>
       </div>
     </div>

@@ -1,0 +1,1 @@
+cd /Users/bsg/Downloads/schoolchoice && npx playwright test apps/web/e2e/bugfix-repro.spec.ts --timeout 30000

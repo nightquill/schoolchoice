@@ -1,0 +1,10 @@
+# .claude/SCOPE -- declare which paths Claude is allowed to edit this session.
+# One glob per line. Lines starting with # are comments.
+# Empty/missing file = no restriction (scope-guard does nothing).
+#
+# Examples:
+#   src/auth/**
+#   tests/auth/**
+#   src/components/Login.tsx
+#
+# Clear or replace contents at the start of each task.

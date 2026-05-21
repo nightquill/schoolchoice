@@ -394,8 +394,9 @@ class CohortPermission(Base):
     programme_choices = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
     grades = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
     plan_generation = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
-    submissions = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")
-    reports = Column(String(10), nullable=False, default="read_only", server_default="'read_only'")
+    submissions = Column(String(10), nullable=False, default="read_write", server_default="'read_write'")  # legacy — now driven by programme_choices
+    reports = Column(String(10), nullable=False, default="read_only", server_default="'read_only'")  # legacy — renamed to data_analysis
+    data_analysis = Column(String(10), nullable=False, default="none", server_default="'none'")
     cohort_management = Column(String(10), nullable=False, default="none", server_default="'none'")
     data_import = Column(String(10), nullable=False, default="none", server_default="'none'")
     account_assignment = Column(String(10), nullable=False, default="none", server_default="'none'")

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from '@schoolchoice/ui/i18n';
 import NavBarV2 from '../../components/NavBarV2/NavBarV2';
 import { LoadingSpinner, ErrorMessage } from '@schoolchoice/ui';
 import { getAccount } from '@schoolchoice/ui/api/account';
@@ -7,15 +8,15 @@ import { getProgrammeStudents } from '../../api/jupas';
 import { getRequirementBadges } from '../../utils/requirementBadges';
 
 // Derive tier from flat admission_stats { median, upper_quartile, lower_quartile }
-function getTierFromStats(stats) {
+function getTierFromStats(stats, t) {
   if (!stats || stats.median == null) {
-    return { label: 'Accessible', bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
+    return { label: t('programmeDetail.accessible'), bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
   }
   const m = Number(stats.median);
-  if (m >= 28) return { label: 'Very Competitive', bg: 'var(--color-error-bg)', color: 'var(--color-error-text)' };
-  if (m >= 24) return { label: 'Competitive', bg: 'var(--color-warning-bg)', color: 'var(--color-warning-text)' };
-  if (m >= 20) return { label: 'Moderate', bg: 'var(--color-success-bg)', color: 'var(--color-success-text)' };
-  return { label: 'Accessible', bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
+  if (m >= 28) return { label: t('programmeDetail.veryCompetitive'), bg: 'var(--color-error-bg)', color: 'var(--color-error-text)' };
+  if (m >= 24) return { label: t('programmeDetail.competitive'), bg: 'var(--color-warning-bg)', color: 'var(--color-warning-text)' };
+  if (m >= 20) return { label: t('programmeDetail.moderate'), bg: 'var(--color-success-bg)', color: 'var(--color-success-text)' };
+  return { label: t('programmeDetail.accessible'), bg: 'var(--color-info-bg)', color: 'var(--color-info-text)' };
 }
 
 function matchColor(score) {
@@ -25,7 +26,7 @@ function matchColor(score) {
   return 'var(--color-error)';
 }
 
-function EligibilityBadge({ eligible }) {
+function EligibilityBadge({ eligible, t }) {
   const style = {
     display: 'inline-block',
     borderRadius: '4px',
@@ -36,10 +37,10 @@ function EligibilityBadge({ eligible }) {
     color: eligible ? 'var(--color-success-text)' : 'var(--color-error-text)',
     border: `1px solid ${eligible ? 'var(--color-success-border)' : 'var(--color-error-border)'}`,
   };
-  return <span style={style}>{eligible ? 'Eligible' : 'Ineligible'}</span>;
+  return <span style={style}>{eligible ? t('programmeDetail.eligible') : t('programmeDetail.ineligible')}</span>;
 }
 
-function StudentRow({ student }) {
+function StudentRow({ student, t }) {
   const matchPct = student.match_score != null ? Math.round(student.match_score * 100) + '%' : '—';
   const tdBase = {
     padding: '10px 12px',
@@ -64,13 +65,13 @@ function StudentRow({ student }) {
       </td>
       <td style={tdBase}>{student.weighted_score != null ? student.weighted_score : '—'}</td>
       <td style={tdBase}>
-        <EligibilityBadge eligible={student.eligible} />
+        <EligibilityBadge eligible={student.eligible} t={t} />
       </td>
     </tr>
   );
 }
 
-function TierSection({ title, students, bgColor, textColor, defaultOpen = true }) {
+function TierSection({ title, students, bgColor, textColor, defaultOpen = true, t }) {
   const [open, setOpen] = useState(defaultOpen);
 
   if (students.length === 0) return null;
@@ -90,10 +91,18 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
     color: textColor,
   };
 
+  const columnHeaders = [
+    t('programmeDetail.name'),
+    t('programmeDetail.class'),
+    t('programmeDetail.match'),
+    t('programmeDetail.weightedScore'),
+    t('programmeDetail.eligibility'),
+  ];
+
   return (
     <div style={{ marginBottom: '16px', border: '1px solid var(--color-border)', borderRadius: '6px', overflow: 'hidden' }}>
       <div style={headerStyle}>
-        <span style={labelStyle}>{title} — {students.length} student{students.length !== 1 ? 's' : ''}</span>
+        <span style={labelStyle}>{title} — {students.length} {t('programmeDetail.students')}</span>
         {!defaultOpen && (
           <button
             aria-expanded={open}
@@ -107,7 +116,7 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
               padding: '0',
             }}
           >
-            {open ? 'hide' : 'show'}
+            {open ? t('programmeDetail.hide') : t('programmeDetail.show')}
           </button>
         )}
       </div>
@@ -115,7 +124,7 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: 'var(--color-background)' }}>
-              {['Name', 'Class', 'Match', 'Weighted Score', 'Eligibility'].map((h) => (
+              {columnHeaders.map((h) => (
                 <th
                   key={h}
                   style={{
@@ -136,7 +145,7 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
           </thead>
           <tbody>
             {students.map((s) => (
-              <StudentRow key={s.student_id} student={s} />
+              <StudentRow key={s.student_id} student={s} t={t} />
             ))}
           </tbody>
         </table>
@@ -147,6 +156,7 @@ function TierSection({ title, students, bgColor, textColor, defaultOpen = true }
 
 export default function ProgrammeDetail() {
   const { schoolId, code } = useParams();
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -160,7 +170,7 @@ export default function ProgrammeDetail() {
         setAccount(accountData);
       })
       .catch((err) => {
-        setError(err?.response?.data?.detail || 'Failed to load programme data');
+        setError(err?.response?.data?.detail || t('programmeDetail.loadFailed'));
       })
       .finally(() => setLoading(false));
   }, [code]);
@@ -183,7 +193,7 @@ export default function ProgrammeDetail() {
     return (
       <div style={pageStyle}>
         <NavBarV2 account={account} />
-        <LoadingSpinner label="Loading programme…" />
+        <LoadingSpinner label={t('programmeDetail.loading')} />
       </div>
     );
   }
@@ -195,7 +205,7 @@ export default function ProgrammeDetail() {
         <div style={{ padding: '24px 32px' }}>
           <ErrorMessage message={error} />
           <Link to={`/schools/${schoolId}`} style={{ ...breadcrumbStyle, padding: '8px 0' }}>
-            ← Back to school
+            {t('programmeDetail.backToSchool')}
           </Link>
         </div>
       </div>
@@ -205,7 +215,7 @@ export default function ProgrammeDetail() {
   const { programme, students = [], total } = data || {};
   const stats = programme?.admission_stats || {};
   const minReq = programme?.minimum_requirements || {};
-  const tier = getTierFromStats(stats);
+  const tier = getTierFromStats(stats, t);
 
   // Partition students
   const withScore = students.filter((s) => s.match_score != null);
@@ -249,7 +259,7 @@ export default function ProgrammeDetail() {
 
       {/* Breadcrumb */}
       <Link to={`/schools/${schoolId}`} style={breadcrumbStyle}>
-        ← {programme?.institution_code || 'School'} / Programmes
+        ← {programme?.institution_code || 'School'} / {t('programmeDetail.programmes')}
       </Link>
 
       {/* Header */}
@@ -317,19 +327,19 @@ export default function ProgrammeDetail() {
         <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
           <div style={cardStyle}>
             <div style={statNumStyle('var(--color-success)')}>{stats.median ?? '—'}</div>
-            <div style={statLabelStyle}>Median Score</div>
+            <div style={statLabelStyle}>{t('programmeDetail.medianScore')}</div>
           </div>
           <div style={cardStyle}>
             <div style={statNumStyle('var(--color-primary)')}>{stats.upper_quartile ?? '—'}</div>
-            <div style={statLabelStyle}>Upper Quartile</div>
+            <div style={statLabelStyle}>{t('programmeDetail.upperQuartile')}</div>
           </div>
           <div style={cardStyle}>
             <div style={statNumStyle('var(--color-warning)')}>{stats.lower_quartile ?? '—'}</div>
-            <div style={statLabelStyle}>Lower Quartile</div>
+            <div style={statLabelStyle}>{t('programmeDetail.lowerQuartile')}</div>
           </div>
           <div style={cardStyle}>
             <div style={statNumStyle('var(--color-text-primary)')}>{minReq.general || '—'}</div>
-            <div style={statLabelStyle}>Min Requirement</div>
+            <div style={statLabelStyle}>{t('programmeDetail.minRequirement')}</div>
           </div>
         </div>
 
@@ -351,19 +361,19 @@ export default function ProgrammeDetail() {
               marginBottom: '10px',
             }}
           >
-            Entry Requirements
+            {t('programmeDetail.entryRequirements')}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-start' }}>
             {/* General */}
             {minReq.general && (
               <div style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                General: <strong style={{ color: 'var(--color-text-primary)' }}>{minReq.general}</strong>
+                {t('programmeDetail.general')} <strong style={{ color: 'var(--color-text-primary)' }}>{minReq.general}</strong>
               </div>
             )}
             {/* Required subjects */}
             {Object.keys(subjectSpecific).length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginRight: '4px' }}>Required:</span>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginRight: '4px' }}>{t('programmeDetail.required')}</span>
                 {Object.entries(subjectSpecific).map(([subj, grade]) => (
                   <span
                     key={subj}
@@ -384,7 +394,7 @@ export default function ProgrammeDetail() {
             {/* Preferred subjects */}
             {preferredSubjects.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
-                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginRight: '4px' }}>Preferred:</span>
+                <span style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginRight: '4px' }}>{t('programmeDetail.preferred')}</span>
                 {preferredSubjects.map((s, i) => (
                   <span
                     key={i}
@@ -424,26 +434,28 @@ export default function ProgrammeDetail() {
                 textWrap: 'balance',
               }}
             >
-              Your Students — Scored against this programme
+              {t('programmeDetail.yourStudents')}
             </h2>
             <span style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-              {total ?? students.length} total
+              {total ?? students.length} {t('programmeDetail.total')}
             </span>
           </div>
 
           <TierSection
-            title="Strong Candidates"
+            title={t('programmeDetail.strongCandidates')}
             students={strong}
             bgColor="var(--color-success-bg)"
             textColor="var(--color-success-text)"
             defaultOpen={true}
+            t={t}
           />
           <TierSection
-            title="Possible"
+            title={t('programmeDetail.possible')}
             students={possible}
             bgColor="var(--color-warning-bg)"
             textColor="var(--color-warning-text)"
             defaultOpen={true}
+            t={t}
           />
 
           {/* Stretch — collapsible */}
@@ -460,7 +472,7 @@ export default function ProgrammeDetail() {
                 }}
               >
                 <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
-                  Stretch — {stretch.length} student{stretch.length !== 1 ? 's' : ''}
+                  {t('programmeDetail.stretch')} — {stretch.length} {t('programmeDetail.students')}
                 </span>
                 <button
                   aria-expanded={stretchOpen}
@@ -474,14 +486,14 @@ export default function ProgrammeDetail() {
                     padding: '0',
                   }}
                 >
-                  {stretchOpen ? 'hide' : 'show'}
+                  {stretchOpen ? t('programmeDetail.hide') : t('programmeDetail.show')}
                 </button>
               </div>
               {stretchOpen && (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: 'var(--color-background)' }}>
-                      {['Name', 'Class', 'Match', 'Weighted Score', 'Eligibility'].map((h) => (
+                      {[t('programmeDetail.name'), t('programmeDetail.class'), t('programmeDetail.match'), t('programmeDetail.weightedScore'), t('programmeDetail.eligibility')].map((h) => (
                         <th
                           key={h}
                           style={{
@@ -502,7 +514,7 @@ export default function ProgrammeDetail() {
                   </thead>
                   <tbody>
                     {stretch.map((s) => (
-                      <StudentRow key={s.student_id} student={s} />
+                      <StudentRow key={s.student_id} student={s} t={t} />
                     ))}
                   </tbody>
                 </table>
@@ -521,13 +533,13 @@ export default function ProgrammeDetail() {
                 }}
               >
                 <span style={{ fontSize: 'var(--font-size-sm)', fontWeight: '600', color: 'var(--color-text-secondary)' }}>
-                  No Grade Data — {noScore.length} student{noScore.length !== 1 ? 's' : ''}
+                  {t('programmeDetail.noGradeData')} — {noScore.length} {t('programmeDetail.students')}
                 </span>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: 'var(--color-background)' }}>
-                    {['Name', 'Class', 'Match', 'Weighted Score', 'Eligibility'].map((h) => (
+                    {[t('programmeDetail.name'), t('programmeDetail.class'), t('programmeDetail.match'), t('programmeDetail.weightedScore'), t('programmeDetail.eligibility')].map((h) => (
                       <th
                         key={h}
                         style={{
@@ -548,7 +560,7 @@ export default function ProgrammeDetail() {
                 </thead>
                 <tbody>
                   {noScore.map((s) => (
-                    <StudentRow key={s.student_id} student={s} />
+                    <StudentRow key={s.student_id} student={s} t={t} />
                   ))}
                 </tbody>
               </table>
@@ -567,7 +579,7 @@ export default function ProgrammeDetail() {
                 borderRadius: '8px',
               }}
             >
-              No students have been scored against this programme yet.
+              {t('programmeDetail.noStudentsScored')}
             </div>
           )}
         </div>

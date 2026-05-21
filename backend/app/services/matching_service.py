@@ -80,6 +80,11 @@ from app.modules.school_choice.services.hkdse_service import letter_grade_to_num
 # ---------------------------------------------------------------------------
 
 
+def _normalize_uuid(val: str) -> str:
+    """Strip dashes from UUID string for consistent comparison."""
+    return str(val).replace("-", "")
+
+
 def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
     """
     Query jupas_programmes for the given school dicts and attach as
@@ -89,9 +94,14 @@ def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
     if not school_ids:
         return schools
 
+    # Normalize UUIDs — school dicts may have dashed UUIDs while DB has dashless
+    normalized_ids = [_normalize_uuid(sid) for sid in school_ids]
+    # Also include dashed versions for PostgreSQL compatibility
+    all_ids = list(set(normalized_ids + school_ids))
+
     # Use IN clause with placeholders (compatible with both PostgreSQL and SQLite)
-    placeholders = ", ".join(f":sid_{i}" for i in range(len(school_ids)))
-    params = {f"sid_{i}": sid for i, sid in enumerate(school_ids)}
+    placeholders = ", ".join(f":sid_{i}" for i in range(len(all_ids)))
+    params = {f"sid_{i}": sid for i, sid in enumerate(all_ids)}
 
     result = db.execute(
         text(f"""
@@ -116,9 +126,10 @@ def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
                 return {}
         return val or {}
 
+    # Key by normalized (dashless) school_id for consistent lookup
     prog_map: dict[str, list[dict]] = {}
     for row in rows:
-        sid = str(row.school_id) if row.school_id else ""
+        sid = _normalize_uuid(row.school_id) if row.school_id else ""
         if sid not in prog_map:
             prog_map[sid] = []
         prog_map[sid].append({
@@ -132,7 +143,7 @@ def attach_jupas_programmes(db: Session, schools: list[dict]) -> list[dict]:
         })
 
     for school in schools:
-        sid = str(school.get("id", ""))
+        sid = _normalize_uuid(school.get("id", ""))
         school["jupas_programmes"] = prog_map.get(sid, [])
 
     return schools
