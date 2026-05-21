@@ -63,10 +63,15 @@ def _get_target_or_404(
 )
 def list_targets(
     student_id: UUID,
+    grade_build_id: str | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """List all target schools for a student with fresh eligibility/match scores. REQ-069"""
+    """List all target schools for a student with fresh eligibility/match scores. REQ-069
+
+    Optional grade_build_id query param: if provided, scores are computed using
+    that grade build's grades instead of the student's actual grades.
+    """
     student = student_service.get_student(
         db, student_id=student_id, user_id=current_user.id,
         organisation_id=getattr(current_user, "active_organisation_id", None),
@@ -80,6 +85,18 @@ def list_targets(
 
     # Re-run eligibility and scoring on every GET to keep scores fresh as grades are updated
     student_data = build_student_data(student, db)
+
+    # Override grades with build grades if requested
+    if grade_build_id:
+        from app.modules.school_choice.models.grade_builds import GradeBuild
+        # Normalize UUID: strip hyphens for SQLite compat
+        normalized_id = grade_build_id.replace("-", "")
+        build = db.query(GradeBuild).filter(
+            GradeBuild.id == normalized_id,
+            GradeBuild.student_id == student_id,
+        ).first()
+        if build and build.grades:
+            student_data["grades_by_code"] = dict(build.grades)
 
     # Pre-build school dicts with JUPAS programmes attached
     school_dict_map: dict[str, dict] = {}

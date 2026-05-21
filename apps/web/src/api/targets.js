@@ -1,7 +1,7 @@
 import { get, post, put, del } from './helpers';
 
-export const getTargets = (studentId) =>
-  get(`/api/v1/students/${studentId}/targets`);
+export const getTargets = (studentId, gradeBuildId = null) =>
+  get(`/api/v1/students/${studentId}/targets${gradeBuildId ? `?grade_build_id=${gradeBuildId}` : ''}`);
 
 export const addTarget = (studentId, data) =>
   post(`/api/v1/students/${studentId}/targets`, data);

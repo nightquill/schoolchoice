@@ -22,7 +22,8 @@ import { getRequirementBadges } from '../../utils/requirementBadges';
 import { useLocalizedName } from '../../utils/localizedName';
 // SubmissionHistory moved to separate /submissions page
 
-/* ── Client-side best-5 + admission probability ── */
+/* ── Client-side best-5 + admission probability (preview only — used in add modal) ── */
+// Real scoring is done server-side via jupas_scorer; this is for quick previews
 // JUPAS 2025 enhanced scale — same as backend grade_scales.json
 const ENHANCED_SCALE = { '5**': 8.5, '5*': 7, '5': 5.5, '4': 4, '3': 3, '2': 2, '1': 1, 'U': 0 };
 const CSD_SCALE = { 'AD': 2, 'A': 1, 'U': 0 };
@@ -102,7 +103,7 @@ const BAND_COLORS = {
   E: { bg: '#fee2e2', fg: '#991b1b' },
 };
 
-export default function ProgrammeChoicesTab({ studentId, isStudent = false, overrideGrades = null }) {
+export default function ProgrammeChoicesTab({ studentId, isStudent = false, gradeBuildId = null }) {
   const { t } = useTranslation();
   const { canEdit: canEditTeacher } = useFeatureAccess('programme_choices');
   // Students always have edit access to their own choices
@@ -140,18 +141,12 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, over
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-  // Use override grades (from a grade build) if provided, otherwise actual grades
-  const studentBest5 = overrideGrades
-    ? computeBest5FromV2Grades(
-        Object.entries(overrideGrades)
-          .filter(([, v]) => v)
-          .map(([code, grade]) => ({ subject_code: code, sitting: 'MOCK', raw_grade: grade }))
-      )
-    : computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
+  const studentBest5 = computeBest5FromV2Grades(gradesQuery.data?.grades ?? gradesQuery.data);
 
+  // When gradeBuildId is set, pass it to the targets API so backend re-scores with build grades
   const targetsQuery = useQuery({
-    queryKey: ['targets', studentId],
-    queryFn: () => getTargets(studentId),
+    queryKey: ['targets', studentId, gradeBuildId || 'actual'],
+    queryFn: () => getTargets(studentId, gradeBuildId),
   });
 
   const rawTargets = targetsQuery.data;
@@ -441,12 +436,9 @@ export default function ProgrammeChoicesTab({ studentId, isStudent = false, over
                   band.slots.map((slot, si) => {
                     const tgt = slotMap[slot];
                     const isFirst = si === 0;
-                    // Compute admission probability client-side so it reacts to grade set changes
-                    const tgtProg = tgt?.jupas_code ? allJupasProgs.find(p => p.jupas_code === tgt.jupas_code) : null;
-                    const clientProb = tgtProg ? estimateAdmissionProb(studentBest5, tgtProg.admission_stats) : null;
-                    const matchScore = clientProb != null ? Math.round(clientProb * 100)
-                      : tgt?.match_score != null ? Math.round(tgt.match_score * 100)
-                      : null;
+                    // match_score comes from backend jupas_scorer (real weighted formula)
+                    // When gradeBuildId is set, backend re-scores with build grades
+                    const matchScore = tgt?.match_score != null ? Math.round(tgt.match_score * 100) : null;
                     return (
                       <tr key={slot} style={{ background: tgt ? 'var(--color-surface)' : band.bg + '40' }}>
                         {/* 志願 number */}

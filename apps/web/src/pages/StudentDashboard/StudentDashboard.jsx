@@ -83,7 +83,7 @@ function ActualGradesView({ studentId, t }) {
 }
 
 /* ── Grade Set Editor (line-by-line) ── */
-function GradeSetEditor({ build, t, onRefresh, onDelete }) {
+function GradeSetEditor({ build, studentId, t, onRefresh, onDelete }) {
   const [grades, setGrades] = useState(build.grades || {});
   const [saving, setSaving] = useState(false);
   const saveRef = useRef(null);
@@ -103,7 +103,7 @@ function GradeSetEditor({ build, t, onRefresh, onDelete }) {
     if (saveRef.current) clearTimeout(saveRef.current);
     saveRef.current = setTimeout(async () => {
       try {
-        await client.put(`/api/v1/student/grade-builds/${build.id}`, { grades: updated });
+        await client.put(`/api/v1/students/${studentId}/grade-builds/${build.id}`, { grades: updated });
       } catch { /* silent */ }
     }, 500);
   };
@@ -112,7 +112,7 @@ function GradeSetEditor({ build, t, onRefresh, onDelete }) {
     if (saveRef.current) clearTimeout(saveRef.current);
     setSaving(true);
     try {
-      await client.put(`/api/v1/student/grade-builds/${build.id}`, { grades });
+      await client.put(`/api/v1/students/${studentId}/grade-builds/${build.id}`, { grades });
       toast.success(t('studentPortal.gradesSaved'));
     } catch {
       toast.error(t('studentPortal.saveFailed'));
@@ -124,7 +124,7 @@ function GradeSetEditor({ build, t, onRefresh, onDelete }) {
   const handleDelete = async () => {
     if (!confirm(t('studentPortal.deleteBuildConfirm'))) return;
     try {
-      await client.delete(`/api/v1/student/grade-builds/${build.id}`);
+      await client.delete(`/api/v1/students/${studentId}/grade-builds/${build.id}`);
       toast.success(t('studentPortal.buildDeleted'));
       onDelete();
     } catch {
@@ -183,11 +183,12 @@ function StudentDashboard() {
   const accountQuery = useQuery({ queryKey: ['account'], queryFn: getAccount });
   const account = accountQuery.data;
 
-  // Grade builds
+  // Grade builds — use the regular endpoint scoped to student ID
+  const studentId = account?.student_id;
   const buildsQuery = useQuery({
-    queryKey: ['student-grade-builds'],
-    queryFn: () => client.get('/api/v1/student/grade-builds').then(r => r.data),
-    enabled: !!account?.student_id,
+    queryKey: ['grade-builds', studentId],
+    queryFn: () => client.get(`/api/v1/students/${studentId}/grade-builds`).then(r => r.data),
+    enabled: !!studentId,
   });
   const builds = buildsQuery.data?.builds ?? [];
 
@@ -227,7 +228,7 @@ function StudentDashboard() {
     if (builds.length >= 5) { toast.error(t('studentPortal.maxBuildsReached')); return; }
     setCreatingBuild(true);
     try {
-      const r = await client.post('/api/v1/student/grade-builds', { name: name.trim(), grades: {} });
+      const r = await client.post(`/api/v1/students/${studentId}/grade-builds`, { name: name.trim(), grades: {} });
       await buildsQuery.refetch();
       setActiveTab(`build:${r.data.id}`);
       toast.success(t('studentPortal.buildCreated'));
@@ -245,7 +246,6 @@ function StudentDashboard() {
     return <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}><LoadingSpinner label={t('common.loading')} /></div>;
   }
 
-  const studentId = account.student_id;
   if (!studentId) {
     return <div style={{ background: 'var(--color-background)', minHeight: '100vh', fontFamily: 'var(--font-family-base)' }}><NavBarV2 account={account} /><div style={{ padding: 'var(--space-8)', textAlign: 'center', color: 'var(--color-text-secondary)' }}>{t('studentDashboard.noProfile')}</div></div>;
   }
@@ -335,12 +335,12 @@ function StudentDashboard() {
             <ProgrammeChoicesTab
               studentId={studentId}
               isStudent={true}
-              overrideGrades={scoringGradeSet ? builds.find(b => b.id === scoringGradeSet)?.grades : null}
+              gradeBuildId={scoringGradeSet || null}
             />
           </div>
         )}
         {activeTab === 'grades' && <ActualGradesView studentId={studentId} t={t} />}
-        {activeBuild && <GradeSetEditor key={activeBuild.id} build={activeBuild} t={t} onRefresh={() => buildsQuery.refetch()} onDelete={() => handleDeleteBuild(activeBuild.id)} />}
+        {activeBuild && <GradeSetEditor key={activeBuild.id} build={activeBuild} studentId={studentId} t={t} onRefresh={() => buildsQuery.refetch()} onDelete={() => handleDeleteBuild(activeBuild.id)} />}
       </div>
     </div>
   );
