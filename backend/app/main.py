@@ -246,15 +246,17 @@ def _seed_jupas_programmes():
                     ).first()
                     if existing:
                         continue
+                    # Derive institution_code from filename or jupas_code
+                    inst = p.get("institution_code") or json_file.stem.upper()
                     db.add(JupasProgramme(
                         jupas_code=p.get("jupas_code"),
                         name=p.get("name"),
                         name_zh=p.get("name_zh"),
-                        institution_code=p.get("institution_code"),
+                        institution_code=inst,
                         faculty=p.get("faculty"),
-                        scoring_formula=p.get("scoring_formula"),
-                        minimum_requirements=p.get("minimum_requirements"),
-                        admission_stats=p.get("admission_stats"),
+                        scoring_formula=p.get("scoring_formula") or {},
+                        minimum_requirements=p.get("minimum_requirements") or {},
+                        admission_stats=p.get("admission_stats") or {},
                         non_grade_requirements=p.get("non_grade_requirements"),
                     ))
                 db.flush()
