@@ -14,10 +14,19 @@ data_dir = _root / "data"
 # Add backend/ to Python path so imports work
 sys.path.insert(0, str(backend_dir))
 
-# Patch data paths: backend code expects data/ relative to backend/
-# On Vercel, data/ is at repo root. Monkey-patch the seed path in main.py
-os.environ["SEED_DIR"] = str(data_dir / "seed")
-os.environ["JUPAS_DATA_DIR"] = str(data_dir / "jupas")
+# Patch data paths: try multiple locations to find data files
+# Vercel serverless runs from various base directories
+_candidates = [
+    data_dir,                                    # relative to api/index.py
+    Path("/var/task/data"),                       # Vercel lambda
+    Path(os.getcwd()) / "data",                  # cwd
+    backend_dir.parent / "data",                 # repo root
+]
+for _cand in _candidates:
+    if (_cand / "seed").exists() or (_cand / "jupas").exists():
+        os.environ["SEED_DIR"] = str(_cand / "seed")
+        os.environ["JUPAS_DATA_DIR"] = str(_cand / "jupas")
+        break
 
 # Vercel has writable /tmp — use it for SQLite
 _db_path = Path("/tmp/app.db")
