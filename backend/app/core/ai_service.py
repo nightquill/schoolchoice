@@ -1,162 +1,100 @@
 """
 app/core/ai_service.py
 
-LiteLLM-backed AI service wrapper. Single entry point for all AI calls.
-Maps AI_PROVIDER + AI_MODEL settings to LiteLLM model string and
-invokes litellm.completion() synchronously.
-
-Security:
-- Logs the model field returned by the provider (model verification)
-- Logs token usage for cost auditing
-- Sanitises AI output (strips control chars, validates JSON structure)
+Direct OpenAI-compatible API client. Single model: gpt-5.4-nano.
+No litellm dependency — just HTTP calls.
 """
 from __future__ import annotations
 
+import json
 import logging
 import re
 from collections.abc import AsyncGenerator
 from typing import Any
 
-try:
-    import litellm
-except ImportError:
-    litellm = None  # Not available on Vercel — AI features disabled
+import httpx
 from fastapi import HTTPException
 
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
-
-# Dedicated logger for AI audit trail — configure separately in production
-# to write to a persistent audit log (file or external service)
 ai_audit_logger = logging.getLogger("ai_audit")
 
-# ---------------------------------------------------------------------------
-# Output sanitisation
-# ---------------------------------------------------------------------------
-
-# Control chars that should never appear in AI-generated text shown to users.
-# Keeps newlines, tabs, and standard whitespace.
 _CONTROL_CHAR_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+MODEL = "gpt-5.4-nano"
 
 
 def _strip_control_chars(text: str) -> str:
-    """Remove non-printable control characters from text."""
     return _CONTROL_CHAR_RE.sub("", text)
 
 
 def _sanitise_ai_output(text: str) -> str:
-    """
-    Sanitise AI provider output before returning to the application.
-
-    - Strips control characters that could cause rendering issues
-    - Trims whitespace
-    - Logs if output looks suspicious (e.g., contains <script> tags)
-    """
     cleaned = _strip_control_chars(text).strip()
-
-    # Check for suspicious content (script tags, event handlers)
-    # This is defence-in-depth — html.escape in plan_generator.py is the
-    # primary XSS barrier, but we log here so you know if a provider is
-    # returning something fishy.
     lower = cleaned.lower()
     if "<script" in lower or "javascript:" in lower or "onerror=" in lower:
         ai_audit_logger.warning(
-            "AI_SUSPICIOUS_OUTPUT response contains potential script injection "
-            "(length=%d, first 200 chars: %s)",
-            len(cleaned), cleaned[:200],
+            "AI_SUSPICIOUS_OUTPUT length=%d first_200=%s", len(cleaned), cleaned[:200],
         )
-
     return cleaned
 
 
-_PROVIDER_DEFAULTS: dict[str, str] = {
-    "openai": "gpt-4o",
-    "anthropic": "claude-sonnet-4-20250514",
-    "gemini": "gemini-2.5-flash",
-}
+def _api_url() -> str:
+    base = (settings.AI_BASE_URL or "https://api.openai.com").rstrip("/")
+    return f"{base}/v1/chat/completions"
 
 
-def _build_model_string() -> str:
-    """Construct LiteLLM model string from AI_PROVIDER + AI_MODEL settings."""
-    provider = settings.AI_PROVIDER
-    model = settings.AI_MODEL or _PROVIDER_DEFAULTS.get(provider)
-    if not model:
-        raise HTTPException(
-            status_code=503,
-            detail=f"AI_MODEL must be set explicitly for '{provider}' provider.",
-        )
-    # LiteLLM uses "openai/" prefix for custom OpenAI-compatible endpoints
-    if provider == "openai-compatible":
-        return f"openai/{model}"
-    return f"{provider}/{model}"
+def _headers() -> dict:
+    return {
+        "Authorization": f"Bearer {settings.AI_API_KEY}",
+        "Content-Type": "application/json",
+    }
 
 
 def call_ai(messages: list[dict[str, str]], **kwargs: Any) -> str:
-    """
-    Call AI provider via LiteLLM. Returns response text.
-
-    Raises:
-        HTTPException(503) — AI_API_KEY not configured, provider unreachable, or auth failed
-        HTTPException(502) — Provider returned bad/unexpected response
-    """
+    """Call AI provider. Returns response text."""
     if not settings.AI_API_KEY:
-        raise HTTPException(
-            status_code=503,
-            detail="AI chat is not available: AI_API_KEY is not configured.",
-        )
+        raise HTTPException(status_code=503, detail="AI_API_KEY is not configured.")
 
-    model_string = _build_model_string()
-    logger.info("Calling AI provider: %s", model_string)
+    logger.info("Calling AI: %s", MODEL)
+
+    body = {"model": MODEL, "messages": messages, **kwargs}
+    body.pop("api_key", None)
+    body.pop("api_base", None)
+    body.pop("timeout", None)
 
     try:
-        response = litellm.completion(
-            model=model_string,
-            messages=messages,
-            api_key=settings.AI_API_KEY,
-            api_base=settings.AI_BASE_URL or None,
+        resp = httpx.post(
+            _api_url(),
+            headers=_headers(),
+            json=body,
             timeout=settings.AI_TIMEOUT,
-            **kwargs,
         )
+        resp.raise_for_status()
+        data = resp.json()
 
-        # --- Model verification logging ---
-        # Log what model the provider CLAIMS to have used.
-        # If the provider substitutes a cheaper model, this is
-        # the first place you'd see it.
-        response_model = getattr(response, "model", None)
-        usage = getattr(response, "usage", None)
+        response_model = data.get("model")
+        usage = data.get("usage", {})
         ai_audit_logger.info(
-            "AI_CALL requested=%s responded=%s prompt_tokens=%s "
-            "completion_tokens=%s total_tokens=%s",
-            model_string,
-            response_model or "UNKNOWN",
-            getattr(usage, "prompt_tokens", "?") if usage else "?",
-            getattr(usage, "completion_tokens", "?") if usage else "?",
-            getattr(usage, "total_tokens", "?") if usage else "?",
+            "AI_CALL model=%s prompt_tokens=%s completion_tokens=%s",
+            response_model, usage.get("prompt_tokens", "?"), usage.get("completion_tokens", "?"),
         )
-        if response_model and model_string.split("/")[-1] not in (response_model or ""):
-            ai_audit_logger.warning(
-                "AI_MODEL_MISMATCH requested=%s but provider returned model=%s",
-                model_string, response_model,
-            )
 
-        content = response.choices[0].message.content
+        content = data["choices"][0]["message"]["content"]
         if content is None:
-            raise HTTPException(
-                status_code=502,
-                detail="AI provider returned an empty response.",
-            )
+            raise HTTPException(status_code=502, detail="AI provider returned empty response.")
 
-        content = _sanitise_ai_output(content)
-        return content
-    except litellm.AuthenticationError as exc:
-        logger.error("AI provider authentication failed: %s", exc)
-        raise HTTPException(status_code=503, detail="AI provider authentication failed.")
-    except litellm.ServiceUnavailableError as exc:
-        logger.error("AI provider unreachable: %s", exc)
-        raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
+        return _sanitise_ai_output(content)
+
+    except httpx.HTTPStatusError as exc:
+        if exc.response.status_code == 401:
+            raise HTTPException(status_code=503, detail="AI provider authentication failed.")
+        logger.error("AI HTTP error: %s %s", exc.response.status_code, exc.response.text[:200])
+        raise HTTPException(status_code=502, detail="AI provider error.")
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="AI provider timed out.")
     except Exception as exc:
-        logger.error("AI provider error: %s", exc)
+        logger.error("AI error: %s", exc)
         raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
 
 
@@ -164,71 +102,59 @@ async def call_ai_stream(
     messages: list[dict[str, str]],
     **kwargs: Any,
 ) -> AsyncGenerator[str, None]:
-    """
-    Async streaming variant of call_ai(). Yields SSE-formatted text chunks.
-    Returns an async generator — wrap in FastAPI StreamingResponse.
-
-    Raises HTTPException(503) if AI_API_KEY is not configured or auth fails.
-    Raises HTTPException(502) on unexpected provider error.
-    """
+    """Async streaming. Yields SSE-formatted text chunks."""
     if not settings.AI_API_KEY:
-        raise HTTPException(
-            status_code=503,
-            detail="AI chat is not available: AI_API_KEY is not configured.",
-        )
+        raise HTTPException(status_code=503, detail="AI_API_KEY is not configured.")
 
-    model_string = _build_model_string()
-    logger.info("Streaming AI call: %s", model_string)
+    logger.info("Streaming AI: %s", MODEL)
 
-    started = False  # Track whether any chunks have been sent
+    body = {"model": MODEL, "messages": messages, "stream": True, **kwargs}
+    body.pop("api_key", None)
+    body.pop("api_base", None)
+    body.pop("timeout", None)
+
+    started = False
     chunk_count = 0
+
     try:
-        response = await litellm.acompletion(
-            model=model_string,
-            messages=messages,
-            api_key=settings.AI_API_KEY,
-            api_base=settings.AI_BASE_URL or None,
-            timeout=settings.AI_TIMEOUT,
-            stream=True,
-            **kwargs,
-        )
-        async for chunk in response:
-            # Log model from first chunk
-            if chunk_count == 0:
-                response_model = getattr(chunk, "model", None)
-                ai_audit_logger.info(
-                    "AI_STREAM requested=%s responded=%s",
-                    model_string, response_model or "UNKNOWN",
-                )
-                if response_model and model_string.split("/")[-1] not in (response_model or ""):
-                    ai_audit_logger.warning(
-                        "AI_MODEL_MISMATCH requested=%s but provider returned model=%s",
-                        model_string, response_model,
-                    )
-            chunk_count += 1
-            content = chunk.choices[0].delta.content or ""
-            if content:
-                # Strip control characters from streamed content
-                content = _strip_control_chars(content)
-                started = True
-                yield f"data: {content}\n\n"
+        async with httpx.AsyncClient(timeout=settings.AI_TIMEOUT) as client:
+            async with client.stream("POST", _api_url(), headers=_headers(), json=body) as resp:
+                resp.raise_for_status()
+                async for line in resp.aiter_lines():
+                    if not line.startswith("data: "):
+                        continue
+                    payload = line[6:]
+                    if payload == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(payload)
+                    except json.JSONDecodeError:
+                        continue
+
+                    if chunk_count == 0:
+                        ai_audit_logger.info("AI_STREAM model=%s", chunk.get("model"))
+                    chunk_count += 1
+
+                    content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                    if content:
+                        content = _strip_control_chars(content)
+                        started = True
+                        yield f"data: {content}\n\n"
+
         ai_audit_logger.info("AI_STREAM completed chunks=%d", chunk_count)
         yield "event: done\ndata: \n\n"
-    except litellm.AuthenticationError as exc:
-        logger.error("AI auth failed: %s", exc)
+
+    except httpx.HTTPStatusError as exc:
+        msg = "AI provider error."
+        if exc.response.status_code == 401:
+            msg = "AI provider authentication failed."
         if started:
-            yield "event: error\ndata: AI provider authentication failed.\n\n"
+            yield f"event: error\ndata: {msg}\n\n"
             return
-        raise HTTPException(status_code=503, detail="AI provider authentication failed.")
-    except litellm.ServiceUnavailableError as exc:
-        logger.error("AI provider unreachable: %s", exc)
-        if started:
-            yield "event: error\ndata: AI provider is temporarily unavailable.\n\n"
-            return
-        raise HTTPException(status_code=503, detail="AI provider is temporarily unavailable.")
+        raise HTTPException(status_code=503, detail=msg)
     except Exception as exc:
         logger.error("AI streaming error: %s", exc)
         if started:
-            yield "event: error\ndata: Unexpected error communicating with AI provider.\n\n"
+            yield "event: error\ndata: Unexpected error.\n\n"
             return
         raise HTTPException(status_code=502, detail="Unexpected error communicating with AI provider.")
